@@ -34,7 +34,7 @@ export default class MainMenuScene extends Phaser.Scene {
     const menuBottomImage = this.add.image(0, 0, 'mainMenuBottom').setOrigin(0);
     const menuBottomText = this.add.text(0.5, 0.5, 'Welcome to the Hero Academy!', {
       font: '50px proLight',
-      color: '#873600' 
+      color: '#873600'
     }).setOrigin(-0.4, -1.3);
     const menuBottomContainer = this.add.container(bg.width - menuBottomImage.width - 14, bg.height - menuBottomImage.height - 14, [menuBottomImage, menuBottomText]);
 
@@ -73,7 +73,15 @@ export default class MainMenuScene extends Phaser.Scene {
       y: 140,
       imageKey: 'playButton',
       text: 'Play!',
-      font: '130px proHeavy'
+      font: '130px proHeavy',
+      callback: () => { this.scene.start('GameScene');}
+    });
+
+    // TODO: Remove after testing
+    this.time.addEvent({
+      delay: 0,
+      loop: false,
+      callback: () => { this.scene.start('GameScene');}
     });
   }
 }
