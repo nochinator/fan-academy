@@ -15,7 +15,10 @@ const config = {
     mode: Phaser.Scale.FIT, // Automatically resize the canvas on window resize
     autoCenter: Phaser.Scale.CENTER_BOTH // Center the canvas
     // orientation: Phaser.Scale.LANDSCAPE
-  }
+  },
+  dom: { createContainer: true },
+  parent: 'app'
+
 };
 
 // Create a new game

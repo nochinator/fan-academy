@@ -8,6 +8,9 @@ export default class MainMenuScene extends Phaser.Scene {
   init() {}
 
   preload() {
+    // login form
+    this.load.html('loginForm', '../src/html/login-form.html'); // Paths are relative form the public folder
+
     // images
     const imagesPath = '/assets/ui/used/';
     this.load.image('mainMenuBg', imagesPath + 'game_screen.png');
@@ -22,6 +25,9 @@ export default class MainMenuScene extends Phaser.Scene {
   }
 
   create() {
+    // login form
+    const element = this.add.dom(800, 400).createFromCache('loginForm');
+
     // background image
     const bg = this.add.image(0, 0, 'mainMenuBg').setOrigin (0);
 
@@ -78,10 +84,10 @@ export default class MainMenuScene extends Phaser.Scene {
     });
 
     // TODO: Remove after testing
-    this.time.addEvent({
-      delay: 0,
-      loop: false,
-      callback: () => { this.scene.start('GameScene');}
-    });
+    // this.time.addEvent({
+    //   delay: 0,
+    //   loop: false,
+    //   callback: () => { this.scene.start('GameScene');}
+    // });
   }
 }
