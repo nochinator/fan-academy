@@ -1,4 +1,5 @@
 import createMainMenuButton from "../lib/buttons";
+import { loginQuery, signUpQuery } from "../queries/userQueries";
 
 export default class MainMenuScene extends Phaser.Scene {
   constructor() {
@@ -9,7 +10,10 @@ export default class MainMenuScene extends Phaser.Scene {
 
   preload() {
     // login form
-    this.load.html('loginForm', '../src/html/login-form.html'); // Paths are relative form the public folder
+    this.load.html('loginForm', '../src/html/loginForm.html'); // Paths are relative form the public folder
+    this.load.html('signUpForm', '../src/html/signUpForm.html');
+    // TODO: play and profile need to be disabled until login. Leaderboard and about should be available. Coming back home should show the login form again
+    // TODO: add middleware check
 
     // images
     const imagesPath = '/assets/ui/used/';
@@ -25,8 +29,8 @@ export default class MainMenuScene extends Phaser.Scene {
   }
 
   create() {
-    // login form
-    const element = this.add.dom(800, 400).createFromCache('loginForm');
+    // Login form
+    const loginForm = this.createSignUpAndLoginForms();
 
     // background image
     const bg = this.add.image(0, 0, 'mainMenuBg').setOrigin (0);
@@ -89,5 +93,50 @@ export default class MainMenuScene extends Phaser.Scene {
     //   loop: false,
     //   callback: () => { this.scene.start('GameScene');}
     // });
+  }
+
+  /*
+  HELPER FUNCTIONS
+  */
+  createSignUpAndLoginForms() {
+    // Login form
+    const loginForm = this.add.dom(800, 400).createFromCache('loginForm');
+    // Get references to the form elements
+    const loginUsernameInput: Element | null = loginForm.getChildByID('username');
+    const loginPasswordInput: Element | null = loginForm.getChildByID('password');
+    const loginButton: Element | null = loginForm.getChildByID('loginButton');
+    const linkToSignUp: Element | null = loginForm.getChildByID('linkToSignUp');
+    loginForm.setVisible(true);
+    // Login query
+    loginButton?.addEventListener('click', async () => {
+      // @ts-expect-error: lol // FIXME: add type
+      if (loginUsernameInput?.value && loginPasswordInput?.value) await loginQuery(loginUsernameInput.value, loginPasswordInput.value);
+    });
+    // Login form, link to sign up form
+    linkToSignUp?.addEventListener('click', async () => {
+      signUpForm.setVisible(true);
+      loginForm.setVisible(false);
+    });
+
+    // Sign up form
+    const signUpForm = this.add.dom(800, 400).createFromCache('signUpForm');
+    // Get references to the form elements
+    const signUpEmailInput: Element | null = signUpForm.getChildByID('email');
+    const signUpUsernameInput: Element | null = signUpForm.getChildByID('username');
+    const signUpPasswordInput: Element | null = signUpForm.getChildByID('password');
+    const signUpButton: Element | null = signUpForm.getChildByID('loginButton');
+    const linkToLogin: Element | null = signUpForm.getChildByID('linkToLogin');
+    signUpForm.setVisible(false);
+
+    // Sign up query
+    signUpButton?.addEventListener('click', async () => {
+      // @ts-expect-error: lol // FIXME: add type
+      if (signUpUsernameInput?.value && signUpPasswordInput?.value) await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
+    });
+    // Sign up form, link to login form
+    linkToLogin?.addEventListener('click', async () => {
+      signUpForm.setVisible(false);
+      loginForm.setVisible(true);
+    });
   }
 }

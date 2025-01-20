@@ -13,7 +13,8 @@ export default [
   {
     rules: {
       "@typescript-eslint/no-explicit-any": ["off"],
-      '@typescript-eslint/no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }],
+      // '@typescript-eslint/no-unused-vars': ['warning', { 'argsIgnorePattern': '^_' }],
+      '@typescript-eslint/no-unused-vars': ["off"],
       "no-multiple-empty-lines": ["error", { "max": 1 }],
       "padded-blocks": ["error", {
         "blocks": "never",

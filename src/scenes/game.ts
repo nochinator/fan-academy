@@ -31,6 +31,6 @@ export default class GameScene extends Phaser.Scene {
     gameMap.x = bg.width - gameMap.width - 14;
     gameMap.y += 14;
 
-    // startGame(this.colyseusClient);
+    startGame(this.colyseusClient);
   }
 }
