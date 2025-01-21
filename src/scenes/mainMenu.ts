@@ -1,5 +1,5 @@
 import createMainMenuButton from "../lib/buttons";
-import { loginQuery, signUpQuery } from "../queries/userQueries";
+import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 
 export default class MainMenuScene extends Phaser.Scene {
   constructor() {
@@ -28,11 +28,11 @@ export default class MainMenuScene extends Phaser.Scene {
     this.load.font('proLight', '/assets/fonts/BlambotFXProLightBB.ttf', 'truetype');
   }
 
-  create() {
-    // Login form
-    const loginForm = this.createSignUpAndLoginForms();
+  async create() {
+    // Login and sign up forms. Only show if user is not authenticated
+    await this.createSignUpAndLoginForms();
 
-    // background image
+    // Background image
     const bg = this.add.image(0, 0, 'mainMenuBg').setOrigin (0);
 
     // main menu image
@@ -98,7 +98,14 @@ export default class MainMenuScene extends Phaser.Scene {
   /*
   HELPER FUNCTIONS
   */
-  createSignUpAndLoginForms() {
+  async createSignUpAndLoginForms(): Promise<
+    {
+      loginForm: Phaser.GameObjects.DOMElement,
+      signUpForm: Phaser.GameObjects.DOMElement
+    }
+  > {
+    // Auth check
+    const isUserAuthenticated = await authCheck();
     // Login form
     const loginForm = this.add.dom(800, 400).createFromCache('loginForm');
     // Get references to the form elements
@@ -110,7 +117,7 @@ export default class MainMenuScene extends Phaser.Scene {
     // Login query
     loginButton?.addEventListener('click', async () => {
       // @ts-expect-error: lol // FIXME: add type
-      if (loginUsernameInput?.value && loginPasswordInput?.value) await loginQuery(loginUsernameInput.value, loginPasswordInput.value);
+      if (loginUsernameInput?.value && loginPasswordInput?.value) await loginQuery(loginUsernameInput.value, loginPasswordInput.value, loginForm);
     });
     // Login form, link to sign up form
     linkToSignUp?.addEventListener('click', async () => {
@@ -138,5 +145,12 @@ export default class MainMenuScene extends Phaser.Scene {
       signUpForm.setVisible(false);
       loginForm.setVisible(true);
     });
+
+    if (isUserAuthenticated) loginForm.setVisible(false);
+
+    return {
+      loginForm,
+      signUpForm
+    };
   }
 }
