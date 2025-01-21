@@ -1,12 +1,12 @@
 # Fan Academy
 
 <p align="center">
-<img src="./readmeImage.png" alt="Fan Academy screenshot" width="400" height="auto">
+<img src="./readmeImage.png" alt="Fan Academy screenshot" width="600" height="auto">
 </p>
 
 Fan Academy is a fan-made revival of the game **Hero Academy**, a turn-based tactics game developed by Robot Entertainment. This project aims to bring back the joy of the original game, offering a way for fans to rediscover it.
 
-This is not a reverse-engenering of the game. The game logic is being implemented from scractch while using the original assets to try to preserve the game's aesthetic as much as possible.
+This is not a reverse engineering of the game. The game logic is being implemented from scratch while using the original assets to try to preserve the game's aesthetic as much as possible.
 
 ## What is Hero Academy?
 
@@ -18,11 +18,11 @@ Learn more about the original game [here on its Wikipedia page](https://en.wikip
 
 ## Why create Fan Academy?
 
-I loved playing Hero Academy back in the day, and no other mobile game has come close to replicating the fun I had with it. Although the game still runs on Steam, the servers were shut down years ago, making it unplayable in its original form. I decided to bring it back as a fan project, alongside my wife, to allow others to rediscover the game.
+I loved playing Hero Academy back in the day, and no other mobile game has come close to replicating the fun I had with it. Although the game still runs on Steam, the servers were shut down years ago, making it unplayable in its original form. I decided to bring it back as a fan project to allow others to rediscover the game.
 
 The name **Fan Academy** highlights that this is a fan project, with no commercial intent, just a passion to preserve and share a great game.
 
-## What tech do you use?
+## How was Fan Academy made?
 
 Fan Academy is written in Typescript, and is being developed using the game engine [Phaser](https://phaser.io/) for the client and Node, Express and [Colyseus](https://colyseus.io/) for the back-end.
 
