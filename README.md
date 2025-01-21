@@ -8,6 +8,8 @@ Fan Academy is a fan-made revival of the game **Hero Academy**, a turn-based tac
 
 This is not a reverse engineering of the game. The game logic is being implemented from scratch while using the original assets to try to preserve the game's aesthetic as much as possible.
 
+**The game is currently UNDER DEVELOPMENT**, with the intention to be made available via itch.io once ready.
+
 ## What is Hero Academy?
 
 Hero Academy is a player-versus-player turn-based tactics game where players choose a team of heroes and use their units and items to defeat their opponents. Unfortunately, the game was delisted from all stores and its online servers shut down, making it impossible to play as intended.
