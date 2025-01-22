@@ -41,7 +41,18 @@ export default class GameScene extends Phaser.Scene {
     gameMap.y += 14;
 
     // test
-    const impaler = this.add.image(923, 587, 'impaler').setOrigin(0).setDepth(10);
+    const impaler = this.add.image(923, 587, 'impaler').setOrigin(0).setDepth(10).setInteractive();
+    this.input.setDraggable(impaler);
+
+    impaler.on('drag', (_: any, dragX: number, dragY: number) => {
+      impaler.x = dragX;
+      impaler.y = dragY;
+    });
+
+    impaler.on('dragend', (_: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+      impaler.x = 0;
+      impaler.y = 0;
+    });
 
     startGame(this.colyseusClient);
   }
