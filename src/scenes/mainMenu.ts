@@ -88,11 +88,11 @@ export default class MainMenuScene extends Phaser.Scene {
     });
 
     // TODO: Remove after testing
-    // this.time.addEvent({
-    //   delay: 0,
-    //   loop: false,
-    //   callback: () => { this.scene.start('GameScene');}
-    // });
+    this.time.addEvent({
+      delay: 0,
+      loop: false,
+      callback: () => { this.scene.start('GameScene');}
+    });
   }
 
   /*
