@@ -30,8 +30,8 @@ export function calculateClosestSquare(boardSquares: Coordinates[], draggedItem:
 
 export default function calculateCenterPoints(): Coordinates[] {
   const topLeft = {
-    x: 455,
-    y: 135
+    x: 545,
+    y: 225
   };
 
   const centerPoints: Coordinates[] = [] as Coordinates[];

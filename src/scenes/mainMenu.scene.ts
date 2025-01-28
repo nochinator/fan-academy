@@ -2,11 +2,15 @@ import createMainMenuButton from "../lib/buttons";
 import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 
 export default class MainMenuScene extends Phaser.Scene {
+  private userId: string | undefined;
+  private gameList: string | undefined;
+
   constructor() {
     super({ key: 'MainMenuScene' });
   }
 
-  init() {}
+  init() {
+  }
 
   preload() {
     // login form
@@ -19,6 +23,7 @@ export default class MainMenuScene extends Phaser.Scene {
     const imagesPath = '/assets/ui/used/';
     this.load.image('mainMenuBg', imagesPath + 'game_screen.png');
     this.load.image('mainMenuImage', imagesPath + 'main_menu_image.png');
+    this.load.image('mainMenuImageLoggedIn', imagesPath + 'main_menu_logged.png');
     this.load.image('mainMenuBottom', imagesPath + 'main_menu_bottom.jpg');
     this.load.image('playButton', imagesPath + 'play_button.png');
     this.load.image('mainMenuButton', imagesPath + 'main_menu_button.png');
@@ -29,16 +34,19 @@ export default class MainMenuScene extends Phaser.Scene {
   }
 
   async create() {
+    // Auth check
+    this.userId = await authCheck();
+
     // Login and sign up forms. Only show if user is not authenticated
-    await this.createSignUpAndLoginForms();
+    this.createSignUpAndLoginForms(this.userId);
 
     // Background image
     const bg = this.add.image(0, 0, 'mainMenuBg').setOrigin (0);
-
     // main menu image
-    const menuIgm = this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
-    menuIgm.x = bg.width - menuIgm.width - 14;
-    menuIgm.y += 14;
+    // const menuIgm = isUserAuthenticated ? this.add.image(0, 0, 'mainMenuImageLoggedIn').setOrigin (0) : this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
+    const menuImg = this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
+    menuImg.x = bg.width - menuImg.width - 14;
+    menuImg.y += 14;
 
     // main menu bottom strip
     const menuBottomImage = this.add.image(0, 0, 'mainMenuBottom').setOrigin(0);
@@ -84,28 +92,52 @@ export default class MainMenuScene extends Phaser.Scene {
       imageKey: 'playButton',
       text: 'Play!',
       font: '130px proHeavy',
-      callback: () => { this.scene.start('GameScene');}
+      callback: () => { this.scene.start('GameScene', { userId: this.userId });}
+    });
+
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      // Log the mouse coordinates
+      console.log(`Mouse coordinates: x=${pointer.x}, y=${pointer.y}`);
     });
 
     // TODO: Remove after testing
     this.time.addEvent({
       delay: 0,
       loop: false,
-      callback: () => { this.scene.start('GameScene');}
+      callback: () => { this.scene.start('GameScene',  { userId: this.userId });}
     });
+
+    /**
+     * REVIEW: from the main menu we will do a query (maybe a loading pop up) and pass the gameState and factions to the game
+     * When clicking on play, we get to the list of games, but we don't access any yet (no gameboard)
+     * The first item on the list is the creating a new game asset, followed by the list of active games. The query vlooks the players' names and profile pics. The list is ordered by two criteria:
+     * -games where the user is the active player go on top
+     * -games where it's been the user's turn the longest go on top
+     * When creating that list we get the players' data, the faction and the boardstate for each game
+     * When the user clicks on a game, we access the room and use that information to generate the board
+     *
+     * What a need to do:
+     * -create a new game asset
+     * -create a current game asset
+     * -create a second user
+     * -check again the function for the rooms (destroying a recovering from the db)
+     * -chech the game code so it doesn't default to the test room
+     * -create a function to create containers for the characters
+     *    -avoid bug: dragging an item onto a character in hand
+     * -set up spawn tiles on board
+     * -add chat to the game object and set it up on colyseus
+     */
   }
 
   /*
   HELPER FUNCTIONS
   */
-  async createSignUpAndLoginForms(): Promise<
-    {
-      loginForm: Phaser.GameObjects.DOMElement,
-      signUpForm: Phaser.GameObjects.DOMElement
-    }
-  > {
-    // Auth check
-    const isUserAuthenticated = await authCheck();
+  createSignUpAndLoginForms(userId: string | undefined): // REVIEW: userId used as a boolean
+  {
+    loginForm: Phaser.GameObjects.DOMElement,
+    signUpForm: Phaser.GameObjects.DOMElement
+  }
+  {
     // Login form
     const loginForm = this.add.dom(800, 400).createFromCache('loginForm');
     // Get references to the form elements
@@ -138,7 +170,11 @@ export default class MainMenuScene extends Phaser.Scene {
     // Sign up query
     signUpButton?.addEventListener('click', async () => {
       // @ts-expect-error: lol // FIXME: add type
-      if (signUpUsernameInput?.value && signUpPasswordInput?.value) await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
+      if (signUpUsernameInput?.value && signUpPasswordInput?.value) {
+        // @ts-expect-error: lol // FIXME: add type
+        const result =  await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
+        if (result) signUpForm.setVisible(false);
+      }
     });
     // Sign up form, link to login form
     linkToLogin?.addEventListener('click', async () => {
@@ -146,7 +182,8 @@ export default class MainMenuScene extends Phaser.Scene {
       loginForm.setVisible(true);
     });
 
-    if (isUserAuthenticated) loginForm.setVisible(false);
+    console.log(userId);
+    if (userId) loginForm.setVisible(false);
 
     return {
       loginForm,

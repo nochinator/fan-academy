@@ -1,6 +1,6 @@
 import { Client } from "colyseus.js";
 
-export async function startGame(client: Client) {
+export async function startGame(client: Client, userId: string | undefined) {
   try {
     const room = await client.joinOrCreate("game_room", { userId: "player1" });
 

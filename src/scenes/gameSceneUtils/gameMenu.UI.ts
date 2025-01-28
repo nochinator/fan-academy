@@ -1,0 +1,15 @@
+import GameScene from "../game.scene";
+import { createGameList } from "./gameList";
+
+export function loadGameMenuUI(context: GameScene) {
+  context.load.image('background', '/assets/ui/used/game_screen.png');
+  context.load.image('gameListButton', '/assets/ui/used/game_list_premade.png');
+  context.load.image('council', '/assets/ui/used/council_emblem.png');
+  context.load.image('elves', '/assets/ui/used/elves_emblem.png');
+}
+
+export async function  createGameMenuUI(context: GameScene) {
+  // Background game scree
+  context.add.image(0, 0, 'background').setOrigin(0, 0);
+  await createGameList(context);
+}
