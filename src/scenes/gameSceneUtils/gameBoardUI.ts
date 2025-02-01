@@ -1,3 +1,4 @@
+import { createGame, joinGame } from "../../lib/colyseusStartGame";
 import calculateCenterPoints from "../../utils/boardCalculations";
 import GameScene from "../game.scene";
 
@@ -22,7 +23,7 @@ export function loadGameBoardUI(context: GameScene) {
   context.load.image('playerTwoPortrait', '/assets/images/profilePics/Phantom_v2-hd.jpg');
 }
 
-export function createGameBoardUI(context: GameScene) {
+export async function createGameBoardUI(context: GameScene) {
   // Game map
   const gameMap = context.add.image(0, 0, 'gameBoard').setOrigin(0);
   gameMap.x = 1434 - gameMap.width - 14;
@@ -33,7 +34,12 @@ export function createGameBoardUI(context: GameScene) {
   context.add.image(0, 0, 'itemRack').setOrigin(0.5).setPosition(900, 736).setScale(0.9);
 
   // Door
-  const doorClosed = context.add.image(0, 0, 'doorClosed').setOrigin(0.5).setPosition(490, 700).setScale(0.9);
+  const doorClosed = context.add.image(0, 0, 'doorClosed').setOrigin(0.5).setPosition(490, 700).setScale(0.9).setInteractive();
+  doorClosed.on('pointerdown', async () => {
+    console.log('Looking for specific room');
+    await joinGame(context.colyseusClient, context.userId, '67990f78db4974459c2538f5');
+  });
+
   const doorOpen = context.add.image(0, 0, 'doorOpen').setOrigin(0.5).setPosition(490, 700).setVisible(false); // TTODO: trigger 'refill' event at the end of the player's turn
   context.add.image(0, 0, 'doorBanner').setOrigin(0.5).setPosition(440, 760); // TODO: add text
 
@@ -47,7 +53,11 @@ export function createGameBoardUI(context: GameScene) {
   const actionArrow = context.add.image(0, 0, 'actionArrow').setOrigin(0.5).setPosition(515, 730).setRotation(-0.1).setVisible(false); // TODO: dynamic. Triggers after a move (if !visible, visible) and on undo (only if it's the first move) and on turn sent
 
   // Send turn button
-  const turnButton =  context.add.image(0, 0, 'turnButton').setOrigin(0.5).setPosition(1300, 725).setScale(1.1); // TODO: add dynamic text. 'Send' - 'Next game'
+  const turnButton =  context.add.image(0, 0, 'turnButton').setOrigin(0.5).setPosition(1300, 725).setScale(1.1).setInteractive(); // TODO: add dynamic text. 'Send' - 'Next game'
+  turnButton.on('pointerdown', async () => {
+    console.log('listener logs');
+    await createGame(context.colyseusClient, context.userId, 'elves');
+  });
 
   // Top banner and health bars TODO:
   const playerOneBanner = context.add.image(0, 0, 'playerBanner').setOrigin(0.5).setPosition(705, 80).setFlipX(true).setTint(0x3399ff); // TODO: add colors

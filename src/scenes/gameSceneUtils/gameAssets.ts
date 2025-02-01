@@ -43,3 +43,7 @@ export function loadGameAssets(context: GameScene) {
   // impaler.x = centerPoints[0].x;
   // impaler.y = centerPoints[0].y;
 }
+
+export function createGameAssets(context: GameScene): void {
+  // console.log(context);
+}

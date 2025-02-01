@@ -72,9 +72,12 @@ export interface ITurn {
  * Game Interface
  */
 export interface IGame {
+  _id: string;
   players: IPlayer[];
   gameState: ITurn[];
-  board: string;
+  // board: string;
   winCondition?: string;
   winner?: string
+  status: string // TODO: share enums?
+  createdAt: Date
 }

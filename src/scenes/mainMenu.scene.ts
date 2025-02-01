@@ -1,12 +1,15 @@
+import { Client } from "colyseus.js";
 import createMainMenuButton from "../lib/buttons";
 import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 
 export default class MainMenuScene extends Phaser.Scene {
-  private userId: string | undefined;
-  private gameList: string | undefined;
+  userId: string | undefined;
+  gameList: string | undefined;
+  colyseusClient: Client;
 
   constructor() {
     super({ key: 'MainMenuScene' });
+    this.colyseusClient = new Client("ws://localhost:3003"); // TODO: env var
   }
 
   init() {
@@ -68,6 +71,7 @@ export default class MainMenuScene extends Phaser.Scene {
       text: 'Profile',
       font: '70px proHeavy'
     });
+
     const leaderboardsButton = createMainMenuButton({
       thisParam: this,
       x: menuButtonX,
@@ -92,20 +96,26 @@ export default class MainMenuScene extends Phaser.Scene {
       imageKey: 'playButton',
       text: 'Play!',
       font: '130px proHeavy',
-      callback: () => { this.scene.start('GameScene', { userId: this.userId });}
+      callback: () => { this.scene.start('GameScene', {
+        userId: this.userId,
+        colyseusClient: this.colyseusClient
+      });}
     });
 
-    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      // Log the mouse coordinates
-      console.log(`Mouse coordinates: x=${pointer.x}, y=${pointer.y}`);
-    });
+    // this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+    //   // Log the mouse coordinates
+    //   console.log(`Mouse coordinates: x=${pointer.x}, y=${pointer.y}`);
+    // });
 
     // TODO: Remove after testing
-    this.time.addEvent({
-      delay: 0,
-      loop: false,
-      callback: () => { this.scene.start('GameScene',  { userId: this.userId });}
-    });
+    // this.time.addEvent({
+    //   delay: 0,
+    //   loop: false,
+    //   callback: () => { this.scene.start('GameScene',  {
+    //     userId: this.userId,
+    //     colyseusClient: this.colyseusClient
+    //   });}
+    // });
 
     /**
      * REVIEW: from the main menu we will do a query (maybe a loading pop up) and pass the gameState and factions to the game
