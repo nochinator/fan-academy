@@ -151,15 +151,20 @@ export default class MainMenuScene extends Phaser.Scene {
     // Login form
     const loginForm = this.add.dom(800, 400).createFromCache('loginForm');
     // Get references to the form elements
-    const loginUsernameInput: Element | null = loginForm.getChildByID('username');
-    const loginPasswordInput: Element | null = loginForm.getChildByID('password');
-    const loginButton: Element | null = loginForm.getChildByID('loginButton');
-    const linkToSignUp: Element | null = loginForm.getChildByID('linkToSignUp');
+    const loginUsernameInput = loginForm.getChildByID('username') as HTMLInputElement | null;
+    const loginPasswordInput = loginForm.getChildByID('password') as HTMLInputElement | null;
+    const loginButton = loginForm.getChildByID('loginButton') as HTMLInputElement | null;
+    const linkToSignUp = loginForm.getChildByID('linkToSignUp') as HTMLInputElement | null;
     loginForm.setVisible(true);
     // Login query
     loginButton?.addEventListener('click', async () => {
-      // @ts-expect-error: lol // FIXME: add type
-      if (loginUsernameInput?.value && loginPasswordInput?.value) await loginQuery(loginUsernameInput.value, loginPasswordInput.value, loginForm);
+      if (loginUsernameInput?.value && loginPasswordInput?.value) {
+        const user = await loginQuery(loginUsernameInput.value, loginPasswordInput.value); // TODO: return user id only
+        if (user) {
+          loginForm.setVisible(false);
+          this.userId = user._id;
+        }
+      }
     });
     // Login form, link to sign up form
     linkToSignUp?.addEventListener('click', async () => {
@@ -170,20 +175,21 @@ export default class MainMenuScene extends Phaser.Scene {
     // Sign up form
     const signUpForm = this.add.dom(800, 400).createFromCache('signUpForm');
     // Get references to the form elements
-    const signUpEmailInput: Element | null = signUpForm.getChildByID('email');
-    const signUpUsernameInput: Element | null = signUpForm.getChildByID('username');
-    const signUpPasswordInput: Element | null = signUpForm.getChildByID('password');
-    const signUpButton: Element | null = signUpForm.getChildByID('loginButton');
-    const linkToLogin: Element | null = signUpForm.getChildByID('linkToLogin');
+    const signUpEmailInput = signUpForm.getChildByID('email') as HTMLInputElement | null;
+    const signUpUsernameInput = signUpForm.getChildByID('username') as HTMLInputElement | null;
+    const signUpPasswordInput = signUpForm.getChildByID('password') as HTMLInputElement | null;
+    const signUpButton = signUpForm.getChildByID('loginButton') as HTMLInputElement | null;
+    const linkToLogin = signUpForm.getChildByID('linkToLogin') as HTMLInputElement | null;
     signUpForm.setVisible(false);
 
     // Sign up query
     signUpButton?.addEventListener('click', async () => {
-      // @ts-expect-error: lol // FIXME: add type
-      if (signUpUsernameInput?.value && signUpPasswordInput?.value) {
-        // @ts-expect-error: lol // FIXME: add type
-        const result =  await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
-        if (result) signUpForm.setVisible(false);
+      if (signUpUsernameInput?.value && signUpPasswordInput?.value && signUpEmailInput?.value) {
+        const user =  await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value); // TODO: return user id only
+        if (user) {
+          signUpForm.setVisible(false);
+          this.userId = user._id;
+        }
       }
     });
     // Sign up form, link to login form

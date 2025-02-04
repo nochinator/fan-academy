@@ -1,6 +1,6 @@
 import { IGame } from "../interfaces/gameInterface";
 
-export async function loginQuery(username: string, password: string, loginForm: Phaser.GameObjects.DOMElement) {
+export async function loginQuery(username: string, password: string) {
   try {
     const response = await fetch('http://localhost:3003/users/login', {
       method: 'POST',
@@ -13,8 +13,9 @@ export async function loginQuery(username: string, password: string, loginForm: 
     });
     if (response.ok) {
       console.log('Successful login! :)');
-      loginForm.setVisible(false);
-      return response;}
+      const data = await response.json();
+      console.log(data);
+      return data.user;}
   } catch(error) {
     console.log('Error login in: ', error);
   }
@@ -32,7 +33,11 @@ export async function signUpQuery( email: string, username: string, password: st
       }),
       credentials: 'include'
     });
-    if (response.ok) { console.log('Successful sign in! :)'); return response;}
+    if (response.ok) {
+      console.log('Successful sign in! :)');
+      const data = await response.json();
+      console.log(data.user);
+      return data;}
   } catch (error) {
     console.log('Error signing in: ', error);
   }
