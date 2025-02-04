@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import GameScene from './scenes/game.scene';
 import MainMenuScene from './scenes/mainMenu.scene';
-import BootScene from './scenes/loading.scene';
 
 const config = {
   // width: 1433,

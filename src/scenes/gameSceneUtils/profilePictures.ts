@@ -8,11 +8,11 @@ export async function loadProfilePictures(context: GameScene, gameList: IGame[])
   }[] = [];
 
   gameList.forEach((game) => {
-    const oponent  = game.players.find(player => player.playerId != context.userId);
+    const oponent  = game.players.find(player => player.userData._id != context.userId);
 
     if (oponent) allPlayerObjects.push({
-      username: oponent.username,
-      picture: oponent.picture
+      username: oponent.userData.username,
+      picture: oponent.userData.picture
     });
   });
 
@@ -28,12 +28,15 @@ export async function loadProfilePictures(context: GameScene, gameList: IGame[])
   );
 
   uniqueOponents.forEach( oponent => {
+    console.log(oponent);
     context.load.image(oponent.username, oponent.picture);
   });
 
-  context.load.start();
-
-  context.load.on('complete', () => {
-    console.log('Profile pictures loaded');
+  return new Promise((resolve) => {
+    context.load.once('complete', () => {
+      console.log('Profile pictures loaded');
+      resolve();
+    });
+    context.load.start(); // Start loading after setting up the event listener
   });
 }

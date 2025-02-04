@@ -9,7 +9,7 @@ export function loadGameMenuUI(context: GameScene) {
 }
 
 export async function  createGameMenuUI(context: GameScene) {
-  // Background game scree
+  // Background game screen
   context.add.image(0, 0, 'background').setOrigin(0, 0);
   await createGameList(context);
 }

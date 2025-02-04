@@ -43,10 +43,12 @@ export interface IFaction {
  * Player Interface
  */
 export interface IPlayer {
-  playerId: string;
+  userData: {
+    _id: string
+    username: string; // from populate in the BE
+    picture: string; // from populate in the BE
+  },
   faction: IFaction;
-  username: string; // from populate in the BE
-  picture: string; // from populate in the BE
 }
 
 /**

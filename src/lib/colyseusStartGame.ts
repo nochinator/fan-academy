@@ -45,14 +45,14 @@ export async function joinGame(client: Client | undefined, userId: string | unde
 
     console.log("Joined room:", room.name);
   } catch (error) {
-    console.error("No room to join:", error);
+    console.error("Recreating room...");
 
     room = await client.create('game_room', {
       userId,
       roomId
     });
 
-    console.log('Recreated room:', room.name);
+    console.log('Recreated room:', room.roomId);
   }
 
   subscribeToGameListeners(room);
