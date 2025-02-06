@@ -16,14 +16,11 @@ export async function createGameList(context: GameScene) {
   const gameListButtonSpacing = 20;
   const visibleHeight = 915;
   const visibleWidth = 400;
-  // const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * gameList.length;
+  const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * gameList.length;
 
   const gameListContainer = context.add.container(19, 65);
 
-  const test = Array(20).fill(gameList[0]);
-  const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * test.length;
-  test.forEach((game, index) => {
-  // gameList.forEach((game, index) => {
+  gameList.forEach((game, index) => {
     const player = game.players.find((p: IPlayer) => context.userId === p.userData._id);
     const opponent = game.players.find((p: IPlayer) => context.userId !== p.userData._id);
     if (!player || !opponent) return;
@@ -31,7 +28,7 @@ export async function createGameList(context: GameScene) {
     const yPosition = index * (gameListButtonHeight + gameListButtonSpacing);
 
     const gameListButtonImage = context.add.image(0, yPosition, "gameListButton").setOrigin(0);
-    const playerFactionImage = index === 19 ? context.add.image(90, yPosition + gameListButtonHeight / 2, opponent.faction.factionName).setScale(0.4) : context.add.image(90, yPosition + gameListButtonHeight / 2, player.faction.factionName).setScale(0.4);
+    const playerFactionImage =  context.add.image(90, yPosition + gameListButtonHeight / 2, player.faction.factionName).setScale(0.4);
     const opponentFactionImage = context.add.image(510, yPosition + gameListButtonHeight / 2, opponent.faction.factionName).setScale(0.4);
     const opponentNameText = context.add.text(200, yPosition + gameListButtonHeight / 2 - 33, opponent.userData.username, {
       fontSize: 50,
