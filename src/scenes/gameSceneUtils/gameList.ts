@@ -1,95 +1,83 @@
-import ScrollingCamera from "phaser3-scrolling-camera/dist/scrollcam";
-import { ScrollablePanel } from 'phaser3-rex-plugins/templates/ui/ui-components.js';
-import { IGame } from "../../interfaces/gameInterface";
+import { IGame, IPlayer } from "../../interfaces/gameInterface";
 import { getGameList } from "../../queries/userQueries";
 import GameScene from "../game.scene";
 import { loadProfilePictures } from "./profilePictures";
+
 export async function createGameList(context: GameScene) {
-  console.log('Create game list logs');
+  console.log("Create game list logs");
 
   const gameList: IGame[] = await getGameList(context.userId!);
+
+  if (!gameList || gameList.length === 0) return;
+
   await loadProfilePictures(context, gameList);
-  const test = [];
-  for (let i = 0; i < 20; i++) {
-    test.push(gameList[0]);
-  }
 
   const gameListButtonHeight = 142;
   const gameListButtonSpacing = 20;
-  const visibleHeight = 922; // TODO: adapt to element size
-  const visibleWidth = 400; // TODO: adapt to element size
-  // const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * gameList.length; // total height of all buttons
-  const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * test.length; // total height of all buttons
+  const visibleHeight = 915;
+  const visibleWidth = 400;
+  // const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * gameList.length;
 
   const gameListContainer = context.add.container(19, 65);
 
-  if (context.textures.exists('player2')) {
-    console.log('Image is loaded!');
-  } else {
-    console.log('Image is NOT loaded.');
-  }
-  // Create buttons dynamically
-  // gameList.forEach((game, index) => {
+  const test = Array(20).fill(gameList[0]);
+  const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * test.length;
   test.forEach((game, index) => {
-    const player = game.players.find(player => context.userId === player.userData._id);
-    const oponent = game.players.find(player => context.userId != player.userData._id);
-
-    if (!player || !oponent) {
-      console.log('Player missing for game index -> ', index); // TODO: missing id in Game
-      return;
-    }
+  // gameList.forEach((game, index) => {
+    const player = game.players.find((p: IPlayer) => context.userId === p.userData._id);
+    const opponent = game.players.find((p: IPlayer) => context.userId !== p.userData._id);
+    if (!player || !opponent) return;
 
     const yPosition = index * (gameListButtonHeight + gameListButtonSpacing);
 
-    // Button image
-    const gameListButtonImage = context.add.image(0, yPosition, 'gameListButton').setOrigin(0);
-    const playerFactionImage = context.add.image(40, yPosition + gameListButtonHeight / 2, player.faction.factionName).setScale(0.4);
-    playerFactionImage.x = playerFactionImage.x + 50;
-
-    const oponentFactionImage = context.add.image(60, yPosition + gameListButtonHeight / 2, oponent.faction.factionName).setScale(0.4);
-    oponentFactionImage.x = oponentFactionImage.x + 450;
-
-    const oponentNameText =  context.add.text(200, yPosition + gameListButtonHeight / 2 - 33, oponent.userData.username, {
+    const gameListButtonImage = context.add.image(0, yPosition, "gameListButton").setOrigin(0);
+    const playerFactionImage = index === 19 ? context.add.image(90, yPosition + gameListButtonHeight / 2, opponent.faction.factionName).setScale(0.4) : context.add.image(90, yPosition + gameListButtonHeight / 2, player.faction.factionName).setScale(0.4);
+    const opponentFactionImage = context.add.image(510, yPosition + gameListButtonHeight / 2, opponent.faction.factionName).setScale(0.4);
+    const opponentNameText = context.add.text(200, yPosition + gameListButtonHeight / 2 - 33, opponent.userData.username, {
       fontSize: 50,
-      fontFamily: 'proLight'
+      fontFamily: "proLight"
     });
+    const opponentProfilePicture = context.add.image(632, yPosition + gameListButtonHeight / 2, opponent.userData.username).setFlipX(true).setScale(0.4);
 
-    console.log('player.userData.username', oponent.userData.username);
-    const oponentProfilePicture = context.add.image(632, yPosition + gameListButtonHeight / 2, oponent.userData.username).setFlipX(true).setScale(0.4);
-    // const lastMoveText = addText() // TODO: add last move
-
-    // Add elements to container
-    gameListContainer.add([gameListButtonImage, playerFactionImage, oponentFactionImage, oponentNameText, oponentProfilePicture]).setScale(0.51);
+    gameListContainer.add([gameListButtonImage, playerFactionImage, opponentFactionImage, opponentNameText, opponentProfilePicture]).setScale(0.51);
   });
 
-  const bounds = gameListContainer.getBounds();
-  gameListContainer.setSize(bounds.width, bounds.height);
-  // gameListContainer.setPosition(gameListContainer.x + 23, gameListContainer.y + 70 );
+  const maskGraphics = context.make.graphics();
+  maskGraphics.fillStyle(0xffffff);
+  maskGraphics.fillRect(19, 65, visibleWidth, visibleHeight - 15);
+  const mask = new Phaser.Display.Masks.GeometryMask(context, maskGraphics);
 
-  // Make container interactive
-  gameListContainer.setInteractive();
-  gameListContainer.on('pointerdown', () => {
-    console.log('Clicked on game');
+  gameListContainer.setMask(mask);
+
+  let isHovered = false;
+  const scrollSpeed = 1;
+  let contentOffset = 0;
+
+  context.input.on("wheel", (_pointer: Phaser.Input.Pointer, _gameObjects: any, _deltaX: number, deltaY: number, _deltaZ: number ) => {
+    console.log(contentHeight, visibleHeight, contentOffset);
+    if (isHovered && contentHeight > visibleHeight) {
+      // Calculate the new offset
+      contentOffset -= deltaY * scrollSpeed;
+
+      // Define boundaries
+      const maxOffset = 0; // The topmost position (no scrolling above the first item)
+      const minOffset = visibleHeight * 2 - contentHeight - 50; // The lowest allowed position. Needs to be double the visibleHeight to work properly. -50 for padding.
+
+      // Clamp the scrolling within bounds
+      contentOffset = Phaser.Math.Clamp(contentOffset, minOffset, maxOffset);
+
+      // Apply offset to each child
+      gameListContainer.each((child: any) => {
+        if (child.originalY === undefined) {
+          child.originalY = child.y; // Store original position once
+        }
+        child.y = child.originalY + contentOffset;
+      });
+    }
   });
 
-  // const scrollMenu = new ScrollingCamera(context, {
-  //   x: 19,
-  //   y: 65,
-  //   width: visibleWidth,
-  //   height: visibleHeight,
-  //   contentBounds: {
-  //     x: 0,
-  //     y: 0,
-  //     length: gameListContainer.height
-  //   }
-  // }); // REVIEW: remove package if not working
-
-  // const scrollMenu = new ScrollablePanel(context, {
-  //   x: 19,
-  //   y: 65,
-  //   width: visibleWidth,
-  //   height: visibleHeight,
-  //   panel: { child: gameListContainer }
-  // });
-  // context.add.existing(scrollMenu);
+  context.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
+    isHovered = pointer.x >= 19 && pointer.x <= 19 + visibleWidth &&
+                pointer.y >= 65 && pointer.y <= 65 + visibleHeight;
+  });
 }
