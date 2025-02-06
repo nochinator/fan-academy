@@ -1,8 +1,7 @@
 import { createGame, joinGame } from "../../lib/colyseusStartGame";
-import calculateCenterPoints from "../../utils/boardCalculations";
 import GameScene from "../game.scene";
 
-export function loadGameBoardUI(context: GameScene) {
+export function loadGameBoardUI(context: GameScene): void {
   context.load.image('gameBoard', '/assets/images/maps/game_board.png');
 
   context.load.image('itemRack', '/assets/images/gameItems/item_rack.png');
@@ -23,12 +22,11 @@ export function loadGameBoardUI(context: GameScene) {
   context.load.image('playerTwoPortrait', '/assets/images/profilePics/Phantom_v2-hd.jpg');
 }
 
-export async function createGameBoardUI(context: GameScene) {
+export async function createGameBoardUI(context: GameScene): Promise<void> {
   // Game map
   const gameMap = context.add.image(0, 0, 'gameBoard').setOrigin(0);
   gameMap.x = 1434 - gameMap.width - 14;
   gameMap.y += 14;
-  const centerPoints = calculateCenterPoints();
 
   // Item rack
   context.add.image(0, 0, 'itemRack').setOrigin(0.5).setPosition(900, 736).setScale(0.9);
