@@ -5,11 +5,9 @@ import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 export default class MainMenuScene extends Phaser.Scene {
   userId: string | undefined;
   gameList: string | undefined;
-  colyseusClient: Client;
 
   constructor() {
     super({ key: 'MainMenuScene' });
-    this.colyseusClient = new Client("ws://localhost:3003"); // TODO: env var
   }
 
   init() {
@@ -96,10 +94,7 @@ export default class MainMenuScene extends Phaser.Scene {
       imageKey: 'playButton',
       text: 'Play!',
       font: '130px proHeavy',
-      callback: () => { this.scene.start('GameScene', {
-        userId: this.userId,
-        colyseusClient: this.colyseusClient
-      });}
+      callback: () => { this.scene.start('GameScene', { userId: this.userId });}
     });
 
     // this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {

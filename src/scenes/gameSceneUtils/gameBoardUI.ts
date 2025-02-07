@@ -1,4 +1,4 @@
-import { createGame, joinGame } from "../../lib/colyseusStartGame";
+import { createGame, joinGame } from "../../lib/colyseusGameRoom";
 import GameScene from "../game.scene";
 
 export function loadGameBoardUI(context: GameScene): void {

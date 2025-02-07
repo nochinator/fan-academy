@@ -9,7 +9,7 @@ export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
   room: Room | undefined;
   userId: string | undefined;
-  gameList: string | undefined;
+  gameList: string | undefined; // We don't want to create the list every time the user clicks on a different game
 
   constructor() {
     super({ key: 'GameScene' });
@@ -17,6 +17,7 @@ export default class GameScene extends Phaser.Scene {
     this.room = undefined;
     this.userId = undefined;
     this.gameList = undefined;
+    this.colyseusClient = new Client("ws://localhost:3003"); // TODO: env var
   }
 
   init(data: {
@@ -41,5 +42,10 @@ export default class GameScene extends Phaser.Scene {
     await createGameBoardUI(this); // generates the game board
     createBoardGameTiles(this);
     createGameAssets(this);
+    // REVIEW: theoretically we select the first game on the list and show it
+  }
+
+  update() {
+
   }
 }
