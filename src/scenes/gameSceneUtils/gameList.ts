@@ -1,5 +1,5 @@
 import { IGame, IPlayer } from "../../interfaces/gameInterface";
-import { getGameList } from "../../queries/userQueries";
+import { getGameList } from "../../queries/gameQueries";
 import GameScene from "../game.scene";
 import { loadProfilePictures } from "./profilePictures";
 
