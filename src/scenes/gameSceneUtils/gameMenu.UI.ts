@@ -7,6 +7,8 @@ export function loadGameMenuUI(context: GameScene) {
   context.load.image('gameListButton', '/assets/ui/used/game_list_premade.png');
   context.load.image('council', '/assets/ui/used/council_emblem.png');
   context.load.image('elves', '/assets/ui/used/elves_emblem.png');
+  context.load.image('unknownFaction', '/assets/ui/used/unknown_faction.png');
+  context.load.image('unknownOpponent', '/assets/images/profilePics/UnknownAvatar-hd.jpg');
 }
 
 export async function  createGameMenuUI(context: GameScene) {

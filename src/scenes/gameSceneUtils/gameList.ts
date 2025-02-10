@@ -4,41 +4,108 @@ import GameScene from "../game.scene";
 import { loadProfilePictures } from "./profilePictures";
 
 export async function createGameList(context: GameScene) {
-  console.log("Create game list logs");
-
+// Get game list and split it into 3 arrays, depending on status
   const gameList: IGame[] = await getGameList(context.userId!);
-
   if (!gameList || gameList.length === 0) return;
 
+  const listPlayerTurnArray: IGame[] = [];
+  const listOpponentTurnArray: IGame[] = [];
+  const listSearchingArray: IGame[] = [];
+
+  gameList.forEach((game: IGame )=> {
+    if (game.status === 'searching') listSearchingArray.push(game);
+    if (game.status === 'playing' && game.activePlayer === context.userId) listPlayerTurnArray.push(game);
+    if (game.status === 'playing' && game.activePlayer != context.userId) listOpponentTurnArray.push(game);
+  });
+  // Load oponents' profile pictures
   await loadProfilePictures(context, gameList);
 
+  // Setting spacing for the positioning of the items in the list
   const gameListButtonHeight = 142;
   const gameListButtonSpacing = 20;
+  const textListHeight = 40;
   const visibleHeight = 915;
   const visibleWidth = 400;
   const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * gameList.length;
+  let lastListItemY = 0;
 
+  // Creating a container for the game list
   const gameListContainer = context.add.container(19, 65);
 
-  gameList.forEach((game, index) => {
-    const player = game.players.find((p: IPlayer) => context.userId === p.userData._id);
-    const opponent = game.players.find((p: IPlayer) => context.userId !== p.userData._id);
-    if (!player || !opponent) return;
+  // Function for adding elements to the container
+  const createGameListItem = (gameListArray: IGame[]) => {
+    gameListArray.forEach((game, index) => {
+      const player = game.players.find((p: IPlayer) => context.userId === p.userData._id);
+      const opponent = game.players.find((p: IPlayer) => context.userId !== p.userData._id);
+      if (!player) return;
 
-    const yPosition = index * (gameListButtonHeight + gameListButtonSpacing);
+      lastListItemY += ( index === 0 ? textListHeight : gameListButtonHeight) + gameListButtonSpacing;
 
-    const gameListButtonImage = context.add.image(0, yPosition, "gameListButton").setOrigin(0);
-    const playerFactionImage =  context.add.image(90, yPosition + gameListButtonHeight / 2, player.faction.factionName).setScale(0.4);
-    const opponentFactionImage = context.add.image(510, yPosition + gameListButtonHeight / 2, opponent.faction.factionName).setScale(0.4);
-    const opponentNameText = context.add.text(200, yPosition + gameListButtonHeight / 2 - 33, opponent.userData.username, {
+      const gameListButtonImage = context.add.image(0, lastListItemY, "gameListButton").setOrigin(0);
+      const playerFactionImage =  context.add.image(90, lastListItemY + gameListButtonHeight / 2, player.faction.factionName).setScale(0.4);
+
+      let opponentFactionImage;
+      let opponentProfilePicture;
+      let opponentNameText;
+
+      if (opponent) {
+        opponentFactionImage = context.add.image(510, lastListItemY + gameListButtonHeight / 2, opponent.faction.factionName).setScale(0.4);
+        opponentNameText = context.add.text(200, lastListItemY + gameListButtonHeight / 2 - 33, opponent.userData.username, {
+          fontSize: 50,
+          fontFamily: "proLight"
+        });
+        opponentProfilePicture = context.add.image(632, lastListItemY + gameListButtonHeight / 2, opponent.userData.username).setFlipX(true).setScale(0.4);
+      } else {
+        opponentFactionImage = context.add.image(510, lastListItemY + gameListButtonHeight / 2, 'unknownFaction');
+        opponentNameText = context.add.text(200, lastListItemY + gameListButtonHeight / 2 - 33, 'Searching...', {
+          fontSize: 50,
+          fontFamily: "proLight"
+        });
+        opponentProfilePicture = context.add.image(632, lastListItemY + gameListButtonHeight / 2, 'unknownOpponent').setFlipX(true).setScale(0.4);
+      }
+
+      gameListContainer.add([gameListButtonImage, playerFactionImage, opponentFactionImage, opponentNameText, opponentProfilePicture]);
+    });
+  };
+
+  // Check the arrays one by one, adding the elements in order
+  if (listPlayerTurnArray.length) {
+    const playerTurnText = context.add.text(30, lastListItemY, 'Your turn', {
       fontSize: 50,
       fontFamily: "proLight"
     });
-    const opponentProfilePicture = context.add.image(632, yPosition + gameListButtonHeight / 2, opponent.userData.username).setFlipX(true).setScale(0.4);
+    gameListContainer.add(playerTurnText);
 
-    gameListContainer.add([gameListButtonImage, playerFactionImage, opponentFactionImage, opponentNameText, opponentProfilePicture]).setScale(0.51);
-  });
+    createGameListItem(listPlayerTurnArray);
+    lastListItemY += gameListButtonHeight + gameListButtonSpacing;
+  }
 
+  if (listOpponentTurnArray.length) {
+    const opponentTurnText = context.add.text(30, lastListItemY, "Opponent's turn", {
+      fontSize: 50,
+      fontFamily: "proLight"
+    });
+    gameListContainer.add(opponentTurnText);
+
+    createGameListItem(listOpponentTurnArray);
+    lastListItemY += gameListButtonHeight + gameListButtonSpacing;
+  }
+
+  if (listSearchingArray.length) {
+    const searchingText = context.add.text(30, lastListItemY, 'Searching', {
+      fontSize: 50,
+      fontFamily: "proLight"
+    });
+
+    gameListContainer.add(searchingText);
+
+    createGameListItem(listSearchingArray);
+    lastListItemY += gameListButtonHeight + gameListButtonSpacing;
+  }
+
+  gameListContainer.setScale(0.51);
+
+  // Set the mask to make the list scrollable
   const maskGraphics = context.make.graphics();
   maskGraphics.fillStyle(0xffffff);
   maskGraphics.fillRect(19, 65, visibleWidth, visibleHeight - 15);

@@ -106,10 +106,7 @@ export default class MainMenuScene extends Phaser.Scene {
     // this.time.addEvent({
     //   delay: 0,
     //   loop: false,
-    //   callback: () => { this.scene.start('GameScene',  {
-    //     userId: this.userId,
-    //     colyseusClient: this.colyseusClient
-    //   });}
+    //   callback: () => { this.scene.start('GameScene',  { userId: this.userId });}
     // });
 
     /**

@@ -82,4 +82,5 @@ export interface IGame {
   winner?: string
   status: string // TODO: share enums?
   createdAt: Date
+  activePlayer: string
 }

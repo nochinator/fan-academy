@@ -2,10 +2,14 @@ import { IGame } from "../../interfaces/gameInterface";
 import GameScene from "../game.scene";
 
 export async function loadProfilePictures(context: GameScene, gameList: IGame[]): Promise<void> {
+  if (gameList.length === 0) return;
+
   const allPlayerObjects: {
     username: string,
     picture: string
   }[] = [];
+
+  console.log('GAMELIST', JSON.stringify(gameList));
 
   gameList.forEach((game) => {
     const oponent  = game.players.find(player => player.userData._id != context.userId);
