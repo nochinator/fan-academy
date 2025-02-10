@@ -15,13 +15,14 @@ export async function loginQuery(username: string, password: string) {
       console.log('Successful login! :)');
       const data = await response.json();
       console.log(data);
-      return data.user;}
+      return data.user;
+    }
   } catch(error) {
     console.log('Error login in: ', error);
   }
 }
 
-export async function signUpQuery( email: string, username: string, password: string) {
+export async function signUpQuery(email: string, username: string, password: string) {
   try {
     const response = await fetch('http://localhost:3003/users/signup', {
       method: 'POST',
@@ -37,7 +38,8 @@ export async function signUpQuery( email: string, username: string, password: st
       console.log('Successful sign in! :)');
       const data = await response.json();
       console.log(data.user);
-      return data;}
+      return data;
+    }
   } catch (error) {
     console.log('Error signing in: ', error);
   }

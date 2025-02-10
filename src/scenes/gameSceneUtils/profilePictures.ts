@@ -9,8 +9,6 @@ export async function loadProfilePictures(context: GameScene, gameList: IGame[])
     picture: string
   }[] = [];
 
-  console.log('GAMELIST', JSON.stringify(gameList));
-
   gameList.forEach((game) => {
     const oponent  = game.players.find(player => player.userData._id != context.userId);
 

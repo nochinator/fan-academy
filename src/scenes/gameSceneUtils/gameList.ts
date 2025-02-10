@@ -68,6 +68,18 @@ export async function createGameList(context: GameScene) {
     });
   };
 
+  // New game button is always at the top of the games' list
+  const newGameText = context.add.text(40, lastListItemY + 40, 'Create a game', {
+    fontSize: 70,
+    fontFamily: "proHeavy"
+  });
+  const newGameButton = context.add.image(0, lastListItemY, 'newGameButton').setOrigin(0);
+  const councilEmblem = context.add.image(380, lastListItemY, 'council').setOrigin(0).setScale(0.5);
+  const elvesEmblem = context.add.image(530, lastListItemY, 'elves').setOrigin(0).setScale(0.5);
+
+  lastListItemY += 150;
+
+  gameListContainer.add([newGameButton, newGameText, councilEmblem, elvesEmblem]);
   // Check the arrays one by one, adding the elements in order
   if (listPlayerTurnArray.length) {
     const playerTurnText = context.add.text(30, lastListItemY, 'Your turn', {
@@ -92,7 +104,7 @@ export async function createGameList(context: GameScene) {
   }
 
   if (listSearchingArray.length) {
-    const searchingText = context.add.text(30, lastListItemY, 'Searching', {
+    const searchingText = context.add.text(30, lastListItemY, 'Searching for players', {
       fontSize: 50,
       fontFamily: "proLight"
     });
