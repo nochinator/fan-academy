@@ -10,6 +10,7 @@ export function loadGameMenuUI(context: GameScene) {
   context.load.image('elves', '/assets/ui/used/elves_emblem.png');
   context.load.image('unknownFaction', '/assets/ui/used/unknown_faction.png');
   context.load.image('unknownOpponent', '/assets/images/profilePics/UnknownAvatar-hd.jpg');
+  context.load.image('closeButton', '/assets/ui/used/close_button.png');
 }
 
 export async function  createGameMenuUI(context: GameScene) {

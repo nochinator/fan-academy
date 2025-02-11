@@ -1,6 +1,6 @@
 import { IGame, IPlayer } from "../../interfaces/gameInterface";
 import { createGame } from "../../lib/colyseusGameRoom";
-import { getGameList } from "../../queries/gameQueries";
+import { deleteGame, getGameList } from "../../queries/gameQueries";
 import GameScene from "../game.scene";
 import { loadProfilePictures } from "./profilePictures";
 
@@ -32,6 +32,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
 
   // Setting spacing for the positioning of the items in the list
   const gameListButtonHeight = 142;
+  const gameListButtonWidth = 700;
   const gameListButtonSpacing = 20;
   const textListHeight = 40;
   const visibleHeight = 915;
@@ -44,7 +45,6 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
 
   // Creating a container for the game list and adding it to the context (scene)
   const gameListContainer = context.add.container(19, 65);
-  context.gameListContainer = gameListContainer;
 
   // Function for adding elements to the container
   const createGameListItem = (gameListArray: IGame[]) => {
@@ -78,7 +78,18 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
         opponentProfilePicture = context.add.image(632, lastListItemY + gameListButtonHeight / 2, 'unknownOpponent').setFlipX(true).setScale(0.4);
       }
 
-      gameListContainer.add([gameListButtonImage, playerFactionImage, opponentFactionImage, opponentNameText, opponentProfilePicture]);
+      // Add an X button to each game in the list
+      const closeButton = context.add.image(gameListButtonWidth - 30, lastListItemY, 'closeButton').setOrigin(0).setVisible(false);
+      if (game.status === 'searching') {
+        closeButton.setVisible(true).setInteractive();
+        closeButton.on('pointerdown', async () => {
+          console.log('Clicked on X button!');
+          await deleteGame(context.userId, game._id);
+          createGameList(context);
+        });
+      }
+
+      gameListContainer.add([gameListButtonImage, playerFactionImage, opponentFactionImage, opponentNameText, opponentProfilePicture, closeButton]);
     });
   };
 
@@ -178,6 +189,8 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
 
   context.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
     isHovered = pointer.x >= 19 && pointer.x <= 19 + visibleWidth &&
-                pointer.y >= 65 && pointer.y <= 65 + visibleHeight;
+    pointer.y >= 65 && pointer.y <= 65 + visibleHeight;
   });
+
+  context.gameListContainer = gameListContainer;
 }
