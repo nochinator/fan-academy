@@ -65,7 +65,23 @@ function subscribeToGameListeners(room: Room): void {
   });
 
   // Send a message to the server
-  room.send("turnSent", { userIds: ['67979a0099f7c74fa80d6378', '67967b3cb47931a80cddedc6'] }); // FIXME:
-
-  // TODO: on disconnect ?
+  room.send("turnSent", {
+    game: {
+      _id: '67990f78db4974459c2538f5',
+      players: [
+        {
+          userData: '67979a0099f7c74fa80d6378',
+          faction: { factionName: 'council' }
+        },
+        {
+          userData: '67967b3cb47931a80cddedc6',
+          faction: { factionName: 'elves' }
+        }
+      ],
+      createdAt: '2025-02-01T19:04:45.420+00:00',
+      status: 'playing',
+      gameState: [{}],
+      activePlayer: '67979a0099f7c74fa80d6378'
+    }
+  });
 }

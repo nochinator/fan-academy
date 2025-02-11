@@ -4,11 +4,20 @@ import { getGameList } from "../../queries/gameQueries";
 import GameScene from "../game.scene";
 import { loadProfilePictures } from "./profilePictures";
 
-export async function createGameList(context: GameScene) {
-// Get game list and split it into 3 arrays, depending on status
-  const gameList: IGame[] = await getGameList(context.userId!);
+export async function createGameList(context: GameScene, colyseusGameList?: IGame[]) {
+  // Check if the game list is coming from a colyseus update or if it needs to be fetched
+  let gameList: IGame[];
+  if (colyseusGameList) {
+    gameList = colyseusGameList;
+  } else {
+    gameList = await getGameList(context.userId!);
+  }
   if (!gameList || gameList.length === 0) return;
 
+  // If the game list already exists in the scene, remove it before re-rendering
+  if (context.gameListContainer) context.gameListContainer.destroy(true);
+
+  // Split game list and split it into 3 arrays, depending on status
   const listPlayerTurnArray: IGame[] = [];
   const listOpponentTurnArray: IGame[] = [];
   const listSearchingArray: IGame[] = [];
@@ -30,8 +39,9 @@ export async function createGameList(context: GameScene) {
   const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * gameList.length;
   let lastListItemY = 0;
 
-  // Creating a container for the game list
+  // Creating a container for the game list and adding it to the context (scene)
   const gameListContainer = context.add.container(19, 65);
+  context.gameListContainer = gameListContainer;
 
   // Function for adding elements to the container
   const createGameListItem = (gameListArray: IGame[]) => {

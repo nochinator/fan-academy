@@ -10,15 +10,15 @@ export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
   room: Room | undefined;
   userId: string | undefined;
-  gameList: string | undefined; // We don't want to create the list every time the user clicks on a different game
+  gameListContainer: any; // REVIEW
 
   constructor() {
     super({ key: 'GameScene' });
 
     this.room = undefined;
     this.userId = undefined;
-    this.gameList = undefined;
     this.colyseusClient = new Client("ws://localhost:3003"); // TODO: env var
+    this.gameListContainer = null;
   }
 
   init(data: {
@@ -38,7 +38,7 @@ export default class GameScene extends Phaser.Scene {
 
   async create() {
     // Connect to the colyseus lobby room
-    connectToGameLobby(this.colyseusClient, this.userId);
+    connectToGameLobby(this.colyseusClient, this.userId, this);
     calculateCenterPoints(); // REVIEW:
     await createGameMenuUI(this); // generates background menu and game list
     await createGameBoardUI(this); // generates the game board
