@@ -36,8 +36,11 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
   const textListHeight = 40;
   const visibleHeight = 915;
   const visibleWidth = 400;
-  const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * gameList.length;
   let lastListItemY = 0;
+
+  // Calculate content height for scrolling
+  const totalSections = (listPlayerTurnArray.length ? 1 : 0) + (listOpponentTurnArray.length ? 1 : 0) + (listSearchingArray.length ? 1 : 0);
+  const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * gameList.length + ( textListHeight * totalSections + 200); // 200 = newGameButton + some padding to make sure the last item always displays fully
 
   // Creating a container for the game list and adding it to the context (scene)
   const gameListContainer = context.add.container(19, 65);
