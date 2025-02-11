@@ -30,10 +30,10 @@ export async function createGame(client: Client | undefined, userId: string | un
   }
 }
 
-export async function joinGame(client: Client | undefined, userId: string | undefined, roomId: string) {
+export async function joinGame(client: Client | undefined, userId: string | undefined, roomId: string): Promise<Room | undefined> {
   if( !client || !userId || !roomId) {
     console.log('joinGame, { client | userid | gameid } missing');
-    return;
+    return undefined;
   }
 
   let room: Room;
@@ -56,6 +56,8 @@ export async function joinGame(client: Client | undefined, userId: string | unde
   }
 
   subscribeToGameListeners(room);
+
+  return room;
 }
 
 function subscribeToGameListeners(room: Room): void {
@@ -66,22 +68,21 @@ function subscribeToGameListeners(room: Room): void {
 
   // Send a message to the server
   room.send("turnSent", {
-    game: {
-      _id: '67990f78db4974459c2538f5',
-      players: [
-        {
-          userData: '67979a0099f7c74fa80d6378',
-          faction: { factionName: 'council' }
-        },
-        {
-          userData: '67967b3cb47931a80cddedc6',
-          faction: { factionName: 'elves' }
-        }
-      ],
-      createdAt: '2025-02-01T19:04:45.420+00:00',
-      status: 'playing',
-      gameState: [{}],
-      activePlayer: '67979a0099f7c74fa80d6378'
-    }
+    _id: '67aa3048b77ce4887a694773',
+    players: [
+      {
+        userData: '67979a0099f7c74fa80d6378',
+        faction: { factionName: 'council' }
+      },
+      {
+        userData: '67967b3cb47931a80cddedc6',
+        faction: { factionName: 'elves' }
+      }
+    ],
+    createdAt: '2025-02-01T19:04:45.420+00:00',
+    status: 'playing',
+    gameState: [{}],
+    activePlayer: '67967b3cb47931a80cddedc6'
+
   });
 }

@@ -1,5 +1,5 @@
 import { IGame, IPlayer } from "../../interfaces/gameInterface";
-import { createGame } from "../../lib/colyseusGameRoom";
+import { createGame, joinGame } from "../../lib/colyseusGameRoom";
 import { deleteGame, getGameList } from "../../queries/gameQueries";
 import GameScene from "../game.scene";
 import { loadProfilePictures } from "./profilePictures";
@@ -45,6 +45,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
 
   // Creating a container for the game list and adding it to the context (scene)
   const gameListContainer = context.add.container(19, 65);
+  context.gameListContainer = gameListContainer;
 
   // Function for adding elements to the container
   const createGameListItem = (gameListArray: IGame[]) => {
@@ -86,6 +87,21 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
           console.log('Clicked on X button!');
           await deleteGame(context.userId, game._id);
           createGameList(context);
+        });
+      }
+
+      // Make the game accessible -only for games already playing. // REVIEW: what about games already finished?
+      if (game.status === 'playing') {
+        gameListButtonImage.setInteractive();
+        gameListButtonImage.on('pointerdown', async () => {
+          if (context.currentRoom) {
+            console.log('Leaving game: ', context.currentRoom.roomId);
+            await context.currentRoom.leave();
+            context.currentRoom = undefined;
+          }
+          console.log('Accessing game: ', game._id);
+          const room = await joinGame(context.colyseusClient, context.userId, game._id);
+          context.currentRoom = room;
         });
       }
 
@@ -150,6 +166,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
     lastListItemY += gameListButtonHeight + gameListButtonSpacing;
   }
 
+  // Reduce the size of the container to make the images fit the UI
   gameListContainer.setScale(0.51);
 
   // Set the mask to make the list scrollable
@@ -191,6 +208,4 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
     isHovered = pointer.x >= 19 && pointer.x <= 19 + visibleWidth &&
     pointer.y >= 65 && pointer.y <= 65 + visibleHeight;
   });
-
-  context.gameListContainer = gameListContainer;
 }

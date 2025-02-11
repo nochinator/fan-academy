@@ -8,17 +8,13 @@ import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
 
 export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
-  room: Room | undefined;
   userId: string | undefined;
-  gameListContainer: any; // REVIEW
+  gameListContainer: any; // REVIEW:
+  currentRoom: Room | undefined;
 
   constructor() {
     super({ key: 'GameScene' });
-
-    this.room = undefined;
-    this.userId = undefined;
     this.colyseusClient = new Client("ws://localhost:3003"); // TODO: env var
-    this.gameListContainer = null;
   }
 
   init(data: {
