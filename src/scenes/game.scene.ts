@@ -4,6 +4,7 @@ import { createGameBoardUI, loadGameBoardUI } from "./gameSceneUtils/gameBoardUI
 import { loadGameMenuUI, createGameMenuUI } from "./gameSceneUtils/gameMenu.UI";
 import { createBoardGameTiles, loadGameBoardTiles } from "./gameSceneUtils/gameBoardTiles.";
 import calculateCenterPoints from "../utils/boardCalculations";
+import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
 
 export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
@@ -25,7 +26,6 @@ export default class GameScene extends Phaser.Scene {
     colyseusClient: Client
   }) {
     this.userId = data.userId;
-    this.colyseusClient = data.colyseusClient;
     console.log('datauserid', data.userId);
   }
 
@@ -37,6 +37,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   async create() {
+    // Connect to the colyseus lobby room
+    connectToGameLobby(this.colyseusClient, this.userId);
     calculateCenterPoints(); // REVIEW:
     await createGameMenuUI(this); // generates background menu and game list
     await createGameBoardUI(this); // generates the game board

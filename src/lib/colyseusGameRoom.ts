@@ -65,7 +65,7 @@ function subscribeToGameListeners(room: Room): void {
   });
 
   // Send a message to the server
-  room.send("turn", { turnMoves: [{}] });
+  room.send("turnSent", { userIds: ['67979a0099f7c74fa80d6378', '67967b3cb47931a80cddedc6'] }); // FIXME:
 
   // TODO: on disconnect ?
 }

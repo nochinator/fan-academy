@@ -15,6 +15,5 @@ export function loadGameMenuUI(context: GameScene) {
 export async function  createGameMenuUI(context: GameScene) {
   // Background game screen
   context.add.image(0, 0, 'background').setOrigin(0, 0);
-  await connectToGameLobby(context.colyseusClient, context.userId);
   await createGameList(context);
 }

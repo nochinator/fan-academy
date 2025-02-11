@@ -14,7 +14,7 @@ export function loadGameBoardTiles(context: GameScene): void {
   // Crystals
   context.load.image('crystal', '/assets/images/gameItems/Crystal-LgDmg01_Color-hd.png');
   context.load.image('pedestal', '/assets/images/gameItems/Crystal-Lg_Base-hd.png');
-  context.load.image('damagedCrystal', '/assets/images/gameItems/Crustal-LgDmg03_Color-hd.png');
+  context.load.image('damagedCrystal', '/assets/images/gameItems/Crystal-LgDmg03_Color-hd.png');
 };
 
 export function createBoardGameTiles(context: GameScene): void {

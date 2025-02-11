@@ -1,4 +1,5 @@
 import { IGame, IPlayer } from "../../interfaces/gameInterface";
+import { createGame } from "../../lib/colyseusGameRoom";
 import { getGameList } from "../../queries/gameQueries";
 import GameScene from "../game.scene";
 import { loadProfilePictures } from "./profilePictures";
@@ -74,8 +75,18 @@ export async function createGameList(context: GameScene) {
     fontFamily: "proHeavy"
   });
   const newGameButton = context.add.image(0, lastListItemY, 'newGameButton').setOrigin(0);
-  const councilEmblem = context.add.image(380, lastListItemY, 'council').setOrigin(0).setScale(0.5);
-  const elvesEmblem = context.add.image(530, lastListItemY, 'elves').setOrigin(0).setScale(0.5);
+  const councilEmblem = context.add.image(380, lastListItemY, 'council').setOrigin(0).setScale(0.5).setInteractive();
+  const elvesEmblem = context.add.image(530, lastListItemY, 'elves').setOrigin(0).setScale(0.5).setInteractive();
+
+  // Creating a new game when clicking on the desired faction
+  councilEmblem.on('pointerdown', async () => {
+    console.log('listener logs');
+    await createGame(context.colyseusClient, context.userId, 'council');
+  });
+  elvesEmblem.on('pointerdown', async () => {
+    console.log('listener logs');
+    await createGame(context.colyseusClient, context.userId, 'elves');
+  });
 
   lastListItemY += 150;
 
