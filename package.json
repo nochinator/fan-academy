@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "colyseus.js": "^0.15.26",
-    "phaser": "^3.87.0",
-    "uuid": "^11.0.5"
+    "phaser": "^3.87.0"
   }
 }

@@ -1,4 +1,4 @@
-import { createGame, joinGame } from "../../lib/colyseusGameRoom";
+import { createGame, joinGame, sendTurnMessage } from "../../lib/colyseusGameRoom";
 import GameScene from "../game.scene";
 
 export function loadGameBoardUI(context: GameScene): void {
@@ -53,8 +53,23 @@ export async function createGameBoardUI(context: GameScene): Promise<void> {
   // Send turn button
   const turnButton =  context.add.image(0, 0, 'turnButton').setOrigin(0.5).setPosition(1300, 725).setScale(1.1).setInteractive(); // TODO: add dynamic text. 'Send' - 'Next game'
   turnButton.on('pointerdown', async () => {
-    console.log('listener logs');
-    await createGame(context.colyseusClient, context.userId, 'elves');
+    console.log('Check context.currentGame && context.currentGame.activePlayer', context.currentGame, context?.currentGame?.activePlayer);
+    if (context.currentGame && context.currentGame.activePlayer === context.userId) {
+      console.log('Clicked on send turn');
+
+      context.currentTurn = [
+        {
+          activeUnit: 'Bianca the archer',
+          targetUnit: 'Portia the impales',
+          action: 'attack', // TODO: enum
+          actionNumber: 1
+        }
+      ]; // REVIEW: THIS
+
+      sendTurnMessage(context.currentRoom, context.currentTurn, context.currentOpponent);
+    } else {
+      console.log('Clicked on send turn but... not your turn'); // TODO: remove after testing
+    }
   });
 
   // Top banner and health bars TODO:

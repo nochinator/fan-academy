@@ -1,4 +1,5 @@
 import { Client, Room } from "colyseus.js";
+import { ITurnAction } from "../interfaces/gameInterface";
 
 /**
  *
@@ -21,8 +22,6 @@ export async function createGame(client: Client | undefined, userId: string | un
     });
 
     subscribeToGameListeners(room);
-
-    // TODO: delete uuid package if not used
 
     console.log("Joined room:", room.name);
   } catch (error) {
@@ -64,25 +63,26 @@ function subscribeToGameListeners(room: Room): void {
   // Listen for broadcasted messages
   room.onMessage("turnPlayed", (message) => {
     console.log("Player sent turn:", message);
-  });
-
-  // Send a message to the server
-  room.send("turnSent", {
-    _id: '67aa3048b77ce4887a694773',
-    players: [
-      {
-        userData: '67979a0099f7c74fa80d6378',
-        faction: { factionName: 'council' }
-      },
-      {
-        userData: '67967b3cb47931a80cddedc6',
-        faction: { factionName: 'elves' }
-      }
-    ],
-    createdAt: '2025-02-01T19:04:45.420+00:00',
-    status: 'playing',
-    gameState: [{}],
-    activePlayer: '67967b3cb47931a80cddedc6'
-
+    // TODO: call here playTurn function
   });
 }
+
+export function sendTurnMessage(currentRoom: Room | undefined, currentTurn: ITurnAction[] | undefined, newActivePlayer: string | undefined): void {
+  if (!currentRoom || !currentTurn || !newActivePlayer) {
+    console.log('Error sending turn, missing one or more params:');
+    console.log('Current Room -> ', currentRoom);
+    console.log('Current Turn -> ', currentTurn);
+    console.log('newActivePlayer -> ', newActivePlayer);
+
+    return;
+  }
+
+  console.log('turnSent check for currentRoom.roomId', currentRoom.roomId);
+  currentRoom.send("turnSent", {
+    _id: currentRoom.roomId,
+    newTurn: currentTurn,
+    newActivePlayer
+  });
+
+  console.log("Turn message sent...");
+} // TODO: add a lastTurnSentFunction changing status, winner and victory condition

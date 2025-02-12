@@ -62,22 +62,12 @@ export interface ITurnAction {
 }
 
 /**
- * Turn Interface
- */
-export interface ITurn {
-  turnNumber: number;
-  activePlayer: string; // userId
-  actions: ITurnAction[];
-}
-
-/**
  * Game Interface
  */
 export interface IGame {
   _id: string;
   players: IPlayer[];
-  gameState: ITurn[];
-  // board: string;
+  gameState: ITurnAction[];
   winCondition?: string;
   winner?: string
   status: string // TODO: share enums?

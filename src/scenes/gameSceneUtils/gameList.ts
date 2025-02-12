@@ -12,7 +12,6 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
   } else {
     gameList = await getGameList(context.userId!);
   }
-  if (!gameList || gameList.length === 0) return;
 
   // If the game list already exists in the scene, remove it before re-rendering
   if (context.gameListContainer) context.gameListContainer.destroy(true);
@@ -99,9 +98,19 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
             await context.currentRoom.leave();
             context.currentRoom = undefined;
           }
+
           console.log('Accessing game: ', game._id);
+
           const room = await joinGame(context.colyseusClient, context.userId, game._id);
+
+          // Updating GameScene properties
           context.currentRoom = room;
+          context.currentOpponent = opponent?.userData._id.toString();
+          context.activePlayer =  game.activePlayer.toString();
+          context.currentGame = game;
+
+          console.log('PLAYING CHECK for currentRoom', context.currentRoom);
+          console.log('PLAYING CHECK for currentOpponent', JSON.stringify(context.currentOpponent));
         });
       }
 

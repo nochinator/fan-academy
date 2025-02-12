@@ -5,12 +5,17 @@ import { loadGameMenuUI, createGameMenuUI } from "./gameSceneUtils/gameMenu.UI";
 import { createBoardGameTiles, loadGameBoardTiles } from "./gameSceneUtils/gameBoardTiles.";
 import calculateCenterPoints from "../utils/boardCalculations";
 import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
+import { IGame, ITurnAction } from "../interfaces/gameInterface";
 
 export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
   userId: string | undefined;
   gameListContainer: any; // REVIEW:
   currentRoom: Room | undefined;
+  currentGame: IGame | undefined;
+  currentTurn: ITurnAction[] | undefined;
+  currentOpponent: string | undefined;
+  activePlayer: string | undefined;
 
   constructor() {
     super({ key: 'GameScene' });
