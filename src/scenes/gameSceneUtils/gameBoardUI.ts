@@ -33,10 +33,7 @@ export async function createGameBoardUI(context: GameScene): Promise<void> {
 
   // Door
   const doorClosed = context.add.image(0, 0, 'doorClosed').setOrigin(0.5).setPosition(490, 700).setScale(0.9).setInteractive();
-  doorClosed.on('pointerdown', async () => {
-    console.log('Looking for specific room');
-    await joinGame(context.colyseusClient, context.userId, '67990f78db4974459c2538f5');
-  });
+  // TODO: doorClosed on 'hoover' -> show remaining units and items in the deck
 
   const doorOpen = context.add.image(0, 0, 'doorOpen').setOrigin(0.5).setPosition(490, 700).setVisible(false); // TTODO: trigger 'refill' event at the end of the player's turn
   context.add.image(0, 0, 'doorBanner').setOrigin(0.5).setPosition(440, 760); // TODO: add text
