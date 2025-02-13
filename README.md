@@ -32,7 +32,7 @@ The server code is hosted on a [separate repository](https://github.com/Dan-DH/f
 
 ## Who is behind the project?
 
-Hi, I'm **Daniel**, a full-stack developer based in Brussels. You can learn more about me on [GitHub profile](https://github.com/Dan-DH).
+Hi, I'm **Daniel**, a full-stack developer based in Brussels. You can learn more about me on my [GitHub profile](https://github.com/Dan-DH).
 
 ## Licensing and disclaimer
 
