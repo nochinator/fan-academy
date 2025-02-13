@@ -23,11 +23,6 @@ export interface IUnit {
 }
 
 /**
- * Unit Data Interface
- */
-export interface IUnitData {unitData: IUnit}
-
-/**
  * Faction Interface
  */
 export interface IFaction {
@@ -40,14 +35,19 @@ export interface IFaction {
 }
 
 /**
+ * User data Interface
+ */
+export interface IUserData {
+  _id: string
+  username: string; // from populate in the BE
+  picture: string; // from populate in the BE
+}
+
+/**
  * Player Interface
  */
 export interface IPlayer {
-  userData: {
-    _id: string
-    username: string; // from populate in the BE
-    picture: string; // from populate in the BE
-  },
+  userData: IUserData,
   faction: IFaction;
 }
 

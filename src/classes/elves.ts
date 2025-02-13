@@ -3,7 +3,7 @@ import { IFaction, IUnit } from "../interfaces/gameInterface";
 import { EFaction } from "../enums/gameEnums";
 import { shuffleArray } from "../utils/shuffleArray";
 
-export class Archer extends Unit {
+export class Impaler extends Unit {
   constructor(
     data: {
       unitId: string,
@@ -20,7 +20,7 @@ export class Archer extends Unit {
     super(
       {
         unitClass: "hero",
-        unitType: 'archer',
+        unitType: 'impaler',
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 0, // positions go from 0-50, 0 being the deck and 46-50 the hand
         maxHealth,
@@ -30,7 +30,7 @@ export class Archer extends Unit {
         range: 3,
         attackType: "physical",
         rangeAttackDamage: 300,
-        meleeAttackDamage: 150,
+        meleeAttackDamage: 300,
         healingPower: 0, // If > 0, the unit can heal
         physicalDamageResistance: 0,
         magicalDamageResistance: 0,
@@ -43,7 +43,7 @@ export class Archer extends Unit {
 }
 
 // FIXME: correct data after testing
-export class Knight extends Unit {
+export class VoidMonk extends Unit {
   constructor(
     data: {
       unitId: string,
@@ -60,7 +60,7 @@ export class Knight extends Unit {
     super(
       {
         unitClass: "hero",
-        unitType: 'archer',
+        unitType: 'impaler',
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 0, // positions go from 0-50, 0 being the deck and 46-50 the hand
         maxHealth,
@@ -70,7 +70,7 @@ export class Knight extends Unit {
         range: 3,
         attackType: "physical",
         rangeAttackDamage: 300,
-        meleeAttackDamage: 150,
+        meleeAttackDamage: 300,
         healingPower: 0, // If > 0, the unit can heal
         physicalDamageResistance: 0,
         magicalDamageResistance: 0,
@@ -82,7 +82,7 @@ export class Knight extends Unit {
   }
 }
 
-export class Wizard extends Unit {
+export class Necromancer extends Unit {
   constructor(
     data: {
       unitId: string,
@@ -99,7 +99,7 @@ export class Wizard extends Unit {
     super(
       {
         unitClass: "hero",
-        unitType: 'archer',
+        unitType: 'impaler',
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 0, // positions go from 0-50, 0 being the deck and 46-50 the hand
         maxHealth,
@@ -109,7 +109,7 @@ export class Wizard extends Unit {
         range: 3,
         attackType: "physical",
         rangeAttackDamage: 300,
-        meleeAttackDamage: 150,
+        meleeAttackDamage: 300,
         healingPower: 0, // If > 0, the unit can heal
         physicalDamageResistance: 0,
         magicalDamageResistance: 0,
@@ -121,7 +121,7 @@ export class Wizard extends Unit {
   }
 }
 
-export class CouncilFaction implements IFaction {
+export class ElvesFaction implements IFaction {
   factionName: string;
   unitsOnBoard: IUnit[];
   unitsInHand: IUnit[];
@@ -137,28 +137,25 @@ export class CouncilFaction implements IFaction {
     cristalTwoHealth?: number
 
   ) {
-    const newDeck = unitsInDeck ?? this.createCouncilDeck(); // REVIEW
+    const newDeck = unitsInDeck ?? this.createElvesDeck(); // REVIEW
     const startingHand = unitsInHand ?? newDeck.splice(0, 6) ;
 
-    this.factionName = EFaction.COUNCIL;
+    this.factionName = EFaction.DARK_ELVES;
     this.unitsOnBoard = unitsOnBoard ?? [];
     this.unitsInDeck = unitsInDeck ?? newDeck;
     this.unitsInHand = unitsInHand ?? startingHand;
     this.cristalOneHealth = cristalOneHealth ?? 4500;
     this.cristalTwoHealth = cristalTwoHealth ?? 4500;
   }
-
-  createCouncilDeck(): IUnit[] {
+  createElvesDeck(): IUnit[] {
     const deck = [];
 
     for (let index = 0; index < 3; index++) {
-      const archer = new Archer({ unitId: 'archer_' + index });
-      const knight = new Knight({ unitId: 'knight_' + index });
-      const wizard = new Wizard({ unitId: 'wizard_' + index });
+      const impaler = new Impaler({ unitId: 'impaler_' + index });
+      const voidMonk = new VoidMonk({ unitId: 'voidMonk_' + index });
+      const necromancer = new Necromancer({ unitId: 'necromancer_' + index });
 
-      // TODO: add rest of items / units (don't forget buffs)
-
-      deck.push(archer, knight, wizard);
+      deck.push(impaler, voidMonk, necromancer);
     }
 
     const shuffledDeck = shuffleArray(deck);
@@ -166,15 +163,3 @@ export class CouncilFaction implements IFaction {
     return shuffledDeck;
   }
 }
-
-// class Wizard extends Unit {
-//   constructor(id: string, team: string) {
-//     super(id, team, "wizard", 40, 15, 3); // Example stats
-//   }
-// }
-
-// class Warrior extends Unit {
-//   constructor(id: string, team: string) {
-//     super(id, team, "warrior", 60, 8, 4); // Example stats
-//   }
-// }

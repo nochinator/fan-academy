@@ -1,4 +1,4 @@
-import { createGame, joinGame, sendTurnMessage } from "../../lib/colyseusGameRoom";
+import { sendTurnMessage } from "../../lib/colyseusGameRoom";
 import GameScene from "../game.scene";
 
 export function loadGameBoardUI(context: GameScene): void {

@@ -41,7 +41,7 @@ export function loadGameAssets(context: GameScene) {
   // });
 
   // impaler.x = centerPoints[0].x;
-  // impaler.y = centerPoints[0].y;
+  // impaler.y = centerPoints[0].y; // REVIEW: create a dragable events function that we can add to all units. I think if setDraggable is unset we can leave the actual listeners since they won't be triggered (less code activiate / deactivate when is not the player's turn)
 }
 
 export function createGameAssets(context: GameScene): void {

@@ -18,7 +18,7 @@ export async function loadProfilePictures(context: GameScene, gameList: IGame[])
     });
   });
 
-  // remove duplicates
+  // Remove duplicates
   const uniqueOponents: {
     username: string,
     picture: string

@@ -42,10 +42,11 @@ export default class GameScene extends Phaser.Scene {
     connectToGameLobby(this.colyseusClient, this.userId, this);
     calculateCenterPoints(); // REVIEW:
     await createGameMenuUI(this); // generates background menu and game list
+
+    // TODO: have a background image asset for when the list is first rendered and the player hasn't selected a game yet
     await createGameBoardUI(this); // generates the game board
     createBoardGameTiles(this);
     createGameAssets(this);
-    // REVIEW: theoretically we select the first game on the list and show it
   }
 
   update() {

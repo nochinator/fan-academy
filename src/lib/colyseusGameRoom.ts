@@ -1,5 +1,5 @@
 import { Client, Room } from "colyseus.js";
-import { ITurnAction } from "../interfaces/gameInterface";
+import { IFaction, ITurnAction } from "../interfaces/gameInterface";
 
 /**
  *
@@ -8,7 +8,7 @@ import { ITurnAction } from "../interfaces/gameInterface";
  * once working, test joining games
  * @param userId
  */
-export async function createGame(client: Client | undefined, userId: string | undefined, faction: string | undefined): Promise<void> {
+export async function createGame(client: Client | undefined, userId: string | undefined, faction: IFaction | undefined): Promise<void> {
   if (!client || !userId || !faction) {
     console.log('createGame error: missing one of client / userId / faction');
     return;
@@ -23,9 +23,9 @@ export async function createGame(client: Client | undefined, userId: string | un
 
     subscribeToGameListeners(room);
 
-    console.log("Joined room:", room.name);
+    console.log("Created and joined room:", room.name);
   } catch (error) {
-    console.error("Failed to join room:", error);
+    console.error("Failed to create or join room:", error);
   }
 }
 
