@@ -20,7 +20,7 @@ Learn more about the original game [here on its Wikipedia page](https://en.wikip
 
 ## Why create Fan Academy?
 
-I loved playing Hero Academy back in the day, and no other mobile game has come close to replicating the fun I had with it. Although the game still runs on Steam, the servers were shut down years ago, making it unplayable in its original form. I decided to bring it back as a fan project to allow others to rediscover the game.
+I loved playing Hero Academy back in the day, and no other mobile game has come close to replicating the fun I had with it. Although the game still runs on Steam, the servers were shut down years ago, making it unplayable in its original form. I decided to bring it back as a fan project to allow people who bought the game to continue playing it, and for new people to discover it.
 
 The name **Fan Academy** highlights that this is a fan project, with no commercial intent, just a passion to preserve and share a great game.
 
@@ -32,7 +32,7 @@ The server code is hosted on a [separate repository](https://github.com/Dan-DH/f
 
 ## Who is behind the project?
 
-Hi, I'm **Daniel**, a full-stack developer based in Brussels. You can learn more about me on [GitHub profile](https://github.com/Dan-DH).
+Hi, I'm **Daniel**, a full-stack developer based in Brussels. You can learn more about me on my [GitHub profile](https://github.com/Dan-DH).
 
 ## Licensing and disclaimer
 
