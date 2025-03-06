@@ -5,9 +5,6 @@ import { IFaction, IPlayer, IUserData } from "../interfaces/gameInterface";
 
 /**
  * Creates a starting state for a given faction, randomizing the assets in deck and dealing a starting hand
- * @param player The player id, useranem and picture
- * @param playerFaction The player's faction
- * @returns
  */
 export function createNewGameFactionState(playerFaction: string): IFaction {
   console.log('CREATEFUNC_PLAYERFACTION', playerFaction);

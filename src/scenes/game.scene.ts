@@ -1,7 +1,7 @@
 import { Client, Room } from "colyseus.js";
 import { createGameAssets, loadGameAssets } from "./gameSceneUtils/gameAssets";
 import { createGameBoardUI, loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
-import { loadGameMenuUI, createGameMenuUI } from "./gameSceneUtils/gameMenu.UI";
+import { loadGameMenuUI, createGameMenuUI } from "./gameSceneUtils/gameMenuUI";
 import { createBoardGameTiles, loadGameBoardTiles } from "./gameSceneUtils/gameBoardTiles.";
 import calculateCenterPoints from "../utils/boardCalculations";
 import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
@@ -44,9 +44,11 @@ export default class GameScene extends Phaser.Scene {
     await createGameMenuUI(this); // generates background menu and game list
 
     // TODO: have a background image asset for when the list is first rendered and the player hasn't selected a game yet
-    await createGameBoardUI(this); // generates the game board
-    createBoardGameTiles(this);
-    createGameAssets(this);
+
+    // REVIEW: the below functions should only be called when a game is selected
+    // await createGameBoardUI(this); // generates the game board
+    // createBoardGameTiles(this);
+    // createGameAssets(this); // TODO: we need to pass the game state to this function
   }
 
   update() {
