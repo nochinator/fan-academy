@@ -1,6 +1,6 @@
 import { Unit } from "./unit";
 import { IFaction, IUnit } from "../interfaces/gameInterface";
-import { EAttackTypes, EFaction } from "../enums/gameEnums";
+import { EAttackType, EFaction } from "../enums/gameEnums";
 import { shuffleArray } from "../utils/shuffleArray";
 
 export class Impaler extends Unit {
@@ -28,7 +28,7 @@ export class Impaler extends Unit {
         isKO: data.isKO ?? false,
         movement: 2,
         range: 3,
-        attackType: EAttackTypes.PHYSICAL,
+        attackType: EAttackType.PHYSICAL,
         rangeAttackDamage: 300,
         meleeAttackDamage: 300,
         healingPower: 0, // If > 0, the unit can heal
@@ -68,7 +68,7 @@ export class VoidMonk extends Unit {
         isKO: data.isKO ?? false,
         movement: 2,
         range: 3,
-        attackType: EAttackTypes.PHYSICAL,
+        attackType: EAttackType.PHYSICAL,
         rangeAttackDamage: 300,
         meleeAttackDamage: 300,
         healingPower: 0, // If > 0, the unit can heal
@@ -107,7 +107,7 @@ export class Necromancer extends Unit {
         isKO: data.isKO ?? false,
         movement: 2,
         range: 3,
-        attackType: EAttackTypes.PHYSICAL,
+        attackType: EAttackType.PHYSICAL,
         rangeAttackDamage: 300,
         meleeAttackDamage: 300,
         healingPower: 0, // If > 0, the unit can heal
@@ -123,7 +123,6 @@ export class Necromancer extends Unit {
 
 export class ElvesFaction implements IFaction {
   factionName: string;
-  unitsOnBoard: IUnit[];
   unitsInHand: IUnit[];
   unitsInDeck: IUnit[];
   cristalOneHealth: number;
@@ -141,7 +140,6 @@ export class ElvesFaction implements IFaction {
     const startingHand = unitsInHand ?? newDeck.splice(0, 6) ;
 
     this.factionName = EFaction.DARK_ELVES;
-    this.unitsOnBoard = unitsOnBoard ?? [];
     this.unitsInDeck = unitsInDeck ?? newDeck;
     this.unitsInHand = unitsInHand ?? startingHand;
     this.cristalOneHealth = cristalOneHealth ?? 4500;

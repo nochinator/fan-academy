@@ -1,11 +1,11 @@
 import { Client, Room } from "colyseus.js";
-import { createGameAssets, loadGameAssets } from "./gameSceneUtils/gameAssets";
-import { createGameBoardUI, loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
+import { loadGameAssets } from "./gameSceneUtils/gameAssets";
+import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameMenuUI, createGameMenuUI } from "./gameSceneUtils/gameMenuUI";
-import { createBoardGameTiles, loadGameBoardTiles } from "./gameSceneUtils/gameBoardTiles.";
-import calculateCenterPoints from "../utils/boardCalculations";
+import { loadGameBoardTiles } from "./gameSceneUtils/gameBoardTiles.";
+import { calculateCenterPoints, Coordinates } from "../utils/boardCalculations";
 import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
-import { IGame, ITurnAction } from "../interfaces/gameInterface";
+import { IGame, IGameState, ITurnAction } from "../interfaces/gameInterface";
 
 export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
@@ -13,13 +13,15 @@ export default class GameScene extends Phaser.Scene {
   gameListContainer: any; // REVIEW:
   currentRoom: Room | undefined;
   currentGame: IGame | undefined;
-  currentTurn: ITurnAction[] | undefined;
+  currentTurn: IGameState | undefined;
   currentOpponent: string | undefined;
   activePlayer: string | undefined;
+  centerPoints: Coordinates[];
 
   constructor() {
     super({ key: 'GameScene' });
     this.colyseusClient = new Client("ws://localhost:3003"); // TODO: env var
+    this.centerPoints = [];
   }
 
   init(data: {
@@ -40,15 +42,8 @@ export default class GameScene extends Phaser.Scene {
   async create() {
     // Connect to the colyseus lobby room
     connectToGameLobby(this.colyseusClient, this.userId, this);
-    calculateCenterPoints(); // REVIEW:
+    this.centerPoints = calculateCenterPoints(); // REVIEW:
     await createGameMenuUI(this); // generates background menu and game list
-
-    // TODO: have a background image asset for when the list is first rendered and the player hasn't selected a game yet
-
-    // REVIEW: the below functions should only be called when a game is selected
-    // await createGameBoardUI(this); // generates the game board
-    // createBoardGameTiles(this);
-    // createGameAssets(this); // TODO: we need to pass the game state to this function
   }
 
   update() {

@@ -1,9 +1,10 @@
 import { EFaction } from "../../enums/gameEnums";
-import { IGame, IPlayer } from "../../interfaces/gameInterface";
+import { IGame, IPlayerData } from "../../interfaces/gameInterface";
 import { createGame, joinGame } from "../../lib/colyseusGameRoom";
 import { deleteGame, getGameList } from "../../queries/gameQueries";
 import { createNewGameFactionState } from "../../utils/renderGameState";
 import GameScene from "../game.scene";
+import { createGameAssets } from "./gameAssets";
 import { loadProfilePictures } from "./profilePictures";
 
 export async function createGameList(context: GameScene, colyseusGameList?: IGame[]) {
@@ -51,21 +52,21 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
   // Function for adding elements to the container
   const createGameListItem = (gameListArray: IGame[]) => {
     gameListArray.forEach((game, index) => {
-      const player = game.players.find((p: IPlayer) => context.userId === p.userData._id);
-      const opponent = game.players.find((p: IPlayer) => context.userId !== p.userData._id);
+      const player = game.players.find((p: IPlayerData) => context.userId === p.userData._id);
+      const opponent = game.players.find((p: IPlayerData) => context.userId !== p.userData._id);
       if (!player) return;
 
       lastListItemY += ( index === 0 ? textListHeight : gameListButtonHeight) + gameListButtonSpacing;
 
       const gameListButtonImage = context.add.image(0, lastListItemY, "gameListButton").setOrigin(0);
-      const playerFactionImage =  context.add.image(90, lastListItemY + gameListButtonHeight / 2, player.faction.factionName).setScale(0.4);
+      const playerFactionImage =  context.add.image(90, lastListItemY + gameListButtonHeight / 2, player.faction).setScale(0.4);
 
       let opponentFactionImage;
       let opponentProfilePicture;
       let opponentNameText;
 
       if (opponent) {
-        opponentFactionImage = context.add.image(510, lastListItemY + gameListButtonHeight / 2, opponent.faction.factionName).setScale(0.4);
+        opponentFactionImage = context.add.image(510, lastListItemY + gameListButtonHeight / 2, opponent.faction).setScale(0.4);
         opponentNameText = context.add.text(200, lastListItemY + gameListButtonHeight / 2 - 33, opponent.userData.username, {
           fontSize: 50,
           fontFamily: "proLight"
@@ -111,8 +112,8 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
           context.activePlayer =  game.activePlayer.toString();
           context.currentGame = game;
 
-          console.log('PLAYING CHECK for currentRoom', context.currentRoom);
-          console.log('PLAYING CHECK for currentOpponent', JSON.stringify(context.currentOpponent));
+          // Render the game map
+          await createGameAssets(context);
         });
       }
 

@@ -1,3 +1,4 @@
+import { EAction } from "../../enums/gameEnums";
 import { sendTurnMessage } from "../../lib/colyseusGameRoom";
 import GameScene from "../game.scene";
 
@@ -54,14 +55,15 @@ export async function createGameBoardUI(context: GameScene): Promise<void> {
     if (context.currentGame && context.currentGame.activePlayer === context.userId) {
       console.log('Clicked on send turn');
 
-      context.currentTurn = [
-        {
+      context.currentTurn = {
+        ...context.currentGame.currentState, // REVIEW:
+        action: {
           activeUnit: 'Bianca the archer',
-          targetUnit: 'Portia the impales',
-          action: 'attack', // TODO: enum
+          targetUnit: 'Portia the impaler',
+          action: EAction.ATTACK,
           actionNumber: 1
         }
-      ]; // REVIEW: THIS
+      }; // REVIEW: THIS
 
       sendTurnMessage(context.currentRoom, context.currentTurn, context.currentOpponent);
     } else {

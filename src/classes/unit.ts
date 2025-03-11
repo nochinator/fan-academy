@@ -1,3 +1,4 @@
+import { EAttackType } from "../enums/gameEnums";
 import { IUnit } from "../interfaces/gameInterface";
 
 export class Unit implements IUnit {
@@ -10,7 +11,7 @@ export class Unit implements IUnit {
   isKO: boolean;
   movement: number;
   range: number;
-  attackType: "physical" | "magical";
+  attackType: EAttackType;
   rangeAttackDamage: number;
   meleeAttackDamage: number;
   healingPower: number;
@@ -30,7 +31,7 @@ export class Unit implements IUnit {
     isKO: boolean,
     movement: number,
     range: number,
-    attackType: "physical" | "magical",
+    attackType: EAttackType,
     rangeAttackDamage: number,
     meleeAttackDamage: number,
     healingPower: number, // If > 0, the unit can heal

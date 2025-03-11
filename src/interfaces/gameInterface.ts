@@ -1,17 +1,19 @@
+import { EAction, EAttackType, EFaction, EGameStatus } from "../enums/gameEnums";
+
 /**
  * Unit Interface
  */
 export interface IUnit {
   unitClass: "hero" | "item";
-  unitType: string; // enum?
-  unitId: string;
+  unitType: string; // TODO: enum?
+  unitId: string; // eg: p101 -> player 1 archer for ex
   boardPosition: number;
   maxHealth: number;
   currentHealth: number;
   isKO: boolean;
   movement: number;
   range: number;
-  attackType: "physical" | "magical";
+  attackType: EAttackType;
   rangeAttackDamage: number;
   meleeAttackDamage: number;
   healingPower: number; // If > 0, the unit can heal
@@ -20,6 +22,7 @@ export interface IUnit {
   dragonScale: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
+  // belongsTo: string; // user id
 }
 
 /**
@@ -27,7 +30,6 @@ export interface IUnit {
  */
 export interface IFaction {
   factionName: string;
-  unitsOnBoard: IUnit[];
   unitsInHand: IUnit[];
   unitsInDeck: IUnit[];
   cristalOneHealth: number;
@@ -37,28 +39,42 @@ export interface IFaction {
 /**
  * User data Interface
  */
-export interface IUserData {
-  _id: string
-  username: string; // from populate in the BE
-  picture: string; // from populate in the BE
-}
-
-/**
- * Player Interface
- */
-export interface IPlayer {
-  userData: IUserData,
-  faction: IFaction;
+export interface IPlayerData {
+  userData: {
+    _id: string
+    username: string; // from populate in the BE
+    picture: string; // from populate in the BE
+  };
+  faction: EFaction;
 }
 
 /**
  * TurnAction Interface
  */
 export interface ITurnAction {
-  activeUnit: string; // Unit id
+  activeUnit?: string; // Unit id
   targetUnit: string; // Unit id or deck
-  action: "attack" | "heal" | "shuffle"; // Enum for action type
+  action: EAction,
   actionNumber: number; // Order in the turn
+}
+
+/**
+ * UserState Interface
+ */
+export interface IPlayerState {
+  playerId: string,
+  factionData: IFaction;
+}
+
+/**
+ * GameState Interface
+ */
+export interface IGameState {
+  // After a turn is played, a new turn (without action but with the current board state) is created as CurrentTurn
+  player1: IPlayerState;
+  player2?: IPlayerState;
+  boardState: IUnit[];
+  action?: ITurnAction;
 }
 
 /**
@@ -66,11 +82,13 @@ export interface ITurnAction {
  */
 export interface IGame {
   _id: string;
-  players: IPlayer[];
-  gameState: ITurnAction[];
+  players: IPlayerData[];
+  gameState: IGameState[]; // turn 0 is the dealing of the hands
+  currentState: IGameState;
   winCondition?: string;
-  winner?: string
-  status: string // TODO: share enums?
-  createdAt: Date
-  activePlayer: string
+  winner?: string;
+  status: EGameStatus;
+  createdAt: Date;
+  activePlayer: string;
+  // TODO: add a mapType field that is enum. The enum will be used to render a specific tile combination for that map
 }

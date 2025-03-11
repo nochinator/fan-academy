@@ -1,4 +1,7 @@
 import GameScene from "../game.scene";
+import { createBoardGameTiles } from "./gameBoardTiles.";
+import { createGameBoardUI } from "./gameBoardUI";
+import { renderCharacter } from "./renderCharacter";
 
 export function loadGameAssets(context: GameScene) {
   // Loading units
@@ -15,35 +18,43 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('runeMetal', './assets/images/factions/common/rune_metal.png');
   context.load.image('dragonScale', './assets/images/factions/common/dragon_scale.png');
   context.load.image('shiningHelm', './assets/images/factions/common/shining_helm.png');
-
-  // test // REVIEW:
-  // const character = this.add.image(0, -10, 'impaler').setOrigin(0.5).setDepth(10);
-  // const runeMetal = this.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.3).setDepth(10);
-  // const dragonScale = this.add.image(5, 25, 'dragonScale').setOrigin(0.5).setScale(0.3).setDepth(10);
-  // const shiningHelm = this.add.image(-28, 25, 'shiningHelm').setOrigin(0.5).setScale(0.3).setDepth(10);
-
-  // const impaler = this.add.container(centerPoints[0].x, centerPoints[0].y, [character, runeMetal, dragonScale, shiningHelm]).setSize(50, 50).setInteractive();
-
-  // this.input.setDraggable(impaler);
-
-  // impaler.on('drag', (_: any, dragX: number, dragY: number) => {
-  //   impaler.x = dragX;
-  //   impaler.y = dragY;
-  // });
-
-  // impaler.on('dragend', (_: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-  //   impaler.x = 500;
-  //   impaler.y = 180;
-  // });
-  // this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-  //   // Log the mouse coordinates
-  //   console.log(`Mouse coordinates: x=${pointer.x}, y=${pointer.y}`);
-  // });
-
-  // impaler.x = centerPoints[0].x;
-  // impaler.y = centerPoints[0].y; // REVIEW: create a dragable events function that we can add to all units. I think if setDraggable is unset we can leave the actual listeners since they won't be triggered (less code activiate / deactivate when is not the player's turn)
 }
 
-export function createGameAssets(context: GameScene): void {
-  // console.log(context);
+export async function createGameAssets(context: GameScene): Promise<void> {
+  console.log('This logs when I click on the game', context.currentGame?._id);
+
+  await createGameBoardUI(context);
+  createBoardGameTiles(context); // TODO: this should be based on map
+
+  // TODO: generate the hand for the player and the assets on the map
+  // Gotta split the items for the players, so the user wont be able to see the items and hand of the opponent
+
+  const game = context.currentGame;
+  if (!game) return; // TODO: throw error here
+
+  const userPlayer = game.players.find(p => p._id === context.userId);
+  const opponent = game.players.find(p => p._id != context.userId);
+
+  // FIXME: render the crystal here
+
+  /**
+   * Render units on the board
+   */
+  const unitsOnBoard =  game.currentState.boardState;
+
+  unitsOnBoard.forEach(unit => {
+    renderCharacter(context, unit);
+  });
+
+  /**
+   * Render units in hand
+   */
+
+  /**
+   * Render units in deck (not visible
+   */
+
+  console.log('userPlayer', userPlayer);
+
+  console.log('CURRENTGAMESTATE', context.currentGame);
 }

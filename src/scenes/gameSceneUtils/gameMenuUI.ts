@@ -18,5 +18,6 @@ export async function  createGameMenuUI(context: GameScene) {
   // Background game screen
   context.add.image(0, 0, 'uiBackground').setOrigin(0, 0);
   await createGameList(context);
-  context.add.image(397, 15, 'createGame').setOrigin(0, 0).setScale(1.06, 1.2); // REVIEW:
+
+  if (!context.currentGame) context.add.image(397, 15, 'createGame').setOrigin(0, 0).setScale(1.06, 1.2);
 }

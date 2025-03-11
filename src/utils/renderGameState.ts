@@ -1,7 +1,7 @@
 import { CouncilFaction } from "../classes/council";
 import { ElvesFaction } from "../classes/elves";
 import { EFaction } from "../enums/gameEnums";
-import { IFaction, IPlayer, IUserData } from "../interfaces/gameInterface";
+import { IFaction } from "../interfaces/gameInterface";
 
 /**
  * Creates a starting state for a given faction, randomizing the assets in deck and dealing a starting hand

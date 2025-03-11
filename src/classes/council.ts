@@ -1,6 +1,6 @@
 import { Unit } from "./unit";
 import { IFaction, IUnit } from "../interfaces/gameInterface";
-import { EFaction } from "../enums/gameEnums";
+import { EAttackType, EFaction } from "../enums/gameEnums";
 import { shuffleArray } from "../utils/shuffleArray";
 
 export class Archer extends Unit {
@@ -28,7 +28,7 @@ export class Archer extends Unit {
         isKO: data.isKO ?? false,
         movement: 2,
         range: 3,
-        attackType: "physical",
+        attackType: EAttackType.PHYSICAL,
         rangeAttackDamage: 300,
         meleeAttackDamage: 150,
         healingPower: 0, // If > 0, the unit can heal
@@ -60,7 +60,7 @@ export class Knight extends Unit {
     super(
       {
         unitClass: "hero",
-        unitType: 'archer',
+        unitType: 'knight',
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 0, // positions go from 0-50, 0 being the deck and 46-50 the hand
         maxHealth,
@@ -68,7 +68,7 @@ export class Knight extends Unit {
         isKO: data.isKO ?? false,
         movement: 2,
         range: 3,
-        attackType: "physical",
+        attackType: EAttackType.PHYSICAL,
         rangeAttackDamage: 300,
         meleeAttackDamage: 150,
         healingPower: 0, // If > 0, the unit can heal
@@ -99,7 +99,7 @@ export class Wizard extends Unit {
     super(
       {
         unitClass: "hero",
-        unitType: 'archer',
+        unitType: 'wizard',
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 0, // positions go from 0-50, 0 being the deck and 46-50 the hand
         maxHealth,
@@ -107,7 +107,7 @@ export class Wizard extends Unit {
         isKO: data.isKO ?? false,
         movement: 2,
         range: 3,
-        attackType: "physical",
+        attackType: EAttackType.MAGICAL,
         rangeAttackDamage: 300,
         meleeAttackDamage: 150,
         healingPower: 0, // If > 0, the unit can heal
@@ -123,14 +123,12 @@ export class Wizard extends Unit {
 
 export class CouncilFaction implements IFaction {
   factionName: string;
-  unitsOnBoard: IUnit[];
   unitsInHand: IUnit[];
   unitsInDeck: IUnit[];
   cristalOneHealth: number;
   cristalTwoHealth: number;
 
   constructor(
-    unitsOnBoard?: IUnit[],
     unitsInDeck?: IUnit[],
     unitsInHand?: IUnit[],
     cristalOneHealth?: number,
@@ -141,7 +139,6 @@ export class CouncilFaction implements IFaction {
     const startingHand = unitsInHand ?? newDeck.splice(0, 6) ;
 
     this.factionName = EFaction.COUNCIL;
-    this.unitsOnBoard = unitsOnBoard ?? [];
     this.unitsInDeck = unitsInDeck ?? newDeck;
     this.unitsInHand = unitsInHand ?? startingHand;
     this.cristalOneHealth = cristalOneHealth ?? 4500;
