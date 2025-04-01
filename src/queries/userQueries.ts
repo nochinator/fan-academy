@@ -1,5 +1,3 @@
-import { IGame } from "../interfaces/gameInterface";
-
 export async function loginQuery(username: string, password: string) {
   try {
     const response = await fetch('http://localhost:3003/users/login', {

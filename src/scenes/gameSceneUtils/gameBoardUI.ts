@@ -55,7 +55,7 @@ export async function createGameBoardUI(context: GameScene): Promise<void> {
     if (context.currentGame && context.currentGame.activePlayer === context.userId) {
       console.log('Clicked on send turn');
 
-      context.currentTurn = {
+      context.currentTurn = { // FIXME:
         ...context.currentGame.currentState, // REVIEW:
         action: {
           activeUnit: 'Bianca the archer',
@@ -76,5 +76,12 @@ export async function createGameBoardUI(context: GameScene): Promise<void> {
   const playerTwoBanner = context.add.image(0, 0, 'playerBanner').setOrigin(0.5).setPosition(1095, 80).setTint(0x990000);
   const vsBanner = context.add.image(0, 0, 'vsBanner').setOrigin(0.5).setPosition(900, 75);
   const playerOnePortrait = context.add.image(0, 0, 'playerOnePortrait').setOrigin(0.5).setPosition(600, 73).setScale(0.25);
-  const playerTwoPortrait = context.add.image(0, 0, 'playerTwoPortrait').setOrigin(0.5).setPosition(1200, 73).setScale(0.25).setFlipX(true);;
+  const playerTwoPortrait = context.add.image(0, 0, 'playerTwoPortrait').setOrigin(0.5).setPosition(1200, 73).setScale(0.25).setFlipX(true);
+
+  // // TEST FIXME: Adding icons to the hand tray
+  // for (let item = 45; item < 51; item++) {
+  //   const itemX = context.centerPoints[item].x;
+  //   const itemY = context.centerPoints[item].y;
+  //   context.add.image(itemX, itemY, 'archer');
+  // }
 }

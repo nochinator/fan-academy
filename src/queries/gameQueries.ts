@@ -1,5 +1,4 @@
 import { IGame } from "../interfaces/gameInterface";
-import { createGameList } from "../scenes/gameSceneUtils/gameList";
 
 export async function getGameList(userId: string): Promise<IGame[] | []> {
   console.log('Fetching game list...');

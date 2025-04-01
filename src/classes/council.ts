@@ -22,7 +22,7 @@ export class Archer extends Unit {
         unitClass: "hero",
         unitType: 'archer',
         unitId: data.unitId,
-        boardPosition: data.boardPosition ?? 0, // positions go from 0-50, 0 being the deck and 46-50 the hand
+        boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
         currentHealth: data.currentHealth ?? maxHealth,
         isKO: data.isKO ?? false,
@@ -62,7 +62,7 @@ export class Knight extends Unit {
         unitClass: "hero",
         unitType: 'knight',
         unitId: data.unitId,
-        boardPosition: data.boardPosition ?? 0, // positions go from 0-50, 0 being the deck and 46-50 the hand
+        boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
         currentHealth: data.currentHealth ?? maxHealth,
         isKO: data.isKO ?? false,
@@ -101,7 +101,7 @@ export class Wizard extends Unit {
         unitClass: "hero",
         unitType: 'wizard',
         unitId: data.unitId,
-        boardPosition: data.boardPosition ?? 0, // positions go from 0-50, 0 being the deck and 46-50 the hand
+        boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
         currentHealth: data.currentHealth ?? maxHealth,
         isKO: data.isKO ?? false,
@@ -135,8 +135,8 @@ export class CouncilFaction implements IFaction {
     cristalTwoHealth?: number
 
   ) {
-    const newDeck = unitsInDeck ?? this.createCouncilDeck(); // REVIEW
-    const startingHand = unitsInHand ?? newDeck.splice(0, 6) ;
+    const newDeck = unitsInDeck ?? this.createCouncilDeck(); // REVIEW:
+    const startingHand = unitsInHand ?? newDeck.splice(0, 6);
 
     this.factionName = EFaction.COUNCIL;
     this.unitsInDeck = unitsInDeck ?? newDeck;
@@ -163,15 +163,3 @@ export class CouncilFaction implements IFaction {
     return shuffledDeck;
   }
 }
-
-// class Wizard extends Unit {
-//   constructor(id: string, team: string) {
-//     super(id, team, "wizard", 40, 15, 3); // Example stats
-//   }
-// }
-
-// class Warrior extends Unit {
-//   constructor(id: string, team: string) {
-//     super(id, team, "warrior", 60, 8, 4); // Example stats
-//   }
-// }

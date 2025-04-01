@@ -22,7 +22,7 @@ export class Impaler extends Unit {
         unitClass: "hero",
         unitType: 'impaler',
         unitId: data.unitId,
-        boardPosition: data.boardPosition ?? 0, // positions go from 0-50, 0 being the deck and 46-50 the hand
+        boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
         currentHealth: data.currentHealth ?? maxHealth,
         isKO: data.isKO ?? false,
@@ -60,9 +60,9 @@ export class VoidMonk extends Unit {
     super(
       {
         unitClass: "hero",
-        unitType: 'voidMonk',
+        unitType: 'voidmonk',
         unitId: data.unitId,
-        boardPosition: data.boardPosition ?? 0, // positions go from 0-50, 0 being the deck and 46-50 the hand
+        boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
         currentHealth: data.currentHealth ?? maxHealth,
         isKO: data.isKO ?? false,
@@ -101,7 +101,7 @@ export class Necromancer extends Unit {
         unitClass: "hero",
         unitType: 'necromancer',
         unitId: data.unitId,
-        boardPosition: data.boardPosition ?? 0, // positions go from 0-50, 0 being the deck and 46-50 the hand
+        boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
         currentHealth: data.currentHealth ?? maxHealth,
         isKO: data.isKO ?? false,
@@ -129,7 +129,6 @@ export class ElvesFaction implements IFaction {
   cristalTwoHealth: number;
 
   constructor(
-    unitsOnBoard?: IUnit[],
     unitsInDeck?: IUnit[],
     unitsInHand?: IUnit[],
     cristalOneHealth?: number,

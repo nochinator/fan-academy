@@ -5,7 +5,7 @@ import { loadGameMenuUI, createGameMenuUI } from "./gameSceneUtils/gameMenuUI";
 import { loadGameBoardTiles } from "./gameSceneUtils/gameBoardTiles.";
 import { calculateCenterPoints, Coordinates } from "../utils/boardCalculations";
 import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
-import { IGame, IGameState, ITurnAction } from "../interfaces/gameInterface";
+import { IGame, IGameState } from "../interfaces/gameInterface";
 
 export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
@@ -44,6 +44,11 @@ export default class GameScene extends Phaser.Scene {
     connectToGameLobby(this.colyseusClient, this.userId, this);
     this.centerPoints = calculateCenterPoints(); // REVIEW:
     await createGameMenuUI(this); // generates background menu and game list
+
+    // this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+    //   // Log the mouse coordinates
+    //   console.log(`Mouse coordinates: x=${pointer.x}, y=${pointer.y}`);
+    // }); FIXME: remove after testing
   }
 
   update() {

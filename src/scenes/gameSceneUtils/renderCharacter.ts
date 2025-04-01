@@ -22,6 +22,7 @@ export function renderCharacter(context: GameScene, char: IUnit): void {
 
   // Listeners for dragging the unit if it's on the player's hand
   if (char.boardPosition > 44 && char.boardPosition < 51) {
+    console.log('Character boardposition is -> ', char.boardPosition);
     context.input.setDraggable(characterContainer);
 
     characterContainer.on('drag', (_: any, dragX: number, dragY: number) => {
@@ -38,6 +39,11 @@ export function renderCharacter(context: GameScene, char: IUnit): void {
       character.x = boardPosition.x;
       character.y = boardPosition.y;
     });
+  }
+
+  // Making the unit not visible if it's in the deck (board position 51)
+  if (char.boardPosition === 51) {
+    characterContainer.setVisible(false);
   }
 
   // TODO: add functions for attacking, moving etc if the character is on the board. Will this be updated as the character is moved?

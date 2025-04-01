@@ -84,7 +84,7 @@ export interface IGame {
   _id: string;
   players: IPlayerData[];
   gameState: IGameState[]; // turn 0 is the dealing of the hands
-  currentState: IGameState;
+  currentState?: IGameState;
   winCondition?: string;
   winner?: string;
   status: EGameStatus;

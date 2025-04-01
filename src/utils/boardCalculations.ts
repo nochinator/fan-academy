@@ -45,7 +45,23 @@ export function calculateCenterPoints(): Coordinates[] {
         x,
         y
       });
-    }}
+    }
+  };
+
+  // Adding coordinates for the items in the player's hand
+  const leftMostItem = {
+    x: 700,
+    y: 745
+  };
+
+  for (let item = 0; item < 6; item++) {
+    centerPoints.push({
+      x: leftMostItem.x,
+      y: leftMostItem.y
+    });
+
+    leftMostItem.x += 80;
+  }
 
   console.log(centerPoints);
   return centerPoints;

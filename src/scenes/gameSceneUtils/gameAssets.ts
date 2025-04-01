@@ -5,8 +5,8 @@ import { renderCharacter } from "./renderCharacter";
 
 export function loadGameAssets(context: GameScene) {
   // Loading units
-  const councilArray = ['archer', 'cleric', 'fighter', 'ninja', 'wizard'];
-  const darkElvesArray = ['heretic', 'impaler', 'necro', 'phantom', 'voidmonk', 'wraith'];
+  const councilArray = ['archer', 'cleric', 'knight', 'ninja', 'wizard'];
+  const darkElvesArray = ['heretic', 'impaler', 'necromancer', 'phantom', 'voidmonk', 'wraith'];
 
   // TODO: a check should be made to see if both factions are needed
   councilArray.forEach( asset => { context.load.image(asset, `/assets/images/factions/council/${asset}.png`);
@@ -30,31 +30,57 @@ export async function createGameAssets(context: GameScene): Promise<void> {
   // Gotta split the items for the players, so the user wont be able to see the items and hand of the opponent
 
   const game = context.currentGame;
-  if (!game) return; // TODO: throw error here
+  if (!game || !game.currentState) {
+    console.log('Error: No currentState for current game');
+    return;
+  }
 
-  const userPlayer = game.players.find(p => p._id === context.userId);
-  const opponent = game.players.find(p => p._id != context.userId);
+  const userPlayer = game.players.find(p => p.userData._id === context.userId);
+  const opponent = game.players.find(p => p.userData._id != context.userId);
+
+  const playerFactionData = game.currentState.player1.playerId == context.userId ? game.currentState.player1.factionData : game.currentState.player2?.factionData;
+  const opponentFactionData = game.currentState.player1.playerId == context.userId ? game.currentState.player1.factionData : game.currentState.player2?.factionData; // we need this for the crystals
 
   // FIXME: render the crystal here
+  /**
+   * RENDERING CRISTALS
+   */
+  // TODO: renderCrystal function
+  /**
+   * RENDERING UNITS
+   */
 
+  if (game.currentState) {
   /**
    * Render units on the board
    */
-  const unitsOnBoard =  game.currentState.boardState;
+    const unitsOnBoard =  game.currentState.boardState;
 
-  unitsOnBoard.forEach(unit => {
-    renderCharacter(context, unit);
-  });
+    unitsOnBoard.forEach(unit => {
+      renderCharacter(context, unit);
+    });
 
-  /**
-   * Render units in hand
+    /**
+     * Render units in hand
+    */
+    const unitsInHand = playerFactionData?.unitsInHand;
+
+    unitsInHand?.forEach(unit => {
+      renderCharacter(context, unit);
+    });
+
+    /**
+    * Render units in deck (not visible)
    */
 
-  /**
-   * Render units in deck (not visible
-   */
+    const unitsInDeck = playerFactionData?.unitsInDeck;
+
+    unitsInDeck?.forEach(unit => {
+      renderCharacter(context, unit);
+    }); // TODO: flag for making then invisible?
+  }
 
   console.log('userPlayer', userPlayer);
 
-  console.log('CURRENTGAMESTATE', context.currentGame);
+  console.log('CURRENTGAME', context.currentGame);
 }

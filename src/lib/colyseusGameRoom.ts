@@ -1,5 +1,5 @@
 import { Client, Room } from "colyseus.js";
-import { IFaction, IGameState, ITurnAction } from "../interfaces/gameInterface";
+import { IFaction, IGameState } from "../interfaces/gameInterface";
 
 /**
  *
@@ -78,6 +78,16 @@ export function sendTurnMessage(currentRoom: Room | undefined, currentTurn: IGam
   }
 
   console.log('turnSent check for currentRoom.roomId', currentRoom.roomId);
+  console.log('turnSent check for currentTurn', currentTurn);
+
+  // Convert the object to a JSON string
+  const jsonString = JSON.stringify(currentTurn);
+
+  // Get the byte size of the JSON string using TextEncoder
+  const byteSize = new TextEncoder().encode(jsonString).length;
+
+  console.log('currenturn size', byteSize);
+
   currentRoom.send("turnSent", {
     _id: currentRoom.roomId,
     newTurn: currentTurn,
