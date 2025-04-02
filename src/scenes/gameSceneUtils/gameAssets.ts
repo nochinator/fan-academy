@@ -1,7 +1,8 @@
+import { isHero } from "../../utils/deckUtils";
 import GameScene from "../game.scene";
 import { createBoardGameTiles } from "./gameBoardTiles.";
 import { createGameBoardUI } from "./gameBoardUI";
-import { renderCharacter } from "./renderCharacter";
+import { renderHero } from "./renderHero";
 
 export function loadGameAssets(context: GameScene) {
   // Loading units
@@ -16,8 +17,21 @@ export function loadGameAssets(context: GameScene) {
 
   // Equipment icons
   context.load.image('runeMetal', './assets/images/factions/common/rune_metal.png');
-  context.load.image('dragonScale', './assets/images/factions/common/dragon_scale.png');
   context.load.image('shiningHelm', './assets/images/factions/common/shining_helm.png');
+
+  // Faction specific equipment
+  // Council
+  context.load.image('dragonScale', './assets/images/factions/council/dragon_scale.png');
+  context.load.image('inferno', './assets/images/factions/council/inferno.png');
+  context.load.image('healingPotion', './assets/images/factions/council/healing_potion.png');
+
+  // Dark Elves
+  context.load.image('soulStone', './assets/images/factions/darkElves/soul_stone.png');
+  context.load.image('soulHarvest', './assets/images/factions/darkElves/soul_harvest.png');
+  context.load.image('manaVial', './assets/images/factions/darkElves/mana_vial.png');
+
+  // Shared items
+  context.load.image('scroll', './assets/images/factions/common/scroll.png');
 }
 
 export async function createGameAssets(context: GameScene): Promise<void> {
@@ -57,7 +71,7 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     const unitsOnBoard =  game.currentState.boardState;
 
     unitsOnBoard.forEach(unit => {
-      renderCharacter(context, unit);
+      renderHero(context, unit);
     });
 
     /**
@@ -66,7 +80,8 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     const unitsInHand = playerFactionData?.unitsInHand;
 
     unitsInHand?.forEach(unit => {
-      renderCharacter(context, unit);
+      if (isHero(unit)) renderHero(context, unit);
+      // TODO: render item
     });
 
     /**
@@ -76,8 +91,9 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     const unitsInDeck = playerFactionData?.unitsInDeck;
 
     unitsInDeck?.forEach(unit => {
-      renderCharacter(context, unit);
-    }); // TODO: flag for making then invisible?
+      if (isHero(unit)) renderHero(context, unit);
+      // TODO: render item
+    });
   }
 
   console.log('userPlayer', userPlayer);

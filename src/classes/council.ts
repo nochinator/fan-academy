@@ -1,9 +1,9 @@
-import { Unit } from "./unit";
-import { IFaction, IUnit } from "../interfaces/gameInterface";
+import { Hero } from "./hero";
+import { IFaction, IHero, IItem } from "../interfaces/gameInterface";
 import { EAttackType, EFaction } from "../enums/gameEnums";
-import { shuffleArray } from "../utils/shuffleArray";
+import { shuffleArray } from "../utils/deckUtils";
 
-export class Archer extends Unit {
+export class Archer extends Hero {
   constructor(
     data: {
       unitId: string,
@@ -19,7 +19,7 @@ export class Archer extends Unit {
 
     super(
       {
-        unitClass: "hero",
+        faction: EFaction.COUNCIL,
         unitType: 'archer',
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
@@ -43,7 +43,7 @@ export class Archer extends Unit {
 }
 
 // FIXME: correct data after testing
-export class Knight extends Unit {
+export class Knight extends Hero {
   constructor(
     data: {
       unitId: string,
@@ -59,7 +59,7 @@ export class Knight extends Unit {
 
     super(
       {
-        unitClass: "hero",
+        faction: EFaction.COUNCIL,
         unitType: 'knight',
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
@@ -82,7 +82,7 @@ export class Knight extends Unit {
   }
 }
 
-export class Wizard extends Unit {
+export class Wizard extends Hero {
   constructor(
     data: {
       unitId: string,
@@ -98,7 +98,7 @@ export class Wizard extends Unit {
 
     super(
       {
-        unitClass: "hero",
+        faction: EFaction.COUNCIL,
         unitType: 'wizard',
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
@@ -122,15 +122,17 @@ export class Wizard extends Unit {
 }
 
 export class CouncilFaction implements IFaction {
+  userId: string;
   factionName: string;
-  unitsInHand: IUnit[];
-  unitsInDeck: IUnit[];
+  unitsInHand: (IHero | IItem)[];
+  unitsInDeck: (IHero | IItem)[];
   cristalOneHealth: number;
   cristalTwoHealth: number;
 
   constructor(
-    unitsInDeck?: IUnit[],
-    unitsInHand?: IUnit[],
+    userId: string,
+    unitsInDeck?: (IHero | IItem)[],
+    unitsInHand?: (IHero | IItem)[],
     cristalOneHealth?: number,
     cristalTwoHealth?: number
 
@@ -138,6 +140,7 @@ export class CouncilFaction implements IFaction {
     const newDeck = unitsInDeck ?? this.createCouncilDeck(); // REVIEW:
     const startingHand = unitsInHand ?? newDeck.splice(0, 6);
 
+    this.userId = userId;
     this.factionName = EFaction.COUNCIL;
     this.unitsInDeck = unitsInDeck ?? newDeck;
     this.unitsInHand = unitsInHand ?? startingHand;
@@ -145,15 +148,40 @@ export class CouncilFaction implements IFaction {
     this.cristalTwoHealth = cristalTwoHealth ?? 4500;
   }
 
-  createCouncilDeck(): IUnit[] {
+  createCouncilDeck(): (IHero | IItem)[] {
     const deck = [];
 
     for (let index = 0; index < 3; index++) {
-      const archer = new Archer({ unitId: 'archer_' + index });
-      const knight = new Knight({ unitId: 'knight_' + index });
-      const wizard = new Wizard({ unitId: 'wizard_' + index });
+      const archer = new Archer({ unitId: `${this.userId}_archer_${index}` });
+      const knight = new Knight({ unitId: `${this.userId}_knight_${index}` });
+      const wizard = new Wizard({ unitId: `${this.userId}_wizard_${index}` });
 
-      // TODO: add rest of items / units (don't forget buffs)
+      /**
+    To add:
+
+    COUNCIL:
+    Inferno (x2)
+    High-damage attack spell that does 350 magical damage in a 3x3 area.
+    Can remove knocked-out enemies from the field.
+    Use against clustered groups of weakened enemies, or to eliminate knocked-out targets at range.
+
+    Revive potion (x2)
+    Heals an ally for 1000 hitpoints.
+    Can also be used to revive a fallen ally with all equipment intact.
+
+    Dragonscale (x3)
+    Increases physical resistance by 20% and max health by 10%
+
+    GENERIC:
+    Runemetal (x3)
+    Increases base power by 50% and max health by 10%
+
+    Shining Helm (x3)
+    Increases magical resistance by 20% and max health by 10%
+
+        Supercharge (x2)
+    Triples the attack power of the next attack for the chosen unit
+    */
 
       deck.push(archer, knight, wizard);
     }

@@ -134,16 +134,24 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
   councilEmblem.on('pointerdown', async () => {
     console.log('listener logs');
     // Create the faction's deck and starting hand
-    const playerFaction = createNewGameFactionState(EFaction.COUNCIL);
-    console.log('PLAYERFACTION', playerFaction);
-    await createGame(context.colyseusClient, context.userId, playerFaction);
+    if (context.userId) {
+      const playerFaction = createNewGameFactionState(EFaction.COUNCIL, context.userId);
+      console.log('PLAYERFACTION', playerFaction);
+      await createGame(context.colyseusClient, context.userId, playerFaction);
+    } else {
+      console.error('No userId when creating a new game');
+    }
   });
   elvesEmblem.on('pointerdown', async () => {
     console.log('listener logs');
     // Create the faction's deck and starting hand
-    const playerFaction = createNewGameFactionState(EFaction.DARK_ELVES);
-    console.log('PLAYERFACTION', playerFaction);
-    await createGame(context.colyseusClient, context.userId, playerFaction);
+    if (context.userId) {
+      const playerFaction = createNewGameFactionState(EFaction.DARK_ELVES, context.userId);
+      console.log('PLAYERFACTION', playerFaction);
+      await createGame(context.colyseusClient, context.userId, playerFaction);
+    } else {
+      console.error('No userId when creating a new game');
+    }
   });
 
   lastListItemY += 150;

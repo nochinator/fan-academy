@@ -33,3 +33,20 @@ export enum EAction {
   USE = 'use', // works for potions and buffs
   SHUFFLE = 'shuffle'
 }
+
+export enum EItems {
+  // Generic
+  SHINING_HELM = "shiningHelm",
+  RUNE_METAL = "runeMetal",
+  SCROLL = "scroll",
+
+  // Council
+  DRAGON_SCALE = "dragonScale",
+  HEALING_POTION = "healingPotion",
+  INFERNO = "inferno",
+
+  // Dark elves
+  SOUL_STONE = "soulStone",
+  SOUL_HARVEST = "soulHarvest",
+  MANA_VIAL = "manaVial"
+}

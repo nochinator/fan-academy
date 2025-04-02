@@ -1,10 +1,20 @@
-import { EAction, EAttackType, EFaction, EGameStatus } from "../enums/gameEnums";
+import { EAction, EAttackType, EFaction, EGameStatus, EItems } from "../enums/gameEnums";
+
+/**
+ * Item Interface
+ */
+export interface IItem {
+  class: "item"
+  itemType: EItems;
+  boardPosition: number //45 | 46 | 47 | 48 | 49 | 50 | 51 // Needs a check when dragging to be applied to the unit if possible
+}
 
 /**
  * Unit Interface
  */
-export interface IUnit {
-  unitClass: "hero" | "item";
+export interface IHero {
+  class: "hero";
+  faction: EFaction.COUNCIL | EFaction.DARK_ELVES;
   unitType: string; // TODO: enum?
   unitId: string; // eg: p101 -> player 1 archer for ex
   boardPosition: number;
@@ -19,7 +29,7 @@ export interface IUnit {
   healingPower: number; // If > 0, the unit can heal
   physicalDamageResistance: number;
   magicalDamageResistance: number;
-  dragonScale: boolean;
+  factionBuff: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
   // belongsTo: string; // user id
@@ -29,9 +39,10 @@ export interface IUnit {
  * Faction Interface
  */
 export interface IFaction {
+  userId: string; // REVIEW: required to differentiate units by id when playing the same faction
   factionName: string;
-  unitsInHand: IUnit[];
-  unitsInDeck: IUnit[];
+  unitsInHand: (IHero | IItem)[];
+  unitsInDeck: (IHero | IItem)[];
   cristalOneHealth: number;
   cristalTwoHealth: number;
 }
@@ -73,7 +84,7 @@ export interface IGameState {
   // After a turn is played, a new turn (without action but with the current board state) is created as CurrentTurn
   player1: IPlayerState;
   player2?: IPlayerState;
-  boardState: IUnit[];
+  boardState: IHero[];
   action?: ITurnAction;
 }
 

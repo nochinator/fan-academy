@@ -6,11 +6,11 @@ import { IFaction } from "../interfaces/gameInterface";
 /**
  * Creates a starting state for a given faction, randomizing the assets in deck and dealing a starting hand
  */
-export function createNewGameFactionState(playerFaction: string): IFaction {
+export function createNewGameFactionState(playerFaction: string, userId: string): IFaction {
   console.log('CREATEFUNC_PLAYERFACTION', playerFaction);
   const faction: Record<string, IFaction> = {
-    [EFaction.COUNCIL]: new CouncilFaction(),
-    [EFaction.DARK_ELVES]: new ElvesFaction()
+    [EFaction.COUNCIL]: new CouncilFaction(userId),
+    [EFaction.DARK_ELVES]: new ElvesFaction(userId)
   };
 
   return faction[playerFaction];

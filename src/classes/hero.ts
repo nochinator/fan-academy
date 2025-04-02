@@ -1,8 +1,9 @@
-import { EAttackType } from "../enums/gameEnums";
-import { IUnit } from "../interfaces/gameInterface";
+import { EAttackType, EFaction } from "../enums/gameEnums";
+import { IHero } from "../interfaces/gameInterface";
 
-export class Unit implements IUnit {
-  unitClass: "hero" | "item";
+export class Hero implements IHero {
+  class: "hero";
+  faction: EFaction.COUNCIL | EFaction.DARK_ELVES;
   unitType: string;
   unitId: string;
   boardPosition: number; // if position 0, not visible
@@ -17,12 +18,12 @@ export class Unit implements IUnit {
   healingPower: number;
   physicalDamageResistance: number;
   magicalDamageResistance: number;
-  dragonScale: boolean;
+  factionBuff: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
 
   constructor(data: {
-    unitClass: "hero" | "item",
+    faction: EFaction,
     unitType: string, // enum?
     unitId: string,
     boardPosition: number,
@@ -42,7 +43,8 @@ export class Unit implements IUnit {
     shiningHelm: boolean
   }
   ) {
-    this.unitClass = data.unitClass;
+    this.class = "hero";
+    this.faction = data.faction;
     this.unitType = data.unitType;
     this.unitId = data.unitId;
     this.boardPosition = data.boardPosition;
@@ -57,7 +59,7 @@ export class Unit implements IUnit {
     this.healingPower = data.healingPower;
     this.physicalDamageResistance = data.physicalDamageResistance;
     this.magicalDamageResistance = data.magicalDamageResistance;
-    this.dragonScale = data.dragonScale;
+    this.factionBuff = data.dragonScale;
     this.runeMetal = data.runeMetal;
     this.shiningHelm = data.shiningHelm;
   }
@@ -67,7 +69,7 @@ export class Unit implements IUnit {
     // TODO: we need a range of movement and range of attack functions
   }
 
-  attack(target: Unit): void {
+  attack(target: Hero): void {
     // Define how the unit attacks
   }
 

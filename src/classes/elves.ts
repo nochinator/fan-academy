@@ -1,9 +1,9 @@
-import { Unit } from "./unit";
-import { IFaction, IUnit } from "../interfaces/gameInterface";
+import { Hero } from "./hero";
+import { IFaction, IHero, IItem } from "../interfaces/gameInterface";
 import { EAttackType, EFaction } from "../enums/gameEnums";
-import { shuffleArray } from "../utils/shuffleArray";
+import { shuffleArray } from "../utils/deckUtils";
 
-export class Impaler extends Unit {
+export class Impaler extends Hero {
   constructor(
     data: {
       unitId: string,
@@ -19,7 +19,7 @@ export class Impaler extends Unit {
 
     super(
       {
-        unitClass: "hero",
+        faction: EFaction.DARK_ELVES,
         unitType: 'impaler',
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
@@ -43,7 +43,7 @@ export class Impaler extends Unit {
 }
 
 // FIXME: correct data after testing
-export class VoidMonk extends Unit {
+export class VoidMonk extends Hero {
   constructor(
     data: {
       unitId: string,
@@ -59,7 +59,7 @@ export class VoidMonk extends Unit {
 
     super(
       {
-        unitClass: "hero",
+        faction: EFaction.DARK_ELVES,
         unitType: 'voidmonk',
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
@@ -82,7 +82,7 @@ export class VoidMonk extends Unit {
   }
 }
 
-export class Necromancer extends Unit {
+export class Necromancer extends Hero {
   constructor(
     data: {
       unitId: string,
@@ -98,7 +98,7 @@ export class Necromancer extends Unit {
 
     super(
       {
-        unitClass: "hero",
+        faction: EFaction.DARK_ELVES,
         unitType: 'necromancer',
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
@@ -122,15 +122,17 @@ export class Necromancer extends Unit {
 }
 
 export class ElvesFaction implements IFaction {
+  userId: string;
   factionName: string;
-  unitsInHand: IUnit[];
-  unitsInDeck: IUnit[];
+  unitsInHand: (IHero | IItem)[];
+  unitsInDeck: (IHero | IItem)[];
   cristalOneHealth: number;
   cristalTwoHealth: number;
 
   constructor(
-    unitsInDeck?: IUnit[],
-    unitsInHand?: IUnit[],
+    userId: string,
+    unitsInDeck?: (IHero | IItem)[],
+    unitsInHand?: (IHero | IItem)[],
     cristalOneHealth?: number,
     cristalTwoHealth?: number
 
@@ -138,6 +140,7 @@ export class ElvesFaction implements IFaction {
     const newDeck = unitsInDeck ?? this.createElvesDeck(); // REVIEW:
     const startingHand = unitsInHand ?? newDeck.splice(0, 6) ;
 
+    this.userId = userId;
     this.factionName = EFaction.DARK_ELVES;
     this.unitsInDeck = unitsInDeck ?? newDeck;
     this.unitsInHand = unitsInHand ?? startingHand;
@@ -145,19 +148,44 @@ export class ElvesFaction implements IFaction {
     this.cristalTwoHealth = cristalTwoHealth ?? 4500;
   }
 
-  createElvesDeck(): IUnit[] {
+  createElvesDeck(): (IHero | IItem)[] {
     const deck = [];
 
     for (let index = 0; index < 3; index++) {
-      const impaler = new Impaler({ unitId: 'impaler_' + index });
-      const voidMonk = new VoidMonk({ unitId: 'voidMonk_' + index });
-      const necromancer = new Necromancer({ unitId: 'necromancer_' + index });
+      const impaler = new Impaler({ unitId: `${this.userId}_impaler_${index}` });
+      const voidMonk = new VoidMonk({ unitId: `${this.userId}_voidMonk_${index}` });
+      const necromancer = new Necromancer({ unitId: `${this.userId}_necromancer_${index}` });
 
       deck.push(impaler, voidMonk, necromancer);
     }
 
-    // TODO: add items to the deck
-    // TODO: create items
+    /**
+    To add:
+
+    COUNCIL:
+    Soul Harvest (x2)
+    Does damage to enemies while raising your fallen heroes and adding to their maximum health.
+    Health gained by each unit is equal to the total life lost by enemy units divided by the number of friendly units plus 3 rounded to the nearest 5.
+    The equation for this is H = 1/(3+U) x D, where H is Health gained by each allied unit, D is Damage dealt, U = Amount of allied units on the field, and R = Any real number. H is rounded to the nearest 5 at the end.
+      For example, if there were 3 allied units, and the harvest dealt 400 damage, then H = 1/(3+3) x 400, which is 1/6 x 400, which is 66.66...., which rounds to 65.
+      As a second example, if there were 7 allied units, and the harvest dealt 780 damage, then H = 1/(3+7) x 780, which is 1/10 x 780, which is 78, which rounds to 80
+
+    Mana Vial (x2)
+    Heals an ally for 1000 hitpoints and increases max health by 50 points.
+
+    Soulstone (x3)
+    Doubles the units life leech bonus (from 33% to 67%) and increases max health by 10%
+
+    GENERIC:
+    Runemetal (x3)
+    Increases base power by 50% and max health by 10%
+
+    Shining Helm (x3)
+    Increases magical resistance by 20% and max health by 10%
+
+    Supercharge (x2)
+    Triples the attack power of the next attack for the chosen unit
+    */
 
     const shuffledDeck = shuffleArray(deck);
 
