@@ -1,5 +1,6 @@
 import { EFaction } from "../../enums/gameEnums";
 import { IHero } from "../../interfaces/gameInterface";
+import { makeClickable } from "../../utils/setActiveUnit";
 import GameScene from "../game.scene";
 
 export function renderHero(context: GameScene, hero: IHero): void {
@@ -27,8 +28,11 @@ export function renderHero(context: GameScene, hero: IHero): void {
 
   // Making the hero not visible if it's in the deck (board position 51)
   if (hero.boardPosition === 51) {
-    characterContainer.setVisible(false);
+    characterContainer.setVisible(false).disableInteractive();
   }
+
+  // Add listener for clicking on the unit
+  makeClickable(characterContainer, hero);
 
   // TODO: add functions for attacking, moving etc if the character is on the board. Will this be updated as the character is moved?
   // Probably better to add flags as properties in the class: draggable, interactive, etc...

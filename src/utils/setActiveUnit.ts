@@ -1,13 +1,13 @@
-import { Hero } from "../classes/hero";
 import { IHero, IItem } from "../interfaces/gameInterface";
-import GameScene from "../scenes/game.scene";
 
-export function setActiveUnit(element: Phaser.GameObjects.Container | Phaser.GameObjects.Image, context: GameScene): void {
+export function makeClickable(element: Phaser.GameObjects.Container | Phaser.GameObjects.Image, unit: IHero | IItem): void {
   element.on('pointerdown', () => {
-    if (element.isActive) {
-      element.isActive = false;
+    if (unit.isActive) {
+      element.setScale(1);
+      unit.isActive = false;
     } else {
-      element.isActive = true;
+      element.setScale(1.2);
+      unit.isActive = true;
     }
   });
 }
