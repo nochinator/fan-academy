@@ -21,6 +21,7 @@ export class Hero implements IHero {
   factionBuff: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
+  isActive: boolean;
 
   constructor(data: {
     faction: EFaction,
@@ -38,9 +39,10 @@ export class Hero implements IHero {
     healingPower: number, // If > 0, the unit can heal
     physicalDamageResistance: number,
     magicalDamageResistance: number,
-    dragonScale: boolean,
+    factionBuff: boolean,
     runeMetal: boolean,
-    shiningHelm: boolean
+    shiningHelm: boolean,
+    isActive: boolean
   }
   ) {
     this.class = "hero";
@@ -59,9 +61,10 @@ export class Hero implements IHero {
     this.healingPower = data.healingPower;
     this.physicalDamageResistance = data.physicalDamageResistance;
     this.magicalDamageResistance = data.magicalDamageResistance;
-    this.factionBuff = data.dragonScale;
+    this.factionBuff = data.factionBuff;
     this.runeMetal = data.runeMetal;
     this.shiningHelm = data.shiningHelm;
+    this.isActive = false;
   }
 
   move(x: number, y: number): void {

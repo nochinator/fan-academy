@@ -10,7 +10,7 @@ export class Impaler extends Hero {
       boardPosition?: number,
       currentHealth?: number,
       isKO?: boolean,
-      dragonScale?: boolean,
+      factionBuff?: boolean,
       runeMetal?: boolean,
       shiningHelm?: boolean
     }
@@ -34,9 +34,11 @@ export class Impaler extends Hero {
         healingPower: 0, // If > 0, the unit can heal
         physicalDamageResistance: 0,
         magicalDamageResistance: 0,
-        dragonScale: data.dragonScale ?? false,
+        factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false
+        shiningHelm: data.shiningHelm ?? false,
+        isActive: false
+
       }
     );
   }
@@ -50,7 +52,7 @@ export class VoidMonk extends Hero {
       boardPosition?: number,
       currentHealth?: number,
       isKO?: boolean,
-      dragonScale?: boolean,
+      factionBuff?: boolean,
       runeMetal?: boolean,
       shiningHelm?: boolean
     }
@@ -74,9 +76,11 @@ export class VoidMonk extends Hero {
         healingPower: 0, // If > 0, the unit can heal
         physicalDamageResistance: 0,
         magicalDamageResistance: 0,
-        dragonScale: data.dragonScale ?? false,
+        factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false
+        shiningHelm: data.shiningHelm ?? false,
+        isActive: false
+
       }
     );
   }
@@ -89,7 +93,7 @@ export class Necromancer extends Hero {
       boardPosition?: number,
       currentHealth?: number,
       isKO?: boolean,
-      dragonScale?: boolean,
+      factionBuff?: boolean,
       runeMetal?: boolean,
       shiningHelm?: boolean
     }
@@ -113,9 +117,10 @@ export class Necromancer extends Hero {
         healingPower: 0, // If > 0, the unit can heal
         physicalDamageResistance: 0,
         magicalDamageResistance: 0,
-        dragonScale: data.dragonScale ?? false,
+        factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false
+        shiningHelm: data.shiningHelm ?? false,
+        isActive: false
       }
     );
   }

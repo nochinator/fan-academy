@@ -10,7 +10,7 @@ export class Archer extends Hero {
       boardPosition?: number,
       currentHealth?: number,
       isKO?: boolean,
-      dragonScale?: boolean,
+      factionBuff?: boolean,
       runeMetal?: boolean,
       shiningHelm?: boolean
     }
@@ -34,9 +34,10 @@ export class Archer extends Hero {
         healingPower: 0, // If > 0, the unit can heal
         physicalDamageResistance: 0,
         magicalDamageResistance: 0,
-        dragonScale: data.dragonScale ?? false,
+        factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false
+        shiningHelm: data.shiningHelm ?? false,
+        isActive: false
       }
     );
   }
@@ -50,7 +51,7 @@ export class Knight extends Hero {
       boardPosition?: number,
       currentHealth?: number,
       isKO?: boolean,
-      dragonScale?: boolean,
+      factionBuff?: boolean,
       runeMetal?: boolean,
       shiningHelm?: boolean
     }
@@ -74,9 +75,11 @@ export class Knight extends Hero {
         healingPower: 0, // If > 0, the unit can heal
         physicalDamageResistance: 0,
         magicalDamageResistance: 0,
-        dragonScale: data.dragonScale ?? false,
+        factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false
+        shiningHelm: data.shiningHelm ?? false,
+        isActive: false
+
       }
     );
   }
@@ -89,7 +92,7 @@ export class Wizard extends Hero {
       boardPosition?: number,
       currentHealth?: number,
       isKO?: boolean,
-      dragonScale?: boolean,
+      factionBuff?: boolean,
       runeMetal?: boolean,
       shiningHelm?: boolean
     }
@@ -113,9 +116,11 @@ export class Wizard extends Hero {
         healingPower: 0, // If > 0, the unit can heal
         physicalDamageResistance: 0,
         magicalDamageResistance: 0,
-        dragonScale: data.dragonScale ?? false,
+        factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false
+        shiningHelm: data.shiningHelm ?? false,
+        isActive: false
+
       }
     );
   }
@@ -126,6 +131,7 @@ export class ShiningHelm implements IItem {
   itemId: string;
   itemType: EItems.SHINING_HELM;
   boardPosition: number;
+  isActive: false;
 
   constructor(
     itemId: string,
@@ -135,6 +141,7 @@ export class ShiningHelm implements IItem {
     this.itemId = itemId;
     this.itemType = EItems.SHINING_HELM;
     this.boardPosition = boardPosition ?? 51;
+    this.isActive = false;
   }
 }
 
@@ -186,7 +193,7 @@ export class CouncilFaction implements IFaction {
     Heals an ally for 1000 hitpoints.
     Can also be used to revive a fallen ally with all equipment intact.
 
-    Dragonscale (x3)
+    factionBuff (x3)
     Increases physical resistance by 20% and max health by 10%
 
     GENERIC:

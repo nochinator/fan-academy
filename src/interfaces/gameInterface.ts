@@ -8,6 +8,7 @@ export interface IItem {
   itemId: string; // userId_itemName_itemNumber
   itemType: EItems;
   boardPosition: number //45 | 46 | 47 | 48 | 49 | 50 | 51 // Needs a check when dragging to be applied to the unit if possible
+  isActive: boolean;
 }
 
 /**
@@ -33,6 +34,7 @@ export interface IHero {
   factionBuff: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
+  isActive: boolean;
   // belongsTo: string; // user id
 }
 
