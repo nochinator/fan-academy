@@ -4,7 +4,8 @@ import { EAction, EAttackType, EFaction, EGameStatus, EItems } from "../enums/ga
  * Item Interface
  */
 export interface IItem {
-  class: "item"
+  class: 'item'
+  itemId: string; // userId_itemName_itemNumber
   itemType: EItems;
   boardPosition: number //45 | 46 | 47 | 48 | 49 | 50 | 51 // Needs a check when dragging to be applied to the unit if possible
 }
@@ -13,7 +14,7 @@ export interface IItem {
  * Unit Interface
  */
 export interface IHero {
-  class: "hero";
+  class: 'hero';
   faction: EFaction.COUNCIL | EFaction.DARK_ELVES;
   unitType: string; // TODO: enum?
   unitId: string; // eg: p101 -> player 1 archer for ex

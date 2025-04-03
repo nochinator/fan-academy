@@ -1,6 +1,5 @@
 import { EFaction } from "../../enums/gameEnums";
 import { IHero } from "../../interfaces/gameInterface";
-import { calculateClosestSquare } from "../../utils/boardCalculations";
 import GameScene from "../game.scene";
 
 export function renderHero(context: GameScene, hero: IHero): void {
@@ -24,29 +23,9 @@ export function renderHero(context: GameScene, hero: IHero): void {
   if (!hero.factionBuff) factionBuff.setVisible(false);
 
   // Add all images into a container
-  const characterContainer = context.add.container(heroCoordinates.x, heroCoordinates.y, [character, runeMetal, factionBuff, shiningHelm]).setSize(50, 50).setInteractive().setName(`${hero.unitId}_container`);
+  const characterContainer = context.add.container(heroCoordinates.x, heroCoordinates.y, [character, runeMetal, factionBuff, shiningHelm]).setSize(50, 50).setInteractive().setName(hero.unitId);
 
-  // Listeners for dragging the unit if it's on the player's hand
-  if (hero.boardPosition > 44 && hero.boardPosition < 51) {
-    context.input.setDraggable(characterContainer);
-
-    characterContainer.on('drag', (_: any, dragX: number, dragY: number) => {
-      characterContainer.x = dragX;
-      characterContainer.y = dragY;
-    });
-
-    characterContainer.on('dragend', (_: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-      const boardPosition = calculateClosestSquare(context.centerPoints, {
-        x: dragX,
-        y: dragY
-      });
-
-      character.x = boardPosition.x;
-      character.y = boardPosition.y;
-    });
-  }
-
-  // Making the unit not visible if it's in the deck (board position 51)
+  // Making the hero not visible if it's in the deck (board position 51)
   if (hero.boardPosition === 51) {
     characterContainer.setVisible(false);
   }

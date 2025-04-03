@@ -1,8 +1,9 @@
-import { isHero } from "../../utils/deckUtils";
+import { isHero, isItem } from "../../utils/deckUtils";
 import GameScene from "../game.scene";
 import { createBoardGameTiles } from "./gameBoardTiles.";
 import { createGameBoardUI } from "./gameBoardUI";
 import { renderHero } from "./renderHero";
+import { renderItem } from "./renderItem";
 
 export function loadGameAssets(context: GameScene) {
   // Loading units
@@ -81,7 +82,7 @@ export async function createGameAssets(context: GameScene): Promise<void> {
 
     unitsInHand?.forEach(unit => {
       if (isHero(unit)) renderHero(context, unit);
-      // TODO: render item
+      if (isItem(unit)) renderItem(context, unit);
     });
 
     /**

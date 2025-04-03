@@ -1,6 +1,6 @@
 import { Hero } from "./hero";
 import { IFaction, IHero, IItem } from "../interfaces/gameInterface";
-import { EAttackType, EFaction } from "../enums/gameEnums";
+import { EAttackType, EFaction, EItems } from "../enums/gameEnums";
 import { shuffleArray } from "../utils/deckUtils";
 
 export class Archer extends Hero {
@@ -121,6 +121,23 @@ export class Wizard extends Hero {
   }
 }
 
+export class ShiningHelm implements IItem {
+  class: 'item';
+  itemId: string;
+  itemType: EItems.SHINING_HELM;
+  boardPosition: number;
+
+  constructor(
+    itemId: string,
+    boardPosition?: number
+  ) {
+    this.class = 'item';
+    this.itemId = itemId;
+    this.itemType = EItems.SHINING_HELM;
+    this.boardPosition = boardPosition ?? 51;
+  }
+}
+
 export class CouncilFaction implements IFaction {
   userId: string;
   factionName: string;
@@ -135,7 +152,6 @@ export class CouncilFaction implements IFaction {
     unitsInHand?: (IHero | IItem)[],
     cristalOneHealth?: number,
     cristalTwoHealth?: number
-
   ) {
     const newDeck = unitsInDeck ?? this.createCouncilDeck(); // REVIEW:
     const startingHand = unitsInHand ?? newDeck.splice(0, 6);
@@ -155,6 +171,7 @@ export class CouncilFaction implements IFaction {
       const archer = new Archer({ unitId: `${this.userId}_archer_${index}` });
       const knight = new Knight({ unitId: `${this.userId}_knight_${index}` });
       const wizard = new Wizard({ unitId: `${this.userId}_wizard_${index}` });
+      const shiningHelm = new ShiningHelm(`${this.userId}_shinningHelm_${index}`);
 
       /**
     To add:
@@ -183,7 +200,7 @@ export class CouncilFaction implements IFaction {
     Triples the attack power of the next attack for the chosen unit
     */
 
-      deck.push(archer, knight, wizard);
+      deck.push(archer, knight, wizard, shiningHelm);
     }
 
     const shuffledDeck = shuffleArray(deck);

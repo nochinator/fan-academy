@@ -48,7 +48,7 @@ export default class GameScene extends Phaser.Scene {
     // this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
     //   // Log the mouse coordinates
     //   console.log(`Mouse coordinates: x=${pointer.x}, y=${pointer.y}`);
-    // }); FIXME: remove after testing
+    // });  // FIXME: remove after testing
   }
 
   update() {
