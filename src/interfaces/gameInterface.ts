@@ -1,24 +1,37 @@
-import { EAction, EAttackType, EFaction, EGameStatus, EItems } from "../enums/gameEnums";
+import { EAction, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems } from "../enums/gameEnums";
 
 /**
  * Item Interface
  */
 export interface IItem {
-  class: 'item'
+  class: EClass;
   itemId: string; // userId_itemName_itemNumber
   itemType: EItems;
   boardPosition: number //45 | 46 | 47 | 48 | 49 | 50 | 51 // Needs a check when dragging to be applied to the unit if possible
-  isActive: boolean;
+  isActiveValue: boolean;
+}
+
+/**
+ * Patial Hero Interface -used for instantiating hero subclasses
+ */
+export interface IPartialHeroInit {
+  unitId: string,
+  boardPosition?: number,
+  currentHealth?: number,
+  isKO?: boolean,
+  factionBuff?: boolean,
+  runeMetal?: boolean,
+  shiningHelm?: boolean
 }
 
 /**
  * Unit Interface
  */
 export interface IHero {
-  class: 'hero';
-  faction: EFaction.COUNCIL | EFaction.DARK_ELVES;
-  unitType: string; // TODO: enum?
-  unitId: string; // eg: p101 -> player 1 archer for ex
+  class: EClass;
+  faction: EFaction;
+  unitType: EHeroes;
+  unitId: string; // userId_unitName_unitNumber
   boardPosition: number;
   maxHealth: number;
   currentHealth: number;
@@ -34,7 +47,7 @@ export interface IHero {
   factionBuff: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
-  isActive: boolean;
+  isActiveValue: boolean;
   // belongsTo: string; // user id
 }
 

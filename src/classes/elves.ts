@@ -1,26 +1,16 @@
 import { Hero } from "./hero";
-import { IFaction, IHero, IItem } from "../interfaces/gameInterface";
-import { EAttackType, EFaction } from "../enums/gameEnums";
+import { IFaction, IHero, IItem, IPartialHeroInit } from "../interfaces/gameInterface";
+import { EAttackType, EFaction, EHeroes } from "../enums/gameEnums";
 import { shuffleArray } from "../utils/deckUtils";
 
 export class Impaler extends Hero {
-  constructor(
-    data: {
-      unitId: string,
-      boardPosition?: number,
-      currentHealth?: number,
-      isKO?: boolean,
-      factionBuff?: boolean,
-      runeMetal?: boolean,
-      shiningHelm?: boolean
-    }
-  ) {
+  constructor(data: IPartialHeroInit) {
     const maxHealth  = 800;
 
     super(
       {
         faction: EFaction.DARK_ELVES,
-        unitType: 'impaler',
+        unitType: EHeroes.IMPALER,
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
@@ -36,9 +26,7 @@ export class Impaler extends Hero {
         magicalDamageResistance: 0,
         factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false,
-        isActive: false
-
+        shiningHelm: data.shiningHelm ?? false
       }
     );
   }
@@ -46,23 +34,13 @@ export class Impaler extends Hero {
 
 // FIXME: correct data after testing
 export class VoidMonk extends Hero {
-  constructor(
-    data: {
-      unitId: string,
-      boardPosition?: number,
-      currentHealth?: number,
-      isKO?: boolean,
-      factionBuff?: boolean,
-      runeMetal?: boolean,
-      shiningHelm?: boolean
-    }
-  ) {
+  constructor(data: IPartialHeroInit) {
     const maxHealth  = 800;
 
     super(
       {
         faction: EFaction.DARK_ELVES,
-        unitType: 'voidmonk',
+        unitType: EHeroes.VOIDMONK,
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
@@ -78,32 +56,20 @@ export class VoidMonk extends Hero {
         magicalDamageResistance: 0,
         factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false,
-        isActive: false
-
+        shiningHelm: data.shiningHelm ?? false
       }
     );
   }
 }
 
 export class Necromancer extends Hero {
-  constructor(
-    data: {
-      unitId: string,
-      boardPosition?: number,
-      currentHealth?: number,
-      isKO?: boolean,
-      factionBuff?: boolean,
-      runeMetal?: boolean,
-      shiningHelm?: boolean
-    }
-  ) {
+  constructor(data: IPartialHeroInit) {
     const maxHealth  = 800;
 
     super(
       {
         faction: EFaction.DARK_ELVES,
-        unitType: 'necromancer',
+        unitType: EHeroes.NECROMANCER,
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
@@ -119,8 +85,7 @@ export class Necromancer extends Hero {
         magicalDamageResistance: 0,
         factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false,
-        isActive: false
+        shiningHelm: data.shiningHelm ?? false
       }
     );
   }

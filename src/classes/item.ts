@@ -1,18 +1,17 @@
-import { EItems } from "../enums/gameEnums";
+import { EClass, EItems } from "../enums/gameEnums";
 import { IItem } from "../interfaces/gameInterface";
 
 export class Item implements IItem {
-  class: "item";
+  class: EClass = EClass.ITEM;
   itemId: string;
   itemType: EItems;
   boardPosition: number;
-  isActive: boolean;
+  isActiveValue: boolean;
 
-  constructor(itemType: EItems, itemId: string, boardPosition: number) {
-    this.class = "item";
-    this.itemType = itemType;
+  constructor(itemId: string, itemType: EItems, boardPosition: number) {
     this.itemId = itemId;
+    this.itemType = itemType;
     this.boardPosition = boardPosition;
-    this.isActive = false;
+    this.isActiveValue = false;
   }
 }

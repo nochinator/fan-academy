@@ -1,26 +1,17 @@
 import { Hero } from "./hero";
-import { IFaction, IHero, IItem } from "../interfaces/gameInterface";
-import { EAttackType, EFaction, EItems } from "../enums/gameEnums";
+import { IFaction, IHero, IItem, IPartialHeroInit } from "../interfaces/gameInterface";
+import { EAttackType, EFaction, EHeroes, EItems } from "../enums/gameEnums";
 import { shuffleArray } from "../utils/deckUtils";
+import { Item } from "./item";
 
 export class Archer extends Hero {
-  constructor(
-    data: {
-      unitId: string,
-      boardPosition?: number,
-      currentHealth?: number,
-      isKO?: boolean,
-      factionBuff?: boolean,
-      runeMetal?: boolean,
-      shiningHelm?: boolean
-    }
-  ) {
+  constructor(data: IPartialHeroInit) {
     const maxHealth  = 800;
 
     super(
       {
         faction: EFaction.COUNCIL,
-        unitType: 'archer',
+        unitType: EHeroes.ARCHER,
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
@@ -36,8 +27,7 @@ export class Archer extends Hero {
         magicalDamageResistance: 0,
         factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false,
-        isActive: false
+        shiningHelm: data.shiningHelm ?? false
       }
     );
   }
@@ -45,23 +35,13 @@ export class Archer extends Hero {
 
 // FIXME: correct data after testing
 export class Knight extends Hero {
-  constructor(
-    data: {
-      unitId: string,
-      boardPosition?: number,
-      currentHealth?: number,
-      isKO?: boolean,
-      factionBuff?: boolean,
-      runeMetal?: boolean,
-      shiningHelm?: boolean
-    }
-  ) {
+  constructor(data: IPartialHeroInit) {
     const maxHealth  = 800;
 
     super(
       {
         faction: EFaction.COUNCIL,
-        unitType: 'knight',
+        unitType: EHeroes.KNIGHT,
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
@@ -77,32 +57,20 @@ export class Knight extends Hero {
         magicalDamageResistance: 0,
         factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false,
-        isActive: false
-
+        shiningHelm: data.shiningHelm ?? false
       }
     );
   }
 }
 
 export class Wizard extends Hero {
-  constructor(
-    data: {
-      unitId: string,
-      boardPosition?: number,
-      currentHealth?: number,
-      isKO?: boolean,
-      factionBuff?: boolean,
-      runeMetal?: boolean,
-      shiningHelm?: boolean
-    }
-  ) {
+  constructor(data: IPartialHeroInit) {
     const maxHealth  = 800;
 
     super(
       {
         faction: EFaction.COUNCIL,
-        unitType: 'wizard',
+        unitType: EHeroes.WIZARD,
         unitId: data.unitId,
         boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
         maxHealth,
@@ -118,30 +86,56 @@ export class Wizard extends Hero {
         magicalDamageResistance: 0,
         factionBuff: data.factionBuff ?? false,
         runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false,
-        isActive: false
-
+        shiningHelm: data.shiningHelm ?? false
       }
     );
   }
 }
 
-export class ShiningHelm implements IItem {
-  class: 'item';
-  itemId: string;
-  itemType: EItems.SHINING_HELM;
-  boardPosition: number;
-  isActive: false;
+export class Ninja extends Hero {
+  constructor(data: IPartialHeroInit) {
+    const maxHealth  = 800;
 
-  constructor(
-    itemId: string,
-    boardPosition?: number
-  ) {
-    this.class = 'item';
-    this.itemId = itemId;
-    this.itemType = EItems.SHINING_HELM;
-    this.boardPosition = boardPosition ?? 51;
-    this.isActive = false;
+    super(
+      {
+        faction: EFaction.COUNCIL,
+        unitType: EHeroes.WIZARD,
+        unitId: data.unitId,
+        boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
+        maxHealth,
+        currentHealth: data.currentHealth ?? maxHealth,
+        isKO: data.isKO ?? false,
+        movement: 2,
+        range: 3,
+        attackType: EAttackType.MAGICAL,
+        rangeAttackDamage: 300,
+        meleeAttackDamage: 150,
+        healingPower: 0, // If > 0, the unit can heal
+        physicalDamageResistance: 0,
+        magicalDamageResistance: 0,
+        factionBuff: data.factionBuff ?? false,
+        runeMetal: data.runeMetal ?? false,
+        shiningHelm: data.shiningHelm ?? false
+      }
+    );
+  }
+}
+
+export class ShiningHelm extends Item {
+  constructor(itemId: string, boardPosition: number = 51) {
+    super(itemId, EItems.SHINING_HELM, boardPosition);
+  }
+}
+
+export class HealingPotion extends Item {
+  constructor(itemId: string, boardPosition: number = 51) {
+    super(itemId, EItems.HEALING_POTION, boardPosition);
+  }
+}
+
+export class Inferno extends Item {
+  constructor(itemId: string, boardPosition: number = 51) {
+    super(itemId, EItems.INFERNO, boardPosition);
   }
 }
 
@@ -179,7 +173,8 @@ export class CouncilFaction implements IFaction {
       const knight = new Knight({ unitId: `${this.userId}_knight_${index}` });
       const wizard = new Wizard({ unitId: `${this.userId}_wizard_${index}` });
       const shiningHelm = new ShiningHelm(`${this.userId}_shinningHelm_${index}`);
-
+      const healingPotion = new HealingPotion(`${this.userId}_healingPotion_${index}`);
+      const inferno = new Inferno(`${this.userId}_inferno_${index}`);
       /**
     To add:
 
@@ -207,7 +202,7 @@ export class CouncilFaction implements IFaction {
     Triples the attack power of the next attack for the chosen unit
     */
 
-      deck.push(archer, knight, wizard, shiningHelm);
+      deck.push(archer, knight, wizard, shiningHelm, healingPotion, inferno);
     }
 
     const shuffledDeck = shuffleArray(deck);

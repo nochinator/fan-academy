@@ -36,17 +36,39 @@ export enum EAction {
 
 export enum EItems {
   // Generic
-  SHINING_HELM = "shiningHelm",
-  RUNE_METAL = "runeMetal",
-  SCROLL = "scroll",
+  SHINING_HELM = 'shiningHelm',
+  RUNE_METAL = 'runeMetal',
+  SCROLL = 'scroll',
 
   // Council
-  DRAGON_SCALE = "dragonScale",
-  HEALING_POTION = "healingPotion",
-  INFERNO = "inferno",
+  DRAGON_SCALE = 'dragonScale',
+  HEALING_POTION = 'healingPotion',
+  INFERNO = 'inferno',
 
   // Dark elves
-  SOUL_STONE = "soulStone",
-  SOUL_HARVEST = "soulHarvest",
-  MANA_VIAL = "manaVial"
+  SOUL_STONE = 'soulStone',
+  SOUL_HARVEST = 'soulHarvest',
+  MANA_VIAL = 'manaVial'
+}
+
+export enum EClass {
+  HERO = 'hero',
+  ITEM = 'item'
+}
+
+export enum EHeroes {
+  // Council
+  ARCHER = 'archer',
+  CLERIC = 'cleric',
+  KNIGHT = 'knight',
+  NINJA = 'ninja',
+  WIZARD = 'wizard',
+
+  // Dark Elves
+  HERETIC = 'heretic',
+  IMPALER = 'impaler',
+  NECROMANCER = 'necromancer',
+  PHANTOM = 'phantom',
+  VOIDMONK = 'voidmonk',
+  WRAITH = 'wraith'
 }

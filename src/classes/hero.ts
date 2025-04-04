@@ -1,10 +1,12 @@
-import { EAttackType, EFaction } from "../enums/gameEnums";
+import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 
 export class Hero implements IHero {
-  class: "hero";
-  faction: EFaction.COUNCIL | EFaction.DARK_ELVES;
-  unitType: string;
+  // TODO: Automatically assign starting values (when applicable) below, will keep code clean
+  // TODO: change property isActive to activeValue and add properties for setter, getter and highlighting tiles
+  class: EClass = EClass.HERO;
+  faction: EFaction;
+  unitType: EHeroes;
   unitId: string;
   boardPosition: number; // if position 0, not visible
   maxHealth: number;
@@ -21,11 +23,11 @@ export class Hero implements IHero {
   factionBuff: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
-  isActive: boolean;
+  isActiveValue: boolean;
 
   constructor(data: {
     faction: EFaction,
-    unitType: string, // enum?
+    unitType: EHeroes,
     unitId: string,
     boardPosition: number,
     maxHealth: number,
@@ -42,10 +44,8 @@ export class Hero implements IHero {
     factionBuff: boolean,
     runeMetal: boolean,
     shiningHelm: boolean,
-    isActive: boolean
   }
   ) {
-    this.class = "hero";
     this.faction = data.faction;
     this.unitType = data.unitType;
     this.unitId = data.unitId;
@@ -64,7 +64,7 @@ export class Hero implements IHero {
     this.factionBuff = data.factionBuff;
     this.runeMetal = data.runeMetal;
     this.shiningHelm = data.shiningHelm;
-    this.isActive = false;
+    this.isActiveValue = false;
   }
 
   move(x: number, y: number): void {
