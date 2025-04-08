@@ -2,8 +2,6 @@ import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 
 export class Hero implements IHero {
-  // TODO: Automatically assign starting values (when applicable) below, will keep code clean
-  // TODO: change property isActive to activeValue and add properties for setter, getter and highlighting tiles
   class: EClass = EClass.HERO;
   faction: EFaction;
   unitType: EHeroes;
@@ -65,6 +63,46 @@ export class Hero implements IHero {
     this.runeMetal = data.runeMetal;
     this.shiningHelm = data.shiningHelm;
     this.isActiveValue = false;
+  }
+
+  get isActive() {
+    return this.isActiveValue;
+  }
+
+  set isActive(value: boolean) {
+    this.isActiveValue = value;
+    if (value) {
+      this.onActivate();
+    } else {
+      this.onDeactivate();
+    }
+  }
+
+  onActivate() {
+    console.log(`${this.unitId} is now active`);
+
+    this.highlightMovementTiles();
+    this.highlightEnemiesInRange();
+  }
+
+  onDeactivate() {
+    console.log(`${this.unitId} is now inactive`);
+    this.clearHighlights();
+  }
+
+  highlightMovementTiles() {
+    console.log("Highlighting movement tiles...");
+    // Add logic to highlight movement range tiles
+  }
+
+  highlightEnemiesInRange() {
+    console.log("Highlighting enemies in range...");
+    // Add logic to highlight attackable enemies
+  }
+
+  clearHighlights() {
+    console.log("Clearing all highlights...");
+    // Add logic to remove movement/attack highlights
   }
 
   move(x: number, y: number): void {

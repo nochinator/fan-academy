@@ -5,9 +5,9 @@ import { EAction, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems } 
  */
 export interface IItem {
   class: EClass;
-  itemId: string; // userId_itemName_itemNumber
+  unitId: string; // userId_itemName_itemNumber
   itemType: EItems;
-  boardPosition: number //45 | 46 | 47 | 48 | 49 | 50 | 51 // Needs a check when dragging to be applied to the unit if possible
+  boardPosition: number // 45-51
   isActiveValue: boolean;
 }
 
@@ -48,14 +48,13 @@ export interface IHero {
   runeMetal: boolean;
   shiningHelm: boolean;
   isActiveValue: boolean;
-  // belongsTo: string; // user id
 }
 
 /**
  * Faction Interface
  */
 export interface IFaction {
-  userId: string; // REVIEW: required to differentiate units by id when playing the same faction
+  userId: string;
   factionName: string;
   unitsInHand: (IHero | IItem)[];
   unitsInDeck: (IHero | IItem)[];

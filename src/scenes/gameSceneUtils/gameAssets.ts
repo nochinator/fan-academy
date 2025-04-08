@@ -1,9 +1,11 @@
+import { Hero } from "../../classes/hero";
+import { HeroModel } from "../../classes/heroModel";
+import { Item } from "../../classes/item";
+import { ItemModel } from "../../classes/itemModel";
 import { isHero, isItem } from "../../utils/deckUtils";
 import GameScene from "../game.scene";
 import { createBoardGameTiles } from "./gameBoardTiles.";
 import { createGameBoardUI } from "./gameBoardUI";
-import { renderHero } from "./renderHero";
-import { renderItem } from "./renderItem";
 
 export function loadGameAssets(context: GameScene) {
   // Loading units
@@ -72,7 +74,7 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     const unitsOnBoard =  game.currentState.boardState;
 
     unitsOnBoard.forEach(unit => {
-      renderHero(context, unit);
+      new HeroModel(context, unit as Hero); // FIXME: replace interfaces with classes
     });
 
     /**
@@ -81,8 +83,10 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     const unitsInHand = playerFactionData?.unitsInHand;
 
     unitsInHand?.forEach(unit => {
-      if (isHero(unit)) renderHero(context, unit);
-      if (isItem(unit)) renderItem(context, unit);
+      // if (isHero(unit)) renderHero(context, unit);
+      if (isHero(unit)) new HeroModel(context, unit as Hero); // FIXME: replace interfaces with classes
+
+      if (isItem(unit)) new ItemModel(context, unit as Item);
     });
 
     /**
@@ -92,8 +96,9 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     const unitsInDeck = playerFactionData?.unitsInDeck;
 
     unitsInDeck?.forEach(unit => {
-      if (isHero(unit)) renderHero(context, unit);
-      // TODO: render item
+      // if (isHero(unit)) renderHero(context, unit);
+      if (isHero(unit)) new HeroModel(context, unit as Hero); // FIXME: replace interfaces with classes
+      if (isItem(unit)) new ItemModel(context, unit as Item);
     });
   }
 

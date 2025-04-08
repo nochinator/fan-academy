@@ -5,7 +5,9 @@ import { loadGameMenuUI, createGameMenuUI } from "./gameSceneUtils/gameMenuUI";
 import { loadGameBoardTiles } from "./gameSceneUtils/gameBoardTiles.";
 import { calculateCenterPoints, Coordinates } from "../utils/boardCalculations";
 import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
-import { IGame, IGameState } from "../interfaces/gameInterface";
+import { IGame, IGameState, IHero, IItem } from "../interfaces/gameInterface";
+import { Hero } from "../classes/hero";
+import { Item } from "../classes/item";
 
 export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
@@ -17,6 +19,7 @@ export default class GameScene extends Phaser.Scene {
   currentOpponent: string | undefined;
   activePlayer: string | undefined;
   centerPoints: Coordinates[];
+  activeUnit: Hero | Item |  undefined;
 
   constructor() {
     super({ key: 'GameScene' });

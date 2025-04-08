@@ -25,3 +25,7 @@ export function isHero(hero: IHero | IItem): hero is IHero {
 export function isItem(item: IHero | IItem): item is IItem {
   return item.class === "item";
 }
+
+export function isInHand(boardPosition: number): boolean {
+  return boardPosition > 44 && boardPosition < 51;
+}
