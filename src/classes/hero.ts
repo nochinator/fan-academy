@@ -97,6 +97,7 @@ export class Hero extends Phaser.GameObjects.Container implements IHero {
     makeClickable(this, context); // FIXME: this works but doesn't have the logic to do the checks
 
     context.add.existing(this);
+    context.currentGameContainer?.add(this);
   }
 
   get isActive() {

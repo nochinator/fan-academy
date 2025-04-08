@@ -20,6 +20,7 @@ export default class GameScene extends Phaser.Scene {
   activePlayer: string | undefined;
   centerPoints: Coordinates[];
   activeUnit: Hero | Item |  undefined;
+  currentGameContainer: Phaser.GameObjects.Container | undefined;
 
   constructor() {
     super({ key: 'GameScene' });

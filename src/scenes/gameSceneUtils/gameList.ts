@@ -98,15 +98,17 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
         gameListButtonImage.on('pointerdown', async () => {
           if (context.currentRoom) {
             console.log('Leaving game: ', context.currentRoom.roomId);
+            context.currentGameContainer?.destroy(true);
+            context.currentGameContainer = undefined;
             await context.currentRoom.leave();
             context.currentRoom = undefined;
           }
 
           console.log('Accessing game: ', game._id);
-
           const room = await joinGame(context.colyseusClient, context.userId, game._id);
 
           // Updating GameScene properties
+          context.currentGameContainer = context.add.container(0, 0);
           context.currentRoom = room;
           context.currentOpponent = opponent?.userData._id.toString();
           context.activePlayer =  game.activePlayer.toString();

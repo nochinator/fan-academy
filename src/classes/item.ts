@@ -34,6 +34,7 @@ export class Item extends Phaser.GameObjects.Image implements IItem {
     }
 
     context.add.existing(this).setScale(0.8).setDepth(10).setInteractive().setName(this.unitId);
+    context.currentGameContainer?.add(this);
   }
 
   get isActive() {

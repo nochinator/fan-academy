@@ -21,30 +21,59 @@ export function createBoardGameTiles(context: GameScene): void {
   // TODO: randomize tiles and position. Can have different map layouts
 
   // Spawn tiles. Positions 9, 17, 27 and 35 in the coordinates array
-  context.add.image(545, 315, 'spawnTile');
-  context.add.image(545, 495, 'spawnTile');
-  context.add.image(1265, 315, 'spawnTile').setFlipX(true);
-  context.add.image(1265, 495, 'spawnTile').setFlipX(true);
+  const spawn1 = context.add.image(545, 315, 'spawnTile');
+  context.currentGameContainer?.add(spawn1);
+
+  const spawn2 = context.add.image(545, 495, 'spawnTile');
+  context.currentGameContainer?.add(spawn2);
+
+  const spawn3 = context.add.image(1265, 315, 'spawnTile').setFlipX(true);
+  context.currentGameContainer?.add(spawn3);
+
+  const spawn4 = context.add.image(1265, 495, 'spawnTile').setFlipX(true);
+  context.currentGameContainer?.add(spawn4);
 
   // Cristals. Positions 2, 6, 37, and 42 in the coordinates array
-  context.add.image(725, 225, 'pedestal').setScale(0.8);
-  context.add.image(1085, 225, 'pedestal').setScale(0.8);
-  context.add.image(725, 585, 'pedestal').setScale(0.8);
-  context.add.image(1085, 585, 'pedestal').setScale(0.8);
+  const pedestal1 = context.add.image(725, 225, 'pedestal').setScale(0.8);
+  context.currentGameContainer?.add(pedestal1);
 
-  context.add.image(725, 225 - 30, 'crystal').setScale(0.8).setTint(0x3399ff);
-  context.add.image(725, 585 - 30, 'crystal').setScale(0.8).setTint(0x3399ff);;
-  context.add.image(1085, 225 - 30, 'crystal').setScale(0.8).setTint(0x990000);;
-  context.add.image(1085, 585 - 30, 'crystal').setScale(0.8).setTint(0x990000);;
+  const pedestal2 = context.add.image(1085, 225, 'pedestal').setScale(0.8);
+  context.currentGameContainer?.add(pedestal2);
+
+  const pedestal3 = context.add.image(725, 585, 'pedestal').setScale(0.8);
+  context.currentGameContainer?.add(pedestal3);
+
+  const pedestal4 = context.add.image(1085, 585, 'pedestal').setScale(0.8);
+  context.currentGameContainer?.add(pedestal4);
+
+  // Crystals
+  const crystal1 = context.add.image(725, 195, 'crystal').setScale(0.8).setTint(0x3399ff);
+  context.currentGameContainer?.add(crystal1);
+
+  const crystal2 = context.add.image(725, 555, 'crystal').setScale(0.8).setTint(0x3399ff);
+  context.currentGameContainer?.add(crystal2);
+
+  const crystal3 = context.add.image(1085, 195, 'crystal').setScale(0.8).setTint(0x990000);
+  context.currentGameContainer?.add(crystal3);
+
+  const crystal4 = context.add.image(1085, 555, 'crystal').setScale(0.8).setTint(0x990000);
+  context.currentGameContainer?.add(crystal4);
 
   // Damage tiles 11, 33
-  context.add.image(725, 315, 'damageTile');
-  context.add.image(1085, 495, 'damageTile');
+  const damage1 = context.add.image(725, 315, 'damageTile');
+  context.currentGameContainer?.add(damage1);
+
+  const damage2 = context.add.image(1085, 495, 'damageTile');
+  context.currentGameContainer?.add(damage2);
 
   // Crystal damage tile 22
-  context.add.image(905, 405, 'crystalTile');
+  const crystalDamage = context.add.image(905, 405, 'crystalTile');
+  context.currentGameContainer?.add(crystalDamage);
 
   // Defense tiles 19, 23
-  context.add.image(635, 405, 'shieldTile');
-  context.add.image(1175, 405, 'shieldTile');
+  const defense1 = context.add.image(635, 405, 'shieldTile');
+  context.currentGameContainer?.add(defense1);
+
+  const defense2 = context.add.image(1175, 405, 'shieldTile');
+  context.currentGameContainer?.add(defense2);
 }
