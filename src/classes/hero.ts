@@ -1,7 +1,9 @@
 import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
+import GameScene from "../scenes/game.scene";
+import { makeClickable } from "../utils/setActiveUnit";
 
-export class Hero implements IHero {
+export class Hero extends Phaser.GameObjects.Container implements IHero {
   class: EClass = EClass.HERO;
   faction: EFaction;
   unitType: EHeroes;
@@ -23,7 +25,12 @@ export class Hero implements IHero {
   shiningHelm: boolean;
   isActiveValue: boolean;
 
-  constructor(data: {
+  private characterImage: Phaser.GameObjects.Image;
+  private runeMetalImage: Phaser.GameObjects.Image;
+  private shiningHelmImage: Phaser.GameObjects.Image;
+  private factionBuffImage: Phaser.GameObjects.Image;
+
+  constructor(context: GameScene, data:  {
     faction: EFaction,
     unitType: EHeroes,
     unitId: string,
@@ -42,8 +49,11 @@ export class Hero implements IHero {
     factionBuff: boolean,
     runeMetal: boolean,
     shiningHelm: boolean,
-  }
-  ) {
+  }) {
+    const { x, y } = context.centerPoints[data.boardPosition];
+    super(context, x, y);
+
+    // Interface properties assignment
     this.faction = data.faction;
     this.unitType = data.unitType;
     this.unitId = data.unitId;
@@ -63,6 +73,30 @@ export class Hero implements IHero {
     this.runeMetal = data.runeMetal;
     this.shiningHelm = data.shiningHelm;
     this.isActiveValue = false;
+
+    // Create the unit's image and images for its upgrades
+    this.characterImage = context.add.image(0, -10, this.unitType).setOrigin(0.5).setDepth(10).setName('body');
+
+    this.runeMetalImage = context.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.3).setDepth(10).setName('runeMetal');
+    if (!this.runeMetal) this.runeMetalImage.setVisible(false);
+
+    this.shiningHelmImage = context.add.image(-28, 25, 'shiningHelm').setOrigin(0.5).setScale(0.3).setDepth(10).setName('shiningHelm');
+    if (!this.shiningHelm) this.shiningHelmImage.setVisible(false);
+
+    if (this.faction === EFaction.COUNCIL) {
+      this.factionBuffImage = context.add.image(5, 25, 'dragonScale').setOrigin(0.5).setScale(0.3).setDepth(10).setName('dragonScale');
+    } else {
+      this.factionBuffImage = context.add.image(5, 25, 'soulStone').setOrigin(0.5).setScale(0.3).setDepth(10).setName('soulStone');
+    } // Using else here removes a bunch of checks on factionBuff being possibly undefined
+    if (!this.factionBuff) this.factionBuffImage.setVisible(false);
+
+    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage]).setSize(50, 50).setInteractive().setName(this.unitId);
+
+    if (this.boardPosition === 51) this.setVisible(false);
+
+    makeClickable(this, context); // FIXME: this works but doesn't have the logic to do the checks
+
+    context.add.existing(this);
   }
 
   get isActive() {

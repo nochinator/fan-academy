@@ -1,7 +1,5 @@
 import { Hero } from "../../classes/hero";
-import { HeroModel } from "../../classes/heroModel";
 import { Item } from "../../classes/item";
-import { ItemModel } from "../../classes/itemModel";
 import { isHero, isItem } from "../../utils/deckUtils";
 import GameScene from "../game.scene";
 import { createBoardGameTiles } from "./gameBoardTiles.";
@@ -43,9 +41,6 @@ export async function createGameAssets(context: GameScene): Promise<void> {
   await createGameBoardUI(context);
   createBoardGameTiles(context); // TODO: this should be based on map
 
-  // TODO: generate the hand for the player and the assets on the map
-  // Gotta split the items for the players, so the user wont be able to see the items and hand of the opponent
-
   const game = context.currentGame;
   if (!game || !game.currentState) {
     console.log('Error: No currentState for current game');
@@ -74,7 +69,7 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     const unitsOnBoard =  game.currentState.boardState;
 
     unitsOnBoard.forEach(unit => {
-      new HeroModel(context, unit as Hero); // FIXME: replace interfaces with classes
+      new Hero(context, unit);
     });
 
     /**
@@ -84,9 +79,9 @@ export async function createGameAssets(context: GameScene): Promise<void> {
 
     unitsInHand?.forEach(unit => {
       // if (isHero(unit)) renderHero(context, unit);
-      if (isHero(unit)) new HeroModel(context, unit as Hero); // FIXME: replace interfaces with classes
+      if (isHero(unit)) new Hero(context, unit);
 
-      if (isItem(unit)) new ItemModel(context, unit as Item);
+      if (isItem(unit)) new Item(context, unit);
     });
 
     /**
@@ -97,8 +92,8 @@ export async function createGameAssets(context: GameScene): Promise<void> {
 
     unitsInDeck?.forEach(unit => {
       // if (isHero(unit)) renderHero(context, unit);
-      if (isHero(unit)) new HeroModel(context, unit as Hero); // FIXME: replace interfaces with classes
-      if (isItem(unit)) new ItemModel(context, unit as Item);
+      if (isHero(unit)) new Hero(context, unit);
+      if (isItem(unit)) new Item(context, unit);
     });
   }
 

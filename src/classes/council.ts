@@ -1,14 +1,15 @@
-import { Hero } from "./hero";
-import { IFaction, IHero, IItem, IPartialHeroInit } from "../interfaces/gameInterface";
+import { IFaction, IPartialHeroInit } from "../interfaces/gameInterface";
 import { EAttackType, EFaction, EHeroes, EItems } from "../enums/gameEnums";
 import { shuffleArray } from "../utils/deckUtils";
+import { Hero } from "./hero";
 import { Item } from "./item";
+import GameScene from "../scenes/game.scene";
 
 export class Archer extends Hero {
-  constructor(data: IPartialHeroInit) {
+  constructor(context: GameScene, data: IPartialHeroInit) {
     const maxHealth  = 800;
 
-    super(
+    super(context,
       {
         faction: EFaction.COUNCIL,
         unitType: EHeroes.ARCHER,
@@ -35,10 +36,10 @@ export class Archer extends Hero {
 
 // FIXME: correct data after testing
 export class Knight extends Hero {
-  constructor(data: IPartialHeroInit) {
+  constructor(context: GameScene, data: IPartialHeroInit) {
     const maxHealth  = 800;
 
-    super(
+    super(context,
       {
         faction: EFaction.COUNCIL,
         unitType: EHeroes.KNIGHT,
@@ -64,10 +65,10 @@ export class Knight extends Hero {
 }
 
 export class Wizard extends Hero {
-  constructor(data: IPartialHeroInit) {
+  constructor(context: GameScene, data: IPartialHeroInit) {
     const maxHealth  = 800;
 
-    super(
+    super(context,
       {
         faction: EFaction.COUNCIL,
         unitType: EHeroes.WIZARD,
@@ -93,10 +94,10 @@ export class Wizard extends Hero {
 }
 
 export class Ninja extends Hero {
-  constructor(data: IPartialHeroInit) {
+  constructor(context: GameScene, data: IPartialHeroInit) {
     const maxHealth  = 800;
 
-    super(
+    super(context,
       {
         faction: EFaction.COUNCIL,
         unitType: EHeroes.WIZARD,
@@ -122,41 +123,55 @@ export class Ninja extends Hero {
 }
 
 export class ShiningHelm extends Item {
-  constructor(itemId: string, boardPosition: number = 51) {
-    super(itemId, EItems.SHINING_HELM, boardPosition);
+  constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
+    super(context, {
+      unitId,
+      itemType: EItems.SHINING_HELM,
+      boardPosition
+    });
   }
 }
 
 export class HealingPotion extends Item {
-  constructor(itemId: string, boardPosition: number = 51) {
-    super(itemId, EItems.HEALING_POTION, boardPosition);
+  constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
+    super(context, {
+      unitId,
+      itemType: EItems.HEALING_POTION,
+      boardPosition
+    });
   }
 }
 
 export class Inferno extends Item {
-  constructor(itemId: string, boardPosition: number = 51) {
-    super(itemId, EItems.INFERNO, boardPosition);
+  constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
+    super(context, {
+      unitId,
+      itemType: EItems.INFERNO,
+      boardPosition
+    });
   }
 }
 
 export class CouncilFaction implements IFaction {
+  context: GameScene;
   userId: string;
   factionName: string;
-  unitsInHand: (IHero | IItem)[];
-  unitsInDeck: (IHero | IItem)[];
+  unitsInHand: (Hero | Item)[];
+  unitsInDeck: (Hero | Item)[];
   cristalOneHealth: number;
   cristalTwoHealth: number;
 
-  constructor(
+  constructor(context: GameScene,
     userId: string,
-    unitsInDeck?: (IHero | IItem)[],
-    unitsInHand?: (IHero | IItem)[],
+    unitsInDeck?: (Hero | Item)[],
+    unitsInHand?: (Hero | Item)[],
     cristalOneHealth?: number,
     cristalTwoHealth?: number
   ) {
     const newDeck = unitsInDeck ?? this.createCouncilDeck(); // REVIEW:
     const startingHand = unitsInHand ?? newDeck.splice(0, 6);
 
+    this.context = context;
     this.userId = userId;
     this.factionName = EFaction.COUNCIL;
     this.unitsInDeck = unitsInDeck ?? newDeck;
@@ -165,16 +180,16 @@ export class CouncilFaction implements IFaction {
     this.cristalTwoHealth = cristalTwoHealth ?? 4500;
   }
 
-  createCouncilDeck(): (IHero | IItem)[] {
+  createCouncilDeck(): (Hero | Item)[] {
     const deck = [];
 
     for (let index = 0; index < 3; index++) {
-      const archer = new Archer({ unitId: `${this.userId}_archer_${index}` });
-      const knight = new Knight({ unitId: `${this.userId}_knight_${index}` });
-      const wizard = new Wizard({ unitId: `${this.userId}_wizard_${index}` });
-      const shiningHelm = new ShiningHelm(`${this.userId}_shinningHelm_${index}`);
-      const healingPotion = new HealingPotion(`${this.userId}_healingPotion_${index}`);
-      const inferno = new Inferno(`${this.userId}_inferno_${index}`);
+      const archer = new Archer(this.context, { unitId: `${this.userId}_archer_${index}` });
+      const knight = new Knight(this.context, { unitId: `${this.userId}_knight_${index}` });
+      const wizard = new Wizard(this.context, { unitId: `${this.userId}_wizard_${index}` });
+      const shiningHelm = new ShiningHelm(this.context, `${this.userId}_shinningHelm_${index}`);
+      const healingPotion = new HealingPotion(this.context, `${this.userId}_healingPotion_${index}`);
+      const inferno = new Inferno(this.context, `${this.userId}_inferno_${index}`);
       /**
     To add:
 
@@ -198,7 +213,7 @@ export class CouncilFaction implements IFaction {
     Shining Helm (x3)
     Increases magical resistance by 20% and max health by 10%
 
-        Supercharge (x2)
+        Superccontext: GameScene,harge (x2)
     Triples the attack power of the next attack for the chosen unit
     */
 

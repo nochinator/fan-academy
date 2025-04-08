@@ -1,43 +1,44 @@
-import { Hero } from "./hero";
-import { IFaction, IHero, IItem, IPartialHeroInit } from "../interfaces/gameInterface";
+import { IFaction, IPartialHeroInit } from "../interfaces/gameInterface";
 import { EAttackType, EFaction, EHeroes } from "../enums/gameEnums";
 import { shuffleArray } from "../utils/deckUtils";
+import { Hero } from "./hero";
+import { Item } from "./item";
+import GameScene from "../scenes/game.scene";
 
 export class Impaler extends Hero {
-  constructor(data: IPartialHeroInit) {
+  constructor(context: GameScene, data: IPartialHeroInit) {
     const maxHealth  = 800;
 
-    super(
-      {
-        faction: EFaction.DARK_ELVES,
-        unitType: EHeroes.IMPALER,
-        unitId: data.unitId,
-        boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
-        maxHealth,
-        currentHealth: data.currentHealth ?? maxHealth,
-        isKO: data.isKO ?? false,
-        movement: 2,
-        range: 3,
-        attackType: EAttackType.PHYSICAL,
-        rangeAttackDamage: 300,
-        meleeAttackDamage: 300,
-        healingPower: 0, // If > 0, the unit can heal
-        physicalDamageResistance: 0,
-        magicalDamageResistance: 0,
-        factionBuff: data.factionBuff ?? false,
-        runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false
-      }
+    super(context, {
+      faction: EFaction.DARK_ELVES,
+      unitType: EHeroes.IMPALER,
+      unitId: data.unitId,
+      boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
+      maxHealth,
+      currentHealth: data.currentHealth ?? maxHealth,
+      isKO: data.isKO ?? false,
+      movement: 2,
+      range: 3,
+      attackType: EAttackType.PHYSICAL,
+      rangeAttackDamage: 300,
+      meleeAttackDamage: 300,
+      healingPower: 0, // If > 0, the unit can heal
+      physicalDamageResistance: 0,
+      magicalDamageResistance: 0,
+      factionBuff: data.factionBuff ?? false,
+      runeMetal: data.runeMetal ?? false,
+      shiningHelm: data.shiningHelm ?? false
+    }
     );
   }
 }
 
 // FIXME: correct data after testing
 export class VoidMonk extends Hero {
-  constructor(data: IPartialHeroInit) {
+  constructor(context: GameScene, data: IPartialHeroInit) {
     const maxHealth  = 800;
 
-    super(
+    super(context,
       {
         faction: EFaction.DARK_ELVES,
         unitType: EHeroes.VOIDMONK,
@@ -63,10 +64,10 @@ export class VoidMonk extends Hero {
 }
 
 export class Necromancer extends Hero {
-  constructor(data: IPartialHeroInit) {
+  constructor(context: GameScene, data: IPartialHeroInit) {
     const maxHealth  = 800;
 
-    super(
+    super(context,
       {
         faction: EFaction.DARK_ELVES,
         unitType: EHeroes.NECROMANCER,
@@ -92,17 +93,19 @@ export class Necromancer extends Hero {
 }
 
 export class ElvesFaction implements IFaction {
+  context: GameScene;
   userId: string;
   factionName: string;
-  unitsInHand: (IHero | IItem)[];
-  unitsInDeck: (IHero | IItem)[];
+  unitsInHand: (Hero | Item)[];
+  unitsInDeck: (Hero | Item)[];
   cristalOneHealth: number;
   cristalTwoHealth: number;
 
   constructor(
+    context: GameScene,
     userId: string,
-    unitsInDeck?: (IHero | IItem)[],
-    unitsInHand?: (IHero | IItem)[],
+    unitsInDeck?: (Hero | Item)[],
+    unitsInHand?: (Hero | Item)[],
     cristalOneHealth?: number,
     cristalTwoHealth?: number
 
@@ -110,6 +113,7 @@ export class ElvesFaction implements IFaction {
     const newDeck = unitsInDeck ?? this.createElvesDeck(); // REVIEW:
     const startingHand = unitsInHand ?? newDeck.splice(0, 6) ;
 
+    this.context = context;
     this.userId = userId;
     this.factionName = EFaction.DARK_ELVES;
     this.unitsInDeck = unitsInDeck ?? newDeck;
@@ -118,13 +122,13 @@ export class ElvesFaction implements IFaction {
     this.cristalTwoHealth = cristalTwoHealth ?? 4500;
   }
 
-  createElvesDeck(): (IHero | IItem)[] {
+  createElvesDeck(): (Hero | Item)[] {
     const deck = [];
 
     for (let index = 0; index < 3; index++) {
-      const impaler = new Impaler({ unitId: `${this.userId}_impaler_${index}` });
-      const voidMonk = new VoidMonk({ unitId: `${this.userId}_voidMonk_${index}` });
-      const necromancer = new Necromancer({ unitId: `${this.userId}_necromancer_${index}` });
+      const impaler = new Impaler(this.context, { unitId: `${this.userId}_impaler_${index}` });
+      const voidMonk = new VoidMonk(this.context, { unitId: `${this.userId}_voidMonk_${index}` });
+      const necromancer = new Necromancer(this.context, { unitId: `${this.userId}_necromancer_${index}` });
 
       deck.push(impaler, voidMonk, necromancer);
     }
@@ -153,7 +157,7 @@ export class ElvesFaction implements IFaction {
     Shining Helm (x3)
     Increases magical resistance by 20% and max health by 10%
 
-    Supercharge (x2)
+    Superccontext,harge (x2)
     Triples the attack power of the next attack for the chosen unit
     */
 

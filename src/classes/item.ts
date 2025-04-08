@@ -1,18 +1,39 @@
 import { EClass, EItems } from "../enums/gameEnums";
 import { IItem } from "../interfaces/gameInterface";
+import GameScene from "../scenes/game.scene";
+import { makeClickable } from "../utils/setActiveUnit";
 
-export class Item implements IItem {
+export class Item extends Phaser.GameObjects.Image implements IItem {
   class: EClass = EClass.ITEM;
   unitId: string;
   itemType: EItems;
   boardPosition: number;
   isActiveValue: boolean;
 
-  constructor(itemId: string, itemType: EItems, boardPosition: number) {
-    this.unitId = itemId;
-    this.itemType = itemType;
-    this.boardPosition = boardPosition;
+  constructor(context: GameScene, data: {
+    unitId: string,
+    itemType: EItems,
+    boardPosition: number
+  }) {
+    const { x, y } = context.centerPoints[data.boardPosition];
+    const texture = data.itemType;
+    super(context, x, y - 10, texture);
+
+    // Item Interface assignment
+    this.unitId = data.unitId;
+    this.itemType = data.itemType;
+    this.boardPosition = data.boardPosition;
     this.isActiveValue = false;
+
+    // Add listener for clicking on the unit
+    makeClickable(this, context); // FIXME: this works but doesn't have the logic to do the checks
+
+    // Making the item not visible if it's in the deck (board position 51)
+    if (this.boardPosition === 51) {
+      this.setVisible(false).disableInteractive();
+    }
+
+    context.add.existing(this).setScale(0.8).setDepth(10).setInteractive().setName(this.unitId);
   }
 
   get isActive() {

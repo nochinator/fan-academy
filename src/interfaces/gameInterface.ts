@@ -1,3 +1,5 @@
+import { Hero } from "../classes/hero";
+import { Item } from "../classes/item";
 import { EAction, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems } from "../enums/gameEnums";
 
 /**
@@ -56,8 +58,8 @@ export interface IHero {
 export interface IFaction {
   userId: string;
   factionName: string;
-  unitsInHand: (IHero | IItem)[];
-  unitsInDeck: (IHero | IItem)[];
+  unitsInHand: (Hero | Item)[];
+  unitsInDeck: (Hero | Item)[];
   cristalOneHealth: number;
   cristalTwoHealth: number;
 }
@@ -99,7 +101,7 @@ export interface IGameState {
   // After a turn is played, a new turn (without action but with the current board state) is created as CurrentTurn
   player1: IPlayerState;
   player2?: IPlayerState;
-  boardState: IHero[];
+  boardState: Hero[];
   action?: ITurnAction;
 }
 
