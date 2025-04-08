@@ -19,7 +19,7 @@ export class Item extends Phaser.GameObjects.Image implements IItem {
     const texture = data.itemType;
     super(context, x, y - 10, texture);
 
-    // Item Interface assignment
+    // Interface properties assignment
     this.unitId = data.unitId;
     this.itemType = data.itemType;
     this.boardPosition = data.boardPosition;
@@ -51,12 +51,16 @@ export class Item extends Phaser.GameObjects.Image implements IItem {
 
   onActivate() {
     console.log(`${this.unitId} is now active`);
+    this.setScale(1);
+
     this.highlightMovementTiles();
     this.highlightEnemiesInRange();
   }
 
   onDeactivate() {
     console.log(`${this.unitId} is now inactive`);
+    this.setScale(0.8);
+
     this.clearHighlights();
   }
 

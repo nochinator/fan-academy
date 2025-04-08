@@ -114,6 +114,7 @@ export class Hero extends Phaser.GameObjects.Container implements IHero {
 
   onActivate() {
     console.log(`${this.unitId} is now active`);
+    this.setScale(1.2);
 
     this.highlightMovementTiles();
     this.highlightEnemiesInRange();
@@ -121,6 +122,8 @@ export class Hero extends Phaser.GameObjects.Container implements IHero {
 
   onDeactivate() {
     console.log(`${this.unitId} is now inactive`);
+    this.setScale(1);
+
     this.clearHighlights();
   }
 
