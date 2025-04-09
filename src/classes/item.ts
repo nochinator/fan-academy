@@ -3,18 +3,14 @@ import { IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeClickable } from "../utils/setActiveUnit";
 
-export class Item extends Phaser.GameObjects.Image implements IItem {
+export class Item extends Phaser.GameObjects.Image {
   class: EClass = EClass.ITEM;
   unitId: string;
   itemType: EItems;
   boardPosition: number;
   isActiveValue: boolean;
 
-  constructor(context: GameScene, data: {
-    unitId: string,
-    itemType: EItems,
-    boardPosition: number
-  }) {
+  constructor(context: GameScene, data: IItem) {
     const { x, y } = context.centerPoints[data.boardPosition];
     const texture = data.itemType;
     super(context, x, y - 10, texture);
@@ -26,7 +22,7 @@ export class Item extends Phaser.GameObjects.Image implements IItem {
     this.isActiveValue = false;
 
     // Add listener for clicking on the unit
-    makeClickable(this, context); // FIXME: this works but doesn't have the logic to do the checks
+    makeClickable(this, context);
 
     // Making the item not visible if it's in the deck (board position 51)
     if (this.boardPosition === 51) {

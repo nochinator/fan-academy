@@ -1,29 +1,14 @@
-import { Hero } from "../classes/hero";
-import { Item } from "../classes/item";
 import { EAction, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems } from "../enums/gameEnums";
 
 /**
  * Item Interface
  */
 export interface IItem {
-  class: EClass;
+  class?: EClass;
+  faction?: EFaction;
   unitId: string; // userId_itemName_itemNumber
   itemType: EItems;
   boardPosition: number // 45-51
-  isActiveValue: boolean;
-}
-
-/**
- * Patial Hero Interface -used for instantiating hero subclasses
- */
-export interface IPartialHeroInit {
-  unitId: string,
-  boardPosition?: number,
-  currentHealth?: number,
-  isKO?: boolean,
-  factionBuff?: boolean,
-  runeMetal?: boolean,
-  shiningHelm?: boolean
 }
 
 /**
@@ -41,25 +26,22 @@ export interface IHero {
   movement: number;
   range: number;
   attackType: EAttackType;
-  rangeAttackDamage: number;
-  meleeAttackDamage: number;
-  healingPower: number; // If > 0, the unit can heal
+  power: number;
   physicalDamageResistance: number;
   magicalDamageResistance: number;
   factionBuff: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
-  isActiveValue: boolean;
 }
 
 /**
  * Faction Interface
  */
 export interface IFaction {
-  userId: string;
+  userId?: string;
   factionName: string;
-  unitsInHand: (Hero | Item)[];
-  unitsInDeck: (Hero | Item)[];
+  unitsInHand: (IHero | IItem)[];
+  unitsInDeck: (IHero | IItem)[];
   cristalOneHealth: number;
   cristalTwoHealth: number;
 }
@@ -101,7 +83,7 @@ export interface IGameState {
   // After a turn is played, a new turn (without action but with the current board state) is created as CurrentTurn
   player1: IPlayerState;
   player2?: IPlayerState;
-  boardState: Hero[];
+  boardState: IHero[];
   action?: ITurnAction;
 }
 

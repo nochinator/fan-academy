@@ -137,7 +137,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
     console.log('listener logs');
     // Create the faction's deck and starting hand
     if (context.userId) {
-      const playerFaction = createNewGameFactionState(EFaction.COUNCIL, context.userId);
+      const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL);
       console.log('PLAYERFACTION', playerFaction);
       await createGame(context.colyseusClient, context.userId, playerFaction);
     } else {
@@ -148,7 +148,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
     console.log('listener logs');
     // Create the faction's deck and starting hand
     if (context.userId) {
-      const playerFaction = createNewGameFactionState(EFaction.DARK_ELVES, context.userId);
+      const playerFaction = createNewGameFactionState(context.userId, EFaction.DARK_ELVES);
       console.log('PLAYERFACTION', playerFaction);
       await createGame(context.colyseusClient, context.userId, playerFaction);
     } else {

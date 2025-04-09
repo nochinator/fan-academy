@@ -9,6 +9,7 @@ import { IFaction, IGameState } from "../interfaces/gameInterface";
  * @param userId
  */
 export async function createGame(client: Client | undefined, userId: string | undefined, faction: IFaction | undefined): Promise<void> {
+  console.table(faction);
   if (!client || !userId || !faction) {
     console.log('createGame error: missing one of client / userId / faction');
     return;

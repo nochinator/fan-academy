@@ -65,7 +65,7 @@ export enum EHeroes {
   WIZARD = 'wizard',
 
   // Dark Elves
-  HERETIC = 'heretic',
+  PRIESTESS = 'priestess',
   IMPALER = 'impaler',
   NECROMANCER = 'necromancer',
   PHANTOM = 'phantom',

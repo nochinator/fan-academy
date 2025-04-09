@@ -3,7 +3,7 @@ import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeClickable } from "../utils/setActiveUnit";
 
-export class Hero extends Phaser.GameObjects.Container implements IHero {
+export class Hero extends Phaser.GameObjects.Container {
   class: EClass = EClass.HERO;
   faction: EFaction;
   unitType: EHeroes;
@@ -15,9 +15,7 @@ export class Hero extends Phaser.GameObjects.Container implements IHero {
   movement: number;
   range: number;
   attackType: EAttackType;
-  rangeAttackDamage: number;
-  meleeAttackDamage: number;
-  healingPower: number;
+  power: number;
   physicalDamageResistance: number;
   magicalDamageResistance: number;
   factionBuff: boolean;
@@ -30,26 +28,7 @@ export class Hero extends Phaser.GameObjects.Container implements IHero {
   private shiningHelmImage: Phaser.GameObjects.Image;
   private factionBuffImage: Phaser.GameObjects.Image;
 
-  constructor(context: GameScene, data:  {
-    faction: EFaction,
-    unitType: EHeroes,
-    unitId: string,
-    boardPosition: number,
-    maxHealth: number,
-    currentHealth: number,
-    isKO: boolean,
-    movement: number,
-    range: number,
-    attackType: EAttackType,
-    rangeAttackDamage: number,
-    meleeAttackDamage: number,
-    healingPower: number, // If > 0, the unit can heal
-    physicalDamageResistance: number,
-    magicalDamageResistance: number,
-    factionBuff: boolean,
-    runeMetal: boolean,
-    shiningHelm: boolean,
-  }) {
+  constructor(context: GameScene, data: IHero) {
     const { x, y } = context.centerPoints[data.boardPosition];
     super(context, x, y);
 
@@ -64,9 +43,7 @@ export class Hero extends Phaser.GameObjects.Container implements IHero {
     this.movement = data.movement;
     this.range = data.range;
     this.attackType = data.attackType;
-    this.rangeAttackDamage = data.rangeAttackDamage;
-    this.meleeAttackDamage = data.meleeAttackDamage;
-    this.healingPower = data.healingPower;
+    this.power = data.power;
     this.physicalDamageResistance = data.physicalDamageResistance;
     this.magicalDamageResistance = data.magicalDamageResistance;
     this.factionBuff = data.factionBuff;
@@ -94,7 +71,7 @@ export class Hero extends Phaser.GameObjects.Container implements IHero {
 
     if (this.boardPosition === 51) this.setVisible(false);
 
-    makeClickable(this, context); // FIXME: this works but doesn't have the logic to do the checks
+    makeClickable(this, context);
 
     context.add.existing(this);
     context.currentGameContainer?.add(this);

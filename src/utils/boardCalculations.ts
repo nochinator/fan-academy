@@ -29,30 +29,6 @@ export function calculateClosestSquare(boardSquares: Coordinates[], clickedPoint
   return closestSquare ?? clickedPoint; // FIXME: original position, not dragged item
 }
 
-// export function calculateClosestSquare(boardSquares: Coordinates[], draggedItem: Coordinates): Coordinates {
-//   // Calculate the squared Euclidean distance between two points (accounts for negative numbers)
-//   const getDistanceSquared = (p1: Coordinates, p2: Coordinates): number => {
-//     return (p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2 / 100000;
-//   };
-
-//   let closestSquare;
-//   let smallestDistance = 1000;
-
-//   // FIXME: do not count deck, but count hand. Releasing away from the board should also snap the item back to the hand
-//   // FIXME: it also needs a check for occupied tiles and hand spots
-//   console.log('dragged', draggedItem);
-//   boardSquares.forEach(point =>{
-//     const distance = getDistanceSquared(point, draggedItem);
-//     console.log('DISTANCE', distance);
-//     if (distance < smallestDistance) {
-//       smallestDistance = distance;
-//       closestSquare = point;
-//     }
-//   });
-
-//   return closestSquare ?? draggedItem; // FIXME: original position, not dragged item
-// }
-
 export function calculateCenterPoints(): Coordinates[] {
   const topLeft = {
     x: 545,

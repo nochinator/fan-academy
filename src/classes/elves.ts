@@ -1,168 +1,45 @@
-import { IFaction, IPartialHeroInit } from "../interfaces/gameInterface";
-import { EAttackType, EFaction, EHeroes } from "../enums/gameEnums";
-import { shuffleArray } from "../utils/deckUtils";
+import { IHero } from "../interfaces/gameInterface";
 import { Hero } from "./hero";
-import { Item } from "./item";
 import GameScene from "../scenes/game.scene";
+import { createElvesImpalerData, createElvesNecromancerData, createElvesPhantomData, createElvesPriestessData, createElvesVoidMonkData, createElvesWraithData } from "../lib/unitData/elvesHeroData";
 
 export class Impaler extends Hero {
-  constructor(context: GameScene, data: IPartialHeroInit) {
-    const maxHealth  = 800;
-
-    super(context, {
-      faction: EFaction.DARK_ELVES,
-      unitType: EHeroes.IMPALER,
-      unitId: data.unitId,
-      boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
-      maxHealth,
-      currentHealth: data.currentHealth ?? maxHealth,
-      isKO: data.isKO ?? false,
-      movement: 2,
-      range: 3,
-      attackType: EAttackType.PHYSICAL,
-      rangeAttackDamage: 300,
-      meleeAttackDamage: 300,
-      healingPower: 0, // If > 0, the unit can heal
-      physicalDamageResistance: 0,
-      magicalDamageResistance: 0,
-      factionBuff: data.factionBuff ?? false,
-      runeMetal: data.runeMetal ?? false,
-      shiningHelm: data.shiningHelm ?? false
-    }
-    );
+  constructor(context: GameScene, data: Partial<IHero>) {
+    super(context, createElvesImpalerData(data));
   }
+  // TODO: add pull to attack
 }
 
-// FIXME: correct data after testing
 export class VoidMonk extends Hero {
-  constructor(context: GameScene, data: IPartialHeroInit) {
-    const maxHealth  = 800;
-
-    super(context,
-      {
-        faction: EFaction.DARK_ELVES,
-        unitType: EHeroes.VOIDMONK,
-        unitId: data.unitId,
-        boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
-        maxHealth,
-        currentHealth: data.currentHealth ?? maxHealth,
-        isKO: data.isKO ?? false,
-        movement: 2,
-        range: 3,
-        attackType: EAttackType.PHYSICAL,
-        rangeAttackDamage: 300,
-        meleeAttackDamage: 300,
-        healingPower: 0, // If > 0, the unit can heal
-        physicalDamageResistance: 0,
-        magicalDamageResistance: 0,
-        factionBuff: data.factionBuff ?? false,
-        runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false
-      }
-    );
+  constructor(context: GameScene, data: Partial<IHero>) {
+    super(context, createElvesVoidMonkData(data));
   }
+  // TODO: add aoe to attack
 }
 
 export class Necromancer extends Hero {
-  constructor(context: GameScene, data: IPartialHeroInit) {
-    const maxHealth  = 800;
-
-    super(context,
-      {
-        faction: EFaction.DARK_ELVES,
-        unitType: EHeroes.NECROMANCER,
-        unitId: data.unitId,
-        boardPosition: data.boardPosition ?? 51, // positions go from 0-51, 51 being the deck and 45-50 the hand
-        maxHealth,
-        currentHealth: data.currentHealth ?? maxHealth,
-        isKO: data.isKO ?? false,
-        movement: 2,
-        range: 3,
-        attackType: EAttackType.PHYSICAL,
-        rangeAttackDamage: 300,
-        meleeAttackDamage: 300,
-        healingPower: 0, // If > 0, the unit can heal
-        physicalDamageResistance: 0,
-        magicalDamageResistance: 0,
-        factionBuff: data.factionBuff ?? false,
-        runeMetal: data.runeMetal ?? false,
-        shiningHelm: data.shiningHelm ?? false
-      }
-    );
+  constructor(context: GameScene, data: Partial<IHero>) {
+    super(context, createElvesNecromancerData(data));
   }
+  // TODO: add phantom check to attack
 }
 
-export class ElvesFaction implements IFaction {
-  context: GameScene;
-  userId: string;
-  factionName: string;
-  unitsInHand: (Hero | Item)[];
-  unitsInDeck: (Hero | Item)[];
-  cristalOneHealth: number;
-  cristalTwoHealth: number;
-
-  constructor(
-    context: GameScene,
-    userId: string,
-    unitsInDeck?: (Hero | Item)[],
-    unitsInHand?: (Hero | Item)[],
-    cristalOneHealth?: number,
-    cristalTwoHealth?: number
-
-  ) {
-    const newDeck = unitsInDeck ?? this.createElvesDeck(); // REVIEW:
-    const startingHand = unitsInHand ?? newDeck.splice(0, 6) ;
-
-    this.context = context;
-    this.userId = userId;
-    this.factionName = EFaction.DARK_ELVES;
-    this.unitsInDeck = unitsInDeck ?? newDeck;
-    this.unitsInHand = unitsInHand ?? startingHand;
-    this.cristalOneHealth = cristalOneHealth ?? 4500;
-    this.cristalTwoHealth = cristalTwoHealth ?? 4500;
+export class Priestess extends Hero {
+  constructor(context: GameScene, data: Partial<IHero>) {
+    super(context, createElvesPriestessData(data));
   }
+  // TODO: add healing and revive
+}
 
-  createElvesDeck(): (Hero | Item)[] {
-    const deck = [];
+export class Wraith extends Hero {
+  constructor(context: GameScene, data: Partial<IHero>) {
+    super(context, createElvesWraithData(data));
+  }
+  // TODO: add consuming units
+}
 
-    for (let index = 0; index < 3; index++) {
-      const impaler = new Impaler(this.context, { unitId: `${this.userId}_impaler_${index}` });
-      const voidMonk = new VoidMonk(this.context, { unitId: `${this.userId}_voidMonk_${index}` });
-      const necromancer = new Necromancer(this.context, { unitId: `${this.userId}_necromancer_${index}` });
-
-      deck.push(impaler, voidMonk, necromancer);
-    }
-
-    /**
-    To add:
-
-    COUNCIL:
-    Soul Harvest (x2)
-    Does damage to enemies while raising your fallen heroes and adding to their maximum health.
-    Health gained by each unit is equal to the total life lost by enemy units divided by the number of friendly units plus 3 rounded to the nearest 5.
-    The equation for this is H = 1/(3+U) x D, where H is Health gained by each allied unit, D is Damage dealt, U = Amount of allied units on the field, and R = Any real number. H is rounded to the nearest 5 at the end.
-      For example, if there were 3 allied units, and the harvest dealt 400 damage, then H = 1/(3+3) x 400, which is 1/6 x 400, which is 66.66...., which rounds to 65.
-      As a second example, if there were 7 allied units, and the harvest dealt 780 damage, then H = 1/(3+7) x 780, which is 1/10 x 780, which is 78, which rounds to 80
-
-    Mana Vial (x2)
-    Heals an ally for 1000 hitpoints and increases max health by 50 points.
-
-    Soulstone (x3)
-    Doubles the units life leech bonus (from 33% to 67%) and increases max health by 10%
-
-    GENERIC:
-    Runemetal (x3)
-    Increases base power by 50% and max health by 10%
-
-    Shining Helm (x3)
-    Increases magical resistance by 20% and max health by 10%
-
-    Superccontext,harge (x2)
-    Triples the attack power of the next attack for the chosen unit
-    */
-
-    const shuffledDeck = shuffleArray(deck);
-
-    return shuffledDeck;
+export class Phantom extends Hero {
+  constructor(context: GameScene, data: Partial<IHero>) {
+    super(context, createElvesPhantomData(data));
   }
 }
