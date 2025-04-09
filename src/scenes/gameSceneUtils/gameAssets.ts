@@ -8,7 +8,7 @@ import { createGameBoardUI } from "./gameBoardUI";
 export function loadGameAssets(context: GameScene) {
   // Loading units
   const councilArray = ['archer', 'cleric', 'knight', 'ninja', 'wizard'];
-  const darkElvesArray = ['heretic', 'impaler', 'necromancer', 'phantom', 'voidmonk', 'wraith'];
+  const darkElvesArray = ['priestess', 'impaler', 'necromancer', 'phantom', 'voidmonk', 'wraith'];
 
   // TODO: a check should be made to see if both factions are needed
   councilArray.forEach( asset => { context.load.image(asset, `/assets/images/factions/council/${asset}.png`);
@@ -16,11 +16,6 @@ export function loadGameAssets(context: GameScene) {
   darkElvesArray.forEach( asset => { context.load.image(asset, `/assets/images/factions/darkElves/${asset}.png`);
   });
 
-  // Equipment icons
-  context.load.image('runeMetal', './assets/images/factions/common/rune_metal.png');
-  context.load.image('shiningHelm', './assets/images/factions/common/shining_helm.png');
-
-  // Faction specific equipment
   // Council
   context.load.image('dragonScale', './assets/images/factions/council/dragon_scale.png');
   context.load.image('inferno', './assets/images/factions/council/inferno.png');
@@ -32,7 +27,9 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('manaVial', './assets/images/factions/darkElves/mana_vial.png');
 
   // Shared items
-  context.load.image('scroll', './assets/images/factions/common/scroll.png');
+  context.load.image('superCharge', './assets/images/factions/common/super_charge.png');
+  context.load.image('runeMetal', './assets/images/factions/common/rune_metal.png');
+  context.load.image('shiningHelm', './assets/images/factions/common/shining_helm.png');
 }
 
 export async function createGameAssets(context: GameScene): Promise<void> {

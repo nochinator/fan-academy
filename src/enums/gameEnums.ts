@@ -29,6 +29,7 @@ export enum EFaction {
 export enum EAction {
   MOVE = 'move',
   ATTACK = 'attack',
+  HEAL = 'heal',
   SPAWN = 'spawn',
   USE = 'use', // works for potions and buffs
   SHUFFLE = 'shuffle'
@@ -38,7 +39,7 @@ export enum EItems {
   // Generic
   SHINING_HELM = 'shiningHelm',
   RUNE_METAL = 'runeMetal',
-  SCROLL = 'scroll',
+  SUPERCHARGE = 'superCharge',
 
   // Council
   DRAGON_SCALE = 'dragonScale',

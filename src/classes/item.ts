@@ -13,7 +13,7 @@ export class Item extends Phaser.GameObjects.Image {
   constructor(context: GameScene, data: IItem) {
     const { x, y } = context.centerPoints[data.boardPosition];
     const texture = data.itemType;
-    super(context, x, y - 10, texture);
+    super(context, x, y - 20, texture);
 
     // Interface properties assignment
     this.unitId = data.unitId;
@@ -29,7 +29,8 @@ export class Item extends Phaser.GameObjects.Image {
       this.setVisible(false).disableInteractive();
     }
 
-    context.add.existing(this).setScale(0.8).setDepth(10).setInteractive().setName(this.unitId);
+    const displaySize = this.itemType === EItems.SUPERCHARGE || this.itemType === EItems.SHINING_HELM ? 55 : 100; // REVIEW: better way of doing this
+    context.add.existing(this).setDisplaySize(displaySize, displaySize).setDepth(10).setInteractive().setName(this.unitId);
     context.currentGameContainer?.add(this);
   }
 

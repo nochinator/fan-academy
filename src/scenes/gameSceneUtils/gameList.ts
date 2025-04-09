@@ -2,7 +2,7 @@ import { EFaction } from "../../enums/gameEnums";
 import { IGame, IPlayerData } from "../../interfaces/gameInterface";
 import { createGame, joinGame } from "../../lib/colyseusGameRoom";
 import { deleteGame, getGameList } from "../../queries/gameQueries";
-import { createNewGameFactionState } from "../../utils/renderGameState";
+import { createNewGameFactionState } from "../../utils/createGameState";
 import GameScene from "../game.scene";
 import { createGameAssets } from "./gameAssets";
 import { loadProfilePictures } from "./profilePictures";
