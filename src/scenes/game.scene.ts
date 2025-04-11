@@ -2,7 +2,6 @@ import { Client, Room } from "colyseus.js";
 import { loadGameAssets } from "./gameSceneUtils/gameAssets";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameMenuUI, createGameMenuUI } from "./gameSceneUtils/gameMenuUI";
-import { loadGameBoardTiles } from "./gameSceneUtils/gameBoardTiles";
 import { calculateAllCenterPoints } from "../utils/boardCalculations";
 import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
 import { Coordinates, IGame, IGameState } from "../interfaces/gameInterface";
