@@ -1,4 +1,3 @@
-import { Client } from "colyseus.js";
 import createMainMenuButton from "../lib/buttons";
 import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 
@@ -108,27 +107,6 @@ export default class MainMenuScene extends Phaser.Scene {
     //   loop: false,
     //   callback: () => { this.scene.start('GameScene',  { userId: this.userId });}
     // });
-
-    /**
-     * REVIEW: from the main menu we will do a query (maybe a loading pop up) and pass the gameState and factions to the game
-     * When clicking on play, we get to the list of games, but we don't access any yet (no gameboard)
-     * The first item on the list is the creating a new game asset, followed by the list of active games. The query vlooks the players' names and profile pics. The list is ordered by two criteria:
-     * -games where the user is the active player go on top
-     * -games where it's been the user's turn the longest go on top
-     * When creating that list we get the players' data, the faction and the boardstate for each game
-     * When the user clicks on a game, we access the room and use that information to generate the board
-     *
-     * What a need to do:
-     * -create a new game asset
-     * -create a current game asset
-     * -create a second user
-     * -check again the function for the rooms (destroying a recovering from the db)
-     * -chech the game code so it doesn't default to the test room
-     * -create a function to create containers for the characters
-     *    -avoid bug: dragging an item onto a character in hand
-     * -set up spawn tiles on board
-     * -add chat to the game object and set it up on colyseus
-     */
   }
 
   /*

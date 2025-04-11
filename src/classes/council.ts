@@ -3,8 +3,8 @@ import { EItems } from "../enums/gameEnums";
 import { Hero } from "./hero";
 import { Item } from "./item";
 import GameScene from "../scenes/game.scene";
-import { createCouncilArcherData, createCouncilClericData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "../lib/unitData/councilHeroData";
-import { createItemData } from "../lib/unitData/itemData";
+import { createCouncilArcherData, createCouncilClericData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "../gameData/councilHeroData";
+import { createItemData } from "../gameData/itemData";
 
 export class Archer extends Hero {
   constructor(context: GameScene, data: Partial<IHero>) {

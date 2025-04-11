@@ -1,15 +1,7 @@
 import { Client, Room } from "colyseus.js";
-import { IFaction, IGameState } from "../interfaces/gameInterface";
+import { IFaction, IGameState, ITile } from "../interfaces/gameInterface";
 
-/**
- *
- * @param client TODO: connect the create function to a button. test creating games
- * once working, return games to populate the game list
- * once working, test joining games
- * @param userId
- */
-export async function createGame(client: Client | undefined, userId: string | undefined, faction: IFaction | undefined): Promise<void> {
-  console.table(faction);
+export async function createGame(client: Client | undefined, userId: string | undefined, faction: IFaction | undefined, boardState: ITile[] | undefined): Promise<void> {
   if (!client || !userId || !faction) {
     console.log('createGame error: missing one of client / userId / faction');
     return;
@@ -19,7 +11,8 @@ export async function createGame(client: Client | undefined, userId: string | un
 
     const room = await client.create('game_room', {
       userId,
-      faction
+      faction,
+      boardState
     });
 
     subscribeToGameListeners(room);

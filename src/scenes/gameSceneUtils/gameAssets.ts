@@ -1,8 +1,8 @@
+import { Board } from "../../classes/board";
 import { Hero } from "../../classes/hero";
 import { Item } from "../../classes/item";
 import { isHero, isItem } from "../../utils/deckUtils";
 import GameScene from "../game.scene";
-import { createBoardGameTiles } from "./gameBoardTiles.";
 import { createGameBoardUI } from "./gameBoardUI";
 
 export function loadGameAssets(context: GameScene) {
@@ -36,7 +36,7 @@ export async function createGameAssets(context: GameScene): Promise<void> {
   console.log('This logs when I click on the game', context.currentGame?._id);
 
   await createGameBoardUI(context);
-  createBoardGameTiles(context); // TODO: this should be based on map
+  // createBoardGameTiles(context); // TODO: this should be based on map
 
   const game = context.currentGame;
   if (!game || !game.currentState) {
@@ -61,13 +61,10 @@ export async function createGameAssets(context: GameScene): Promise<void> {
 
   if (game.currentState) {
   /**
-   * Render units on the board
+   * Render the board (tiles and heroes on board)
    */
-    const unitsOnBoard =  game.currentState.boardState;
-
-    unitsOnBoard.forEach(unit => {
-      new Hero(context, unit);
-    });
+    const tilesOnBoard =  game.currentState.boardState;
+    const board = new Board(context, tilesOnBoard);
 
     /**
      * Render units in hand

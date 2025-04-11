@@ -73,3 +73,15 @@ export enum EHeroes {
   VOIDMONK = 'voidmonk',
   WRAITH = 'wraith'
 }
+
+export enum ETiles {
+  BASIC = 'basic',
+  POWER = 'powerTile',
+  PHYSICAL_RESISTANCE = 'shieldTile',
+  MAGICAL_RESISTANCE = 'helmetTile',
+  CRYSTAL_DAMAGE = 'crystalDamageTile',
+  TELEPORTER = 'teleporterTile',
+  CRYSTAL = 'crystal',
+  SPAWN = 'spawnTile',
+  SPEED = 'speedTile'
+}

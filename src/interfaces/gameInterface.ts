@@ -1,4 +1,14 @@
-import { EAction, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems } from "../enums/gameEnums";
+import { EAction, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems, ETiles } from "../enums/gameEnums";
+
+/**
+ * Coordinates Interface
+ */
+export type Coordinates = {
+  x: number,
+  y: number,
+  row?: number,
+  col?: number
+};
 
 /**
  * Item Interface
@@ -77,13 +87,27 @@ export interface IPlayerState {
 }
 
 /**
+ * Tile Interface
+ */
+export interface ITile {
+  row: number
+  col: number
+  tileType: ETiles,
+  x: number
+  y: number
+  occupied: boolean,
+  obstacle: boolean,
+  hero?: IHero | undefined;
+}
+
+/**
  * GameState Interface
  */
 export interface IGameState {
   // After a turn is played, a new turn (without action but with the current board state) is created as CurrentTurn
   player1: IPlayerState;
   player2?: IPlayerState;
-  boardState: IHero[];
+  boardState: ITile[];
   action?: ITurnAction;
 }
 

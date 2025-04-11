@@ -2,7 +2,7 @@ import { EFaction } from "../../enums/gameEnums";
 import { IGame, IPlayerData } from "../../interfaces/gameInterface";
 import { createGame, joinGame } from "../../lib/colyseusGameRoom";
 import { deleteGame, getGameList } from "../../queries/gameQueries";
-import { createNewGameFactionState } from "../../utils/createGameState";
+import { createNewGameBoardState, createNewGameFactionState } from "../../utils/createGameState";
 import GameScene from "../game.scene";
 import { createGameAssets } from "./gameAssets";
 import { loadProfilePictures } from "./profilePictures";
@@ -138,8 +138,8 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
     // Create the faction's deck and starting hand
     if (context.userId) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL);
-      console.log('PLAYERFACTION', playerFaction);
-      await createGame(context.colyseusClient, context.userId, playerFaction);
+      const boardState = createNewGameBoardState(context);
+      await createGame(context.colyseusClient, context.userId, playerFaction, boardState);
     } else {
       console.error('No userId when creating a new game');
     }
@@ -149,8 +149,8 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
     // Create the faction's deck and starting hand
     if (context.userId) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.DARK_ELVES);
-      console.log('PLAYERFACTION', playerFaction);
-      await createGame(context.colyseusClient, context.userId, playerFaction);
+      const boardState = createNewGameBoardState(context);
+      await createGame(context.colyseusClient, context.userId, playerFaction, boardState);
     } else {
       console.error('No userId when creating a new game');
     }

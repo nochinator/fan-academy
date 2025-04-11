@@ -2,25 +2,25 @@ import { Client, Room } from "colyseus.js";
 import { loadGameAssets } from "./gameSceneUtils/gameAssets";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameMenuUI, createGameMenuUI } from "./gameSceneUtils/gameMenuUI";
-import { loadGameBoardTiles } from "./gameSceneUtils/gameBoardTiles.";
-import { calculateCenterPoints, Coordinates } from "../utils/boardCalculations";
+import { loadGameBoardTiles } from "./gameSceneUtils/gameBoardTiles";
+import { calculateAllCenterPoints } from "../utils/boardCalculations";
 import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
-import { IGame, IGameState, IHero, IItem } from "../interfaces/gameInterface";
+import { Coordinates, IGame, IGameState } from "../interfaces/gameInterface";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 
 export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
   userId: string | undefined;
+  activePlayer: string | undefined;
+  centerPoints: Coordinates[] ;
   gameListContainer: any; // REVIEW:
   currentRoom: Room | undefined;
   currentGame: IGame | undefined;
+  currentGameContainer: Phaser.GameObjects.Container | undefined;
   currentTurn: IGameState | undefined;
   currentOpponent: string | undefined;
-  activePlayer: string | undefined;
-  centerPoints: Coordinates[];
   activeUnit: Hero | Item |  undefined;
-  currentGameContainer: Phaser.GameObjects.Container | undefined;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -39,15 +39,16 @@ export default class GameScene extends Phaser.Scene {
   preload() {
     loadGameMenuUI(this);
     loadGameBoardUI(this);
-    loadGameBoardTiles(this);
     loadGameAssets(this);
   }
 
   async create() {
     // Connect to the colyseus lobby room
     connectToGameLobby(this.colyseusClient, this.userId, this);
-    this.centerPoints = calculateCenterPoints(); // REVIEW:
-    await createGameMenuUI(this); // generates background menu and game list
+    // Get all the center points
+    this.centerPoints = calculateAllCenterPoints(); // REVIEW:
+    // Create the background menu image and game list
+    await createGameMenuUI(this);
 
     // this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
     //   // Log the mouse coordinates
@@ -55,7 +56,5 @@ export default class GameScene extends Phaser.Scene {
     // });  // FIXME: remove after testing
   }
 
-  update() {
-
-  }
+  update() {}
 }

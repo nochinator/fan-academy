@@ -1,6 +1,6 @@
-import { EFaction, EItems } from "../../enums/gameEnums";
-import { IFaction, IHero, IItem } from "../../interfaces/gameInterface";
-import { shuffleArray } from "../../utils/deckUtils";
+import { EFaction, EItems } from "../enums/gameEnums";
+import { IFaction, IHero, IItem } from "../interfaces/gameInterface";
+import { shuffleArray } from "../utils/deckUtils";
 import { createCouncilArcherData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "./councilHeroData";
 import { createElvesImpalerData, createElvesVoidMonkData, createElvesNecromancerData, createElvesWraithData, createElvesPriestessData } from "./elvesHeroData";
 import { createItemData } from "./itemData";
