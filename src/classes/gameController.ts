@@ -2,6 +2,7 @@ import GameScene from "../scenes/game.scene";
 import { isHero } from "../utils/deckUtils";
 import { Board } from "./board";
 import { Deck } from "./deck";
+import { GameUI } from "./gameUI";
 import { Hand } from "./hand";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -12,8 +13,10 @@ export class GameController {
   board: Board;
   hand: Hand;
   deck: Deck;
-  constructor(context: GameScene, board: Board, hand: Hand, deck: Deck) {
+  gameUI: GameUI;
+  constructor(context: GameScene, board: Board, hand: Hand, deck: Deck, gameUI: GameUI) {
     this.context = context;
+    this.gameUI = gameUI;
     this.board = board;
     this.hand = hand;
     this.deck = deck;
@@ -43,24 +46,24 @@ export class GameController {
    * ACTIONS
    */
   spawnHero(tile: Tile): void {
-    // Move hero to right spawn tile
-    // Remove hero from hand
     // Add action to turn action list
     // Remove a slice from the action pie
     // Make pie interactive
-    //  Clicking in the pie to reset the turn overrides currentTurn with the last turn from the turns array
+    // Clicking in the pie to reset the turn overrides currentTurn with the last turn from the turns array
     const hero = this.context.activeUnit;
     if (!hero || !isHero(hero)) {
       console.log('No active hero when trying to spawn a hero');
       return;
     }
+
     this.hand.removeFromHand(hero);
     hero.boardPosition = tile.boardPosition;  // TODO: update boardposition
     hero.x = tile.x;
     hero.y = tile.y;
     tile.setOccupied(true);
     tile.hero = hero.getHeroData();
-    this.context.activeUnit = undefined; // FIXME: THIS DOESNT WORK, NEED A BETTER WAY OF UPDATING
+    hero.isActive = false;
+    this.context.activeUnit = undefined;
     console.log('All spawnactions done');
     console.log('HAND', this.hand);
     console.log('TILE', tile);

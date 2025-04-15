@@ -1,12 +1,12 @@
 import { Board } from "../../classes/board";
 import { Deck } from "../../classes/deck";
 import { GameController } from "../../classes/gameController";
+import { GameUI } from "../../classes/gameUI";
 import { Hand } from "../../classes/hand";
 import { Hero } from "../../classes/hero";
 import { Item } from "../../classes/item";
 import { isHero, isItem } from "../../utils/deckUtils";
 import GameScene from "../game.scene";
-import { createGameBoardUI } from "./gameBoardUI";
 
 export function loadGameAssets(context: GameScene) {
   // Load tiles
@@ -55,8 +55,6 @@ export function loadGameAssets(context: GameScene) {
 export async function createGameAssets(context: GameScene): Promise<void> {
   console.log('This logs when I click on the game', context.currentGame?._id);
 
-  await createGameBoardUI(context);
-
   const game = context.currentGame;
   if (!game || !game.currentState) {
     console.log('Error: No currentState for current game');
@@ -69,11 +67,10 @@ export async function createGameAssets(context: GameScene): Promise<void> {
   const playerFactionData = game.currentState.player1.playerId == context.userId ? game.currentState.player1.factionData : game.currentState.player2?.factionData;
   const opponentFactionData = game.currentState.player1.playerId == context.userId ? game.currentState.player1.factionData : game.currentState.player2?.factionData; // we need this for the crystals
 
-  // FIXME: render the crystal here
   /**
-   * RENDERING CRISTALS
-   */
-  // TODO: renderCrystal function
+ * RENDERING THE UI
+ */
+  const gameUI = new GameUI(context);
   /**
    * RENDERING UNITS
    */
@@ -92,7 +89,6 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     const hand = new Hand(unitsInHand);
 
     unitsInHand.forEach(unit => {
-      // if (isHero(unit)) renderHero(context, unit);
       if (isHero(unit)) new Hero(context, unit);
 
       if (isItem(unit)) new Item(context, unit);
@@ -112,7 +108,7 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     /**
      *  Create the game controller to handle game interactions
      */
-    context.gameController = new GameController(context, board, hand, deck);
+    context.gameController = new GameController(context, board, hand, deck, gameUI);
   }
 
   console.log('userPlayer', userPlayer);

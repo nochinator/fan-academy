@@ -7,8 +7,6 @@ import { isInHand, isItem } from "./deckUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   unit.on('pointerdown', () => {
-    // TODO: do a check for not activating enemy units
-    // TODO: adds check here for targetting
     if (context.activePlayer != context.userId) return; // Only the active player can activate units (obviously)
 
     if(context.activeUnit && context.activeUnit.unitId === unit.unitId) {
@@ -27,7 +25,7 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
       if (unit.class === EClass.HERO) context.gameController?.onHeroClicked(unit as Hero); // FIXME:
       if (unit.class === EClass.ITEM) context.gameController?.onItemClicked(unit as Item); // FIXME:
     } else if(context.activeUnit && context.activeUnit.unitId != unit.unitId) {
-      // Case 3: clicking on a unit when there is already an active unit -> ignore unless, clicked unit is in hand
+      // Case 3: clicking on a unit when there is already an active unit -> Switch active units if clicked unit is in hand, otherwise check for damage, healing/reviving or stomping
       if (isInHand(unit.boardPosition)) {
         // De-select previous unit
         context.activeUnit!.isActive = false;

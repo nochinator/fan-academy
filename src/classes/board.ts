@@ -12,11 +12,11 @@ export class Board {
   };
 
   tileSize: number = 90;
-  scene: GameScene;
+  context: GameScene;
   tiles: Tile[];
 
-  constructor(scene: GameScene, data: ITile[]) {
-    this.scene = scene;
+  constructor(context: GameScene, data: ITile[]) {
+    this.context = context;
     this.tiles = this.createTileGrid(data);
   }
 
@@ -24,8 +24,8 @@ export class Board {
     const grid: Tile[] = [];
 
     tiles.forEach(tile => {
-      const newTile = new Tile(this.scene, tile);
-      if (newTile.hero) new Hero(this.scene, newTile.hero);
+      const newTile = new Tile(this.context, tile);
+      if (newTile.hero) new Hero(this.context, newTile.hero);
 
       grid.push(newTile);
     });
