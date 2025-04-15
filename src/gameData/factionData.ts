@@ -1,7 +1,7 @@
 import { EFaction, EItems } from "../enums/gameEnums";
 import { IFaction, IHero, IItem } from "../interfaces/gameInterface";
 import { shuffleArray } from "../utils/deckUtils";
-import { createCouncilArcherData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "./councilHeroData";
+import { createCouncilArcherData, createCouncilClericData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "./councilHeroData";
 import { createElvesImpalerData, createElvesVoidMonkData, createElvesNecromancerData, createElvesWraithData, createElvesPriestessData } from "./elvesHeroData";
 import { createItemData } from "./itemData";
 
@@ -28,6 +28,7 @@ function createCouncilDeck(userId: string): (IHero | IItem)[] {
     const archer = createCouncilArcherData( { unitId: `${userId}_archer_${index}` });
     const knight = createCouncilKnightData( { unitId: `${userId}_knight_${index}` });
     const wizard = createCouncilWizardData( { unitId: `${userId}_wizard_${index}` });
+    const cleric = createCouncilClericData( { unitId: `${userId}_cleric_${index}` });
 
     const shiningHelm = createItemData( {
       // Increases magical resistance by 20% and max health by 10%
@@ -49,7 +50,7 @@ function createCouncilDeck(userId: string): (IHero | IItem)[] {
       itemType: EItems.DRAGON_SCALE
     });
 
-    deck.push(archer, knight, wizard, shiningHelm, runeMetal, factionBuff);
+    deck.push(archer, knight, wizard, cleric, shiningHelm, runeMetal, factionBuff);
   }
 
   for (let index = 0; index < 2; index++) {
