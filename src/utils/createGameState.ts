@@ -26,21 +26,23 @@ export function createNewGameBoardState(context: GameScene): ITile[] {
   const mapData = mapTemplates[randomIndexNumber];
   const newBoard: ITile[] = [];
 
-  let pointIndex = 0;
+  let boardPosition = 0;
   for (let row = 0; row < 5; row++) {
     for (let col = 0; col < 9; col++) {
-      const { x, y } = context.centerPoints[pointIndex++];
+      const { x, y } = context.centerPoints[boardPosition];
       const specialTile = mapData.find((tile) => tile.col === col && tile.row === row);
       const tile = createTileData({
         row,
         col,
         x,
         y,
+        boardPosition,
         tileType: specialTile ? specialTile.tileType : ETiles.BASIC,
         occupied: false,
         obstacle: specialTile && specialTile.tileType === ETiles.CRYSTAL ? true : false
       });
       newBoard.push(tile);
+      boardPosition++;
     }}
 
   return newBoard;

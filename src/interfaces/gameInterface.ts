@@ -8,13 +8,14 @@ export type Coordinates = {
   y: number,
   row?: number,
   col?: number
+  boardPosition?: number
 };
 
 /**
  * Item Interface
  */
 export interface IItem {
-  class?: EClass;
+  class: EClass;
   faction?: EFaction;
   unitId: string; // userId_itemName_itemNumber
   itemType: EItems;
@@ -61,7 +62,7 @@ export interface IFaction {
  */
 export interface IPlayerData {
   userData: {
-    _id: string
+    _id: string;
     username: string; // from populate in the BE
     picture: string; // from populate in the BE
   };
@@ -82,7 +83,7 @@ export interface ITurnAction {
  * UserState Interface
  */
 export interface IPlayerState {
-  playerId: string,
+  playerId: string;
   factionData: IFaction;
 }
 
@@ -90,13 +91,14 @@ export interface IPlayerState {
  * Tile Interface
  */
 export interface ITile {
-  row: number
-  col: number
-  tileType: ETiles,
-  x: number
-  y: number
-  occupied: boolean,
-  obstacle: boolean,
+  row: number;
+  col: number;
+  tileType: ETiles;
+  x: number;
+  y: number;
+  boardPosition: number;
+  occupied: boolean;
+  obstacle: boolean;
   hero?: IHero | undefined;
 }
 

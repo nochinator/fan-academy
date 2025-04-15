@@ -1,6 +1,8 @@
+import { ETiles } from "../enums/gameEnums";
 import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { Hero } from "./hero";
+import { Item } from "./item";
 import { Tile } from "./tile";
 
 export class Board {
@@ -35,51 +37,35 @@ export class Board {
     return this.tiles.find(tile => tile.row === row && tile.col === col);
   }
 
-  clearHighlights(gridCoordinates: Coordinates[]) {
-    gridCoordinates.forEach(coord => {
-      const result = this.tiles.find(tile => tile.row === coord.row && tile.col === coord.col);
-      if (result)  result.clearHighlight();
-    });
+  clearHighlights() {
+    // gridCoordinates.forEach(coord => {
+    //   const result = this.tiles.find(tile => tile.row === coord.row && tile.col === coord.col);
+    //   if (result)  result.clearHighlight();
+    // });
+    this.tiles.forEach(tile => tile.clearHighlight());
   }
 
-  getReachableTiles(startRow: number, startCol: number, movement: number) {
-    // const visited = new Set();
-    // const reachable = [];
-    // const queue = [{
-    //   row: startRow,
-    //   col: startCol,
-    //   remaining: movement
-    // }];
-    // visited.add(`${startRow},${startCol}`);
+  highlightSpawns(isPlayerOne: boolean) {
+    const spawns = this.tiles.filter(tile => tile.tileType === ETiles.SPAWN && (isPlayerOne ? tile.col < 5 : tile.col > 5));
+    this.highlightTiles(spawns);
+  }
 
-    // while (queue.length > 0) {
-    //   const { row, col, remaining } = queue.shift();
-    //   const tile = this.getTile(row, col);
-    //   if (tile) reachable.push(tile);
+  showEnemyTargets(hero: Hero) {}
 
-    //   for (const { dr, dc, cost } of directions) {
-    //     const newRow = row + dr;
-    //     const newCol = col + dc;
-    //     const key = `${newRow},${newCol}`;
+  showFriendlyTargets(unit: Hero | Item) {}
 
-    //     const neighbor = this.getTile(newRow, newCol);
-    //     if (!neighbor || visited.has(key)) continue;
-    //     if (neighbor.obstacle || neighbor.isOccupied() && neighbor.isFriendly(owner)) continue;
-    //     if (remaining < cost) continue;
-
-    //     visited.add(key);
-    //     queue.push({
-    //       row: newRow,
-    //       col: newCol,
-    //       remaining: remaining - cost
-    //     });
-    //   }
-    // }
-
-    // return reachable;
+  showMovementArea(hero: Hero) {
+    // Find starting tile
+    const startTile = this.tiles.find(tile => {
+      if (tile.hero?.unitId === hero.unitId) return {
+        row: tile.row,
+        col: tile.col
+      };});
   }
 
   highlightTiles(tiles: Tile[]) {
-    tiles.forEach(tile => tile.setHighlight());
+    tiles.forEach(tile => {
+      tile.setHighlight();
+    });
   }
 }

@@ -9,6 +9,7 @@ export function calculateBoardCenterPoints(): Coordinates[] {
   };
 
   const result: Coordinates[] = [];
+  let boardPosition = 0;
 
   for (let row = 0; row < 5; row++) {
     for (let col = 0; col < 9; col++) {
@@ -19,8 +20,11 @@ export function calculateBoardCenterPoints(): Coordinates[] {
         x,
         y,
         row,
-        col
+        col,
+        boardPosition
       });
+
+      boardPosition++;
     }
   }
   return result;

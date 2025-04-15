@@ -100,6 +100,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
             console.log('Leaving game: ', context.currentRoom.roomId);
             context.currentGameContainer?.destroy(true);
             context.currentGameContainer = undefined;
+            context.gameController = undefined;
             await context.currentRoom.leave();
             context.currentRoom = undefined;
           }
@@ -113,6 +114,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
           context.currentOpponent = opponent?.userData._id.toString();
           context.activePlayer =  game.activePlayer.toString();
           context.currentGame = game;
+          context.isPlayerOne = context.currentGame?.players[0].userData._id === context.userId; // REVIEW: move somewhere else?
 
           // Render the game map
           await createGameAssets(context);
@@ -205,7 +207,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
 
   gameListContainer.setMask(mask);
 
-  let isHovered = false;
+  const isHovered = false;
   const scrollSpeed = 1;
   let contentOffset = 0;
 
@@ -232,8 +234,8 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
     }
   });
 
-  context.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
-    isHovered = pointer.x >= 19 && pointer.x <= 19 + visibleWidth &&
-    pointer.y >= 65 && pointer.y <= 65 + visibleHeight;
-  });
+  // context.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
+  //   isHovered = pointer.x >= 19 && pointer.x <= 19 + visibleWidth &&
+  //   pointer.y >= 65 && pointer.y <= 65 + visibleHeight;
+  // }); // FIXME: remove if no used
 }

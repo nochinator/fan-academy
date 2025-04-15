@@ -1,6 +1,7 @@
-import { ETiles } from "../enums/gameEnums";
+import { EAction, ETiles } from "../enums/gameEnums";
 import { IHero, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import { makeTileClickable } from "../utils/setActiveUnit";
 
 export class Tile extends Phaser.GameObjects.Container {
   baseRectangle: Phaser.GameObjects.Rectangle;
@@ -8,11 +9,16 @@ export class Tile extends Phaser.GameObjects.Container {
   col: number;
   x: number;
   y: number;
-  tileType: ETiles;
+  boardPosition: number;
+
   occupied: boolean = false;
   obstacle: boolean = false;
   hero: IHero | undefined = undefined;
   tileSize: number = 90;
+  tileType: ETiles;
+
+  isHighlighted: boolean;
+  highLightAction: EAction | undefined = undefined; // REVIEW
 
   constructor(context: GameScene,
     data: ITile) {
@@ -24,10 +30,12 @@ export class Tile extends Phaser.GameObjects.Container {
     this.y = data.y;
     this.tileType = data.tileType;
     this.hero = data.hero;
+    this.boardPosition = data.boardPosition;
 
     // Add base tile shape
-    this.baseRectangle = context.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x0080ff, 0);
+    this.baseRectangle = context.add.rectangle(0, 0, this.tileSize, this.tileSize);
     this.add(this.baseRectangle);
+    this.isHighlighted = this.baseRectangle.isFilled;
 
     // If tileType is not BASIC, add the visual representation
     // TODO: clean the below snippet. Add tint based on player preferred color
@@ -49,12 +57,19 @@ export class Tile extends Phaser.GameObjects.Container {
       this.add(tileIcon);
     }
 
+    this.setSize(90, 90).setInteractive();
+    makeTileClickable(this, context);
+
     context.add.existing(this);
     context.currentGameContainer?.add(this);
   }
 
   isOccupied() {
-    return this.occupied !== null;
+    return this.occupied;
+  }
+
+  setOccupied(occupied: boolean) {
+    this.occupied = occupied;
   }
 
   isFriendly(userId: string) {
@@ -67,9 +82,12 @@ export class Tile extends Phaser.GameObjects.Container {
 
   setHighlight() {
     this.baseRectangle.setFillStyle(0x0080ff, 0.3);
+    this.isHighlighted = this.baseRectangle.isFilled;
+    console.log(this.baseRectangle.fillAlpha);
   }
 
   clearHighlight() {
-    this.baseRectangle.setFillStyle(0x0080ff, 0);
+    this.baseRectangle.setFillStyle();
+    this.isHighlighted = this.baseRectangle.isFilled;
   }
 }

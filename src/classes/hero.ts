@@ -1,7 +1,7 @@
 import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { makeClickable } from "../utils/setActiveUnit";
+import { makeUnitClickable } from "../utils/setActiveUnit";
 
 export class Hero extends Phaser.GameObjects.Container {
   class: EClass = EClass.HERO;
@@ -27,6 +27,8 @@ export class Hero extends Phaser.GameObjects.Container {
   private runeMetalImage: Phaser.GameObjects.Image;
   private shiningHelmImage: Phaser.GameObjects.Image;
   private factionBuffImage: Phaser.GameObjects.Image;
+  private attackReticle: Phaser.GameObjects.Image;
+  private healReticle: Phaser.GameObjects.Image;
 
   constructor(context: GameScene, data: IHero) {
     const { x, y } = context.centerPoints[data.boardPosition];
@@ -67,11 +69,34 @@ export class Hero extends Phaser.GameObjects.Container {
     } // Using else here removes a bunch of checks on factionBuff being possibly undefined
     if (!this.factionBuff) this.factionBuffImage.setVisible(false);
 
-    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage]).setSize(50, 50).setInteractive().setName(this.unitId);
+    // Add attack and healing reticles
+    this.attackReticle = context.add.image(0, -10, 'attackReticle').setOrigin(0.5).setScale(0.8).setDepth(10).setName('attackReticle').setVisible(false);
+    this.healReticle = context.add.image(0, -10, 'healReticle').setOrigin(0.5).setScale(0.8).setDepth(10).setName('healReticle').setVisible(false);
 
+    // Add animations to the reticles // TODO: rotate the animation
+    const addTween = (reticle: Phaser.GameObjects.Image) => {
+      context.tweens.add({
+        targets: reticle,
+        scale: {
+          from: 0.8,
+          to: 1
+        },
+        duration: 500,
+        yoyo: true,
+        repeat: -1, // Repeat forever
+        ease: 'Sine.easeInOut'
+      });
+    };
+    addTween(this.attackReticle);
+    addTween(this.healReticle);
+
+    // Add all individual images to container
+    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage, this.attackReticle, this.healReticle]).setSize(50, 50).setInteractive().setName(this.unitId);
+
+    // Hide if in deck
     if (this.boardPosition === 51) this.setVisible(false);
 
-    makeClickable(this, context);
+    makeUnitClickable(this, context);
 
     context.add.existing(this);
     context.currentGameContainer?.add(this);
@@ -88,6 +113,28 @@ export class Hero extends Phaser.GameObjects.Container {
     } else {
       this.onDeactivate();
     }
+  }
+
+  getHeroData(): IHero {
+    return {
+      class: this.class,
+      faction: this.faction,
+      unitType: this.unitType,
+      unitId: this.unitId,
+      boardPosition: this.boardPosition,
+      maxHealth: this.maxHealth,
+      currentHealth: this.currentHealth,
+      isKO: this.isKO,
+      movement: this.movement,
+      range: this.range,
+      attackType: this.attackType,
+      power: this.power,
+      physicalDamageResistance: this.physicalDamageResistance,
+      magicalDamageResistance: this.magicalDamageResistance,
+      factionBuff: this.factionBuff,
+      runeMetal: this.runeMetal,
+      shiningHelm: this.shiningHelm
+    };
   }
 
   onActivate() {

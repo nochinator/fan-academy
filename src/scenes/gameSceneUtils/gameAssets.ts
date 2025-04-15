@@ -1,4 +1,7 @@
 import { Board } from "../../classes/board";
+import { Deck } from "../../classes/deck";
+import { GameController } from "../../classes/gameController";
+import { Hand } from "../../classes/hand";
 import { Hero } from "../../classes/hero";
 import { Item } from "../../classes/item";
 import { isHero, isItem } from "../../utils/deckUtils";
@@ -14,8 +17,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('speedTile', '/assets/images/gameItems/PremiumTile_Speed-hd.png');
   context.load.image('crystalDamageTile', '/assets/images/gameItems/PremiumTile_VictoryDamageMultiplier-hd.png');
   context.load.image('teleporterTile', '/assets/images/gameItems/PremiumTile_Teleport-hd.png');
-
-  // Crystals
+  // Crystal tile images
   context.load.image('crystal', '/assets/images/gameItems/crystal_full.png');
   context.load.image('pedestal', '/assets/images/gameItems/crystal_pedestal.png');
   context.load.image('damagedCrystal', '/assets/images/gameItems/crystal_damaged.png');
@@ -44,13 +46,16 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('superCharge', './assets/images/factions/common/super_charge.png');
   context.load.image('runeMetal', './assets/images/factions/common/rune_metal.png');
   context.load.image('shiningHelm', './assets/images/factions/common/shining_helm.png');
+
+  // Load reticles (attack and healing)
+  context.load.image('attackReticle', './assets/images/gameItems/AttackReticle2-hd.png');
+  context.load.image('healReticle', './assets/images/gameItems/HealReticle-hd.png');
 }
 
 export async function createGameAssets(context: GameScene): Promise<void> {
   console.log('This logs when I click on the game', context.currentGame?._id);
 
   await createGameBoardUI(context);
-  // createBoardGameTiles(context); // TODO: this should be based on map
 
   const game = context.currentGame;
   if (!game || !game.currentState) {
@@ -73,7 +78,7 @@ export async function createGameAssets(context: GameScene): Promise<void> {
    * RENDERING UNITS
    */
 
-  if (game.currentState) {
+  if (game.currentState && playerFactionData) {
   /**
    * Render the board (tiles and heroes on board)
    */
@@ -83,9 +88,10 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     /**
      * Render units in hand
     */
-    const unitsInHand = playerFactionData?.unitsInHand;
+    const unitsInHand = playerFactionData.unitsInHand;
+    const hand = new Hand(unitsInHand);
 
-    unitsInHand?.forEach(unit => {
+    unitsInHand.forEach(unit => {
       // if (isHero(unit)) renderHero(context, unit);
       if (isHero(unit)) new Hero(context, unit);
 
@@ -94,15 +100,19 @@ export async function createGameAssets(context: GameScene): Promise<void> {
 
     /**
     * Render units in deck (not visible)
-   */
+    */
+    const unitsInDeck = playerFactionData.unitsInDeck;
+    const deck = new Deck(context, unitsInDeck);
 
-    const unitsInDeck = playerFactionData?.unitsInDeck;
-
-    unitsInDeck?.forEach(unit => {
-      // if (isHero(unit)) renderHero(context, unit);
+    unitsInDeck.forEach(unit => {
       if (isHero(unit)) new Hero(context, unit);
       if (isItem(unit)) new Item(context, unit);
     });
+
+    /**
+     *  Create the game controller to handle game interactions
+     */
+    context.gameController = new GameController(context, board, hand, deck);
   }
 
   console.log('userPlayer', userPlayer);

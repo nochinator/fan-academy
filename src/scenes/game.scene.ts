@@ -7,6 +7,7 @@ import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
 import { Coordinates, IGame, IGameState } from "../interfaces/gameInterface";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
+import { GameController } from "../classes/gameController";
 
 export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
@@ -20,6 +21,8 @@ export default class GameScene extends Phaser.Scene {
   currentTurn: IGameState | undefined;
   currentOpponent: string | undefined;
   activeUnit: Hero | Item |  undefined;
+  gameController: GameController | undefined;
+  isPlayerOne: boolean | undefined;
 
   constructor() {
     super({ key: 'GameScene' });

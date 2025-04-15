@@ -12,6 +12,7 @@ export function createTileData(data: ITile): ITile {
     col: data.col,
     x: data.x,
     y: data.y,
+    boardPosition: data.boardPosition,
     tileType: data.tileType ?? tileType,
     occupied: data.occupied ?? occupied,
     obstacle: data.obstacle ?? obstacle,
