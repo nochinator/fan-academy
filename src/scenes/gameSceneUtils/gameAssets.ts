@@ -53,6 +53,7 @@ export function loadGameAssets(context: GameScene) {
 }
 
 export async function createGameAssets(context: GameScene): Promise<void> {
+  context.currentTurnAction = 1;
   const game = context.currentGame;
   if (!game) {
     console.log('Error: No currentState for current game');

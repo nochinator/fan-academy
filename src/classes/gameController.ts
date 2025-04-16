@@ -73,6 +73,8 @@ export class GameController {
 
     // Remove hero from hand
     this.hand.removeFromHand(hero);
+    // Flip image if player is player 2
+    if (!this.context.isPlayerOne) (hero.getByName('body') as Phaser.GameObjects.Image)?.setFlipX(true);
     // Position hero on the board
     hero.boardPosition = tile.boardPosition;
     hero.x = tile.x;
@@ -97,7 +99,7 @@ export class GameController {
       boardState: this.game.currentState.boardState
     });
     // Remove a slice from the action pie
-    this.actionPie.hideActionSlice(1); // TODO: add turn action counter
+    this.actionPie.hideActionSlice(this.context.currentTurnAction++); // TODO: add turn action counter
     // Make pie interactive
     // Clicking in the pie to reset the turn overrides currentTurn with the last turn from the turns array //
   }

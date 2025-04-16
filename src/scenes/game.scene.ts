@@ -17,6 +17,7 @@ export default class GameScene extends Phaser.Scene {
   gameListContainer: any; // REVIEW:
   currentRoom: Room | undefined;
   currentGame: IGame | undefined;
+  currentTurnAction: number | undefined;
   currentGameContainer: Phaser.GameObjects.Container | undefined;
   currentTurn: IGameState | undefined;
   currentOpponent: string | undefined;
