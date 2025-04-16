@@ -85,6 +85,8 @@ export class GameController {
     // Remove active status from hero
     hero.isActive = false;
     this.context.activeUnit = undefined;
+    // Remove highlight from tiles
+    this.board.clearHighlights();
     // Add action to turn action list
     this.game.gameState.push({
       turn: this.game.currentTurn,
@@ -99,7 +101,7 @@ export class GameController {
       boardState: this.game.currentState.boardState
     });
     // Remove a slice from the action pie
-    this.actionPie.hideActionSlice(this.context.currentTurnAction++); // TODO: add turn action counter
+    this.actionPie.hideActionSlice(this.context.currentTurnAction!++); // TODO: add turn action counter
     // Make pie interactive
     // Clicking in the pie to reset the turn overrides currentTurn with the last turn from the turns array //
   }
