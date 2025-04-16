@@ -53,10 +53,8 @@ export function loadGameAssets(context: GameScene) {
 }
 
 export async function createGameAssets(context: GameScene): Promise<void> {
-  console.log('This logs when I click on the game', context.currentGame?._id);
-
   const game = context.currentGame;
-  if (!game || !game.currentState) {
+  if (!game) {
     console.log('Error: No currentState for current game');
     return;
   }
@@ -75,7 +73,7 @@ export async function createGameAssets(context: GameScene): Promise<void> {
    * RENDERING UNITS
    */
 
-  if (game.currentState && playerFactionData) {
+  if (playerFactionData) {
   /**
    * Render the board (tiles and heroes on board)
    */

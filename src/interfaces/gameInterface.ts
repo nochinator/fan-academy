@@ -73,10 +73,11 @@ export interface IPlayerData {
  * TurnAction Interface
  */
 export interface ITurnAction {
-  activeUnit?: string; // Unit id
-  targetUnit: string; // Unit id or deck
+  activeUnit: IHero | IItem;
+  targetUnit: IHero;
   action: EAction,
-  actionNumber: number; // Order in the turn
+  actionNumber: number;
+  // TODO: this needs extra properties so we can replay the action (like start and end board points for example)
 }
 
 /**
@@ -107,6 +108,7 @@ export interface ITile {
  */
 export interface IGameState {
   // After a turn is played, a new turn (without action but with the current board state) is created as CurrentTurn
+  turn: number
   player1: IPlayerState;
   player2?: IPlayerState;
   boardState: ITile[];
@@ -119,8 +121,10 @@ export interface IGameState {
 export interface IGame {
   _id: string;
   players: IPlayerData[];
-  gameState: IGameState[]; // turn 0 is the dealing of the hands
-  currentState?: IGameState;
+  gameState: IGameState[]; // REVIEW: each turn has 5 states (6 on first turn)
+  lastTurnState: IGameState;
+  currentState: IGameState;
+  currentTurn: number;
   winCondition?: string;
   winner?: string;
   status: EGameStatus;
