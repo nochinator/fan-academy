@@ -96,14 +96,12 @@ export class GameController {
         activeUnit: hero,
         targetUnit: hero,
         action: EAction.SPAWN,
-        actionNumber: 1 // TODO: add turn action counter to context
+        actionNumber: this.context.currentTurnAction!
       },
       boardState: this.game.currentState.boardState
     });
     // Remove a slice from the action pie
     this.actionPie.hideActionSlice(this.context.currentTurnAction!++); // TODO: add turn action counter
-    // Make pie interactive
-    // Clicking in the pie to reset the turn overrides currentTurn with the last turn from the turns array //
   }
 
   moveHero(tile: Tile): void {
