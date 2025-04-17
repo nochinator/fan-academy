@@ -74,7 +74,7 @@ export class GameController {
     // Remove hero from hand
     this.hand.removeFromHand(hero);
     // Flip image if player is player 2
-    if (!this.context.isPlayerOne) (hero.getByName('body') as Phaser.GameObjects.Image)?.setFlipX(true); // FIXME: needs a diff type of check
+    if (hero.belongsTo === 2) (hero.getByName('body') as Phaser.GameObjects.Image)?.setFlipX(true);
     // Position hero on the board
     hero.boardPosition = tile.boardPosition;
     hero.x = tile.x;

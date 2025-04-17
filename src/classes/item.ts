@@ -9,6 +9,7 @@ export class Item extends Phaser.GameObjects.Image {
   itemType: EItems;
   boardPosition: number;
   isActiveValue: boolean;
+  belongsTo: number;
 
   constructor(context: GameScene, data: IItem) {
     const { x, y } = context.centerPoints[data.boardPosition];
@@ -20,6 +21,7 @@ export class Item extends Phaser.GameObjects.Image {
     this.itemType = data.itemType;
     this.boardPosition = data.boardPosition;
     this.isActiveValue = false;
+    this.belongsTo = data.belongsTo ?? 1;
 
     // Add listener for clicking on the unit
     makeUnitClickable(this, context);

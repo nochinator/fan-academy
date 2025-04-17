@@ -6,6 +6,7 @@ export function createElvesImpalerData(data: Partial<IHero>): IHero {
   const power = 300;
   const physicalDamageResistance = 0;
   const magicalDamageResistance = 0;
+  const belongsTo = 1;
 
   return {
     class: EClass.HERO,
@@ -24,7 +25,8 @@ export function createElvesImpalerData(data: Partial<IHero>): IHero {
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo
   };
 }
 
@@ -34,6 +36,7 @@ export function createElvesPriestessData(data: Partial<IHero>): IHero {
   const power = 200;
   const physicalDamageResistance = 0;
   const magicalDamageResistance = 0;
+  const belongsTo = 1;
 
   return {
     class: EClass.HERO,
@@ -52,7 +55,8 @@ export function createElvesPriestessData(data: Partial<IHero>): IHero {
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo
   };
 }
 
@@ -62,6 +66,7 @@ export function createElvesVoidMonkData(data: Partial<IHero>): IHero {
   const power = 200;
   const physicalDamageResistance = 20;
   const magicalDamageResistance = 20;
+  const belongsTo = 1;
 
   return {
     class: EClass.HERO,
@@ -80,7 +85,8 @@ export function createElvesVoidMonkData(data: Partial<IHero>): IHero {
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo
   };
 }
 
@@ -90,6 +96,7 @@ export function createElvesNecromancerData(data: Partial<IHero>): IHero {
   const power = 200;
   const physicalDamageResistance = 0;
   const magicalDamageResistance = 0;
+  const belongsTo = 1;
 
   return {
     class: EClass.HERO,
@@ -108,7 +115,8 @@ export function createElvesNecromancerData(data: Partial<IHero>): IHero {
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo
   };
 }
 
@@ -119,6 +127,7 @@ export function createElvesWraithData(data: Partial<IHero>): IHero {
   const power = 250;
   const physicalDamageResistance = 0;
   const magicalDamageResistance = 10;
+  const belongsTo = 1;
 
   return {
     class: EClass.HERO,
@@ -137,7 +146,8 @@ export function createElvesWraithData(data: Partial<IHero>): IHero {
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo
   };
 }
 
@@ -160,6 +170,7 @@ export function createElvesPhantomData(data: Partial<IHero>): IHero {
     magicalDamageResistance: 0,
     factionBuff: false,
     runeMetal: false,
-    shiningHelm: false
+    shiningHelm: false,
+    belongsTo: 1 // REVIEW:
   };
 }

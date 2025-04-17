@@ -20,6 +20,7 @@ export interface IItem {
   unitId: string; // userId_itemName_itemNumber
   itemType: EItems;
   boardPosition: number // 45-51
+  belongsTo: number;
 }
 
 /**
@@ -43,6 +44,7 @@ export interface IHero {
   factionBuff: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
+  belongsTo: number;
 }
 
 /**

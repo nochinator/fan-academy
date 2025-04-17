@@ -22,6 +22,7 @@ export class Hero extends Phaser.GameObjects.Container {
   runeMetal: boolean;
   shiningHelm: boolean;
   isActiveValue: boolean;
+  belongsTo: number;
 
   private characterImage: Phaser.GameObjects.Image;
   private runeMetalImage: Phaser.GameObjects.Image;
@@ -52,9 +53,11 @@ export class Hero extends Phaser.GameObjects.Container {
     this.runeMetal = data.runeMetal;
     this.shiningHelm = data.shiningHelm;
     this.isActiveValue = false;
+    this.belongsTo = data.belongsTo ?? 1;
 
     // Create the unit's image and images for its upgrades
     this.characterImage = context.add.image(0, -10, this.unitType).setOrigin(0.5).setDepth(10).setName('body');
+    if (this.belongsTo === 2 && this.boardPosition < 45) this.characterImage.setFlipX(true);
 
     this.runeMetalImage = context.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.3).setDepth(10).setName('runeMetal');
     if (!this.runeMetal) this.runeMetalImage.setVisible(false);
@@ -133,7 +136,8 @@ export class Hero extends Phaser.GameObjects.Container {
       magicalDamageResistance: this.magicalDamageResistance,
       factionBuff: this.factionBuff,
       runeMetal: this.runeMetal,
-      shiningHelm: this.shiningHelm
+      shiningHelm: this.shiningHelm,
+      belongsTo: this.belongsTo
     };
   }
 
