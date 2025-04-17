@@ -108,7 +108,6 @@ export interface ITile {
  */
 export interface IGameState {
   // After a turn is played, a new turn (without action but with the current board state) is created as CurrentTurn
-  turn: number
   player1: IPlayerState;
   player2?: IPlayerState;
   boardState: ITile[];

@@ -74,7 +74,7 @@ export class GameController {
     // Remove hero from hand
     this.hand.removeFromHand(hero);
     // Flip image if player is player 2
-    if (!this.context.isPlayerOne) (hero.getByName('body') as Phaser.GameObjects.Image)?.setFlipX(true);
+    if (!this.context.isPlayerOne) (hero.getByName('body') as Phaser.GameObjects.Image)?.setFlipX(true); // FIXME: needs a diff type of check
     // Position hero on the board
     hero.boardPosition = tile.boardPosition;
     hero.x = tile.x;
@@ -91,7 +91,6 @@ export class GameController {
     const player1 = this.context.isPlayerOne ? this.context.playerStateData! : this.context.opponentStateData!;
     const player2 = !this.context.isPlayerOne ? this.context.playerStateData! : this.context.opponentStateData!;
     this.game.currentState.push({
-      turn: this.game.currentTurn,
       player1,
       player2,
       action: {
