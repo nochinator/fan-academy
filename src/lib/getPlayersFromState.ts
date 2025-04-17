@@ -5,7 +5,8 @@ export function getPlayersState(context: GameScene): {
   player: IPlayerState,
   oponent: IPlayerState
 } {
-  const state = context.currentGame!.currentState;
+  const lastTurnState = context.currentGame!.lastTurnState;
+  const state = lastTurnState[lastTurnState.length - 1];
   const player1 = state.player1.playerId;
 
   let player;

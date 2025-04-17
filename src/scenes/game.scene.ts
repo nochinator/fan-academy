@@ -4,7 +4,7 @@ import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameMenuUI, createGameMenuUI } from "./gameSceneUtils/gameMenuUI";
 import { calculateAllCenterPoints } from "../utils/boardCalculations";
 import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
-import { Coordinates, IGame, IGameState } from "../interfaces/gameInterface";
+import { Coordinates, IFaction, IGame, IGameState, IPlayerData, IPlayerState } from "../interfaces/gameInterface";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { GameController } from "../classes/gameController";
@@ -19,11 +19,12 @@ export default class GameScene extends Phaser.Scene {
   currentGame: IGame | undefined;
   currentTurnAction: number | undefined;
   currentGameContainer: Phaser.GameObjects.Container | undefined;
-  currentTurn: IGameState | undefined;
   currentOpponent: string | undefined;
   activeUnit: Hero | Item |  undefined;
   gameController: GameController | undefined;
   isPlayerOne: boolean | undefined;
+  playerStateData: IPlayerState | undefined;
+  opponentStateData: IPlayerState | undefined;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -59,5 +60,5 @@ export default class GameScene extends Phaser.Scene {
     // });  // FIXME: remove after testing
   }
 
-  update() {}
+  update() {} // WORKING ON SENDING THE TURN BUT THE MESSAGE EXCEEDS MAXPAYLOADSIZE
 }

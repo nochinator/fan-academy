@@ -121,9 +121,9 @@ export interface IGameState {
 export interface IGame {
   _id: string;
   players: IPlayerData[];
-  gameState: IGameState[]; // REVIEW: each turn has 5 states (6 on first turn)
-  lastTurnState: IGameState;
-  currentState: IGameState;
+  gameState: IGameState[][];
+  lastTurnState: IGameState[];
+  currentState: IGameState[];
   currentTurn: number;
   winCondition?: string;
   winner?: string;

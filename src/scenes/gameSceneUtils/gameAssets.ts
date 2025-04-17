@@ -63,8 +63,9 @@ export async function createGameAssets(context: GameScene): Promise<void> {
   const userPlayer = game.players.find(p => p.userData._id === context.userId);
   const opponent = game.players.find(p => p.userData._id != context.userId);
 
-  const playerFactionData = game.currentState.player1.playerId == context.userId ? game.currentState.player1.factionData : game.currentState.player2?.factionData;
-  const opponentFactionData = game.currentState.player1.playerId == context.userId ? game.currentState.player1.factionData : game.currentState.player2?.factionData; // we need this for the crystals
+  const gameState = game.lastTurnState[game.lastTurnState.length - 1];
+  context.playerStateData = gameState.player1.playerId == context.userId ? gameState.player1 : gameState.player2;
+  context.opponentStateData = gameState.player1.playerId == context.userId ? gameState.player1 : gameState.player2; // we need this for the crystals
 
   /**
  * RENDERING THE UI
@@ -74,17 +75,17 @@ export async function createGameAssets(context: GameScene): Promise<void> {
    * RENDERING UNITS
    */
 
-  if (playerFactionData) {
+  if (context.playerStateData) {
   /**
    * Render the board (tiles and heroes on board)
    */
-    const tilesOnBoard =  game.currentState.boardState;
+    const tilesOnBoard =  gameState.boardState;
     const board = new Board(context, tilesOnBoard);
 
     /**
      * Render units in hand
     */
-    const unitsInHand = playerFactionData.unitsInHand;
+    const unitsInHand = context.playerStateData.factionData.unitsInHand;
     const hand = new Hand(unitsInHand);
 
     unitsInHand.forEach(unit => {
@@ -96,7 +97,7 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     /**
     * Render units in deck (not visible)
     */
-    const unitsInDeck = playerFactionData.unitsInDeck;
+    const unitsInDeck = context.playerStateData.factionData.unitsInDeck;
     const deck = new Deck(context, unitsInDeck);
 
     unitsInDeck.forEach(unit => {

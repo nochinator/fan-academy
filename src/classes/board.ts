@@ -37,6 +37,11 @@ export class Board {
     return this.tiles.find(tile => tile.row === row && tile.col === col);
   }
 
+  getBoardState(): ITile[] {
+    const boardState = this.tiles.map(tile =>  tile.getTileData());
+    return boardState;
+  }
+
   clearHighlights() {
     // gridCoordinates.forEach(coord => {
     //   const result = this.tiles.find(tile => tile.row === coord.row && tile.col === coord.col);

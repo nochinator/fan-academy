@@ -64,6 +64,20 @@ export class Tile extends Phaser.GameObjects.Container {
     context.currentGameContainer?.add(this);
   }
 
+  getTileData(): ITile {
+    return {
+      row: this.row,
+      col: this.col,
+      x: this.x,
+      y: this.y,
+      tileType: this.tileType,
+      boardPosition: this.boardPosition,
+      occupied: this.occupied,
+      obstacle: this.obstacle,
+      hero: this.hero
+    };
+  }
+
   isOccupied() {
     return this.occupied;
   }

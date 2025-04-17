@@ -1,3 +1,4 @@
+import { sendTurnMessage } from "../lib/colyseusGameRoom";
 import GameScene from "../scenes/game.scene";
 
 export class TurnButton {
@@ -11,7 +12,8 @@ export class TurnButton {
       if (context.currentGame && context.currentGame.activePlayer === context.userId) {
         console.log('Clicked on send turn');
 
-        // sendTurnMessage(context.currentRoom, context.currentTurn, context.currentOpponent);
+        sendTurnMessage(context.currentRoom, context.currentGame.currentState, context.currentOpponent);
+        // TODO: refresh actionPie - drawn units - update door banner - receive an update to move the game to Opponent's turn
       } else {
         console.log('Clicked on send turn but... not your turn'); // TODO: remove after testing
       }

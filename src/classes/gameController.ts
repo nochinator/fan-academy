@@ -88,17 +88,19 @@ export class GameController {
     // Remove highlight from tiles
     this.board.clearHighlights();
     // Add action to turn action list
-    this.game.gameState.push({
+    const player1 = this.context.isPlayerOne ? this.context.playerStateData! : this.context.opponentStateData!;
+    const player2 = !this.context.isPlayerOne ? this.context.playerStateData! : this.context.opponentStateData!;
+    this.game.currentState.push({
       turn: this.game.currentTurn,
-      player1: this.game.currentState.player1,
-      player2: this.game.currentState.player2,
+      player1,
+      player2,
       action: {
         activeUnit: hero,
         targetUnit: hero,
         action: EAction.SPAWN,
         actionNumber: this.context.currentTurnAction!
       },
-      boardState: this.game.currentState.boardState
+      boardState: this.board.getBoardState()
     });
     // Remove a slice from the action pie
     this.actionPie.hideActionSlice(this.context.currentTurnAction!++); // TODO: add turn action counter

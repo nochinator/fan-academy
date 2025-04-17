@@ -57,11 +57,11 @@ function subscribeToGameListeners(room: Room): void {
   // Listen for broadcasted messages
   room.onMessage("turnPlayed", (message) => {
     console.log("Player sent turn:", message);
-    // TODO: call here playTurn function
+    // TODO: call here playTurn function // REVIEW:
   });
 }
 
-export function sendTurnMessage(currentRoom: Room | undefined, currentTurn: IGameState | undefined, newActivePlayer: string | undefined): void {
+export function sendTurnMessage(currentRoom: Room | undefined, currentTurn: IGameState[] | undefined, newActivePlayer: string | undefined): void {
   if (!currentRoom || !currentTurn || !newActivePlayer) {
     console.log('Error sending turn, missing one or more params:');
     console.log('Current Room -> ', currentRoom);
