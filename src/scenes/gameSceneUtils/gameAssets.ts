@@ -65,7 +65,7 @@ export async function createGameAssets(context: GameScene): Promise<void> {
 
   const gameState = game.lastTurnState[game.lastTurnState.length - 1];
   context.playerStateData = gameState.player1.playerId == context.userId ? gameState.player1 : gameState.player2;
-  context.opponentStateData = gameState.player1.playerId == context.userId ? gameState.player1 : gameState.player2; // we need this for the crystals
+  context.opponentStateData = gameState.player1.playerId == context.userId ? gameState.player2 : gameState.player1; // we need this for the crystals
 
   /**
  * RENDERING THE UI

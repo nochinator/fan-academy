@@ -55,11 +55,11 @@ export class Board {
     this.highlightTiles(spawns);
   }
 
-  showEnemyTargets(hero: Hero) {}
+  highlightEnemyTargets(hero: Hero) {}
 
-  showFriendlyTargets(unit: Hero | Item) {}
+  highlightFriendlyTargets(unit: Hero | Item) {}
 
-  showMovementArea(hero: Hero) {
+  highlightMovementArea(hero: Hero) {
     // Find starting tile
     const startTile = this.tiles.find(tile => {
       if (tile.hero?.unitId === hero.unitId) return {

@@ -98,9 +98,19 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
         gameListButtonImage.on('pointerdown', async () => {
           if (context.currentRoom) {
             console.log('Leaving game: ', context.currentRoom.roomId);
+
+            context.activePlayer = undefined;
+            context.currentGame = undefined;
+            context.currentTurnAction = undefined;
+            context.currentOpponent = undefined;
             context.currentGameContainer?.destroy(true);
             context.currentGameContainer = undefined;
             context.gameController = undefined;
+            context.activeUnit = undefined;
+            context.playerStateData = undefined;
+            context.opponentStateData = undefined;
+            context.isPlayerOne = undefined;
+
             await context.currentRoom.leave();
             context.currentRoom = undefined;
           }
@@ -212,7 +222,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
   let contentOffset = 0;
 
   context.input.on("wheel", (_pointer: Phaser.Input.Pointer, _gameObjects: any, _deltaX: number, deltaY: number, _deltaZ: number ) => {
-    console.log(contentHeight, visibleHeight, contentOffset);
+    // console.log(contentHeight, visibleHeight, contentOffset);
     if (isHovered && contentHeight > visibleHeight) {
       // Calculate the new offset
       contentOffset -= deltaY * scrollSpeed;

@@ -12,8 +12,8 @@ export class TurnButton {
       if (context.currentGame && context.currentGame.activePlayer === context.userId) {
         console.log('Clicked on send turn');
 
-        sendTurnMessage(context.currentRoom, context.currentGame.currentState, context.currentOpponent);
         // TODO: refresh actionPie - drawn units - update door banner - receive an update to move the game to Opponent's turn
+        sendTurnMessage(context.currentRoom, context.currentGame.currentState, context.currentOpponent);
       } else {
         console.log('Clicked on send turn but... not your turn'); // TODO: remove after testing
       }

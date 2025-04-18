@@ -28,8 +28,8 @@ export class GameController {
     this.context = context;
     this.gameUI = gameUI;
     this.board = board;
-    this.hand = hand;
-    this.deck = deck;
+    this.hand = hand; // REVIEW: should the game controller have also the opponent's?
+    this.deck = deck; // REVIEW: should the game controller have also the opponent's?
     this.actionPie = new ActionPie(context);
     this.door = new Door(context);
     this.turnButton = new TurnButton(context);
@@ -46,15 +46,15 @@ export class GameController {
     if (hero.boardPosition > 44) this.board.highlightSpawns(this.context.isPlayerOne!);
 
     if (hero.boardPosition < 45) {
-      this.board.showEnemyTargets(hero);
-      this.board.showFriendlyTargets(hero);
-      this.board.showMovementArea(hero);
+      this.board.highlightEnemyTargets(hero);
+      this.board.highlightFriendlyTargets(hero);
+      this.board.highlightMovementArea(hero);
     }
   }
 
   onItemClicked(item: Item) {
     console.log(`An item ${item.unitId} has been clicked`);
-    this.board.showFriendlyTargets(item);
+    this.board.highlightFriendlyTargets(item);
   }
 
   onTileClicked(tile: Tile) {
@@ -90,6 +90,7 @@ export class GameController {
     // Add action to turn action list
     const player1 = this.context.isPlayerOne ? this.context.playerStateData! : this.context.opponentStateData!;
     const player2 = !this.context.isPlayerOne ? this.context.playerStateData! : this.context.opponentStateData!;
+
     this.game.currentState.push({
       player1,
       player2,

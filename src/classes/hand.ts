@@ -14,8 +14,8 @@ export class Hand {
     // TODO: how to get the empty spots in the array?
   }
 
-  removeFromHand(unitToRemove: IHero | IItem): (IHero | IItem)[] {
+  removeFromHand(unitToRemove: IHero | IItem): void {
     this.hand = this.hand.filter((unit) => unit.unitId != unitToRemove.unitId);
-    return this.hand; // TODO: we return the array or the unit removed?
+    // return this.hand; // REVIEW: should we return the array or the unit removed? or nothing at all?
   }
 }
