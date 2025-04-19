@@ -43,10 +43,6 @@ export class Board {
   }
 
   clearHighlights() {
-    // gridCoordinates.forEach(coord => {
-    //   const result = this.tiles.find(tile => tile.row === coord.row && tile.col === coord.col);
-    //   if (result)  result.clearHighlight();
-    // });
     this.tiles.forEach(tile => tile.clearHighlight());
   }
 

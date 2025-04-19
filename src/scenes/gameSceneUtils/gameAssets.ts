@@ -64,7 +64,9 @@ export async function createGameAssets(context: GameScene): Promise<void> {
   const opponent = game.players.find(p => p.userData._id != context.userId);
 
   const gameState = game.lastTurnState[game.lastTurnState.length - 1];
+
   context.playerStateData = gameState.player1.playerId == context.userId ? gameState.player1 : gameState.player2;
+
   context.opponentStateData = gameState.player1.playerId == context.userId ? gameState.player2 : gameState.player1; // we need this for the crystals
 
   /**
@@ -85,14 +87,7 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     /**
      * Render units in hand
     */
-    const unitsInHand = context.playerStateData.factionData.unitsInHand;
-    const hand = new Hand(unitsInHand);
-
-    unitsInHand.forEach(unit => {
-      if (isHero(unit)) new Hero(context, unit);
-
-      if (isItem(unit)) new Item(context, unit);
-    });
+    const hand = new Hand(context);
 
     /**
     * Render units in deck (not visible)

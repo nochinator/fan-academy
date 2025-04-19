@@ -41,6 +41,7 @@ export class ActionPie extends Phaser.GameObjects.Container {
     this.actionPie4.setVisible(true);
     this.actionPie5.setVisible(true);
     this.actionArrow.setVisible(false);
+    this.removeInteractive();
   }
 
   hideActionSlice(actionNumber: number) {
@@ -66,9 +67,7 @@ export class ActionPie extends Phaser.GameObjects.Container {
     this.setSize(90, 90).setInteractive();
 
     this.on('pointerdown', () => {
-      // TODO: add resetTurn function here
       this.resetActionPie();
-      this.removeInteractive();
       this.context.gameController!.resetTurn();
     });
   };

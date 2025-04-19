@@ -8,4 +8,12 @@ export class Deck {
     this.deck = deckData;
     this.context = context;
   }
+
+  getDeck() {
+    return this.deck;
+  }
+
+  removeFromDeck(amount: number): (IHero | IItem)[] {
+    return this.deck.splice(0, amount);
+  }
 }

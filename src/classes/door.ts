@@ -1,4 +1,3 @@
-import { getPlayersState } from "../lib/getPlayersFromState";
 import GameScene from "../scenes/game.scene";
 
 export class Door extends Phaser.GameObjects.Container {
@@ -6,9 +5,11 @@ export class Door extends Phaser.GameObjects.Container {
   doorOpen: Phaser.GameObjects.Image;
   doorBanner: Phaser.GameObjects.Image;
   bannerText: Phaser.GameObjects.Text;
+  context: GameScene;
 
   constructor(context: GameScene) {
     super(context, 450, 715);
+    this.context = context;
 
     // TODO: this should be a container, and swicht between open and closed. On container 'hoover' -> show icons of remaining units and items in the deck
     this.doorClosed = context.add.image(50, -15, 'doorClosed').setScale(0.9);
@@ -17,8 +18,7 @@ export class Door extends Phaser.GameObjects.Container {
 
     this.doorBanner = context.add.image(0, 45, 'doorBanner');
 
-    const { player } = getPlayersState(context);
-    const deckSize: number = player.factionData.unitsInDeck.length;
+    const deckSize: number = context.gameController?.deck.getDeck().length ?? 0;
     this.bannerText = context.add.text(0, 45 + 2, deckSize!.toString(), {
       fontFamily: "proLight",
       fontSize: 30,
@@ -31,5 +31,11 @@ export class Door extends Phaser.GameObjects.Container {
 
     context.add.existing(this);
     context.currentGameContainer?.add(this);
+  }
+
+  updateBannerText(): void {
+    const deckSize: number = this.context.gameController?.deck.getDeck().length ?? 0;
+
+    this.bannerText.setText(deckSize.toString());
   }
 }

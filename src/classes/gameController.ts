@@ -41,6 +41,15 @@ export class GameController {
     createGameAssets(this.context); // REVIEW: loop?
   }
 
+  drawUnits() {
+    const drawAmount = 6 - this.hand.getHand().length;
+    if (this.deck.getDeck().length === 0 || drawAmount === 0) return;
+
+    const drawnUnits = this.deck.removeFromDeck(drawAmount);
+
+    this.hand.addToHand(drawnUnits);
+  }
+
   onHeroClicked(hero: Hero) {
     console.log(`A hero ${hero.boardPosition} has been clicked`);
     if (hero.boardPosition > 44) this.board.highlightSpawns(this.context.isPlayerOne!);
