@@ -127,7 +127,7 @@ function createElvesDeck(userId: string): (IHero | IItem)[] {
 
     const factionBuff = createItemData( {
       unitId: `${userId}_soulStone_${index}`,
-      faction: EFaction.COUNCIL,
+      faction: EFaction.DARK_ELVES,
       itemType: EItems.SOUL_STONE
     });
 
