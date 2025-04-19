@@ -51,7 +51,7 @@ export class Board {
   }
 
   highlightSpawns(isPlayerOne: boolean) {
-    const spawns = this.tiles.filter(tile => tile.tileType === ETiles.SPAWN && (isPlayerOne ? tile.col < 5 : tile.col > 5));
+    const spawns = this.tiles.filter(tile => tile.tileType === ETiles.SPAWN && !tile.isOccupied() && (isPlayerOne ? tile.col < 5 : tile.col > 5));
     this.highlightTiles(spawns);
   }
 
