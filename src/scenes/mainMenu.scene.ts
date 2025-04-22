@@ -1,5 +1,6 @@
 import createMainMenuButton from "../lib/buttons";
 import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
+import { isValidPassword } from "../utils/isValidPassword";
 
 export default class MainMenuScene extends Phaser.Scene {
   userId: string | undefined;
@@ -43,7 +44,7 @@ export default class MainMenuScene extends Phaser.Scene {
     // Background image
     const bg = this.add.image(0, 0, 'mainMenuBg').setOrigin (0);
     // main menu image
-    // const menuIgm = isUserAuthenticated ? this.add.image(0, 0, 'mainMenuImageLoggedIn').setOrigin (0) : this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
+    // const menuIgm = isUserAuthenticated  this.add.image(0, 0, 'mainMenuImageLoggedIn').setOrigin (0) : this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
     const menuImg = this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
     menuImg.x = bg.width - menuImg.width - 14;
     menuImg.y += 14;
@@ -112,66 +113,90 @@ export default class MainMenuScene extends Phaser.Scene {
   /*
   HELPER FUNCTIONS
   */
-  createSignUpAndLoginForms(userId: string | undefined): // REVIEW: userId used as a boolean
-  {
+  createSignUpAndLoginForms(userId: string | undefined): {
     loginForm: Phaser.GameObjects.DOMElement,
     signUpForm: Phaser.GameObjects.DOMElement
-  }
-  {
-    // Login form
+  } {
     const loginForm = this.add.dom(800, 400).createFromCache('loginForm');
-    // Get references to the form elements
-    const loginUsernameInput = loginForm.getChildByID('username') as HTMLInputElement | null;
-    const loginPasswordInput = loginForm.getChildByID('password') as HTMLInputElement | null;
-    const loginButton = loginForm.getChildByID('loginButton') as HTMLInputElement | null;
-    const linkToSignUp = loginForm.getChildByID('linkToSignUp') as HTMLInputElement | null;
-    loginForm.setVisible(true);
-    // Login query
-    loginButton?.addEventListener('click', async () => {
-      if (loginUsernameInput?.value && loginPasswordInput?.value) {
-        const user = await loginQuery(loginUsernameInput.value, loginPasswordInput.value); // TODO: return user id only
+    const signUpForm = this.add.dom(800, 400).createFromCache('signUpForm');
+    signUpForm.setVisible(false);
+
+    // Login form elements
+    const loginUsernameInput = loginForm.getChildByID('username') as HTMLInputElement;
+    const loginPasswordInput = loginForm.getChildByID('password') as HTMLInputElement;
+    const loginButton = loginForm.getChildByID('loginButton') as HTMLInputElement;
+    const linkToSignUp = loginForm.getChildByID('linkToSignUp') as HTMLInputElement;
+
+    // Sign up form elements
+    const signUpEmailInput = signUpForm.getChildByID('email') as HTMLInputElement;
+    const signUpUsernameInput = signUpForm.getChildByID('username') as HTMLInputElement;
+    const signUpPasswordInput = signUpForm.getChildByID('password') as HTMLInputElement;
+    const signUpPasswordConfirm = signUpForm.getChildByID('passwordConfirm') as HTMLInputElement;
+    const signUpButton = signUpForm.getChildByID('signUpButton') as HTMLInputElement;
+    const linkToLogin = signUpForm.getChildByID('linkToLogin') as HTMLInputElement;
+
+    // Login button click
+    loginButton.addEventListener('click', async () => {
+      if (loginUsernameInput.value && loginPasswordInput.value) {
+        const user = await loginQuery(loginUsernameInput.value, loginPasswordInput.value);
         if (user) {
           loginForm.setVisible(false);
           this.userId = user._id;
-          console.log('UserId after login, ', this.userId);
+          console.log('UserId after login:', this.userId);
         }
       }
     });
-    // Login form, link to sign up form
-    linkToSignUp?.addEventListener('click', async () => {
-      signUpForm.setVisible(true);
-      loginForm.setVisible(false);
-    });
 
-    // Sign up form
-    const signUpForm = this.add.dom(800, 400).createFromCache('signUpForm');
-    // Get references to the form elements
-    const signUpEmailInput = signUpForm.getChildByID('email') as HTMLInputElement | null;
-    const signUpUsernameInput = signUpForm.getChildByID('username') as HTMLInputElement | null;
-    const signUpPasswordInput = signUpForm.getChildByID('password') as HTMLInputElement | null;
-    const signUpButton = signUpForm.getChildByID('loginButton') as HTMLInputElement | null;
-    const linkToLogin = signUpForm.getChildByID('linkToLogin') as HTMLInputElement | null;
-    signUpForm.setVisible(false);
+    // Sign up button click
+    signUpButton.addEventListener('click', async () => {
+      if (signUpPasswordInput.value !== signUpPasswordConfirm.value) {
+        console.error('Signup form: Passwords do not match');
+        return;
+      } // TODO: show errors to user
 
-    // Sign up query
-    signUpButton?.addEventListener('click', async () => {
-      if (signUpUsernameInput?.value && signUpPasswordInput?.value && signUpEmailInput?.value) {
-        const user =  await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value); // TODO: return user id only
+      if (!isValidPassword(signUpPasswordInput.value)) {
+        console.error('Signup form: Password does not fulfill requirements');
+        return;
+      }
+
+      if (signUpEmailInput.value && signUpUsernameInput.value && signUpPasswordInput.value) {
+        const user = await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
+        console.log('event listener user:', user);
         if (user) {
           signUpForm.setVisible(false);
           this.userId = user._id;
-          console.log('UserId after sign up, ', this.userId);
+          console.log('UserId after sign up:', this.userId);
         }
       }
     });
-    // Sign up form, link to login form
-    linkToLogin?.addEventListener('click', async () => {
+
+    // Listeners for login in pressing Enter
+    const addEnterKeyListener = (field: HTMLInputElement, button: HTMLInputElement ) => {
+      field.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          button.click();
+        }
+      });
+    };
+    [loginUsernameInput, loginPasswordInput].forEach(field => addEnterKeyListener(field, loginButton));
+    [signUpEmailInput, signUpUsernameInput, signUpPasswordInput, signUpPasswordConfirm].forEach(field => addEnterKeyListener(field, signUpButton));
+
+    // Switch forms
+    linkToSignUp.addEventListener('click', () => {
+      loginForm.setVisible(false);
+      signUpForm.setVisible(true);
+    });
+
+    linkToLogin.addEventListener('click', () => {
       signUpForm.setVisible(false);
       loginForm.setVisible(true);
     });
 
-    console.log(userId);
-    if (userId) loginForm.setVisible(false);
+    // If already logged in
+    if (userId) {
+      loginForm.setVisible(false);
+      signUpForm.setVisible(false);
+    }
 
     return {
       loginForm,
