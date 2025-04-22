@@ -26,16 +26,17 @@ export class GameController {
   actionPie: ActionPie;
   door: Door;
   turnButton: TurnButton;
-  lastTurnState: IGameState[];
+  lastTurnState: IGameState;
 
   constructor(context: GameScene) {
+    this.context = context;
     this.game = context.currentGame!;
-    this.lastTurnState = this.game.gameState[this.game.gameState.length - 1];
-    const gameState =  this.lastTurnState[this.lastTurnState.length - 1];
+    const gameState = this.game.gameState[this.game.gameState.length - 1];
+    this.lastTurnState =  gameState[gameState.length - 1];
     this.gameUI = new GameUI(context); // TODO: add depth to UI and board assets
-    this.board = new Board(context, gameState.boardState);
-    context.player1 = gameState.player1;
-    context.player2 = gameState.player2;
+    this.board = new Board(context, this.lastTurnState.boardState);
+    context.player1 = this.lastTurnState.player1;
+    context.player2 = this.lastTurnState.player2;
 
     this.deck  = new Deck(context); // FIXME: sometimes door instantiates before deck somehow
     this.context = context;
@@ -45,8 +46,7 @@ export class GameController {
     this.door = new Door(context);
   }
 
-  resetTurn() {
-    this.game.currentState = this.lastTurnState;
+  async resetTurn() {
     createGameAssets(this.context);
   }
 

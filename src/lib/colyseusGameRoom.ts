@@ -1,7 +1,9 @@
 import { Client, Room } from "colyseus.js";
-import { IFaction, IGameState, ITile } from "../interfaces/gameInterface";
+import { IFaction, IGameState, ITile, ITurnSentMessage } from "../interfaces/gameInterface";
+import GameScene from "../scenes/game.scene";
+import { accessGame, createGameAssets } from "../scenes/gameSceneUtils/gameAssets";
 
-export async function createGame(client: Client | undefined, userId: string | undefined, faction: IFaction | undefined, boardState: ITile[] | undefined): Promise<void> {
+export async function createGame(client: Client | undefined, userId: string | undefined, faction: IFaction | undefined, boardState: ITile[] | undefined, context: GameScene): Promise<void> {
   if (!client || !userId || !faction) {
     console.log('createGame error: missing one of client / userId / faction');
     return;
@@ -15,7 +17,7 @@ export async function createGame(client: Client | undefined, userId: string | un
       boardState
     });
 
-    subscribeToGameListeners(room);
+    subscribeToGameListeners(room, context);
 
     console.log("Created and joined room:", room.name);
   } catch (error) {
@@ -23,7 +25,7 @@ export async function createGame(client: Client | undefined, userId: string | un
   }
 }
 
-export async function joinGame(client: Client | undefined, userId: string | undefined, roomId: string): Promise<Room | undefined> {
+export async function joinGame(client: Client | undefined, userId: string | undefined, roomId: string, context: GameScene): Promise<Room | undefined> {
   if( !client || !userId || !roomId) {
     console.log('joinGame, { client | userid | gameid } missing');
     return undefined;
@@ -48,16 +50,20 @@ export async function joinGame(client: Client | undefined, userId: string | unde
     console.log('Recreated room:', room.roomId);
   }
 
-  subscribeToGameListeners(room);
+  subscribeToGameListeners(room, context);
 
   return room;
 }
 
-function subscribeToGameListeners(room: Room): void {
-  // Listen for broadcasted messages
-  room.onMessage("turnPlayed", (message) => {
+function subscribeToGameListeners(room: Room, context: GameScene): void {
+  // Listen for broadcasted messages, received only by opponent
+  room.onMessage("turnPlayed", (message: ITurnSentMessage) => {
     console.log("Player sent turn:", message);
-    // TODO: call here playTurn function // REVIEW:
+    if (message.roomId === context.currentGame?._id) {
+      context.currentGame = message.game;
+      context.activePlayer = context.userId;
+      createGameAssets(context);
+    }
   });
 }
 

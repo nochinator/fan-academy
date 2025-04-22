@@ -4,7 +4,7 @@ import { createGame, joinGame } from "../../lib/colyseusGameRoom";
 import { deleteGame, getGameList } from "../../queries/gameQueries";
 import { createNewGameBoardState, createNewGameFactionState } from "../../utils/createGameState";
 import GameScene from "../game.scene";
-import { createGameAssets } from "./gameAssets";
+import { accessGame } from "./gameAssets";
 import { loadProfilePictures } from "./profilePictures";
 
 export async function createGameList(context: GameScene, colyseusGameList?: IGame[]) {
@@ -96,36 +96,9 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
       if (game.status === 'playing') {
         gameListButtonImage.setInteractive();
         gameListButtonImage.on('pointerdown', async () => {
-          if (context.currentRoom) {
-            console.log('Leaving game: ', context.currentRoom.roomId);
-
-            context.activePlayer = undefined;
-            context.currentGame = undefined;
-            context.currentTurnAction = undefined;
-            context.currentOpponent = undefined;
-            context.currentGameContainer?.destroy(true);
-            context.currentGameContainer = undefined;
-            context.gameController = undefined;
-            context.activeUnit = undefined;
-            context.isPlayerOne = undefined;
-
-            await context.currentRoom.leave();
-            context.currentRoom = undefined;
-          }
-
-          console.log('Accessing game: ', game._id);
-          const room = await joinGame(context.colyseusClient, context.userId, game._id);
-
-          // Updating GameScene properties
-          context.currentGameContainer = context.add.container(0, 0);
-          context.currentRoom = room;
           context.currentOpponent = opponent?.userData._id.toString(); // REVIEW: used only once when sending the turn
-          context.activePlayer =  game.activePlayer.toString();
-          context.currentGame = game;
-          context.isPlayerOne = context.currentGame?.players[0].userData._id === context.userId; // REVIEW: move somewhere else?
-
-          // Render the game map
-          await createGameAssets(context);
+          // Render the game
+          await accessGame(context, game);
         });
       }
 
@@ -149,7 +122,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
     if (context.userId) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL);
       const boardState = createNewGameBoardState(context);
-      await createGame(context.colyseusClient, context.userId, playerFaction, boardState);
+      await createGame(context.colyseusClient, context.userId, playerFaction, boardState, context);
     } else {
       console.error('No userId when creating a new game');
     }
@@ -160,7 +133,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
     if (context.userId) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.DARK_ELVES);
       const boardState = createNewGameBoardState(context);
-      await createGame(context.colyseusClient, context.userId, playerFaction, boardState);
+      await createGame(context.colyseusClient, context.userId, playerFaction, boardState, context);
     } else {
       console.error('No userId when creating a new game');
     }

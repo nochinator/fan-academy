@@ -1,4 +1,6 @@
 import { GameController } from "../../classes/gameController";
+import { IGame } from "../../interfaces/gameInterface";
+import { createGame, joinGame } from "../../lib/colyseusGameRoom";
 import GameScene from "../game.scene";
 
 export function loadGameAssets(context: GameScene) {
@@ -45,14 +47,39 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('healReticle', './assets/images/gameItems/HealReticle-hd.png');
 }
 
-export async function createGameAssets(context: GameScene): Promise<void> {
-  context.currentTurnAction = 1;
-  const game = context.currentGame;
-  if (!game) {
-    console.log('Error: No currentState for current game');
-    return;
+export async function accessGame(context: GameScene, game: IGame): Promise<void> {
+  if (context.currentRoom) {
+    console.log('Leaving game: ', context.currentRoom.roomId);
+
+    context.activePlayer = undefined;
+    context.currentGame = undefined;
+    context.currentTurnAction = undefined;
+    context.currentOpponent = undefined;
+    context.currentGameContainer?.destroy(true);
+    context.currentGameContainer = undefined;
+    context.gameController = undefined;
+    context.activeUnit = undefined;
+    context.isPlayerOne = undefined;
+
+    await context.currentRoom.leave();
+    context.currentRoom = undefined;
   }
 
+  console.log('Accessing game: ', game._id);
+  const room = await joinGame(context.colyseusClient, context.userId, game._id, context);
+
+  // Updating GameScene properties
+  context.currentGameContainer = context.add.container(0, 0);
+  context.currentRoom = room;
+  context.activePlayer =  game.activePlayer.toString();
+  context.currentGame = game;
+  context.isPlayerOne = context.currentGame?.players[0].userData._id === context.userId;
+  context.currentTurnAction = 1;
+
   // Generate the game controller to handle game interactions
+  createGameAssets(context);
+}
+
+export function createGameAssets(context: GameScene): void {
   context.gameController = new GameController(context);
 }

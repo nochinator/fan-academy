@@ -1,6 +1,15 @@
 import { EAction, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 
 /**
+ * Turn sent interface
+ */
+export interface ITurnSentMessage {
+  roomId: string;
+  game: IGame;
+  newActivePlayer: string; // REVIEW: only game is sent by BE, remove other properties if not used later
+}
+
+/**
  * Coordinates Interface
  */
 export type Coordinates = {

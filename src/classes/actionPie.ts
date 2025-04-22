@@ -67,7 +67,7 @@ export class ActionPie extends Phaser.GameObjects.Container {
     this.setSize(90, 90).setInteractive();
 
     this.on('pointerdown', () => {
-      this.resetActionPie();
+      this.resetActionPie(); // REVIEW: Don't think this is needed
       this.context.gameController!.resetTurn();
     });
   };
