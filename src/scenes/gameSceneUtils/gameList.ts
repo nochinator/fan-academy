@@ -27,7 +27,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
   gameList.forEach((game: IGame )=> {
     if (game.status === 'searching') listSearchingArray.push(game);
     if (game.status === 'playing' && game.activePlayer === context.userId) listPlayerTurnArray.push(game);
-    if (game.status === 'playing' && game.activePlayer != context.userId) listOpponentTurnArray.push(game);
+    if (game.status === 'playing' && game.activePlayer !== context.userId) listOpponentTurnArray.push(game);
   });
   // Load oponents' profile pictures
   await loadProfilePictures(context, gameList);
@@ -107,8 +107,6 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
             context.currentGameContainer = undefined;
             context.gameController = undefined;
             context.activeUnit = undefined;
-            context.playerStateData = undefined;
-            context.opponentStateData = undefined;
             context.isPlayerOne = undefined;
 
             await context.currentRoom.leave();
@@ -121,7 +119,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
           // Updating GameScene properties
           context.currentGameContainer = context.add.container(0, 0);
           context.currentRoom = room;
-          context.currentOpponent = opponent?.userData._id.toString();
+          context.currentOpponent = opponent?.userData._id.toString(); // REVIEW: used only once when sending the turn
           context.activePlayer =  game.activePlayer.toString();
           context.currentGame = game;
           context.isPlayerOne = context.currentGame?.players[0].userData._id === context.userId; // REVIEW: move somewhere else?

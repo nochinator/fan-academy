@@ -61,52 +61,15 @@ export async function createGameAssets(context: GameScene): Promise<void> {
   }
 
   const userPlayer = game.players.find(p => p.userData._id === context.userId);
-  const opponent = game.players.find(p => p.userData._id != context.userId);
+  const opponent = game.players.find(p => p.userData._id !== context.userId);
 
   const gameState = game.lastTurnState[game.lastTurnState.length - 1];
 
-  context.playerStateData = gameState.player1.playerId == context.userId ? gameState.player1 : gameState.player2;
+  context.player1 = gameState.player1;
+  context.player2 = gameState.player2;
+  console.log('PLAYER1', gameState.player1.factionData.unitsInHand); // FIXME:
+  console.log('PLAYER2', gameState.player2?.factionData.unitsInHand);
 
-  context.opponentStateData = gameState.player1.playerId == context.userId ? gameState.player2 : gameState.player1; // we need this for the crystals
-
-  /**
- * RENDERING THE UI
- */
-  const gameUI = new GameUI(context);
-  /**
-   * RENDERING UNITS
-   */
-
-  if (context.playerStateData) {
-  /**
-   * Render the board (tiles and heroes on board)
-   */
-    const tilesOnBoard =  gameState.boardState;
-    const board = new Board(context, tilesOnBoard);
-
-    /**
-     * Render units in hand
-    */
-    const hand = new Hand(context);
-
-    /**
-    * Render units in deck (not visible)
-    */
-    const unitsInDeck = context.playerStateData.factionData.unitsInDeck;
-    const deck = new Deck(context, unitsInDeck);
-
-    unitsInDeck.forEach(unit => {
-      if (isHero(unit)) new Hero(context, unit);
-      if (isItem(unit)) new Item(context, unit);
-    });
-
-    /**
-     *  Create the game controller to handle game interactions
-     */
-    context.gameController = new GameController(context, board, hand, deck, gameUI);
-  }
-
-  console.log('userPlayer', userPlayer);
-
-  console.log('CURRENTGAME', context.currentGame);
+  // Generate the game controller to handle game interactions
+  context.gameController = new GameController(context, gameState);
 }

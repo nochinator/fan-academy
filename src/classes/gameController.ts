@@ -10,30 +10,33 @@ import { Hero } from "./hero";
 import { Item } from "./item";
 import { Tile } from "./tile";
 import { TurnButton } from "./turnButton";
-import { IGame } from "../interfaces/gameInterface";
+import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
 import { EAction } from "../enums/gameEnums";
 import { createGameAssets } from "../scenes/gameSceneUtils/gameAssets";
+import { sendTurnMessage } from "../lib/colyseusGameRoom";
+import { getPlayersKey } from "../utils/playerUtils";
 
 export class GameController {
   context: GameScene;
+  game: IGame;
+  gameUI: GameUI;
   board: Board;
   hand: Hand;
   deck: Deck;
-  gameUI: GameUI;
   actionPie: ActionPie;
   door: Door;
   turnButton: TurnButton;
-  game: IGame;
-  constructor(context: GameScene, board: Board, hand: Hand, deck: Deck, gameUI: GameUI) {
+
+  constructor(context: GameScene, gameState: IGameState) {
+    this.deck  = new Deck(context); // FIXME: sometimes door instantiates before deck somehow
     this.context = context;
-    this.gameUI = gameUI;
-    this.board = board;
-    this.hand = hand; // REVIEW: should the game controller have also the opponent's?
-    this.deck = deck; // REVIEW: should the game controller have also the opponent's?
-    this.actionPie = new ActionPie(context);
-    this.door = new Door(context);
-    this.turnButton = new TurnButton(context);
     this.game = context.currentGame!;
+    this.gameUI = new GameUI(context);
+    this.board = new Board(context, gameState.boardState);
+    this.hand = new Hand(context);
+    this.actionPie = new ActionPie(context);
+    this.turnButton = new TurnButton(context);
+    this.door = new Door(context);
   }
 
   resetTurn() {
@@ -41,13 +44,27 @@ export class GameController {
     createGameAssets(this.context); // REVIEW: loop?
   }
 
-  drawUnits() {
-    const drawAmount = 6 - this.hand.getHand().length;
-    if (this.deck.getDeck().length === 0 || drawAmount === 0) return;
+  getDeck() {
+    return this.deck.getDeck();
+  }
 
-    const drawnUnits = this.deck.removeFromDeck(drawAmount);
+  drawUnits() {
+    const drawAmount = 6 - this.hand.getHandSize();
+    if (this.deck.getDeckSize() === 0 || drawAmount === 0) return;
+
+    const drawnUnits = this.deck.removeFromDeck(drawAmount); // IHero IItem
 
     this.hand.addToHand(drawnUnits);
+  }
+
+  endOfTurnActions() {
+    // Refresh actionPie, draw units and update door banner
+    this.actionPie.resetActionPie();
+    this.drawUnits();
+    this.door.updateBannerText();
+    // Generate data for the board, hand and deck // FIXME:
+
+    sendTurnMessage(this.context.currentRoom, this.context.currentGame!.currentState, this.context.currentOpponent);
   }
 
   onHeroClicked(hero: Hero) {
@@ -85,27 +102,33 @@ export class GameController {
     // Flip image if player is player 2
     if (hero.belongsTo === 2) (hero.getByName('body') as Phaser.GameObjects.Image)?.setFlipX(true);
     // Position hero on the board
-    hero.boardPosition = tile.boardPosition;
-    hero.x = tile.x;
-    hero.y = tile.y + 15;
+    hero.updatePosition(tile.boardPosition);
     // Update tile data
     tile.setOccupied(true);
-    tile.hero = hero.getHeroData();
+    tile.hero = hero.exportData();
     // Remove active status from hero
     hero.isActive = false;
     this.context.activeUnit = undefined;
     // Remove highlight from tiles
     this.board.clearHighlights();
-    // Add action to turn action list
-    const player1 = this.context.isPlayerOne ? this.context.playerStateData! : this.context.opponentStateData!;
-    const player2 = !this.context.isPlayerOne ? this.context.playerStateData! : this.context.opponentStateData!;
+    // Assign player and opponent data to player1 and player2
+    const { player, opponent } = getPlayersKey(this.context);
 
+    const playerState: IPlayerState = {
+      ...this.context[player]!,
+      factionData: {
+        ...this.context[player]!.factionData,
+        unitsInHand: this.hand.exportHandData()
+      }
+    };
+    const opponentState = this.context[opponent];
+    // Add action to turn state
     this.game.currentState.push({
-      player1,
-      player2,
+      player1: this.context.isPlayerOne ? playerState : opponentState!,
+      player2: !this.context.isPlayerOne ? playerState : opponentState!,
       action: {
-        activeUnit: hero,
-        targetUnit: hero,
+        activeUnit: hero.exportData(),
+        targetUnit: hero.exportData(),
         action: EAction.SPAWN,
         actionNumber: this.context.currentTurnAction!
       },

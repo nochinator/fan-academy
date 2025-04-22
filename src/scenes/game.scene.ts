@@ -4,7 +4,7 @@ import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameMenuUI, createGameMenuUI } from "./gameSceneUtils/gameMenuUI";
 import { calculateAllCenterPoints } from "../utils/boardCalculations";
 import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
-import { Coordinates, IFaction, IGame, IGameState, IPlayerData, IPlayerState } from "../interfaces/gameInterface";
+import { Coordinates, IGame, IPlayerState } from "../interfaces/gameInterface";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { GameController } from "../classes/gameController";
@@ -12,19 +12,24 @@ import { GameController } from "../classes/gameController";
 export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
   userId: string | undefined;
-  activePlayer: string | undefined;
   centerPoints: Coordinates[] ;
   gameListContainer: any; // REVIEW:
+
   currentRoom: Room | undefined;
   currentGame: IGame | undefined;
   currentTurnAction: number | undefined;
   currentGameContainer: Phaser.GameObjects.Container | undefined;
+
   currentOpponent: string | undefined;
   activeUnit: Hero | Item |  undefined;
+
   gameController: GameController | undefined;
+
+  activePlayer: string | undefined;
   isPlayerOne: boolean | undefined;
-  playerStateData: IPlayerState | undefined;
-  opponentStateData: IPlayerState | undefined;
+
+  player1: IPlayerState | undefined;
+  player2: IPlayerState | undefined;
 
   constructor() {
     super({ key: 'GameScene' });

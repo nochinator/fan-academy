@@ -14,18 +14,10 @@ export class TurnButton {
       if (context.currentGame && context.currentGame.activePlayer === context.userId) {
         console.log('Clicked on send turn');
 
-        this.endOfTurnActions();
-        sendTurnMessage(context.currentRoom, context.currentGame.currentState, context.currentOpponent);
+        this.context.gameController!.endOfTurnActions();
       } else {
         console.log('Clicked on send turn but... not your turn'); // TODO: remove after testing
       }
     });
-  }
-
-  endOfTurnActions() {
-    // Refresh actionPie, draw units and update door banner
-    this.context.gameController?.actionPie.resetActionPie();
-    this.context.gameController?.drawUnits();
-    this.context.gameController?.door.updateBannerText();
   }
 }

@@ -1,12 +1,17 @@
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import { getCurrentPlayer } from "../utils/playerUtils";
 
 export class Deck {
   context: GameScene;
   deck: (IHero | IItem)[];
-  constructor(context: GameScene, deckData: (IHero | IItem)[]) {
-    this.deck = deckData;
+  constructor(context: GameScene) {
     this.context = context;
+    this.deck = getCurrentPlayer(context).factionData.unitsInDeck;
+  }
+
+  getDeckSize(): number {
+    return this.deck.length;
   }
 
   getDeck() {

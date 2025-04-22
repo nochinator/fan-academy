@@ -11,7 +11,7 @@ export async function getGameList(userId: string): Promise<IGame[] | []> {
 
   const games = await result.json();
 
-  if (result.status != 200) {
+  if (result.status !== 200) {
     console.log('Error fetching the game list...'); // TODO: throw errors
     return [];
   }
@@ -38,7 +38,7 @@ export async function deleteGame(userId: string | undefined, gameId: string | un
   const data = await result.json();
   console.log('Deleted game data', data);
 
-  if (result.status != 200) {
+  if (result.status !== 200) {
     console.log('Error deleting  game...'); // TODO: throw errors
     return null;
   }

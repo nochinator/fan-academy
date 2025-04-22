@@ -7,7 +7,7 @@ import { isInHand, isItem } from "./deckUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   unit.on('pointerdown', () => {
-    if (context.activePlayer != context.userId) return; // Only the active player can activate units (obviously)
+    if (context.activePlayer !== context.userId) return; // Only the active player can activate units (obviously)
 
     if(context.activeUnit && context.activeUnit.unitId === unit.unitId) {
       // Case 1: clicking on the active unit -> de-select unit
@@ -51,7 +51,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     const activeUnit = context.activeUnit;
     const gameController = context.gameController;
     if (!activeUnit || !gameController) return;
-    if (context.activePlayer != context.userId) return; // Only the active player can click on tiles
+    if (context.activePlayer !== context.userId) return; // Only the active player can click on tiles
 
     // If unit is on the board and the tile clicked on is in range, move the unit
     if (activeUnit.boardPosition < 45 && tile.isHighlighted) gameController.moveHero(tile);

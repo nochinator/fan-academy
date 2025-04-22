@@ -16,7 +16,7 @@ export type Coordinates = {
  */
 export interface IItem {
   class: EClass;
-  faction?: EFaction;
+  faction: EFaction;
   unitId: string; // userId_itemName_itemNumber
   itemType: EItems;
   boardPosition: number // 45-51

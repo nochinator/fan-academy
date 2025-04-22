@@ -1,12 +1,6 @@
 import GameScene from "../scenes/game.scene";
-import { ActionPie } from "./actionPie";
-import { Door } from "./door";
-import { TurnButton } from "./turnButton";
 
 export class GameUI {
-  actionPie: ActionPie;
-  door: Door;
-  turnButton: TurnButton;
   constructor(context: GameScene) {
     // Game map
     const gameMap = context.add.image(0, 0, 'gameBoard').setOrigin(0);
@@ -17,15 +11,6 @@ export class GameUI {
     // Item rack
     const itemRack = context.add.image(0, 0, 'itemRack').setOrigin(0.5).setPosition(900, 736).setScale(0.9);
     context.currentGameContainer?.add(itemRack);
-
-    // Door
-    this.door = new Door(context);
-
-    // Action pie
-    this.actionPie = new ActionPie(context);
-
-    // Turn button
-    this.turnButton = new TurnButton(context);
 
     // Top banner and health bars TODO:
     const playerOneBanner = context.add.image(0, 0, 'playerBanner').setOrigin(0.5).setPosition(705, 80).setFlipX(true).setTint(0x3399ff); // TODO: add colors

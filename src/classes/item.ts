@@ -1,23 +1,28 @@
-import { EClass, EItems } from "../enums/gameEnums";
+import { EClass, EFaction, EItems } from "../enums/gameEnums";
 import { IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeUnitClickable } from "../utils/setActiveUnit";
 
 export class Item extends Phaser.GameObjects.Image {
   class: EClass = EClass.ITEM;
+  faction: EFaction;
   unitId: string;
   itemType: EItems;
   boardPosition: number;
   isActiveValue: boolean;
   belongsTo: number;
 
+  context: GameScene;
+
   constructor(context: GameScene, data: IItem) {
     const { x, y } = context.centerPoints[data.boardPosition];
     const texture = data.itemType;
     super(context, x, y - 20, texture);
+    this.context = context;
 
     // Interface properties assignment
     this.unitId = data.unitId;
+    this.faction = data.faction;
     this.itemType = data.itemType;
     this.boardPosition = data.boardPosition;
     this.isActiveValue = false;
@@ -47,6 +52,24 @@ export class Item extends Phaser.GameObjects.Image {
     } else {
       this.onDeactivate();
     }
+  }
+
+  exportData(): IItem {
+    return {
+      class: this.class,
+      faction: this.faction,
+      unitId: this.unitId,
+      itemType: this.itemType,
+      boardPosition: this.boardPosition,
+      belongsTo: this.belongsTo
+    };
+  }
+
+  updatePosition(boardPosition: number): void {
+    const { x, y } = this.context.centerPoints[boardPosition];
+    this.x = x;
+    this.y = y;
+    this.boardPosition = boardPosition;
   }
 
   onActivate() {

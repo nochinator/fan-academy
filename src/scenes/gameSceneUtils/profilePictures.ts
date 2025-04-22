@@ -10,7 +10,7 @@ export async function loadProfilePictures(context: GameScene, gameList: IGame[])
   }[] = [];
 
   gameList.forEach((game) => {
-    const oponent  = game.players.find(player => player.userData._id != context.userId);
+    const oponent  = game.players.find(player => player.userData._id !== context.userId);
 
     if (oponent) allPlayerObjects.push({
       username: oponent.userData.username,

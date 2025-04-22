@@ -24,6 +24,8 @@ export class Hero extends Phaser.GameObjects.Container {
   isActiveValue: boolean;
   belongsTo: number;
 
+  context: GameScene;
+
   private characterImage: Phaser.GameObjects.Image;
   private runeMetalImage: Phaser.GameObjects.Image;
   private shiningHelmImage: Phaser.GameObjects.Image;
@@ -34,6 +36,7 @@ export class Hero extends Phaser.GameObjects.Container {
   constructor(context: GameScene, data: IHero) {
     const { x, y } = context.centerPoints[data.boardPosition];
     super(context, x, y);
+    this.context = context;
 
     // Interface properties assignment
     this.faction = data.faction;
@@ -118,7 +121,14 @@ export class Hero extends Phaser.GameObjects.Container {
     }
   }
 
-  getHeroData(): IHero {
+  updatePosition(boardPosition: number): void {
+    const { x, y } = this.context.centerPoints[boardPosition];
+    this.x = x;
+    this.y = boardPosition < 45 ? y + 15 : y; // REVIEW:
+    this.boardPosition = boardPosition;
+  }
+
+  exportData(): IHero {
     return {
       class: this.class,
       faction: this.faction,
@@ -141,7 +151,7 @@ export class Hero extends Phaser.GameObjects.Container {
     };
   }
 
-  onActivate() {
+  onActivate(): void {
     console.log(`${this.unitId} is now active`);
     this.setScale(1.2);
 

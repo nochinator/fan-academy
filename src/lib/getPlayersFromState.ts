@@ -1,6 +1,7 @@
 import { IPlayerState } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
+// REVIEW: not currently used, remove?
 export function getPlayersState(context: GameScene): {
   player: IPlayerState,
   oponent: IPlayerState
