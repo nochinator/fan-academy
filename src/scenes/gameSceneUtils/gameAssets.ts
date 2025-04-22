@@ -1,5 +1,5 @@
 import { GameController } from "../../classes/gameController";
-import { IGame } from "../../interfaces/gameInterface";
+import { IGame, IPlayerData } from "../../interfaces/gameInterface";
 import { createGame, joinGame } from "../../lib/colyseusGameRoom";
 import GameScene from "../game.scene";
 
@@ -47,7 +47,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('healReticle', './assets/images/gameItems/HealReticle-hd.png');
 }
 
-export async function accessGame(context: GameScene, game: IGame): Promise<void> {
+export async function accessGame(context: GameScene, game: IGame, opponent: IPlayerData): Promise<void> {
   if (context.currentRoom) {
     console.log('Leaving game: ', context.currentRoom.roomId);
 
@@ -67,12 +67,14 @@ export async function accessGame(context: GameScene, game: IGame): Promise<void>
 
   console.log('Accessing game: ', game._id);
   const room = await joinGame(context.colyseusClient, context.userId, game._id, context);
+  console.log('ROOMACCESS', room);
 
   // Updating GameScene properties
   context.currentGameContainer = context.add.container(0, 0);
   context.currentRoom = room;
   context.activePlayer =  game.activePlayer.toString();
   context.currentGame = game;
+  context.currentOpponent = opponent?.userData._id.toString(); // REVIEW: used only once when sending the turn
   context.isPlayerOne = context.currentGame?.players[0].userData._id === context.userId;
   context.currentTurnAction = 1;
 

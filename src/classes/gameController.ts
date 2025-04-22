@@ -131,8 +131,9 @@ export class GameController {
     // Position hero on the board
     hero.updatePosition(tile.boardPosition);
     // Update tile data
-    tile.setOccupied(true);
     tile.hero = hero.exportData();
+    tile.setOccupied(true);
+    console.log('TILE', tile);
     // Remove active status from hero
     hero.isActive = false;
     this.context.activeUnit = undefined;

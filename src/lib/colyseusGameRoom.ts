@@ -61,7 +61,7 @@ function subscribeToGameListeners(room: Room, context: GameScene): void {
     console.log("Player sent turn:", message);
     if (message.roomId === context.currentGame?._id) {
       context.currentGame = message.game;
-      context.activePlayer = context.userId;
+      context.activePlayer = message.newActivePlayer;
       createGameAssets(context);
     }
   });
@@ -69,7 +69,7 @@ function subscribeToGameListeners(room: Room, context: GameScene): void {
 
 export function sendTurnMessage(currentRoom: Room | undefined, currentTurn: IGameState[] | undefined, newActivePlayer: string | undefined): void {
   if (!currentRoom || !currentTurn || !newActivePlayer) {
-    console.log('Error sending turn, missing one or more params:');
+    console.error('Error sending turn, missing one or more params:');
     console.log('Current Room -> ', currentRoom);
     console.log('Current Turn -> ', currentTurn);
     console.log('newActivePlayer -> ', newActivePlayer);

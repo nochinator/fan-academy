@@ -93,12 +93,10 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
       }
 
       // Make the game accessible -only for games already playing. // REVIEW: what about games already finished?
-      if (game.status === 'playing') {
+      if (game.status === 'playing' && opponent) {
         gameListButtonImage.setInteractive();
         gameListButtonImage.on('pointerdown', async () => {
-          context.currentOpponent = opponent?.userData._id.toString(); // REVIEW: used only once when sending the turn
-          // Render the game
-          await accessGame(context, game);
+          await accessGame(context, game, opponent);
         });
       }
 
