@@ -149,7 +149,7 @@ function createElvesDeck(userId: string): (IHero | IItem)[] {
       // The equation for this is H = 1/(3+U) x D, where H is Health gained by each allied unit, D is Damage dealt, U = Amount of allied units on the field, and R = Any real number. H is rounded to the nearest 5 at the end.
       //   For example, if there were 3 allied units, and the harvest dealt 400 damage, then H = 1/(3+3) x 400, which is 1/6 x 400, which is 66.66...., which rounds to 65.
       //   As a second example, if there were 7 allied units, and the harvest dealt 780 damage, then H = 1/(3+7) x 780, which is 1/10 x 780, which is 78, which rounds to 80
-      unitId: `${userId}_souldHarvest_${index}`,
+      unitId: `${userId}_soulHarvest_${index}`,
       faction: EFaction.DARK_ELVES,
       itemType: EItems.SOUL_HARVEST
     });
@@ -165,7 +165,7 @@ function createElvesDeck(userId: string): (IHero | IItem)[] {
   }
 
   // Unique unit
-  const wraith = createElvesWraithData( { unitId: `${userId}_wraith}` });
+  const wraith = createElvesWraithData( { unitId: `${userId}_wraith` });
   deck.push(wraith);
 
   const shuffledDeck = shuffleArray(deck);
