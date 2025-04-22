@@ -154,31 +154,11 @@ export class Hero extends Phaser.GameObjects.Container {
   onActivate(): void {
     console.log(`${this.unitId} is now active`);
     this.setScale(1.2);
-
-    this.highlightMovementTiles();
-    this.highlightEnemiesInRange();
   }
 
   onDeactivate() {
     console.log(`${this.unitId} is now inactive`);
     this.setScale(1);
-
-    this.clearHighlights();
-  }
-
-  highlightMovementTiles() {
-    console.log("Highlighting movement tiles...");
-    // Add logic to highlight movement range tiles
-  }
-
-  highlightEnemiesInRange() {
-    console.log("Highlighting enemies in range...");
-    // Add logic to highlight attackable enemies
-  }
-
-  clearHighlights() {
-    console.log("Clearing all highlights...");
-    // Add logic to remove movement/attack highlights
   }
 
   move(x: number, y: number): void {

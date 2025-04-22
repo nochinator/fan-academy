@@ -37,6 +37,10 @@ export class Board {
     return this.tiles.find(tile => tile.row === row && tile.col === col);
   }
 
+  getTileFromBoardPosition(boardPosition: number) {
+    return this.tiles.find(tile => tile.boardPosition === boardPosition);
+  }
+
   getBoardState(): ITile[] {
     const boardState = this.tiles.map(tile =>  tile.getTileData());
     return boardState;
@@ -51,17 +55,28 @@ export class Board {
     this.highlightTiles(spawns);
   }
 
-  highlightEnemyTargets(hero: Hero) {}
+  highlightEnemyTargets(hero: Hero): void {}
 
   highlightFriendlyTargets(unit: Hero | Item) {}
 
   highlightMovementArea(hero: Hero) {
-    // Find starting tile
-    const startTile = this.tiles.find(tile => {
-      if (tile.hero?.unitId === hero.unitId) return {
-        row: tile.row,
-        col: tile.col
-      };});
+    const inRangeTiles: Tile[] = [];
+    const heroTile = this.getTileFromBoardPosition(hero.boardPosition);
+
+    if (!heroTile) {
+      console.log('No tile found - highlightMovementArea');
+      return;
+    }
+
+    this.tiles.forEach(tile => {
+      const distance = Math.abs(tile.row - heroTile.row) + Math.abs(tile.col - heroTile.col);
+
+      if (distance <= hero.movement && !tile.isOccupied()) {
+        inRangeTiles.push(tile);
+      }
+    });
+
+    this.highlightTiles(inRangeTiles);
   }
 
   highlightTiles(tiles: Tile[]) {
