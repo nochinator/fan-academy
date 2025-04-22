@@ -1,7 +1,7 @@
 import { ETiles } from "../enums/gameEnums";
 import { IHero, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { makeTileClickable } from "../utils/setActiveUnit";
+import { makeTileClickable } from "../utils/makeUnitClickable";
 
 export class Tile extends Phaser.GameObjects.Container {
   baseRectangle: Phaser.GameObjects.Rectangle;

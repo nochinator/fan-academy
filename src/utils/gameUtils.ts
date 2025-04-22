@@ -1,6 +1,7 @@
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { IHero, IItem } from "../interfaces/gameInterface";
+import GameScene from "../scenes/game.scene";
 
 // Fisher-Yates shuffle algorithm
 export function shuffleArray(array: (IHero | IItem)[]): (IHero | IItem)[] {
@@ -30,4 +31,9 @@ export function isItem(item: IHero | IItem): item is Item {
 
 export function isInHand(boardPosition: number): boolean {
   return boardPosition > 44 && boardPosition < 51;
+}
+
+export function belongsToPlayer(context: GameScene, unit: Hero | Item): boolean {
+  const playerNumber = context.isPlayerOne ? 1 : 2;
+  return unit.belongsTo === playerNumber;
 }

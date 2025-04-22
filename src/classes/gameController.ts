@@ -1,5 +1,5 @@
 import GameScene from "../scenes/game.scene";
-import { isHero } from "../utils/deckUtils";
+import { isHero } from "../utils/gameUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
 import { Deck } from "./deck";

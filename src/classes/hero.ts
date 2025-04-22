@@ -1,7 +1,7 @@
 import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { makeUnitClickable } from "../utils/setActiveUnit";
+import { makeUnitClickable } from "../utils/makeUnitClickable";
 
 export class Hero extends Phaser.GameObjects.Container {
   class: EClass = EClass.HERO;
@@ -23,6 +23,7 @@ export class Hero extends Phaser.GameObjects.Container {
   shiningHelm: boolean;
   isActiveValue: boolean;
   belongsTo: number;
+  canHeal: boolean;
 
   context: GameScene;
 
@@ -57,6 +58,7 @@ export class Hero extends Phaser.GameObjects.Container {
     this.shiningHelm = data.shiningHelm;
     this.isActiveValue = false;
     this.belongsTo = data.belongsTo ?? 1;
+    this.canHeal = data.canHeal ?? false;
 
     // Create the unit's image and images for its upgrades
     this.characterImage = context.add.image(0, -10, this.unitType).setOrigin(0.5).setDepth(10).setName('body');
@@ -124,7 +126,7 @@ export class Hero extends Phaser.GameObjects.Container {
   updatePosition(boardPosition: number): void {
     const { x, y } = this.context.centerPoints[boardPosition];
     this.x = x;
-    this.y = boardPosition < 45 ? y + 15 : y; // REVIEW:
+    this.y = y;
     this.boardPosition = boardPosition;
   }
 
@@ -147,7 +149,8 @@ export class Hero extends Phaser.GameObjects.Container {
       factionBuff: this.factionBuff,
       runeMetal: this.runeMetal,
       shiningHelm: this.shiningHelm,
-      belongsTo: this.belongsTo
+      belongsTo: this.belongsTo,
+      canHeal: this.canHeal
     };
   }
 
@@ -170,7 +173,7 @@ export class Hero extends Phaser.GameObjects.Container {
     // Define how the unit attacks
   }
 
-  // heal(target: Unit): void {
-  //   // Define how the unit attacks
-  // } TODO: to be added to healing subclasses
+  heal(target: Hero): void {
+    // Check if unit can heal and if target should be healed or revived
+  }
 }

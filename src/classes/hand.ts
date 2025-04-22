@@ -1,6 +1,6 @@
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { isHero, isItem } from "../utils/deckUtils";
+import { isHero, isItem } from "../utils/gameUtils";
 import { getCurrentPlayer } from "../utils/playerUtils";
 import { Hero } from "./hero";
 import { Item } from "./item";

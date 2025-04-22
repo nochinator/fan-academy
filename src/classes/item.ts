@@ -1,7 +1,8 @@
 import { EClass, EFaction, EItems } from "../enums/gameEnums";
 import { IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { makeUnitClickable } from "../utils/setActiveUnit";
+import { makeUnitClickable } from "../utils/makeUnitClickable";
+import { Hero } from "./hero";
 
 export class Item extends Phaser.GameObjects.Image {
   class: EClass = EClass.ITEM;
@@ -11,6 +12,8 @@ export class Item extends Phaser.GameObjects.Image {
   boardPosition: number;
   isActiveValue: boolean;
   belongsTo: number;
+  canHeal: boolean;
+  dealsDamage: boolean;
 
   context: GameScene;
 
@@ -27,6 +30,8 @@ export class Item extends Phaser.GameObjects.Image {
     this.boardPosition = data.boardPosition;
     this.isActiveValue = false;
     this.belongsTo = data.belongsTo ?? 1;
+    this.canHeal = data.canHeal ?? false;
+    this.dealsDamage = data.dealsDamage ?? false;
 
     // Add listener for clicking on the unit
     makeUnitClickable(this, context);
@@ -61,7 +66,9 @@ export class Item extends Phaser.GameObjects.Image {
       unitId: this.unitId,
       itemType: this.itemType,
       boardPosition: this.boardPosition,
-      belongsTo: this.belongsTo
+      belongsTo: this.belongsTo,
+      canHeal: this.canHeal,
+      dealsDamage: this.dealsDamage
     };
   }
 
@@ -100,5 +107,13 @@ export class Item extends Phaser.GameObjects.Image {
   clearHighlights() {
     console.log("Clearing all highlights...");
     // Add logic to remove movement/attack highlights
+  }
+
+  dealDamage(boardPosition: number): void {
+    // All damage items are AOE, right?
+  }
+
+  heal(target: Hero): void {
+    // Check if unit can heal and if target should be healed or revived
   }
 }

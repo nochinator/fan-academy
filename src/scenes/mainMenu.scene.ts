@@ -1,6 +1,6 @@
 import createMainMenuButton from "../lib/buttons";
 import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
-import { isValidPassword } from "../utils/isValidPassword";
+import { isValidPassword } from "../utils/playerUtils";
 
 export default class MainMenuScene extends Phaser.Scene {
   userId: string | undefined;
