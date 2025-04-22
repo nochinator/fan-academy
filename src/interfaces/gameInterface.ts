@@ -75,8 +75,8 @@ export interface IPlayerData {
  * TurnAction Interface
  */
 export interface ITurnAction {
-  activeUnit: IHero | IItem;
-  targetUnit: IHero;
+  activeUnit?: IHero | IItem;
+  targetUnit?: IHero | IItem; // an item can be a target for shuffle
   action: EAction,
   actionNumber: number;
   // TODO: this needs extra properties so we can replay the action (like start and end board points for example)
@@ -123,7 +123,6 @@ export interface IGame {
   _id: string;
   players: IPlayerData[];
   gameState: IGameState[][];
-  lastTurnState: IGameState[];
   currentState: IGameState[];
   currentTurn: number;
   winCondition?: string;

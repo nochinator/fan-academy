@@ -32,7 +32,8 @@ export enum EAction {
   HEAL = 'heal',
   SPAWN = 'spawn',
   USE = 'use',
-  SHUFFLE = 'shuffle'
+  SHUFFLE = 'shuffle',
+  DRAW = 'draw' // automatic action at the end of a turn
 }
 
 export enum EItems {

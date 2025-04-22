@@ -1,11 +1,4 @@
-import { Board } from "../../classes/board";
-import { Deck } from "../../classes/deck";
 import { GameController } from "../../classes/gameController";
-import { GameUI } from "../../classes/gameUI";
-import { Hand } from "../../classes/hand";
-import { Hero } from "../../classes/hero";
-import { Item } from "../../classes/item";
-import { isHero, isItem } from "../../utils/deckUtils";
 import GameScene from "../game.scene";
 
 export function loadGameAssets(context: GameScene) {
@@ -60,16 +53,6 @@ export async function createGameAssets(context: GameScene): Promise<void> {
     return;
   }
 
-  const userPlayer = game.players.find(p => p.userData._id === context.userId);
-  const opponent = game.players.find(p => p.userData._id !== context.userId);
-
-  const gameState = game.lastTurnState[game.lastTurnState.length - 1];
-
-  context.player1 = gameState.player1;
-  context.player2 = gameState.player2;
-  console.log('PLAYER1', gameState.player1.factionData.unitsInHand); // FIXME:
-  console.log('PLAYER2', gameState.player2?.factionData.unitsInHand);
-
   // Generate the game controller to handle game interactions
-  context.gameController = new GameController(context, gameState);
+  context.gameController = new GameController(context);
 }

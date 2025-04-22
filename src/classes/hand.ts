@@ -42,12 +42,13 @@ export class Hand {
       } else {
         const unitData = units.shift();
         if (unitData) {
+          unitData.boardPosition = element;
           const newUnit = this.renderUnit(unitData);
-          newUnit.boardPosition = element;
           this.hand.splice(++previousIndex, 0, newUnit);
         }
       }
     });
+    console.log('ADDTOHAND', this.hand);
   }
 
   removeFromHand(unitToRemove: IHero | IItem): void {

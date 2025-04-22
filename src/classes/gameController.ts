@@ -26,13 +26,19 @@ export class GameController {
   actionPie: ActionPie;
   door: Door;
   turnButton: TurnButton;
+  lastTurnState: IGameState[];
 
-  constructor(context: GameScene, gameState: IGameState) {
+  constructor(context: GameScene) {
+    this.game = context.currentGame!;
+    this.lastTurnState = this.game.gameState[this.game.gameState.length - 1];
+    const gameState =  this.lastTurnState[this.lastTurnState.length - 1];
+    this.gameUI = new GameUI(context); // TODO: add depth to UI and board assets
+    this.board = new Board(context, gameState.boardState);
+    context.player1 = gameState.player1;
+    context.player2 = gameState.player2;
+
     this.deck  = new Deck(context); // FIXME: sometimes door instantiates before deck somehow
     this.context = context;
-    this.game = context.currentGame!;
-    this.gameUI = new GameUI(context);
-    this.board = new Board(context, gameState.boardState);
     this.hand = new Hand(context);
     this.actionPie = new ActionPie(context);
     this.turnButton = new TurnButton(context);
@@ -40,8 +46,8 @@ export class GameController {
   }
 
   resetTurn() {
-    this.game.currentState = this.game.lastTurnState;
-    createGameAssets(this.context); // REVIEW: loop?
+    this.game.currentState = this.lastTurnState;
+    createGameAssets(this.context);
   }
 
   getDeck() {
@@ -50,11 +56,33 @@ export class GameController {
 
   drawUnits() {
     const drawAmount = 6 - this.hand.getHandSize();
+
     if (this.deck.getDeckSize() === 0 || drawAmount === 0) return;
 
     const drawnUnits = this.deck.removeFromDeck(drawAmount); // IHero IItem
 
     this.hand.addToHand(drawnUnits);
+
+    // Add action to turn state // FIXME: there is already a function for adding actions, DRY
+    const { player, opponent } = getPlayersKey(this.context);
+
+    const playerState: IPlayerState = {
+      ...this.context[player]!,
+      factionData: {
+        ...this.context[player]!.factionData,
+        unitsInHand: this.hand.exportHandData()
+      }
+    };
+    const opponentState = this.context[opponent];
+    this.game.currentState.push({
+      player1: this.context.isPlayerOne ? playerState : opponentState!,
+      player2: !this.context.isPlayerOne ? playerState : opponentState!,
+      action: {
+        action: EAction.DRAW,
+        actionNumber: 6 // REVIEW: always 6?
+      },
+      boardState: this.board.getBoardState()
+    });
   }
 
   endOfTurnActions() {
@@ -62,7 +90,6 @@ export class GameController {
     this.actionPie.resetActionPie();
     this.drawUnits();
     this.door.updateBannerText();
-    // Generate data for the board, hand and deck // FIXME:
 
     sendTurnMessage(this.context.currentRoom, this.context.currentGame!.currentState, this.context.currentOpponent);
   }
@@ -111,6 +138,13 @@ export class GameController {
     this.context.activeUnit = undefined;
     // Remove highlight from tiles
     this.board.clearHighlights();
+    // Add action to current state
+    this.addAction(EAction.SPAWN, hero);
+    // Remove a slice from the action pie
+    this.actionPie.hideActionSlice(this.context.currentTurnAction!++); // TODO: add turn action counter
+  }
+
+  addAction(action: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item) {
     // Assign player and opponent data to player1 and player2
     const { player, opponent } = getPlayersKey(this.context);
 
@@ -127,15 +161,13 @@ export class GameController {
       player1: this.context.isPlayerOne ? playerState : opponentState!,
       player2: !this.context.isPlayerOne ? playerState : opponentState!,
       action: {
-        activeUnit: hero.exportData(),
-        targetUnit: hero.exportData(),
-        action: EAction.SPAWN,
+        activeUnit: activeUnit.exportData(),
+        targetUnit: targetUnit ? targetUnit.exportData() : activeUnit.exportData(),
+        action,
         actionNumber: this.context.currentTurnAction!
       },
       boardState: this.board.getBoardState()
     });
-    // Remove a slice from the action pie
-    this.actionPie.hideActionSlice(this.context.currentTurnAction!++); // TODO: add turn action counter
   }
 
   moveHero(tile: Tile): void {
