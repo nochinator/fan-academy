@@ -1,4 +1,4 @@
-import { EAction, ETiles } from "../enums/gameEnums";
+import { ETiles } from "../enums/gameEnums";
 import { IHero, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeTileClickable } from "../utils/setActiveUnit";
@@ -11,14 +11,13 @@ export class Tile extends Phaser.GameObjects.Container {
   y: number;
   boardPosition: number;
 
-  occupied: boolean = false;
-  obstacle: boolean = false;
-  hero: IHero | undefined = undefined;
+  occupied: boolean;
+  obstacle: boolean;
+  hero: IHero | undefined;
   tileSize: number = 90;
   tileType: ETiles;
 
   isHighlighted: boolean;
-  highLightAction: EAction | undefined = undefined; // REVIEW
 
   constructor(context: GameScene,
     data: ITile) {
@@ -29,6 +28,8 @@ export class Tile extends Phaser.GameObjects.Container {
     this.x = data.x;
     this.y = data.y;
     this.tileType = data.tileType;
+    this.occupied = data.occupied;
+    this.obstacle = data.obstacle;
     this.hero = data.hero;
     this.boardPosition = data.boardPosition;
 
@@ -49,6 +50,7 @@ export class Tile extends Phaser.GameObjects.Container {
         tileIcon = context.add.image(0, -30, this.tileType).setScale(0.8);
         const crystalColor = this.col > 4 ? 0x990000 : 0x3399ff;
         tileIcon.setTint(crystalColor);
+        this.occupied = true;
       } else {
         tileIcon = context.add.image(0, 0, this.tileType);
       }
