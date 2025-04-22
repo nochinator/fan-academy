@@ -9,14 +9,29 @@ export async function loginQuery(username: string, password: string) {
       }),
       credentials: 'include'
     });
+
+    const data = await response.json();
+
     if (response.ok) {
       console.log('Successful login! :)');
-      const data = await response.json();
       console.log(data);
-      return data.user;
+      return {
+        success: true,
+        user: data.user
+      };
+    } else {
+      console.log('Server responded with an error:', data.message || 'Unknown error');
+      return {
+        success: false,
+        error: data.message || 'Unknown error'
+      };
     }
   } catch(error) {
     console.log('Error login in: ', error);
+    return {
+      success: false,
+      error: 'Network error. Please try again.'
+    };
   }
 }
 
@@ -32,14 +47,28 @@ export async function signUpQuery(email: string, username: string, password: str
       }),
       credentials: 'include'
     });
+
+    const data = await response.json();
+
     if (response.ok) {
-      console.log('Successful sign in! :)');
-      const data = await response.json();
-      console.log(data.user);
-      return data;
+      console.log('Successful sign up! :)');
+      return {
+        success: true,
+        user: data.user
+      };
+    } else {
+      console.log('Server responded with an error:', data.message || 'Unknown error');
+      return {
+        success: false,
+        error: data.message || 'Unknown error'
+      };
     }
   } catch (error) {
-    console.log('Error signing in: ', error);
+    console.log('Network error signing up:', error);
+    return {
+      success: false,
+      error: 'Network error. Please try again.'
+    };
   }
 }
 

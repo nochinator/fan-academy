@@ -126,6 +126,7 @@ export default class MainMenuScene extends Phaser.Scene {
     const loginPasswordInput = loginForm.getChildByID('password') as HTMLInputElement;
     const loginButton = loginForm.getChildByID('loginButton') as HTMLInputElement;
     const linkToSignUp = loginForm.getChildByID('linkToSignUp') as HTMLInputElement;
+    const loginError = loginForm.getChildByID('loginError') as HTMLDivElement;
 
     // Sign up form elements
     const signUpEmailInput = signUpForm.getChildByID('email') as HTMLInputElement;
@@ -134,38 +135,53 @@ export default class MainMenuScene extends Phaser.Scene {
     const signUpPasswordConfirm = signUpForm.getChildByID('passwordConfirm') as HTMLInputElement;
     const signUpButton = signUpForm.getChildByID('signUpButton') as HTMLInputElement;
     const linkToLogin = signUpForm.getChildByID('linkToLogin') as HTMLInputElement;
+    const signUpError = signUpForm.getChildByID('signUpError') as HTMLDivElement;
+
+    const showFormError = (element: HTMLDivElement, message: string) => {
+      element.innerText = message;
+      element.style.display = 'block';
+    };
+
+    const hideFormError = (element: HTMLDivElement) => {
+      element.innerText = '';
+      element.style.display = 'none';
+    };
 
     // Login button click
     loginButton.addEventListener('click', async () => {
       if (loginUsernameInput.value && loginPasswordInput.value) {
-        const user = await loginQuery(loginUsernameInput.value, loginPasswordInput.value);
-        if (user) {
+        const result = await loginQuery(loginUsernameInput.value, loginPasswordInput.value);
+        if (result.success) {
           loginForm.setVisible(false);
-          this.userId = user._id;
+          this.userId = result.user._id;
           console.log('UserId after login:', this.userId);
+        }else {
+          showFormError(loginError, result.error); // Show server error to user
         }
       }
     });
 
     // Sign up button click
     signUpButton.addEventListener('click', async () => {
-      if (signUpPasswordInput.value !== signUpPasswordConfirm.value) {
-        console.error('Signup form: Passwords do not match');
-        return;
-      } // TODO: show errors to user
+      hideFormError(signUpError);
 
-      if (!isValidPassword(signUpPasswordInput.value)) {
-        console.error('Signup form: Password does not fulfill requirements');
+      if (signUpPasswordInput.value !== signUpPasswordConfirm.value) {
+        showFormError(signUpError, 'Passwords do not match');
         return;
-      }
+      };
+      if (!isValidPassword(signUpPasswordInput.value)) {
+        showFormError(signUpError, 'Password must be at least 8 characters long and contain a letter and a number');
+        return;
+      };
 
       if (signUpEmailInput.value && signUpUsernameInput.value && signUpPasswordInput.value) {
-        const user = await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
-        console.log('event listener user:', user);
-        if (user) {
+        const result = await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
+        if (result.success) {
           signUpForm.setVisible(false);
-          this.userId = user._id;
+          this.userId = result.user._id;
           console.log('UserId after sign up:', this.userId);
+        } else {
+          showFormError(signUpError, result.error); // Show server error to user
         }
       }
     });
