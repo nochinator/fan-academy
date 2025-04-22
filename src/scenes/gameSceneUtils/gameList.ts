@@ -17,7 +17,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
   }
 
   // If the game list already exists in the scene, remove it before re-rendering
-  if (context.gameListContainer) context.gameListContainer.destroy(true);
+  context.gameListContainer?.destroy(true);
 
   // Split game list and split it into 3 arrays, depending on status
   const listPlayerTurnArray: IGame[] = [];

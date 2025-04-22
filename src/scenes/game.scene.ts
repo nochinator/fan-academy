@@ -13,7 +13,7 @@ export default class GameScene extends Phaser.Scene {
   colyseusClient: Client | undefined;
   userId: string | undefined;
   centerPoints: Coordinates[] ;
-  gameListContainer: any; // REVIEW:
+  gameListContainer: Phaser.GameObjects.Container | undefined;
 
   currentRoom: Room | undefined;
   currentGame: IGame | undefined;
