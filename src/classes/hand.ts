@@ -25,7 +25,7 @@ export class Hand {
   }
 
   renderUnit(unit: IHero | IItem): Hero | Item {
-    if (isHero(unit)) return new Hero(this.context, unit);
+    if (isHero(unit)) return new Hero(this.context, unit); // TODO: refactor to create units based on specific class
     if (isItem(unit)) return new Item(this.context, unit);
     throw new Error('Unit passed to renderUnit is not a recognized type');
   }

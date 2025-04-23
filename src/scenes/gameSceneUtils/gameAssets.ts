@@ -67,7 +67,6 @@ export async function accessGame(context: GameScene, game: IGame, opponent: IPla
 
   console.log('Accessing game: ', game._id);
   const room = await joinGame(context.colyseusClient, context.userId, game._id, context);
-  console.log('ROOMACCESS', room);
 
   // Updating GameScene properties
   context.currentGameContainer = context.add.container(0, 0);

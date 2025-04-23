@@ -72,19 +72,19 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
 export function makeTileClickable(tile: Tile, context: GameScene): void {
   tile.on('pointerdown', () => {
-    console.log('Clicking a tile works');
+    if (context.activePlayer !== context.userId) return; // Only the active player can click on tiles
+
     const activeUnit = context.activeUnit;
     const gameController = context.gameController;
     if (!activeUnit || !gameController) return;
-    if (context.activePlayer !== context.userId) return; // Only the active player can click on tiles
 
     // If unit is on the board and the tile clicked on is in range, move the unit
     if (activeUnit.boardPosition < 45 && tile.isHighlighted) gameController.moveHero(tile);
 
     // If hero is in hand and clicked tile is highlighted, spawn
-    if (activeUnit.boardPosition > 44 && tile.isHighlighted) gameController.spawnHero(tile);
-
-    // If item is in hand, check if the activeUnit is a inferno or sould harvest (otherwise, it should have not clicked on a tile...) // REVIEW:
-    if (isItem(activeUnit) && (activeUnit.itemType === EItems.SOUL_HARVEST || activeUnit.itemType === EItems.INFERNO)) gameController.aoeSpell(tile);
+    if (activeUnit.boardPosition > 44 && tile.isHighlighted) {
+      if (isHero(activeUnit)) gameController.spawnHero(tile);
+      if (isItem(activeUnit) && activeUnit.dealsDamage) gameController.aoeSpell(tile);
+    }
   });
 }

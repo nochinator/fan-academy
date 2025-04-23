@@ -25,7 +25,7 @@ export class Board {
 
     tiles.forEach(tile => {
       const newTile = new Tile(this.context, tile);
-      if (newTile.hero) new Hero(this.context, newTile.hero);
+      if (newTile.hero) new Hero(this.context, newTile.hero); // TODO: refactor to use each specific hero class
 
       grid.push(newTile);
     });

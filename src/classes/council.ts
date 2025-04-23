@@ -41,32 +41,33 @@ export class Cleric extends Hero {
   // TODO: add healing/revive functions
 }
 
-export class ShiningHelm extends Item {
-  constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
-    super(context, createItemData({
-      unitId,
-      itemType: EItems.SHINING_HELM,
-      boardPosition
-    }));
-  }
-}
+// FIXME:
+// export class ShiningHelm extends Item {
+//   constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
+//     super(context, createItemData({
+//       unitId,
+//       itemType: EItems.SHINING_HELM,
+//       boardPosition,
+//     }));
+//   }
+// }
 
-export class HealingPotion extends Item {
-  constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
-    super(context, {
-      unitId,
-      itemType: EItems.HEALING_POTION,
-      boardPosition
-    });
-  }
-}
+// export class HealingPotion extends Item {
+//   constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
+//     super(context, createItemData({
+//       unitId,
+//       itemType: EItems.HEALING_POTION,
+//       boardPosition
+//     }));
+//   }
+// }
 
-export class Inferno extends Item {
-  constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
-    super(context, {
-      unitId,
-      itemType: EItems.INFERNO,
-      boardPosition
-    });
-  }
-}
+// export class Inferno extends Item {
+//   constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
+//     super(context, {
+//       unitId,
+//       itemType: EItems.INFERNO,
+//       boardPosition
+//     });
+//   }
+// }

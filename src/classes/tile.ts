@@ -88,6 +88,11 @@ export class Tile extends Phaser.GameObjects.Container {
     this.occupied = occupied;
   }
 
+  removeHero(): void {
+    this.occupied = false;
+    this.hero = undefined;
+  }
+
   isFriendly(userId: string) {
     return this.hero && this.hero.unitId.includes(userId);
   }

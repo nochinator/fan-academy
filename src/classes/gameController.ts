@@ -14,7 +14,7 @@ import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
 import { EAction } from "../enums/gameEnums";
 import { createGameAssets } from "../scenes/gameSceneUtils/gameAssets";
 import { sendTurnMessage } from "../lib/colyseusGameRoom";
-import { getPlayersKey } from "../utils/playerUtils";
+import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 
 export class GameController {
   context: GameScene;
@@ -107,7 +107,7 @@ export class GameController {
 
   onItemClicked(item: Item) {
     console.log(`An item ${item.unitId} has been clicked`);
-    this.board.highlightFriendlyTargets(item);
+    this.board.highlightFriendlyTargets(item); // FIXME: this depends on the item. AOE doesn't trigger a highlight
   }
 
   onTileClicked(tile: Tile) {
@@ -133,19 +133,35 @@ export class GameController {
     // Update tile data
     tile.hero = hero.exportData();
     tile.setOccupied(true);
-    console.log('TILE', tile);
-    // Remove active status from hero
-    hero.isActive = false;
-    this.context.activeUnit = undefined;
-    // Remove highlight from tiles
-    this.board.clearHighlights();
-    // Add action to current state
-    this.addAction(EAction.SPAWN, hero);
-    // Remove a slice from the action pie
-    this.actionPie.hideActionSlice(this.context.currentTurnAction!++); // TODO: add turn action counter
+
+    this.afterAction(EAction.SPAWN, hero);
   }
 
-  addAction(action: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item) {
+  moveHero(targetTile: Tile): void {
+    const hero = this.context.activeUnit;
+    if (!hero || !isHero(hero)) return;
+
+    const startTile = this.board.getTileFromBoardPosition(hero.boardPosition);
+    if (!startTile) return;
+
+    hero.updatePosition(targetTile.boardPosition);
+    targetTile.hero = hero.exportData();
+    targetTile.setOccupied(true);
+    startTile.removeHero();
+
+    this.afterAction(EAction.MOVE, hero);
+  }
+
+  afterAction(actionType: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
+    // Add action to current state
+    this.addActionToState(actionType, activeUnit);
+    // Remove a slice from the action pie
+    this.actionPie.hideActionSlice(this.context.currentTurnAction!++); // TODO: add turn action counter ?
+    // Deselect unit and clear highlights
+    deselectUnit(this.context);
+  }
+
+  addActionToState(action: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item) {
     // Assign player and opponent data to player1 and player2
     const { player, opponent } = getPlayersKey(this.context);
 
@@ -169,10 +185,6 @@ export class GameController {
       },
       boardState: this.board.getBoardState()
     });
-  }
-
-  moveHero(tile: Tile): void {
-
   }
 
   aoeSpell(tile: Tile): void {
