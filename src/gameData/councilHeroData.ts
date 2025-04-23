@@ -25,7 +25,9 @@ export function createCouncilArcherData(data: Partial<IHero>): IHero {
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo: data.belongsTo ?? 1,
+    canHeal: true
   };
 }
 
@@ -52,7 +54,9 @@ export function createCouncilWizardData(data: Partial<IHero>): IHero {
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo: data.belongsTo ?? 1,
+    canHeal: false
   };
 }
 
@@ -79,7 +83,9 @@ export function createCouncilKnightData(data: Partial<IHero>): IHero {
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo: data.belongsTo ?? 1,
+    canHeal: false
   };
 }
 
@@ -107,7 +113,9 @@ export function createCouncilClericData(data: Partial<IHero>): IHero {
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo: data.belongsTo ?? 1,
+    canHeal: false
   };
 }
 
@@ -136,6 +144,8 @@ export function createCouncilNinjaData(data: Partial<IHero>): IHero {
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo: data.belongsTo ?? 1,
+    canHeal: false
   };
 }
