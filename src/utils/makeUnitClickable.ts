@@ -63,9 +63,11 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
         }
       }
 
-      // If unit can't be healed or teleported, switch focus to new unit
-      deselectUnit(context);
-      return selectUnit(context, unit);
+      // If the new unit can't be attacked, healed or teleported, and it's a friendly unit, switch focus to new unit
+      if (isFriendly) {
+        deselectUnit(context);
+        return selectUnit(context, unit);
+      }
     }
   });
 }
