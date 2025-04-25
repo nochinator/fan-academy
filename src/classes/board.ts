@@ -42,8 +42,7 @@ export class Board {
   }
 
   getBoardState(): ITile[] {
-    const boardState = this.tiles.map(tile =>  tile.getTileData());
-    return boardState;
+    return this.tiles.map(tile =>  tile.getTileData());
   }
 
   clearHighlights() {

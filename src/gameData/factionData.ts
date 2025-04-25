@@ -77,6 +77,8 @@ function createCouncilDeck(userId: string): (IHero | IItem)[] {
     deck.push(healingPotion, inferno, superCharge);
   }
 
+  console.log('DECK', deck);
+
   // Unique unit
   const ninja = createCouncilNinjaData( { unitId: `${userId}_ninja` });
   deck.push(ninja);

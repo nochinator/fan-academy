@@ -44,4 +44,5 @@ export function deselectUnit(context: GameScene): void {
   context.activeUnit = undefined;
   // Clear highlighted tiles, if any
   context.gameController?.board.clearHighlights();
+  console.log('BOARD', context.gameController?.board.tiles);
 }

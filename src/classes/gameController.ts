@@ -157,7 +157,7 @@ export class GameController {
 
   afterAction(actionType: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
     // Add action to current state
-    this.addActionToState(actionType, activeUnit);
+    this.addActionToState(actionType, activeUnit, targetUnit);
     // Remove a slice from the action pie
     this.actionPie.hideActionSlice(this.context.currentTurnAction!++);
     // Deselect unit and clear highlights
