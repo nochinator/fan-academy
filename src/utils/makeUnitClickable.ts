@@ -1,15 +1,14 @@
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EItems } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, isHero, isInHand, isItem } from "./gameUtils";
+import { belongsToPlayer, isHero, isItem } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   unit.on('pointerdown', () => {
-    // Only the active player can activate units (obviously)
-    if (context.activePlayer !== context.userId) return;
+    // Only the active player can activate units (obviously), and only if it still have actions available
+    if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
 
     const activeUnit = context.activeUnit;
     const isFriendly = belongsToPlayer(context, unit);
