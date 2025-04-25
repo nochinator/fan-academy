@@ -6,7 +6,7 @@ const actionPieCoordinates = {
 };
 
 export class ActionPie extends Phaser.GameObjects.Container {
-  actionCircle;
+  actionCircle: Phaser.GameObjects.Image;
   actionPie1: Phaser.GameObjects.Image;
   actionPie2: Phaser.GameObjects.Image;
   actionPie3: Phaser.GameObjects.Image;
@@ -18,7 +18,7 @@ export class ActionPie extends Phaser.GameObjects.Container {
   constructor(context: GameScene) {
     super(context, actionPieCoordinates.x, actionPieCoordinates.y);
 
-    this.context = context; // REVIEW: used only for debugging atm
+    this.context = context;
 
     this.actionCircle = context.add.image(0, 0, 'actionCircle').setOrigin(0.5).setName('actionCircle');
     this.actionPie1 = context.add.image(12, -19, 'actionPie').setOrigin(0.5).setRotation(-0.3).setName('actionPie1');
@@ -68,6 +68,7 @@ export class ActionPie extends Phaser.GameObjects.Container {
 
     this.on('pointerdown', () => {
       this.resetActionPie(); // REVIEW: Don't think this is needed
+      this.context.currentTurnAction = 1;
       this.context.gameController!.resetTurn();
     });
   };

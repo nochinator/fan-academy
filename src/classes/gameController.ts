@@ -156,7 +156,7 @@ export class GameController {
     // Add action to current state
     this.addActionToState(actionType, activeUnit);
     // Remove a slice from the action pie
-    this.actionPie.hideActionSlice(this.context.currentTurnAction!++); // TODO: add turn action counter ?
+    this.actionPie.hideActionSlice(this.context.currentTurnAction!++);
     // Deselect unit and clear highlights
     deselectUnit(this.context);
   }
