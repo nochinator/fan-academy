@@ -10,7 +10,7 @@ export class TurnButton {
 
     // Sending a turn
     turnButton.on('pointerdown', async () => {
-      if (context.currentGame && context.currentGame.activePlayer === context.userId) {
+      if (context.currentGame && context.activePlayer === context.userId) {
         console.log('Clicked on send turn');
 
         this.context.gameController!.endOfTurnActions();

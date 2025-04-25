@@ -47,6 +47,7 @@ export class GameController {
   }
 
   async resetTurn() {
+    console.log(this.hand);
     createGameAssets(this.context);
   }
 
@@ -90,6 +91,8 @@ export class GameController {
     this.actionPie.resetActionPie();
     this.drawUnits();
     this.door.updateBannerText();
+
+    this.context.activePlayer = this.context.currentOpponent;
 
     sendTurnMessage(this.context.currentRoom, this.context.currentGame!.currentState, this.context.currentOpponent);
   }
