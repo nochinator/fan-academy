@@ -26,11 +26,11 @@ export function createNewGameBoardState(): ITile[] {
   const randomIndexNumber = Math.floor(Math.random() * mapTemplates.length);
   const mapData = mapTemplates[randomIndexNumber];
   const newBoard: ITile[] = [];
+  const centerPoints = calculateAllCenterPoints();
 
   let boardPosition = 0;
   for (let row = 0; row < 5; row++) {
     for (let col = 0; col < 9; col++) {
-      const centerPoints = calculateAllCenterPoints();
       const { x, y } = centerPoints[boardPosition];
       const specialTile = mapData.find((tile) => tile.col === col && tile.row === row);
       const tile = createTileData({
