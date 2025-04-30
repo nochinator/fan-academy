@@ -104,7 +104,6 @@ export class Tile extends Phaser.GameObjects.Container {
   setHighlight() {
     this.baseRectangle.setFillStyle(0x0080ff, 0.3);
     this.isHighlighted = this.baseRectangle.isFilled;
-    console.log(this.baseRectangle.fillAlpha);
   }
 
   clearHighlight() {

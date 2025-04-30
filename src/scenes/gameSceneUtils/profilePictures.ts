@@ -1,7 +1,7 @@
 import { IGame } from "../../interfaces/gameInterface";
-import GameScene from "../game.scene";
+import UIScene from "../ui.scene";
 
-export async function loadProfilePictures(context: GameScene, gameList: IGame[]): Promise<void> {
+export async function loadProfilePictures(context: UIScene, gameList: IGame[]): Promise<void> {
   if (gameList.length === 0) return;
 
   const allPlayerObjects: {

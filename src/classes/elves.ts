@@ -1,7 +1,7 @@
-import { IHero } from "../interfaces/gameInterface";
-import { Hero } from "./hero";
-import GameScene from "../scenes/game.scene";
 import { createElvesImpalerData, createElvesNecromancerData, createElvesPhantomData, createElvesPriestessData, createElvesVoidMonkData, createElvesWraithData } from "../gameData/elvesHeroData";
+import { IHero } from "../interfaces/gameInterface";
+import GameScene from "../scenes/game.scene";
+import { Hero } from "./hero";
 
 export class Impaler extends Hero {
   constructor(context: GameScene, data: Partial<IHero>) {

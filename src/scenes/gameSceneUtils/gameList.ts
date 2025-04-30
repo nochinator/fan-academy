@@ -1,13 +1,13 @@
 import { EFaction } from "../../enums/gameEnums";
 import { IGame, IPlayerData } from "../../interfaces/gameInterface";
-import { createGame, joinGame } from "../../lib/colyseusGameRoom";
+import { createGame } from "../../lib/colyseusGameRoom";
 import { deleteGame, getGameList } from "../../queries/gameQueries";
 import { createNewGameBoardState, createNewGameFactionState } from "../../utils/createGameState";
-import GameScene from "../game.scene";
-import { accessGame } from "./gameAssets";
+import UIScene from "../ui.scene";
+import { accessGame } from "./gameMenuUI";
 import { loadProfilePictures } from "./profilePictures";
 
-export async function createGameList(context: GameScene, colyseusGameList?: IGame[]) {
+export async function createGameList(context: UIScene, colyseusGameList?: IGame[]) {
   // Check if the game list is coming from a colyseus update or if it needs to be fetched
   let gameList: IGame[];
   if (colyseusGameList) {
@@ -96,7 +96,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
       if (game.status === 'playing' && opponent) {
         gameListButtonImage.setInteractive();
         gameListButtonImage.on('pointerdown', async () => {
-          await accessGame(context, game, opponent);
+          await accessGame(context, game, opponent.userData._id);
         });
       }
 
@@ -119,7 +119,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
     // Create the faction's deck and starting hand
     if (context.userId) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL);
-      const boardState = createNewGameBoardState(context);
+      const boardState = createNewGameBoardState();
       await createGame(context.colyseusClient, context.userId, playerFaction, boardState, context);
     } else {
       console.error('No userId when creating a new game');
@@ -130,7 +130,7 @@ export async function createGameList(context: GameScene, colyseusGameList?: IGam
     // Create the faction's deck and starting hand
     if (context.userId) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.DARK_ELVES);
-      const boardState = createNewGameBoardState(context);
+      const boardState = createNewGameBoardState();
       await createGame(context.colyseusClient, context.userId, playerFaction, boardState, context);
     } else {
       console.error('No userId when creating a new game');

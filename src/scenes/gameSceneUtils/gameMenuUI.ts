@@ -1,8 +1,9 @@
 import { EFaction } from "../../enums/gameEnums";
-import GameScene from "../game.scene";
-import { createGameList } from "./gameList";
+import { IGame } from "../../interfaces/gameInterface";
+import { joinGame } from "../../lib/colyseusGameRoom";
+import UIScene from "../ui.scene";
 
-export function loadGameMenuUI(context: GameScene) {
+export function loadGameMenuUI(context: UIScene) {
   context.load.image('uiBackground', '/assets/ui/used/game_screen.png');
   context.load.image('createGame', '/assets/ui/used/create_game.png');
   context.load.image('gameListButton', '/assets/ui/used/game_list_premade.png');
@@ -14,12 +15,22 @@ export function loadGameMenuUI(context: GameScene) {
   context.load.image('closeButton', '/assets/ui/used/close_button.png');
 }
 
-export async function  createGameMenuUI(context: GameScene) {
-  // Background game screen
-  context.add.image(0, 0, 'uiBackground').setOrigin(0, 0);
+export async function accessGame(context: UIScene, game: IGame, opponentId: string): Promise<void> {
+  if (context.currentRoom) {
+    console.log('Leaving game: ', context.currentRoom.roomId);
+    await context.currentRoom.leave();
+    context.currentRoom = undefined;
+    context.scene.stop('GameScene');
+  }
 
-  // Game list
-  await createGameList(context);
+  console.log('Accessing game: ', game._id);
+  const room = await joinGame(context.colyseusClient, context.userId, game._id, context);
 
-  if (!context.currentGame) context.add.image(397, 15, 'createGame').setOrigin(0, 0).setScale(1.06, 1.2);
+  context.scene.launch('GameScene', {
+    userId: context.userId,
+    colyseusClient: context.colyseusClient,
+    currentGame: game,
+    currentRoom: room,
+    opponentId
+  });
 }

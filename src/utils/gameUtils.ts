@@ -2,6 +2,7 @@ import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import UIScene from "../scenes/ui.scene";
 
 // Fisher-Yates shuffle algorithm
 export function shuffleArray(array: (IHero | IItem)[]): (IHero | IItem)[] {

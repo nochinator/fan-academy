@@ -1,10 +1,7 @@
-import { IHero } from "../interfaces/gameInterface";
-import { EItems } from "../enums/gameEnums";
-import { Hero } from "./hero";
-import { Item } from "./item";
-import GameScene from "../scenes/game.scene";
 import { createCouncilArcherData, createCouncilClericData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "../gameData/councilHeroData";
-import { createItemData } from "../gameData/itemData";
+import { IHero } from "../interfaces/gameInterface";
+import GameScene from "../scenes/game.scene";
+import { Hero } from "./hero";
 
 export class Archer extends Hero {
   constructor(context: GameScene, data: Partial<IHero>) {

@@ -1,6 +1,7 @@
 import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import { debugHitArea } from "../utils/debugHitArea";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 
 export class Hero extends Phaser.GameObjects.Container {
@@ -99,12 +100,14 @@ export class Hero extends Phaser.GameObjects.Container {
     addTween(this.healReticle);
 
     // Add all individual images to container
-    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage, this.attackReticle, this.healReticle]).setSize(50, 50).setInteractive().setName(this.unitId);
+    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage, this.attackReticle, this.healReticle]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(y);
 
     // Hide if in deck
     if (this.boardPosition === 51) this.setVisible(false);
 
     makeUnitClickable(this, context);
+
+    this.scene.input.enableDebug(this);
 
     context.add.existing(this);
     context.currentGameContainer?.add(this);
@@ -128,6 +131,8 @@ export class Hero extends Phaser.GameObjects.Container {
     this.x = x;
     this.y = y;
     this.boardPosition = boardPosition;
+    debugHitArea(this.context, this);
+    console.log('unit depth', this.depth);
   }
 
   exportData(): IHero {

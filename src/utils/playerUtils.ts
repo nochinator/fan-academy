@@ -1,4 +1,3 @@
-import { Game } from "phaser";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { EClass } from "../enums/gameEnums";

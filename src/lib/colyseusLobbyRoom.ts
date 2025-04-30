@@ -1,8 +1,8 @@
 import { Client } from "colyseus.js";
 import { createGameList } from "../scenes/gameSceneUtils/gameList";
-import GameScene from "../scenes/game.scene";
+import UIScene from "../scenes/ui.scene";
 
-export async function connectToGameLobby(client: Client | undefined, userId: string | undefined, context: GameScene): Promise<void> {
+export async function connectToGameLobby(client: Client | undefined, userId: string | undefined, context: UIScene): Promise<void> {
   if (!client || !userId) return;
 
   try {

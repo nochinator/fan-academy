@@ -7,8 +7,11 @@ import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   unit.on('pointerdown', () => {
-    // Only the active player can activate units (obviously), and only if it still have actions available
+    console.log('Clicking unit logs');
+    // Only the active player can click on tiles, and only if they still have actions available
     if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
+
+    console.log('currentturnaction', context.currentTurnAction);
 
     const activeUnit = context.activeUnit;
     const isFriendly = belongsToPlayer(context, unit);
@@ -73,7 +76,9 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
 export function makeTileClickable(tile: Tile, context: GameScene): void {
   tile.on('pointerdown', () => {
-    if (context.activePlayer !== context.userId) return; // Only the active player can click on tiles
+    console.log('clicking tile logs');
+    // Only the active player can click on tiles, and only if they still have actions available
+    if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
 
     const activeUnit = context.activeUnit;
     const gameController = context.gameController;

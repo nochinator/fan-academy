@@ -1,5 +1,9 @@
+import { EAction } from "../enums/gameEnums";
+import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
+import { sendTurnMessage } from "../lib/colyseusGameRoom";
 import GameScene from "../scenes/game.scene";
 import { isHero } from "../utils/gameUtils";
+import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
 import { Deck } from "./deck";
@@ -10,11 +14,6 @@ import { Hero } from "./hero";
 import { Item } from "./item";
 import { Tile } from "./tile";
 import { TurnButton } from "./turnButton";
-import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
-import { EAction } from "../enums/gameEnums";
-import { createGameAssets } from "../scenes/gameSceneUtils/gameAssets";
-import { sendTurnMessage } from "../lib/colyseusGameRoom";
-import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 
 export class GameController {
   context: GameScene;
@@ -47,8 +46,7 @@ export class GameController {
   }
 
   async resetTurn() {
-    console.log(this.hand);
-    createGameAssets(this.context);
+    this.context.scene.restart();
   }
 
   getDeck() {
@@ -92,9 +90,9 @@ export class GameController {
     this.drawUnits();
     this.door.updateBannerText();
 
-    this.context.activePlayer = this.context.currentOpponent;
+    this.context.activePlayer = this.context.opponentId;
 
-    sendTurnMessage(this.context.currentRoom, this.context.currentGame!.currentState, this.context.currentOpponent);
+    sendTurnMessage(this.context.currentRoom, this.context.currentGame!.currentState, this.context.opponentId);
   }
 
   onHeroClicked(hero: Hero) {
@@ -153,6 +151,8 @@ export class GameController {
     startTile.removeHero();
 
     this.afterAction(EAction.MOVE, hero);
+
+    console.log(`Hero moved to y=${hero.y}, hit area:`, hero.input?.hitArea);
   }
 
   afterAction(actionType: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
