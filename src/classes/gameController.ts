@@ -92,7 +92,7 @@ export class GameController {
 
     this.context.activePlayer = this.context.opponentId;
 
-    sendTurnMessage(this.context.currentRoom, this.context.currentGame!.currentState, this.context.opponentId);
+    sendTurnMessage(this.context.currentRoom, this.context.currentGame.currentState, this.context.opponentId);
   }
 
   onHeroClicked(hero: Hero) {

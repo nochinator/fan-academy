@@ -59,11 +59,14 @@ function subscribeToGameListeners(room: Room, context: UIScene): void {
   // Listen for broadcasted messages, received only by opponent
   room.onMessage("turnPlayed", (message: ITurnSentMessage) => {
     console.log("Player sent turn:", message);
-    // if (message.roomId === context.currentGame?._id) {
-    // context.currentGame = message.game;
-    // context.activePlayer = message.newActivePlayer;
-    // createGameAssets(context);
-    // } // FIXME: find a way to share updates with the game
+    if (message.roomId === context.currentRoom?.roomId) {
+      context.scene.get('GameScene').scene.restart({
+        userId: context.userId,
+        colyseusClient: context.colyseusClient,
+        currentGame: message.game,
+        currentRoom: room
+      });
+    } // FIXME: find a way to share updates with the game
   });
 }
 

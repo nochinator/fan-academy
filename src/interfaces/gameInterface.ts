@@ -6,7 +6,7 @@ import { EAction, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems, E
 export interface ITurnSentMessage {
   roomId: string;
   game: IGame;
-  newActivePlayer: string; // REVIEW: only game is sent by BE, remove other properties if not used later
+  newActivePlayer: string;
 }
 
 /**

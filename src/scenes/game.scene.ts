@@ -2,7 +2,7 @@ import { Client, Room } from "colyseus.js";
 import { GameController } from "../classes/gameController";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
-import { Coordinates, IGame, IPlayerState } from "../interfaces/gameInterface";
+import { Coordinates, IGame, IPlayerData, IPlayerState } from "../interfaces/gameInterface";
 import { calculateAllCenterPoints } from "../utils/boardCalculations";
 import { loadGameAssets } from "./gameSceneUtils/gameAssets";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
@@ -38,15 +38,14 @@ export default class GameScene extends Phaser.Scene {
     colyseusClient: Client,
     currentGame: IGame,
     currentRoom: Room,
-    opponentId: string
   }) {
-    console.log('thisdata', this.data);
     this.currentGameContainer = this.add.container(0, 0);
     this.userId = data.userId;
     this.colyseusClient = data.colyseusClient;
     this.currentGame = data.currentGame;
     this.currentRoom = data.currentRoom;
-    this.opponentId = data.opponentId;
+    const opponent = data.currentGame.players.find((p: IPlayerData) => data.userId !== p.userData._id);
+    this.opponentId = opponent!.userData._id;
 
     // Updating GameScene properties
     this.activePlayer =  this.currentGame.activePlayer.toString();

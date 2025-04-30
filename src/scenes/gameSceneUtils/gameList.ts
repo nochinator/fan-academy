@@ -96,7 +96,7 @@ export async function createGameList(context: UIScene, colyseusGameList?: IGame[
       if (game.status === 'playing' && opponent) {
         gameListButtonImage.setInteractive();
         gameListButtonImage.on('pointerdown', async () => {
-          await accessGame(context, game, opponent.userData._id);
+          await accessGame(context, game);
         });
       }
 
