@@ -120,7 +120,7 @@ export async function createGameList(context: UIScene, colyseusGameList?: IGame[
     if (context.userId) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL);
       const boardState = createNewGameBoardState();
-      await createGame(context.colyseusClient, context.userId, playerFaction, boardState, context);
+      await createGame(context, playerFaction, boardState);
     } else {
       console.error('No userId when creating a new game');
     }
@@ -131,7 +131,7 @@ export async function createGameList(context: UIScene, colyseusGameList?: IGame[
     if (context.userId) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.DARK_ELVES);
       const boardState = createNewGameBoardState();
-      await createGame(context.colyseusClient, context.userId, playerFaction, boardState, context);
+      await createGame(context, playerFaction, boardState);
     } else {
       console.error('No userId when creating a new game');
     }

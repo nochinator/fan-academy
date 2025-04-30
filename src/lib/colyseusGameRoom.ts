@@ -2,15 +2,16 @@ import { Client, Room } from "colyseus.js";
 import { IFaction, IGameState, ITile, ITurnSentMessage } from "../interfaces/gameInterface";
 import UIScene from "../scenes/ui.scene";
 
-export async function createGame(client: Client | undefined, userId: string | undefined, faction: IFaction | undefined, boardState: ITile[] | undefined, context: UIScene): Promise<void> {
-  if (!client || !userId || !faction) {
+export async function createGame(context: UIScene, faction: IFaction | undefined, boardState: ITile[] | undefined ): Promise<void> {
+  const { colyseusClient, userId } = context;
+  if (!colyseusClient || !userId || !faction) {
     console.log('createGame error: missing one of client / userId / faction');
     return;
   }
   try {
     console.log('Checking for open games | creating a new game...');
 
-    const room = await client.create('game_room', {
+    const room = await colyseusClient.create('game_room', {
       userId,
       faction,
       boardState
