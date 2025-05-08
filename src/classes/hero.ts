@@ -85,14 +85,14 @@ export class Hero extends Phaser.GameObjects.Container {
     const addTween = (reticle: Phaser.GameObjects.Image) => {
       context.tweens.add({
         targets: reticle,
-        scale: {
-          from: 0.8,
-          to: 1
-        },
-        duration: 500,
-        yoyo: true,
-        repeat: -1, // Repeat forever
-        ease: 'Sine.easeInOut'
+        angle: 360,
+        duration: 7000,
+        repeat: -1,
+        ease: 'Linear',
+        onRepeat: () => {
+          // Reset the angle to 0 each time to prevent overflow
+          reticle.angle = 0;
+        }
       });
     };
     addTween(this.attackReticle);
