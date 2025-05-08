@@ -6,7 +6,6 @@ export class TurnButton {
     this.context = context;
     const turnButton =  context.add.image(0, 0, 'turnButton').setOrigin(0.5).setPosition(1300, 725).setScale(1.1);
     if (context.activePlayer === context.userId) turnButton.setInteractive(); // REVIEW: might not trigger in some cases
-    context.currentGameContainer?.add(turnButton);
 
     // Sending a turn
     turnButton.on('pointerdown', async () => {

@@ -15,7 +15,6 @@ export default class GameScene extends Phaser.Scene {
   currentRoom!: Room;
   currentGame!: IGame;
   currentTurnAction: number | undefined;
-  currentGameContainer: Phaser.GameObjects.Container | undefined;
 
   activeUnit: Hero | Item |  undefined;
 
@@ -39,7 +38,6 @@ export default class GameScene extends Phaser.Scene {
     currentGame: IGame,
     currentRoom: Room,
   }) {
-    this.currentGameContainer = this.add.container(0, 0);
     this.userId = data.userId;
     this.colyseusClient = data.colyseusClient;
     this.currentGame = data.currentGame;

@@ -37,13 +37,10 @@ export class Item extends Phaser.GameObjects.Image {
     makeUnitClickable(this, context);
 
     // Making the item not visible if it's in the deck (board position 51)
-    if (this.boardPosition === 51) {
-      this.setVisible(false).disableInteractive();
-    }
+    if (this.boardPosition === 51) this.setVisible(false).disableInteractive();
 
     const displaySize = this.itemType === EItems.SUPERCHARGE || this.itemType === EItems.SHINING_HELM ? 55 : 100; // REVIEW: better way of doing this
-    context.add.existing(this).setDisplaySize(displaySize, displaySize).setDepth(10).setInteractive().setName(this.unitId);
-    context.currentGameContainer?.add(this);
+    context.add.existing(this).setDisplaySize(displaySize, displaySize).setDepth(this.boardPosition).setInteractive().setName(this.unitId);
   }
 
   get isActive() {

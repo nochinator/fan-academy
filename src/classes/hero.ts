@@ -1,7 +1,6 @@
 import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { debugHitArea } from "../utils/debugHitArea";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 
 export class Hero extends Phaser.GameObjects.Container {
@@ -9,7 +8,7 @@ export class Hero extends Phaser.GameObjects.Container {
   faction: EFaction;
   unitType: EHeroes;
   unitId: string;
-  boardPosition: number; // if position 0, not visible
+  boardPosition: number;
   maxHealth: number;
   currentHealth: number;
   isKO: boolean;
@@ -62,25 +61,25 @@ export class Hero extends Phaser.GameObjects.Container {
     this.canHeal = data.canHeal ?? false;
 
     // Create the unit's image and images for its upgrades
-    this.characterImage = context.add.image(0, -10, this.unitType).setOrigin(0.5).setDepth(10).setName('body');
+    this.characterImage = context.add.image(0, -10, this.unitType).setOrigin(0.5).setName('body');
     if (this.belongsTo === 2 && this.boardPosition < 45) this.characterImage.setFlipX(true);
 
-    this.runeMetalImage = context.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.3).setDepth(10).setName('runeMetal');
+    this.runeMetalImage = context.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.3).setName('runeMetal');
     if (!this.runeMetal) this.runeMetalImage.setVisible(false);
 
-    this.shiningHelmImage = context.add.image(-28, 25, 'shiningHelm').setOrigin(0.5).setScale(0.3).setDepth(10).setName('shiningHelm');
+    this.shiningHelmImage = context.add.image(-28, 25, 'shiningHelm').setOrigin(0.5).setScale(0.3).setName('shiningHelm');
     if (!this.shiningHelm) this.shiningHelmImage.setVisible(false);
 
     if (this.faction === EFaction.COUNCIL) {
-      this.factionBuffImage = context.add.image(5, 25, 'dragonScale').setOrigin(0.5).setScale(0.3).setDepth(10).setName('dragonScale');
+      this.factionBuffImage = context.add.image(5, 25, 'dragonScale').setOrigin(0.5).setScale(0.3).setName('dragonScale');
     } else {
-      this.factionBuffImage = context.add.image(5, 25, 'soulStone').setOrigin(0.5).setScale(0.3).setDepth(10).setName('soulStone');
+      this.factionBuffImage = context.add.image(5, 25, 'soulStone').setOrigin(0.5).setScale(0.3).setName('soulStone');
     } // Using else here removes a bunch of checks on factionBuff being possibly undefined
     if (!this.factionBuff) this.factionBuffImage.setVisible(false);
 
     // Add attack and healing reticles
-    this.attackReticle = context.add.image(0, -10, 'attackReticle').setOrigin(0.5).setScale(0.8).setDepth(10).setName('attackReticle').setVisible(false);
-    this.healReticle = context.add.image(0, -10, 'healReticle').setOrigin(0.5).setScale(0.8).setDepth(10).setName('healReticle').setVisible(false);
+    this.attackReticle = context.add.image(0, -10, 'attackReticle').setOrigin(0.5).setScale(0.8).setName('attackReticle').setVisible(false);
+    this.healReticle = context.add.image(0, -10, 'healReticle').setOrigin(0.5).setScale(0.8).setName('healReticle').setVisible(false);
 
     // Add animations to the reticles // TODO: rotate the animation
     const addTween = (reticle: Phaser.GameObjects.Image) => {
@@ -100,7 +99,7 @@ export class Hero extends Phaser.GameObjects.Container {
     addTween(this.healReticle);
 
     // Add all individual images to container
-    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage, this.attackReticle, this.healReticle]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(y);
+    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage, this.attackReticle, this.healReticle]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(this.boardPosition + 10); // REVIEW: depth
 
     // Hide if in deck
     if (this.boardPosition === 51) this.setVisible(false);
@@ -110,7 +109,6 @@ export class Hero extends Phaser.GameObjects.Container {
     this.scene.input.enableDebug(this);
 
     context.add.existing(this);
-    context.currentGameContainer?.add(this);
   }
 
   get isActive() {
@@ -131,8 +129,6 @@ export class Hero extends Phaser.GameObjects.Container {
     this.x = x;
     this.y = y;
     this.boardPosition = boardPosition;
-    debugHitArea(this.context, this);
-    console.log('unit depth', this.depth);
   }
 
   exportData(): IHero {

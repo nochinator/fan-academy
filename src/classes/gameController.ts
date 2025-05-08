@@ -85,6 +85,8 @@ export class GameController {
   }
 
   endOfTurnActions() {
+    // If a unit was currently selected, de-select it
+    if (this.context.activeUnit) deselectUnit(this.context);
     // Refresh actionPie, draw units and update door banner
     this.actionPie.resetActionPie();
     this.drawUnits();
@@ -141,6 +143,7 @@ export class GameController {
   moveHero(targetTile: Tile): void {
     const hero = this.context.activeUnit;
     if (!hero || !isHero(hero)) return;
+    hero.depth = 100;
 
     const startTile = this.board.getTileFromBoardPosition(hero.boardPosition);
     if (!startTile) return;
@@ -152,7 +155,7 @@ export class GameController {
 
     this.afterAction(EAction.MOVE, hero);
 
-    console.log(`Hero moved to y=${hero.y}, hit area:`, hero.input?.hitArea);
+    hero.setInteractive();
   }
 
   afterAction(actionType: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
@@ -164,7 +167,7 @@ export class GameController {
     deselectUnit(this.context);
   }
 
-  addActionToState(action: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item) {
+  addActionToState(action: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
     // Assign player and opponent data to player1 and player2
     const { player, opponent } = getPlayersKey(this.context);
 

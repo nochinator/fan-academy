@@ -25,8 +25,7 @@ export class Board {
 
     tiles.forEach(tile => {
       const newTile = new Tile(this.context, tile);
-      if (newTile.hero) new Hero(this.context, newTile.hero); // TODO: refactor to use each specific hero class
-
+      if (newTile.hero) new Hero(this.context, newTile.hero);
       grid.push(newTile);
     });
 
@@ -54,7 +53,9 @@ export class Board {
     this.highlightTiles(spawns);
   }
 
-  highlightEnemyTargets(hero: Hero): void {}
+  highlightEnemyTargets(hero: Hero): void {
+    // We can use the same function as for the movement but inputting the range
+  }
 
   highlightFriendlyTargets(unit: Hero | Item) {}
 

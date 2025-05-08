@@ -8,6 +8,7 @@ import { deselectUnit, selectUnit } from "./playerUtils";
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   unit.on('pointerdown', () => {
     console.log('Clicking unit logs');
+    console.log(`Unit in ${unit.boardPosition}`);
     // Only the active player can click on tiles, and only if they still have actions available
     if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
 

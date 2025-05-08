@@ -48,7 +48,6 @@ export class Hand {
         }
       }
     });
-    console.log('ADDTOHAND', this.hand);
   }
 
   removeFromHand(unitToRemove: IHero | IItem): void {

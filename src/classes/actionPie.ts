@@ -31,7 +31,6 @@ export class ActionPie extends Phaser.GameObjects.Container {
     this.add([this.actionCircle, this.actionPie1, this.actionPie2, this.actionPie3, this.actionPie4, this.actionPie5, this.actionArrow]);
 
     context.add.existing(this);
-    context.currentGameContainer?.add(this);
   }
 
   resetActionPie() {

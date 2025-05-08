@@ -30,7 +30,6 @@ export class Door extends Phaser.GameObjects.Container {
     this.setSize(70, 100).setInteractive();
 
     context.add.existing(this);
-    context.currentGameContainer?.add(this);
   }
 
   updateBannerText(): void {

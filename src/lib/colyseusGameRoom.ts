@@ -80,7 +80,6 @@ export function sendTurnMessage(currentRoom: Room | undefined, currentTurn: IGam
     return;
   }
 
-  console.log('ROOMID', currentRoom.roomId);
   currentRoom.send("turnSent", {
     _id: currentRoom.roomId,
     newTurn: currentTurn,

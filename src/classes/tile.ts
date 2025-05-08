@@ -59,11 +59,10 @@ export class Tile extends Phaser.GameObjects.Container {
       this.add(tileIcon);
     }
 
-    this.setSize(90, 90).setInteractive();
+    this.setSize(90, 90).setInteractive().setDepth(2);
     makeTileClickable(this, context);
 
     context.add.existing(this);
-    context.currentGameContainer?.add(this);
   }
 
   getTileData(): ITile {

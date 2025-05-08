@@ -17,7 +17,6 @@ export async function getGameList(userId: string): Promise<IGame[] | []> {
   }
 
   console.log('Game list fetched...');
-  console.log('Game list', JSON.stringify(games));
   return games;
 }
 
