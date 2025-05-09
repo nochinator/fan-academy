@@ -3,7 +3,7 @@ import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 
-export class Hero extends Phaser.GameObjects.Container {
+export abstract class Hero extends Phaser.GameObjects.Container {
   class: EClass = EClass.HERO;
   faction: EFaction;
   unitType: EHeroes;
@@ -168,16 +168,13 @@ export class Hero extends Phaser.GameObjects.Container {
     this.setScale(1);
   }
 
-  move(x: number, y: number): void {
-    // Define how the unit moves
-    // TODO: we need a range of movement and range of attack functions
-  }
+  abstract move(x: number, y: number): void;
 
-  attack(target: Hero): void {
-    // Define how the unit attacks
-  }
+  abstract attack(target: Hero): void;
 
-  heal(target: Hero): void {
-    // Check if unit can heal and if target should be healed or revived
-  }
+  abstract heal(target: Hero): void;
+
+  abstract revive(target: Hero): void;
+
+  abstract teleport(target: Hero): void;
 }

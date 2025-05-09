@@ -117,8 +117,47 @@ export class GameController {
     console.log(`A tile ${tile.tileType} has been clicked`);
   }
 
+  afterAction(actionType: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
+    // Add action to current state
+    this.addActionToState(actionType, activeUnit, targetUnit);
+    // Remove a slice from the action pie
+    this.actionPie.hideActionSlice(this.context.currentTurnAction!++);
+    // Deselect unit and clear highlights
+    deselectUnit(this.context);
+  }
+
+  addActionToState(action: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
+    // Assign player and opponent data to player1 and player2
+    const { player, opponent } = getPlayersKey(this.context);
+
+    const playerState: IPlayerState = {
+      ...this.context[player]!,
+      factionData: {
+        ...this.context[player]!.factionData,
+        unitsInHand: this.hand.exportHandData()
+      }
+    };
+    const opponentState = this.context[opponent];
+    // Add action to turn state
+    this.game.currentState.push({
+      player1: this.context.isPlayerOne ? playerState : opponentState!,
+      player2: !this.context.isPlayerOne ? playerState : opponentState!,
+      action: {
+        activeUnit: activeUnit.exportData(),
+        targetUnit: targetUnit ? targetUnit.exportData() : activeUnit.exportData(),
+        action,
+        actionNumber: this.context.currentTurnAction!
+      },
+      boardState: this.board.getBoardState()
+    });
+  }
+
   /**
+   *
+   *
    * ACTIONS
+   *
+   *
    */
   spawnHero(tile: Tile): void {
     const hero = this.context.activeUnit;
@@ -156,41 +195,6 @@ export class GameController {
     this.afterAction(EAction.MOVE, hero);
 
     hero.setInteractive();
-  }
-
-  afterAction(actionType: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
-    // Add action to current state
-    this.addActionToState(actionType, activeUnit, targetUnit);
-    // Remove a slice from the action pie
-    this.actionPie.hideActionSlice(this.context.currentTurnAction!++);
-    // Deselect unit and clear highlights
-    deselectUnit(this.context);
-  }
-
-  addActionToState(action: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
-    // Assign player and opponent data to player1 and player2
-    const { player, opponent } = getPlayersKey(this.context);
-
-    const playerState: IPlayerState = {
-      ...this.context[player]!,
-      factionData: {
-        ...this.context[player]!.factionData,
-        unitsInHand: this.hand.exportHandData()
-      }
-    };
-    const opponentState = this.context[opponent];
-    // Add action to turn state
-    this.game.currentState.push({
-      player1: this.context.isPlayerOne ? playerState : opponentState!,
-      player2: !this.context.isPlayerOne ? playerState : opponentState!,
-      action: {
-        activeUnit: activeUnit.exportData(),
-        targetUnit: targetUnit ? targetUnit.exportData() : activeUnit.exportData(),
-        action,
-        actionNumber: this.context.currentTurnAction!
-      },
-      boardState: this.board.getBoardState()
-    });
   }
 
   aoeSpell(tile: Tile): void {

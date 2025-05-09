@@ -36,8 +36,8 @@ export function selectUnit(context: GameScene, unit: Hero | Item): void {
   console.log(unit.exportData());
 
   // Highlight tiles
-  if (unit.class === EClass.HERO) context.gameController?.onHeroClicked(unit as Hero); // FIXME:
-  if (unit.class === EClass.ITEM) context.gameController?.onItemClicked(unit as Item); // FIXME:
+  if (unit.class === EClass.HERO) context.gameController?.onHeroClicked(unit as Hero);
+  if (unit.class === EClass.ITEM) context.gameController?.onItemClicked(unit as Item);
 }
 
 export function deselectUnit(context: GameScene): void {

@@ -1,6 +1,7 @@
 import { ERange, ETiles } from "../enums/gameEnums";
 import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import { createNewHero, getGridDistance } from "../utils/gameUtils";
 import { Hero } from "./hero";
 import { Tile } from "./tile";
 
@@ -24,7 +25,7 @@ export class Board {
 
     tiles.forEach(tile => {
       const newTile = new Tile(this.context, tile);
-      if (newTile.hero) new Hero(this.context, newTile.hero);
+      if (newTile.hero) createNewHero(this.context, newTile.hero);
       grid.push(newTile);
     });
 
@@ -148,7 +149,8 @@ export class Board {
     }
 
     this.tiles.forEach(tile => {
-      const distance = Math.abs(tile.row - heroTile.row) + Math.abs(tile.col - heroTile.col);
+      // const distance = Math.abs(tile.row - heroTile.row) + Math.abs(tile.col - heroTile.col);
+      const distance = getGridDistance(tile.row, tile.col, heroTile.row, heroTile.col);
 
       if (distance <= range) {
         if (rangeType === ERange.MOVE && !tile.isOccupied()) inRangeTiles.push(tile);

@@ -1,5 +1,8 @@
+import { Archer, Cleric, Knight, Ninja, Wizard } from "../classes/council";
+import { Priestess, Impaler, Necromancer, Phantom, Wraith, VoidMonk } from "../classes/elves";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
+import { EHeroes } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
@@ -36,4 +39,29 @@ export function isInHand(boardPosition: number): boolean {
 export function belongsToPlayer(context: GameScene, unit: Hero | Item): boolean {
   const playerNumber = context.isPlayerOne ? 1 : 2;
   return unit.belongsTo === playerNumber;
+}
+
+export function getGridDistance(startRow: number, startColumn: number, targetRow: number, targetColumn: number): number {
+  return Math.abs(startRow - targetRow) + Math.abs(startColumn - targetColumn);
+}
+
+export function createNewHero(context: GameScene, heroData: IHero): Hero {
+  const heroTypes: Record<EHeroes, () => Hero> = {
+    [EHeroes.ARCHER]: () => new Archer(context, heroData),
+    [EHeroes.CLERIC]: () => new Cleric(context, heroData),
+    [EHeroes.KNIGHT]: () => new Knight(context, heroData),
+    [EHeroes.NINJA]: () => new Ninja(context, heroData),
+    [EHeroes.WIZARD]: () => new Wizard(context, heroData),
+
+    [EHeroes.PRIESTESS]: () => new Priestess(context, heroData),
+    [EHeroes.IMPALER]: () => new Impaler(context, heroData),
+    [EHeroes.NECROMANCER]: () => new Necromancer(context, heroData),
+    [EHeroes.PHANTOM]: () => new Phantom(context, heroData),
+    [EHeroes.VOIDMONK]: () => new VoidMonk(context, heroData),
+    [EHeroes.WRAITH]: () => new Wraith(context, heroData)
+  };
+
+  const createHero = heroTypes[heroData.unitType];
+  if (!createHero) console.error('Error creating hero', heroData);
+  return createHero();
 }
