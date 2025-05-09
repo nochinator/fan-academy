@@ -18,7 +18,8 @@ export function createCouncilArcherData(data: Partial<IHero>): IHero {
     currentHealth: data.currentHealth ?? maxHealth,
     isKO: data.isKO ?? false,
     movement: 2,
-    range: 3,
+    attackRange: 3,
+    healingRange: 0,
     attackType: EAttackType.PHYSICAL,
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
@@ -47,7 +48,8 @@ export function createCouncilWizardData(data: Partial<IHero>): IHero {
     currentHealth: data.currentHealth ?? maxHealth,
     isKO: data.isKO ?? false,
     movement: 2,
-    range: 2,
+    attackRange: 2,
+    healingRange: 0,
     attackType: EAttackType.MAGICAL,
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
@@ -76,7 +78,8 @@ export function createCouncilKnightData(data: Partial<IHero>): IHero {
     currentHealth: data.currentHealth ?? maxHealth,
     isKO: data.isKO ?? false,
     movement: 2,
-    range: 1,
+    attackRange: 1,
+    healingRange: 0,
     attackType: EAttackType.PHYSICAL,
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
@@ -106,7 +109,8 @@ export function createCouncilClericData(data: Partial<IHero>): IHero {
     currentHealth: data.currentHealth ?? maxHealth,
     isKO: data.isKO ?? false,
     movement: 2,
-    range: 2,
+    attackRange: 2,
+    healingRange: 2,
     attackType: EAttackType.MAGICAL,
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
@@ -115,7 +119,7 @@ export function createCouncilClericData(data: Partial<IHero>): IHero {
     runeMetal: data.runeMetal ?? false,
     shiningHelm: data.shiningHelm ?? false,
     belongsTo: data.belongsTo ?? 1,
-    canHeal: false
+    canHeal: true
   };
 }
 
@@ -137,7 +141,8 @@ export function createCouncilNinjaData(data: Partial<IHero>): IHero {
     currentHealth: data.currentHealth ?? maxHealth,
     isKO: data.isKO ?? false,
     movement: 3,
-    range: 2,
+    attackRange: 2,
+    healingRange: 0,
     attackType: EAttackType.PHYSICAL,
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,

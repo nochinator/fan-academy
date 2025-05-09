@@ -86,3 +86,9 @@ export enum ETiles {
   SPAWN = 'spawnTile',
   SPEED = 'speedTile'
 }
+
+export enum ERange {
+  MOVE = 'move',
+  ATTACK = 'attack',
+  HEAL = 'healing'
+}

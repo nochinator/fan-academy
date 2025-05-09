@@ -115,7 +115,6 @@ export async function createGameList(context: UIScene, colyseusGameList?: IGame[
 
   // Creating a new game when clicking on the desired faction
   councilEmblem.on('pointerdown', async () => {
-    console.log('listener logs');
     // Create the faction's deck and starting hand
     if (context.userId) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL);
@@ -126,7 +125,6 @@ export async function createGameList(context: UIScene, colyseusGameList?: IGame[
     }
   });
   elvesEmblem.on('pointerdown', async () => {
-    console.log('listener logs');
     // Create the faction's deck and starting hand
     if (context.userId) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.DARK_ELVES);
@@ -191,7 +189,6 @@ export async function createGameList(context: UIScene, colyseusGameList?: IGame[
   let contentOffset = 0;
 
   context.input.on("wheel", (_pointer: Phaser.Input.Pointer, _gameObjects: any, _deltaX: number, deltaY: number, _deltaZ: number ) => {
-    // console.log(contentHeight, visibleHeight, contentOffset);
     if (isHovered && contentHeight > visibleHeight) {
       // Calculate the new offset
       contentOffset -= deltaY * scrollSpeed;

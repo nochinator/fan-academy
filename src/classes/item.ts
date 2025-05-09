@@ -40,7 +40,7 @@ export class Item extends Phaser.GameObjects.Image {
     if (this.boardPosition === 51) this.setVisible(false).disableInteractive();
 
     const displaySize = this.itemType === EItems.SUPERCHARGE || this.itemType === EItems.SHINING_HELM ? 55 : 100; // REVIEW: better way of doing this
-    context.add.existing(this).setDisplaySize(displaySize, displaySize).setDepth(this.boardPosition).setInteractive().setName(this.unitId);
+    context.add.existing(this).setDisplaySize(displaySize, displaySize).setDepth(this.boardPosition + 10).setInteractive().setName(this.unitId);
   }
 
   get isActive() {

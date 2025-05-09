@@ -33,19 +33,18 @@ export function selectUnit(context: GameScene, unit: Hero | Item): void {
   unit.isActive = true;
   context.activeUnit = unit;
 
+  console.log(unit.exportData());
+
   // Highlight tiles
   if (unit.class === EClass.HERO) context.gameController?.onHeroClicked(unit as Hero); // FIXME:
   if (unit.class === EClass.ITEM) context.gameController?.onItemClicked(unit as Item); // FIXME:
 }
 
 export function deselectUnit(context: GameScene): void {
-  console.log('Active unit 1', context.activeUnit);
-
   context.activeUnit!.isActive = false;
   context.activeUnit = undefined;
   // Clear highlighted tiles, if any
   context.gameController?.board.clearHighlights();
-
-  console.log('BOARD', context.gameController?.board.tiles);
-  console.log('Active unit 2', context.activeUnit);
+  // Clear reticles from units, if any
+  context.gameController?.board.removeReticles();
 }

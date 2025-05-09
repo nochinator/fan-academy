@@ -13,7 +13,8 @@ export class Hero extends Phaser.GameObjects.Container {
   currentHealth: number;
   isKO: boolean;
   movement: number;
-  range: number;
+  attackRange: number;
+  healingRange: number;
   attackType: EAttackType;
   power: number;
   physicalDamageResistance: number;
@@ -48,7 +49,8 @@ export class Hero extends Phaser.GameObjects.Container {
     this.currentHealth = data.currentHealth;
     this.isKO = data.isKO;
     this.movement = data.movement;
-    this.range = data.range;
+    this.attackRange = data.attackRange;
+    this.healingRange = data.healingRange;
     this.attackType = data.attackType;
     this.power = data.power;
     this.physicalDamageResistance = data.physicalDamageResistance;
@@ -142,7 +144,8 @@ export class Hero extends Phaser.GameObjects.Container {
       currentHealth: this.currentHealth,
       isKO: this.isKO,
       movement: this.movement,
-      range: this.range,
+      attackRange: this.attackRange,
+      healingRange: this.healingRange,
       attackType: this.attackType,
       power: this.power,
       physicalDamageResistance: this.physicalDamageResistance,

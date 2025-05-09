@@ -7,7 +7,6 @@ import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   unit.on('pointerdown', () => {
-    console.log('Clicking unit logs');
     console.log(`Unit in ${unit.boardPosition}`);
     // Only the active player can click on tiles, and only if they still have actions available
     if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
@@ -39,6 +38,7 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
         if (isHero(activeUnit) && attackReticle?.visible) {
           activeUnit.attack(unit);
+          // Remove reticle when done
           deselectUnit(context);
           return;
         }
@@ -61,6 +61,7 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
         const healReticle = unit.getByName('healReticle') as Phaser.GameObjects.Image;
         if (activeUnit.canHeal && healReticle?.visible) {
           activeUnit.heal(unit);
+          // Remove reticle when done
           deselectUnit(context);
           return;
         }
@@ -77,7 +78,6 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
 export function makeTileClickable(tile: Tile, context: GameScene): void {
   tile.on('pointerdown', () => {
-    console.log('clicking tile logs');
     // Only the active player can click on tiles, and only if they still have actions available
     if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
 

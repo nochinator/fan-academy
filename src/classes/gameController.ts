@@ -98,19 +98,19 @@ export class GameController {
   }
 
   onHeroClicked(hero: Hero) {
-    console.log(`A hero ${hero.boardPosition} has been clicked`);
+    console.log(`A hero in position ${hero.boardPosition} has been clicked`);
     if (hero.boardPosition > 44) this.board.highlightSpawns(this.context.isPlayerOne!);
 
     if (hero.boardPosition < 45) {
-      this.board.highlightEnemyTargets(hero);
-      this.board.highlightFriendlyTargets(hero);
+      this.board.highlightHeroEnemyTargets(hero);
+      this.board.highlighHerotFriendlyTargets(hero);
       this.board.highlightMovementArea(hero);
     }
   }
 
   onItemClicked(item: Item) {
     console.log(`An item ${item.unitId} has been clicked`);
-    this.board.highlightFriendlyTargets(item); // FIXME: this depends on the item. AOE doesn't trigger a highlight
+    // this.board.highlighHerotFriendlyTargets(item); // TODO: create equivalent for items
   }
 
   onTileClicked(tile: Tile) {

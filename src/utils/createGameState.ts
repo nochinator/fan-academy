@@ -2,7 +2,6 @@ import { EFaction, ETiles } from "../enums/gameEnums";
 import { createCouncilFactionData, createElvesFactionData } from "../gameData/factionData";
 import { createTileData } from "../gameData/tileData";
 import { IFaction, ITile } from "../interfaces/gameInterface";
-import UIScene from "../scenes/ui.scene";
 import { calculateAllCenterPoints } from "./boardCalculations";
 import { mapTemplates } from "./maps";
 
@@ -10,7 +9,6 @@ import { mapTemplates } from "./maps";
  * Creates a starting state for a given faction, randomizing the assets in deck and dealing a starting hand
  */
 export function createNewGameFactionState(userId: string, playerFaction: EFaction): IFaction {
-  console.log('CREATEFUNC_PLAYERFACTION', playerFaction);
   const faction: Record<string, IFaction> = {
     [EFaction.COUNCIL]: createCouncilFactionData(userId),
     [EFaction.DARK_ELVES]: createElvesFactionData(userId)
