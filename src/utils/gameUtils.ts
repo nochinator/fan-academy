@@ -85,7 +85,7 @@ export async function moveAnimation(context: GameScene, hero: Hero, targetTile: 
     temporaryFlip = true;
   }
 
-  const moveAnimation = (hero: Hero, targetTile: Tile): Promise<void> => {
+  const animation = (hero: Hero, targetTile: Tile): Promise<void> => {
     return new Promise((resolve) => {
       context.tweens.add({
         targets: hero,
@@ -103,13 +103,13 @@ export async function moveAnimation(context: GameScene, hero: Hero, targetTile: 
     });
   };
 
-  await moveAnimation.call(context, hero, targetTile);
+  await animation.call(context, hero, targetTile);
 }
 
-export async function pushAnimation(context: GameScene, hero: Hero, targetTile: Tile): Promise<void> {
+export async function forcedMoveAnimation(context: GameScene, hero: Hero, targetTile: Tile): Promise<void> {
   context.input.enabled = false;
 
-  const pushAnimation = (hero: Hero, targetTile: Tile): Promise<void> => {
+  const animation = (hero: Hero, targetTile: Tile): Promise<void> => {
     return new Promise((resolve) => {
       context.tweens.add({
         targets: hero,
@@ -118,7 +118,6 @@ export async function pushAnimation(context: GameScene, hero: Hero, targetTile: 
         duration: 200,
         ease: 'Linear',
         onComplete: () => {
-          console.log('Push complete!');
           context.input.enabled = true;
           resolve();
         }
@@ -126,5 +125,26 @@ export async function pushAnimation(context: GameScene, hero: Hero, targetTile: 
     });
   };
 
-  await pushAnimation.call(context, hero, targetTile);
+  await animation.call(context, hero, targetTile);
 };
+
+export function getNewPositionAfterForce(attackerRow: number, attackerCol: number, targetRow: number, targetCol: number, isPush: boolean) {
+  // Direction from attacker to target
+  let directionRow = targetRow - attackerRow;
+  let directionColumn = targetCol - attackerCol;
+
+  // Normalize to single step
+  directionRow = Math.sign(directionRow);
+  directionColumn = Math.sign(directionColumn);
+
+  // For pull, reverse the direction
+  if (!isPush) {
+    directionRow *= -1;
+    directionColumn *= -1;
+  }
+
+  return {
+    row: targetRow + directionRow,
+    col: targetCol + directionColumn
+  };
+}

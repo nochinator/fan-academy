@@ -37,7 +37,7 @@ export class Knight extends Hero {
     target.currentHealth -= this.power;
     if (target.currentHealth <= 0) target.knockedDown();
 
-    await gameController.pushEnemy(this, target, 1);
+    await gameController.pushEnemy(this, target);
 
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
