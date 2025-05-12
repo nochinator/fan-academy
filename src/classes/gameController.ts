@@ -196,6 +196,24 @@ export class GameController {
     this.afterAction(EAction.MOVE, hero);
   }
 
+  async pushEnemy(target: Hero, direction: number, distance: number): Promise<void> {
+    /**
+     * Direction
+     * 1 2 3
+     * 8 T 4
+     * 7 6 5
+     */
+  }
+
+  async pullEnemy(target: Hero, direction: number, distance: number): Promise<void> {
+    /**
+     * Direction
+     * 1 2 3
+     * 8 T 4
+     * 7 6 5
+     */
+  }
+
   aoeSpell(tile: Tile): void {
 
   }
