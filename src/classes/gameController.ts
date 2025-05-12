@@ -2,7 +2,7 @@ import { EAction } from "../enums/gameEnums";
 import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
 import { sendTurnMessage } from "../lib/colyseusGameRoom";
 import GameScene from "../scenes/game.scene";
-import { isHero } from "../utils/gameUtils";
+import { isHero, moveAnimation } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -179,13 +179,14 @@ export class GameController {
     this.afterAction(EAction.SPAWN, hero);
   }
 
-  moveHero(targetTile: Tile): void {
+  async moveHero(targetTile: Tile): Promise<void> {
     const hero = this.context.activeUnit;
     if (!hero || !isHero(hero)) return;
-    hero.depth = 100;
 
     const startTile = this.board.getTileFromBoardPosition(hero.boardPosition);
     if (!startTile) return;
+
+    await moveAnimation(this.context, hero, targetTile);
 
     hero.updatePosition(targetTile.boardPosition);
     targetTile.hero = hero.exportData();
@@ -193,8 +194,6 @@ export class GameController {
     startTile.removeHero();
 
     this.afterAction(EAction.MOVE, hero);
-
-    hero.setInteractive();
   }
 
   aoeSpell(tile: Tile): void {

@@ -2,6 +2,7 @@ import { Archer, Cleric, Knight, Ninja, Wizard } from "../classes/council";
 import { Priestess, Impaler, Necromancer, Phantom, Wraith, VoidMonk } from "../classes/elves";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
+import { Tile } from "../classes/tile";
 import { EHeroes } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
@@ -64,4 +65,44 @@ export function createNewHero(context: GameScene, heroData: IHero): Hero {
   const createHero = heroTypes[heroData.unitType];
   if (!createHero) console.error('Error creating hero', heroData);
   return createHero();
+}
+
+export async function moveAnimation(context: GameScene, hero: Hero, targetTile: Tile): Promise<void> {
+  // Stop user input until the animation finishes playing
+  context.input.enabled = false;
+
+  console.log(targetTile.x, hero.x);
+  const unitImage: Phaser.GameObjects.Image = hero.getByName('body');
+
+  // If the unit is moving backwards, flip the unit's image for the duration of the animation
+  let temporaryFlip: boolean;
+  if (hero.belongsTo === 1 &&  targetTile.x < hero.x) {
+    unitImage.setFlipX(true);
+    temporaryFlip = true;
+  }
+
+  if (hero.belongsTo === 2 &&  targetTile.x > hero.x ) {
+    unitImage.setFlipX(false);
+    temporaryFlip = true;
+  }
+
+  const moveAnimation = (hero: Hero, targetTile: Tile): Promise<void> => {
+    return new Promise((resolve) => {
+      context.tweens.add({
+        targets: hero,
+        x: targetTile.x,
+        y: targetTile.y,
+        duration: 500,
+        ease: 'Linear',
+        onComplete: () => {
+          console.log('Move complete!');
+          context.input.enabled = true;
+          if (temporaryFlip) unitImage.setFlipX(!unitImage.flipX);
+          resolve();
+        }
+      });
+    });
+  };
+
+  await moveAnimation.call(context, hero, targetTile);
 }
