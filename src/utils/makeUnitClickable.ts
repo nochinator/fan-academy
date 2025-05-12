@@ -37,8 +37,8 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
         const attackReticle = unit.getByName('attackReticle') as Phaser.GameObjects.Image;
 
         if (isHero(activeUnit) && attackReticle?.visible) {
+          console.log('this logs');
           activeUnit.attack(unit);
-          deselectUnit(context);
           return;
         }
 

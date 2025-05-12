@@ -32,7 +32,7 @@ export class Board {
     return grid;
   }
 
-  getTile(row: number, col: number) {
+  getTileFromCoordinates(row: number, col: number) {
     return this.tiles.find(tile => tile.row === row && tile.col === col);
   }
 

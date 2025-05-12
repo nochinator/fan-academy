@@ -71,7 +71,6 @@ export async function moveAnimation(context: GameScene, hero: Hero, targetTile: 
   // Stop user input until the animation finishes playing
   context.input.enabled = false;
 
-  console.log(targetTile.x, hero.x);
   const unitImage: Phaser.GameObjects.Image = hero.getByName('body');
 
   // If the unit is moving backwards, flip the unit's image for the duration of the animation
@@ -106,3 +105,26 @@ export async function moveAnimation(context: GameScene, hero: Hero, targetTile: 
 
   await moveAnimation.call(context, hero, targetTile);
 }
+
+export async function pushAnimation(context: GameScene, hero: Hero, targetTile: Tile): Promise<void> {
+  context.input.enabled = false;
+
+  const pushAnimation = (hero: Hero, targetTile: Tile): Promise<void> => {
+    return new Promise((resolve) => {
+      context.tweens.add({
+        targets: hero,
+        x: targetTile.x,
+        y: targetTile.y,
+        duration: 200,
+        ease: 'Linear',
+        onComplete: () => {
+          console.log('Push complete!');
+          context.input.enabled = true;
+          resolve();
+        }
+      });
+    });
+  };
+
+  await pushAnimation.call(context, hero, targetTile);
+};

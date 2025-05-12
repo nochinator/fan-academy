@@ -2,6 +2,7 @@ import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
+import { GameController } from "./gameController";
 
 export abstract class Hero extends Phaser.GameObjects.Container {
   class: EClass = EClass.HERO;
@@ -168,9 +169,29 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.setScale(1);
   }
 
-  abstract move(x: number, y: number): void;
+  knockedDown(): void {
+    const gameController = this.context.gameController;
+    if (!gameController) {
+      console.error('knockedDown() No gameController');
+      return;
+    }
+    this.currentHealth = 0;
+    this.isKO = true;
+    // Update tile
+    const tile = gameController.board.getTileFromBoardPosition(this.boardPosition);
+    if (!tile) {
+      console.error('knockedDown() -> No tile found');
+      return;
+    }
+    tile.setOccupied(false); // REVIEW: might need a rework to function with the necromancer
+    tile.hero = this.exportData();
+
+    // Switch to KO'd image
+  }
 
   abstract attack(target: Hero): void;
+
+  abstract move(x: number, y: number): void;
 
   abstract heal(target: Hero): void;
 

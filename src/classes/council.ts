@@ -1,3 +1,4 @@
+import { EAction } from "../enums/gameEnums";
 import { createCouncilArcherData, createCouncilClericData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "../gameData/councilHeroData";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
@@ -8,13 +9,46 @@ export class Archer extends Hero {
     super(context, createCouncilArcherData(data));
   }
   // TODO: dmg (m/r)
+  override attack(target: Hero): void {
+    console.log('Archer attack logs');
+  }
+
+  move(x: number, y: number): void {};
+
+  heal(target: Hero): void {};
+
+  revive(target: Hero): void {};
+
+  teleport(target: Hero): void {};
 }
 
 export class Knight extends Hero {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilKnightData(data));
   }
-  // TODO: add push to attack
+
+  override async attack(target: Hero): Promise<void> {
+    console.log('Knight attack logs');
+    const gameController = this.context.gameController;
+    if (!gameController) {
+      console.error('hero attack() No gameController found');
+      return;
+    }
+    target.currentHealth -= this.power;
+    if (target.currentHealth <= 0) target.knockedDown();
+
+    await gameController.pushEnemy(this, target, 1);
+
+    gameController?.afterAction(EAction.ATTACK, this, target);
+  }
+
+  move(x: number, y: number): void {};
+
+  heal(target: Hero): void {};
+
+  revive(target: Hero): void {};
+
+  teleport(target: Hero): void {};
 }
 
 export class Wizard extends Hero {
@@ -22,6 +56,17 @@ export class Wizard extends Hero {
     super(context, createCouncilWizardData(data));
   }
   // TODO: add chain attack
+  override attack(target: Hero): void {
+    console.log('Wizard attack logs');
+  }
+
+  move(x: number, y: number): void {};
+
+  heal(target: Hero): void {};
+
+  revive(target: Hero): void {};
+
+  teleport(target: Hero): void {};
 }
 
 export class Ninja extends Hero {
@@ -29,6 +74,17 @@ export class Ninja extends Hero {
     super(context, createCouncilNinjaData(data));
   }
   // TODO: add teleport function and dmg (m/r)
+  override attack(target: Hero): void {
+    console.log('Ninja attack logs');
+  }
+
+  move(x: number, y: number): void {};
+
+  heal(target: Hero): void {};
+
+  revive(target: Hero): void {};
+
+  teleport(target: Hero): void {};
 }
 
 export class Cleric extends Hero {
@@ -36,6 +92,17 @@ export class Cleric extends Hero {
     super(context, createCouncilClericData(data));
   }
   // TODO: add healing/revive functions
+  override attack(target: Hero): void {
+    console.log('Cleric attack logs');
+  }
+
+  move(x: number, y: number): void {};
+
+  heal(target: Hero): void {};
+
+  revive(target: Hero): void {};
+
+  teleport(target: Hero): void {};
 }
 
 // FIXME:

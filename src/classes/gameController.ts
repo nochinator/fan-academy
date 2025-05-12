@@ -2,7 +2,7 @@ import { EAction } from "../enums/gameEnums";
 import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
 import { sendTurnMessage } from "../lib/colyseusGameRoom";
 import GameScene from "../scenes/game.scene";
-import { isHero, moveAnimation } from "../utils/gameUtils";
+import { isHero, moveAnimation, pushAnimation } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -127,6 +127,7 @@ export class GameController {
   }
 
   addActionToState(action: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
+    console.log('addActionToState logs');
     // Assign player and opponent data to player1 and player2
     const { player, opponent } = getPlayersKey(this.context);
 
@@ -196,16 +197,53 @@ export class GameController {
     this.afterAction(EAction.MOVE, hero);
   }
 
-  async pushEnemy(target: Hero, direction: number, distance: number): Promise<void> {
+  async pushEnemy(attacker: Hero, target: Hero, distance: number): Promise<void> {
     /**
      * Direction
      * 1 2 3
      * 8 T 4
      * 7 6 5
      */
+    const attackerTile = this.board.getTileFromBoardPosition(attacker.boardPosition);
+    const targetTile = this.board.getTileFromBoardPosition(target.boardPosition);
+    if (!attackerTile || !targetTile) {
+      console.error('pushEnemy() no attacker or target board position');
+      return;
+    }
+    const direction = {
+      row: targetTile.row - attackerTile.row,
+      col: targetTile.col - attackerTile.col
+    };
+    const pushTile = {
+      row: targetTile.row + direction.row,
+      col: targetTile.col + direction.col
+    };
+
+    // If the tile is beyond the boundaries of the map, ignore
+    if (pushTile.row > 4 || pushTile.col > 8) {
+      console.log('pushEnemy() Cant push enemy out of the map');
+      return;
+    }
+
+    const targetNewTile = this.board.getTileFromCoordinates(pushTile.row, pushTile.col);
+    if (!targetNewTile) {
+      console.error('pushEnemy() No destination tile found');
+      return;
+    }
+    if (targetNewTile?.isOccupied()) {
+      console.log('pushEnemy() Destination tile is occupied');
+      return;
+    }
+
+    await pushAnimation(this.context, target, targetNewTile);
+
+    target.updatePosition(targetNewTile.boardPosition);
+    targetNewTile.hero = target.exportData();
+    targetNewTile.setOccupied(true);
+    targetTile.removeHero();
   }
 
-  async pullEnemy(target: Hero, direction: number, distance: number): Promise<void> {
+  async pullEnemy(attacker: Hero, target: Hero, distance: number): Promise<void> {
     /**
      * Direction
      * 1 2 3
