@@ -188,9 +188,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   revived(): void {
     this.isKO = false;
     this.lastBreath = false;
-    const tile = this.getTile();
-    tile.setOccupied(true);
-    tile.hero = this.exportData();
+    this.updateTileData();
     this.characterImage.angle = 0;
   }
 

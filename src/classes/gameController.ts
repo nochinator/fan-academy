@@ -100,6 +100,8 @@ export class GameController {
       }
     });
 
+    if (!unitsToRemove.length) return;
+
     const animation = (hero: Hero): Promise<void> => {
       return new Promise((resolve) => {
         this.context.tweens.add({
