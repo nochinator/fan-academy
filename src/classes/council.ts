@@ -12,9 +12,8 @@ export class Archer extends Hero {
   override attack(target: Hero): void {
     console.log('Archer attack logs');
     const gameController = this.context.gameController!;
-    const attacker = this.context.activeUnit!;
 
-    const attackerTile = gameController.board.getTileFromBoardPosition(attacker.boardPosition);
+    const attackerTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
     const targetTile = gameController.board.getTileFromBoardPosition(target.boardPosition);
 
     if (!attackerTile || !targetTile) {
@@ -55,11 +54,7 @@ export class Knight extends Hero {
   override async attack(target: Hero): Promise<void> {
     console.log('Knight attack logs');
 
-    const gameController = this.context.gameController;
-    if (!gameController) {
-      console.error('hero attack() No gameController found');
-      return;
-    }
+    const gameController = this.context.gameController!;
 
     target.currentHealth -= this.power;
     if (target.currentHealth <= 0) target.knockedDown();
@@ -125,11 +120,7 @@ export class Cleric extends Hero {
   override attack(target: Hero): void {
     console.log('Cleric attack logs');
 
-    const gameController = this.context.gameController;
-    if (!gameController) {
-      console.error('hero attack() No gameController found');
-      return;
-    }
+    const gameController = this.context.gameController!;
 
     target.currentHealth -= this.power;
     if (target.currentHealth <= 0) target.knockedDown();
