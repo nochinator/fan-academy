@@ -66,7 +66,7 @@ function subscribeToGameListeners(room: Room, context: UIScene): void {
         currentGame: message.game,
         currentRoom: room
       });
-    } // FIXME: find a way to share updates with the game
+    }
   });
 }
 

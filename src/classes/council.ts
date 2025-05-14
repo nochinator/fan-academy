@@ -119,7 +119,15 @@ export class Cleric extends Hero {
 
   move(x: number, y: number): void {};
 
-  heal(target: Hero): void {};
+  override heal(target: Hero): void {
+    if (target.currentHealth === 0) {
+      target.currentHealth += this.power * 2;
+      target.revived();
+    } else {
+      target.currentHealth += this.power * 3;
+    }
+    this.context.gameController?.afterAction(EAction.HEAL, this, target);
+  };
 
   revive(target: Hero): void {};
 

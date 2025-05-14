@@ -14,6 +14,7 @@ export class Board {
   tileSize: number = 90;
   context: GameScene;
   tiles: Tile[];
+  units: Hero[] = [];
 
   constructor(context: GameScene, data: ITile[]) {
     this.context = context;
@@ -25,7 +26,7 @@ export class Board {
 
     tiles.forEach(tile => {
       const newTile = new Tile(this.context, tile);
-      if (newTile.hero) createNewHero(this.context, newTile.hero);
+      if (newTile.hero) this.units.push(createNewHero(this.context, newTile.hero));
       grid.push(newTile);
     });
 

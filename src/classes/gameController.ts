@@ -84,7 +84,52 @@ export class GameController {
     });
   }
 
-  endOfTurnActions() {
+  async removeKOUnits() {
+    console.log('removeKOUnits this logs');
+    // Remove KO'd units from the board
+    const unitsToRemove: Hero[] = [];
+
+    this.board.units.forEach(unit => {
+      if (unit.isKO) {
+        console.log('lastBreath', unit.lastBreath);
+        if (unit.lastBreath) unitsToRemove.push(unit);
+        if (!unit.lastBreath) {
+          unit.lastBreath = true;
+          unit.updateTileData();
+        }
+      }
+    });
+
+    const animation = (hero: Hero): Promise<void> => {
+      return new Promise((resolve) => {
+        this.context.tweens.add({
+          targets: hero,
+          alpha: 0,
+          duration: 500,
+          ease: 'Linear',
+          onComplete: () => {
+            hero.removeFromBoard();
+            console.log('Unit removed from board!');
+            console.log('Hero', hero);
+            console.log('Tiles', this.board.tiles);
+            resolve();
+          }
+        });
+      });
+    };
+
+    await Promise.all(unitsToRemove.map(unit => {
+      console.log('Unit board position', unit.boardPosition);
+      return animation.call(this.context, unit);
+    }));
+
+    const lastAction = this.game.currentState[this.game.currentState.length - 1];
+    lastAction.boardState = this.board.getBoardState();
+  }
+
+  async endOfTurnActions() {
+    // Remove KO'd units
+    await this.removeKOUnits();
     // If a unit was currently selected, de-select it
     if (this.context.activeUnit) deselectUnit(this.context);
     // Refresh actionPie, draw units and update door banner

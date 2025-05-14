@@ -1,6 +1,32 @@
 import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 
+function createGenericCouncilData(data: Partial<IHero>): {
+  class: EClass,
+  faction: EFaction,
+  unitId: string,
+  boardPosition: number,
+  isKO: boolean,
+  factionBuff: boolean,
+  runeMetal: boolean,
+  shiningHelm: boolean,
+  belongsTo: number,
+  lastBreath: boolean
+} {
+  return {
+    class: EClass.HERO,
+    faction: EFaction.COUNCIL,
+    unitId: data.unitId!,
+    boardPosition: data.boardPosition ?? 51,
+    isKO: data.isKO ?? false,
+    lastBreath: data.lastBreath ?? false,
+    factionBuff: data.factionBuff ?? false,
+    runeMetal: data.runeMetal ?? false,
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo: data.belongsTo ?? 1
+  };
+}
+
 export function createCouncilArcherData(data: Partial<IHero>): IHero {
   // Melee damage = 1/2 power
   const maxHealth = 800;
@@ -9,14 +35,9 @@ export function createCouncilArcherData(data: Partial<IHero>): IHero {
   const magicalDamageResistance = 0;
 
   return {
-    class: EClass.HERO,
-    faction: EFaction.COUNCIL,
     unitType: EHeroes.ARCHER,
-    unitId: data.unitId!,
-    boardPosition: data.boardPosition ?? 51,
     maxHealth: data.maxHealth ?? maxHealth,
     currentHealth: data.currentHealth ?? maxHealth,
-    isKO: data.isKO ?? false,
     movement: 2,
     attackRange: 3,
     healingRange: 0,
@@ -24,11 +45,8 @@ export function createCouncilArcherData(data: Partial<IHero>): IHero {
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
-    factionBuff: data.factionBuff ?? false,
-    runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false,
-    belongsTo: data.belongsTo ?? 1,
-    canHeal: true
+    canHeal: false,
+    ...createGenericCouncilData(data)
   };
 }
 
@@ -39,14 +57,9 @@ export function createCouncilWizardData(data: Partial<IHero>): IHero {
   const magicalDamageResistance = 10;
 
   return {
-    class: EClass.HERO,
-    faction: EFaction.COUNCIL,
     unitType: EHeroes.WIZARD,
-    unitId: data.unitId!,
-    boardPosition: data.boardPosition ?? 51,
     maxHealth: data.maxHealth ?? maxHealth,
     currentHealth: data.currentHealth ?? maxHealth,
-    isKO: data.isKO ?? false,
     movement: 2,
     attackRange: 2,
     healingRange: 0,
@@ -54,11 +67,8 @@ export function createCouncilWizardData(data: Partial<IHero>): IHero {
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
-    factionBuff: data.factionBuff ?? false,
-    runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false,
-    belongsTo: data.belongsTo ?? 1,
-    canHeal: false
+    canHeal: false,
+    ...createGenericCouncilData(data)
   };
 }
 
@@ -69,14 +79,9 @@ export function createCouncilKnightData(data: Partial<IHero>): IHero {
   const magicalDamageResistance = 0;
 
   return {
-    class: EClass.HERO,
-    faction: EFaction.COUNCIL,
     unitType: EHeroes.KNIGHT,
-    unitId: data.unitId!,
-    boardPosition: data.boardPosition ?? 51,
     maxHealth: data.maxHealth ?? maxHealth,
     currentHealth: data.currentHealth ?? maxHealth,
-    isKO: data.isKO ?? false,
     movement: 2,
     attackRange: 1,
     healingRange: 0,
@@ -84,11 +89,8 @@ export function createCouncilKnightData(data: Partial<IHero>): IHero {
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
-    factionBuff: data.factionBuff ?? false,
-    runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false,
-    belongsTo: data.belongsTo ?? 1,
-    canHeal: false
+    canHeal: false,
+    ...createGenericCouncilData(data)
   };
 }
 
@@ -100,14 +102,9 @@ export function createCouncilClericData(data: Partial<IHero>): IHero {
   const magicalDamageResistance = 0;
 
   return {
-    class: EClass.HERO,
-    faction: EFaction.COUNCIL,
     unitType: EHeroes.CLERIC,
-    unitId: data.unitId!,
-    boardPosition: data.boardPosition ?? 51,
     maxHealth: data.maxHealth ?? maxHealth,
     currentHealth: data.currentHealth ?? maxHealth,
-    isKO: data.isKO ?? false,
     movement: 2,
     attackRange: 2,
     healingRange: 2,
@@ -115,11 +112,8 @@ export function createCouncilClericData(data: Partial<IHero>): IHero {
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
-    factionBuff: data.factionBuff ?? false,
-    runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false,
-    belongsTo: data.belongsTo ?? 1,
-    canHeal: true
+    canHeal: true,
+    ...createGenericCouncilData(data)
   };
 }
 
@@ -132,14 +126,9 @@ export function createCouncilNinjaData(data: Partial<IHero>): IHero {
   const magicalDamageResistance = 0;
 
   return {
-    class: EClass.HERO,
-    faction: EFaction.COUNCIL,
     unitType: EHeroes.NINJA,
-    unitId: data.unitId!,
-    boardPosition: data.boardPosition ?? 51,
     maxHealth: data.maxHealth ?? maxHealth,
     currentHealth: data.currentHealth ?? maxHealth,
-    isKO: data.isKO ?? false,
     movement: 3,
     attackRange: 2,
     healingRange: 0,
@@ -147,10 +136,7 @@ export function createCouncilNinjaData(data: Partial<IHero>): IHero {
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
-    factionBuff: data.factionBuff ?? false,
-    runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false,
-    belongsTo: data.belongsTo ?? 1,
-    canHeal: false
+    canHeal: false,
+    ...createGenericCouncilData(data)
   };
 }

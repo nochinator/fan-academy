@@ -1,6 +1,32 @@
 import { EClass, EFaction, EHeroes, EAttackType } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 
+function createGenericElvesData(data: Partial<IHero>): {
+  class: EClass,
+  faction: EFaction,
+  unitId: string,
+  boardPosition: number,
+  isKO: boolean,
+  factionBuff: boolean,
+  runeMetal: boolean,
+  shiningHelm: boolean,
+  belongsTo: number,
+  lastBreath: boolean
+} {
+  return {
+    class: EClass.HERO,
+    faction: EFaction.DARK_ELVES,
+    unitId: data.unitId!,
+    boardPosition: data.boardPosition ?? 51,
+    isKO: data.isKO ?? false,
+    lastBreath: data.lastBreath ?? false,
+    factionBuff: data.factionBuff ?? false,
+    runeMetal: data.runeMetal ?? false,
+    shiningHelm: data.shiningHelm ?? false,
+    belongsTo: data.belongsTo ?? 1
+  };
+}
+
 export function createElvesImpalerData(data: Partial<IHero>): IHero {
   const maxHealth = 800;
   const power = 300;
@@ -8,14 +34,9 @@ export function createElvesImpalerData(data: Partial<IHero>): IHero {
   const magicalDamageResistance = 0;
 
   return {
-    class: EClass.HERO,
-    faction: EFaction.DARK_ELVES,
     unitType: EHeroes.IMPALER,
-    unitId: data.unitId!,
-    boardPosition: data.boardPosition ?? 51,
     maxHealth: data.maxHealth ?? maxHealth,
     currentHealth: data.currentHealth ?? maxHealth,
-    isKO: data.isKO ?? false,
     movement: 2,
     attackRange: 2,
     healingRange: 0,
@@ -23,11 +44,8 @@ export function createElvesImpalerData(data: Partial<IHero>): IHero {
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
-    factionBuff: data.factionBuff ?? false,
-    runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false,
-    belongsTo: data.belongsTo ?? 1,
-    canHeal: false
+    canHeal: false,
+    ...createGenericElvesData(data)
   };
 }
 
@@ -39,14 +57,9 @@ export function createElvesPriestessData(data: Partial<IHero>): IHero {
   const magicalDamageResistance = 0;
 
   return {
-    class: EClass.HERO,
-    faction: EFaction.DARK_ELVES,
     unitType: EHeroes.PRIESTESS,
-    unitId: data.unitId!,
-    boardPosition: data.boardPosition ?? 51,
     maxHealth: data.maxHealth ?? maxHealth,
     currentHealth: data.currentHealth ?? maxHealth,
-    isKO: data.isKO ?? false,
     movement: 2,
     attackRange: 2, // TODO: applies debuff
     healingRange: 3,
@@ -54,11 +67,9 @@ export function createElvesPriestessData(data: Partial<IHero>): IHero {
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
-    factionBuff: data.factionBuff ?? false,
-    runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false,
-    belongsTo: data.belongsTo ?? 1,
     canHeal: true
+    ,
+    ...createGenericElvesData(data)
   };
 }
 
@@ -70,14 +81,9 @@ export function createElvesVoidMonkData(data: Partial<IHero>): IHero {
   const magicalDamageResistance = 20;
 
   return {
-    class: EClass.HERO,
-    faction: EFaction.DARK_ELVES,
     unitType: EHeroes.VOIDMONK,
-    unitId: data.unitId!,
-    boardPosition: data.boardPosition ?? 51,
     maxHealth: data.maxHealth ?? maxHealth,
     currentHealth: data.currentHealth ?? maxHealth,
-    isKO: data.isKO ?? false,
     movement: 3,
     attackRange: 1,
     healingRange: 0,
@@ -85,11 +91,8 @@ export function createElvesVoidMonkData(data: Partial<IHero>): IHero {
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
-    factionBuff: data.factionBuff ?? false,
-    runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false,
-    belongsTo: data.belongsTo ?? 1,
-    canHeal: false
+    canHeal: false,
+    ...createGenericElvesData(data)
   };
 }
 
@@ -101,14 +104,9 @@ export function createElvesNecromancerData(data: Partial<IHero>): IHero {
   const magicalDamageResistance = 0;
 
   return {
-    class: EClass.HERO,
-    faction: EFaction.DARK_ELVES,
     unitType: EHeroes.NECROMANCER,
-    unitId: data.unitId!,
-    boardPosition: data.boardPosition ?? 51,
     maxHealth: data.maxHealth ?? maxHealth,
     currentHealth: data.currentHealth ?? maxHealth,
-    isKO: data.isKO ?? false,
     movement: 2,
     attackRange: 3,
     healingRange: 0,
@@ -116,11 +114,8 @@ export function createElvesNecromancerData(data: Partial<IHero>): IHero {
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
-    factionBuff: data.factionBuff ?? false,
-    runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false,
-    belongsTo: data.belongsTo ?? 1,
-    canHeal: false
+    canHeal: false,
+    ...createGenericElvesData(data)
   };
 }
 
@@ -133,14 +128,9 @@ export function createElvesWraithData(data: Partial<IHero>): IHero {
   const magicalDamageResistance = 10;
 
   return {
-    class: EClass.HERO,
-    faction: EFaction.DARK_ELVES,
     unitType: EHeroes.WRAITH,
-    unitId: data.unitId!,
-    boardPosition: data.boardPosition ?? 51,
     maxHealth: data.maxHealth ?? maxHealth,
     currentHealth: data.currentHealth ?? maxHealth,
-    isKO: data.isKO ?? false,
     movement: 3,
     attackRange: 1,
     healingRange: 0,
@@ -148,25 +138,17 @@ export function createElvesWraithData(data: Partial<IHero>): IHero {
     power: data.power ?? power,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
-    factionBuff: data.factionBuff ?? false,
-    runeMetal: data.runeMetal ?? false,
-    shiningHelm: data.shiningHelm ?? false,
-    belongsTo: data.belongsTo ?? 1,
-    canHeal: false
+    canHeal: false,
+    ...createGenericElvesData(data)
   };
 }
 
 export function createElvesPhantomData(data: Partial<IHero>): IHero {
-  // Cannot be buffed or healed
+  // Cannot be buffed or healed, disappears if KO'd
   return {
-    class: EClass.HERO,
-    faction: EFaction.DARK_ELVES,
     unitType: EHeroes.PHANTOM,
-    unitId: data.unitId!,
-    boardPosition: data.boardPosition!, // REVIEW: can't be on deck or hand
     maxHealth: 100,
     currentHealth: data.currentHealth ?? 100,
-    isKO: false, // If KO'd immediately disappears
     movement: 3,
     attackRange: 1,
     healingRange: 0,
@@ -174,10 +156,7 @@ export function createElvesPhantomData(data: Partial<IHero>): IHero {
     power: 100,
     physicalDamageResistance: 0,
     magicalDamageResistance: 0,
-    factionBuff: false,
-    runeMetal: false,
-    shiningHelm: false,
-    belongsTo: data.belongsTo ?? 1,
-    canHeal: false
+    canHeal: false,
+    ...createGenericElvesData(data)
   };
 }

@@ -60,7 +60,6 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
         const healReticle = unit.getByName('healReticle') as Phaser.GameObjects.Image;
         if (activeUnit.canHeal && healReticle?.visible) {
           activeUnit.heal(unit);
-          deselectUnit(context);
           return;
         }
       }

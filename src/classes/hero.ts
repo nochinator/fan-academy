@@ -2,6 +2,7 @@ import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
+import { Tile } from "./tile";
 
 export abstract class Hero extends Phaser.GameObjects.Container {
   class: EClass = EClass.HERO;
@@ -12,6 +13,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   maxHealth: number;
   currentHealth: number;
   isKO: boolean;
+  lastBreath: boolean;
   movement: number;
   attackRange: number;
   healingRange: number;
@@ -48,6 +50,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.maxHealth = data.maxHealth;
     this.currentHealth = data.currentHealth;
     this.isKO = data.isKO;
+    this.lastBreath = data.lastBreath;
     this.movement = data.movement;
     this.attackRange = data.attackRange;
     this.healingRange = data.healingRange;
@@ -65,6 +68,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Create the unit's image and images for its upgrades
     this.characterImage = context.add.image(0, -10, this.unitType).setOrigin(0.5).setName('body');
     if (this.belongsTo === 2 && this.boardPosition < 45) this.characterImage.setFlipX(true);
+    if (this.isKO) this.characterImage.angle = 90;
 
     this.runeMetalImage = context.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.3).setName('runeMetal');
     if (!this.runeMetal) this.runeMetalImage.setVisible(false);
@@ -143,6 +147,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       maxHealth: this.maxHealth,
       currentHealth: this.currentHealth,
       isKO: this.isKO,
+      lastBreath: this.lastBreath,
       movement: this.movement,
       attackRange: this.attackRange,
       healingRange: this.healingRange,
@@ -169,24 +174,55 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   knockedDown(): void {
-    const gameController = this.context.gameController;
-    if (!gameController) {
-      console.error('knockedDown() No gameController');
-      return;
-    }
     this.currentHealth = 0;
     this.isKO = true;
-    // Update tile
-    const tile = gameController.board.getTileFromBoardPosition(this.boardPosition);
-    if (!tile) {
-      console.error('knockedDown() -> No tile found');
-      return;
-    }
+    const tile = this.getTile();
     tile.setOccupied(false); // REVIEW: might need a rework to function with the necromancer
     tile.hero = this.exportData();
 
     // TODO: Switch to KO'd image
     this.characterImage.angle = 90; // REVIEW: p1 units are face down, P2 face up
+  }
+
+  revived(): void {
+    this.isKO = false;
+    this.lastBreath = false;
+    const tile = this.getTile();
+    tile.setOccupied(true);
+    tile.hero = this.exportData();
+    this.characterImage.angle = 0;
+  }
+
+  private getTile(): Tile {
+    const tile = this.context?.gameController?.board.getTileFromBoardPosition(this.boardPosition);
+    if (!tile) throw new Error('getTile() -> No tile found');
+
+    return tile;
+  }
+
+  updateTileData(): void {
+    const tile = this.getTile();
+    tile.hero = this.exportData();
+  }
+
+  removeFromBoard(): void {
+    // Remove animations
+    this.scene.tweens.killTweensOf(this);
+
+    this.list.forEach(child => {
+      this.scene.tweens.killTweensOf(child);
+    });
+
+    // Remove hero data from tile
+    const tile = this.getTile();
+    tile.removeHero();
+
+    // Remove hero from board array
+    let  unitsArray = this.context.gameController!.board.units;
+    unitsArray = unitsArray.filter(unit => unit.unitId !== this.unitId);
+
+    // Destroy container and children
+    this.destroy(true);
   }
 
   abstract attack(target: Hero): void;
