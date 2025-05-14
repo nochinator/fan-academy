@@ -2,7 +2,6 @@ import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
-import { GameController } from "./gameController";
 
 export abstract class Hero extends Phaser.GameObjects.Container {
   class: EClass = EClass.HERO;
@@ -186,7 +185,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     tile.setOccupied(false); // REVIEW: might need a rework to function with the necromancer
     tile.hero = this.exportData();
 
-    // Switch to KO'd image
+    // TODO: Switch to KO'd image
+    this.characterImage.angle = 90; // REVIEW: p1 units are face down, P2 face up
   }
 
   abstract attack(target: Hero): void;

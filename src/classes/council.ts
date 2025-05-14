@@ -2,15 +2,36 @@ import { EAction } from "../enums/gameEnums";
 import { createCouncilArcherData, createCouncilClericData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "../gameData/councilHeroData";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import { getGridDistance } from "../utils/gameUtils";
 import { Hero } from "./hero";
 
 export class Archer extends Hero {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilArcherData(data));
   }
-  // TODO: dmg (m/r)
   override attack(target: Hero): void {
     console.log('Archer attack logs');
+    const gameController = this.context.gameController!;
+    const attacker = this.context.activeUnit!;
+
+    const attackerTile = gameController.board.getTileFromBoardPosition(attacker.boardPosition);
+    const targetTile = gameController.board.getTileFromBoardPosition(target.boardPosition);
+
+    if (!attackerTile || !targetTile) {
+      console.error('Archer attack() No attacker or target tile found');
+      return;
+    }
+
+    const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
+
+    if (distance === 1) {
+      target.currentHealth -= this.power / 2;
+    } else {
+      target.currentHealth -= this.power;
+    }
+
+    if (target.currentHealth <= 0) target.knockedDown();
+    gameController?.afterAction(EAction.ATTACK, this, target);
   }
 
   move(x: number, y: number): void {};

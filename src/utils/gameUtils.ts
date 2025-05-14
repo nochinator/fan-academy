@@ -91,7 +91,7 @@ export async function moveAnimation(context: GameScene, hero: Hero, targetTile: 
         targets: hero,
         x: targetTile.x,
         y: targetTile.y,
-        duration: 500,
+        duration: 300,
         ease: 'Linear',
         onComplete: () => {
           console.log('Move complete!');
