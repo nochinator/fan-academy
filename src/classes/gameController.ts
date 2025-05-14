@@ -220,8 +220,7 @@ export class GameController {
     // Position hero on the board
     hero.updatePosition(tile.boardPosition);
     // Update tile data
-    tile.hero = hero.exportData();
-    tile.setOccupied(true);
+    hero.updateTileData();
 
     this.afterAction(EAction.SPAWN, hero);
   }

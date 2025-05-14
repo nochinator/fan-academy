@@ -31,6 +31,10 @@ export class Archer extends Hero {
     }
 
     if (target.currentHealth <= 0) target.knockedDown();
+
+    // Update target tile data
+    target.updateTileData();
+
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
 
@@ -50,15 +54,20 @@ export class Knight extends Hero {
 
   override async attack(target: Hero): Promise<void> {
     console.log('Knight attack logs');
+
     const gameController = this.context.gameController;
     if (!gameController) {
       console.error('hero attack() No gameController found');
       return;
     }
+
     target.currentHealth -= this.power;
     if (target.currentHealth <= 0) target.knockedDown();
 
     await gameController.pushEnemy(this, target);
+
+    // Update target tile data
+    target.updateTileData();
 
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
@@ -115,6 +124,20 @@ export class Cleric extends Hero {
   // TODO: add healing/revive functions
   override attack(target: Hero): void {
     console.log('Cleric attack logs');
+
+    const gameController = this.context.gameController;
+    if (!gameController) {
+      console.error('hero attack() No gameController found');
+      return;
+    }
+
+    target.currentHealth -= this.power;
+    if (target.currentHealth <= 0) target.knockedDown();
+
+    // Update target tile data
+    target.updateTileData();
+
+    gameController?.afterAction(EAction.ATTACK, this, target);
   }
 
   move(x: number, y: number): void {};

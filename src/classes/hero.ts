@@ -203,6 +203,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   updateTileData(): void {
     const tile = this.getTile();
     tile.hero = this.exportData();
+    tile.setOccupied(!this.isKO);
   }
 
   removeFromBoard(): void {
