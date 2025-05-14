@@ -83,11 +83,11 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     if (!activeUnit || !gameController) return;
 
     // If unit is on the board and the tile clicked on is in range, move the unit
-    if (activeUnit.boardPosition < 45 && tile.isHighlighted) gameController.moveHero(tile);
+    if (activeUnit.boardPosition < 45 && tile.isHighlighted && isHero(activeUnit)) activeUnit.move(tile);
 
     // If hero is in hand and clicked tile is highlighted, spawn
     if (activeUnit.boardPosition > 44 && tile.isHighlighted) {
-      if (isHero(activeUnit)) gameController.spawnHero(tile);
+      if (isHero(activeUnit)) activeUnit.spawn(tile);
       if (isItem(activeUnit) && activeUnit.dealsDamage) gameController.aoeSpell(tile);
     }
   });

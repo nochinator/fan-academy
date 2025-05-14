@@ -1,6 +1,7 @@
-import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
+import { EAction, EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import { moveAnimation } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Tile } from "./tile";
 
@@ -226,9 +227,37 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.destroy(true);
   }
 
-  abstract attack(target: Hero): void;
+  async move(targetTile: Tile): Promise<void> {
+    const gameController = this.context.gameController!;
 
-  abstract move(x: number, y: number): void;
+    const startTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
+    if (!startTile) return;
+
+    await moveAnimation(this.context, this, targetTile);
+
+    this.updatePosition(targetTile.boardPosition);
+    targetTile.hero = this.exportData();
+    targetTile.setOccupied(true);
+    startTile.removeHero();
+
+    gameController.afterAction(EAction.MOVE, this);
+  }
+
+  spawn(tile: Tile): void {
+    const gameController = this.context.gameController!;
+    gameController.hand.removeFromHand(this);
+
+    // Flip image if player is player 2
+    if (this.belongsTo === 2) (this.getByName('body') as Phaser.GameObjects.Image)?.setFlipX(true);
+    // Position hero on the board
+    this.updatePosition(tile.boardPosition);
+    // Update tile data
+    this.updateTileData();
+
+    gameController.afterAction(EAction.SPAWN, this);
+  }
+
+  abstract attack(target: Hero): void;
 
   abstract heal(target: Hero): void;
 

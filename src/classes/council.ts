@@ -37,8 +37,6 @@ export class Archer extends Hero {
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
 
-  move(x: number, y: number): void {};
-
   heal(target: Hero): void {};
 
   revive(target: Hero): void {};
@@ -67,8 +65,6 @@ export class Knight extends Hero {
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
 
-  move(x: number, y: number): void {};
-
   heal(target: Hero): void {};
 
   revive(target: Hero): void {};
@@ -85,8 +81,6 @@ export class Wizard extends Hero {
     console.log('Wizard attack logs');
   }
 
-  move(x: number, y: number): void {};
-
   heal(target: Hero): void {};
 
   revive(target: Hero): void {};
@@ -102,8 +96,6 @@ export class Ninja extends Hero {
   override attack(target: Hero): void {
     console.log('Ninja attack logs');
   }
-
-  move(x: number, y: number): void {};
 
   heal(target: Hero): void {};
 
@@ -130,8 +122,6 @@ export class Cleric extends Hero {
 
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
-
-  move(x: number, y: number): void {};
 
   override heal(target: Hero): void {
     if (target.currentHealth === 0) {

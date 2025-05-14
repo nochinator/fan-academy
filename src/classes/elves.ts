@@ -24,8 +24,6 @@ export class Impaler extends Hero {
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
 
-  move(x: number, y: number): void {};
-
   heal(target: Hero): void {};
 
   revive(target: Hero): void {};
@@ -41,8 +39,6 @@ export class VoidMonk extends Hero {
   override attack(target: Hero): void {
     console.log('VoidMonk attack logs');
   }
-
-  move(x: number, y: number): void {};
 
   heal(target: Hero): void {};
 
@@ -60,8 +56,6 @@ export class Necromancer extends Hero {
     console.log('Necromancer attack logs');
   }
 
-  move(x: number, y: number): void {};
-
   heal(target: Hero): void {};
 
   revive(target: Hero): void {};
@@ -77,8 +71,6 @@ export class Priestess extends Hero {
   override attack(target: Hero): void {
     console.log('Priestess attack logs');
   }
-
-  move(x: number, y: number): void {};
 
   heal(target: Hero): void {};
 
@@ -96,8 +88,6 @@ export class Wraith extends Hero {
     console.log('Wraith attack logs');
   }
 
-  move(x: number, y: number): void {};
-
   heal(target: Hero): void {};
 
   revive(target: Hero): void {};
@@ -112,8 +102,6 @@ export class Phantom extends Hero {
   override attack(target: Hero): void {
     console.log('Phantom attack logs');
   }
-
-  move(x: number, y: number): void {};
 
   heal(target: Hero): void {};
 

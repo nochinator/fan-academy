@@ -199,49 +199,6 @@ export class GameController {
     });
   }
 
-  /**
-   *
-   *
-   * ACTIONS
-   *
-   *
-   */
-  spawnHero(tile: Tile): void {
-    const hero = this.context.activeUnit;
-    if (!hero || !isHero(hero)) {
-      console.log('No active hero when trying to spawn a hero');
-      return;
-    }
-
-    // Remove hero from hand
-    this.hand.removeFromHand(hero);
-    // Flip image if player is player 2
-    if (hero.belongsTo === 2) (hero.getByName('body') as Phaser.GameObjects.Image)?.setFlipX(true);
-    // Position hero on the board
-    hero.updatePosition(tile.boardPosition);
-    // Update tile data
-    hero.updateTileData();
-
-    this.afterAction(EAction.SPAWN, hero);
-  }
-
-  async moveHero(targetTile: Tile): Promise<void> {
-    const hero = this.context.activeUnit;
-    if (!hero || !isHero(hero)) return;
-
-    const startTile = this.board.getTileFromBoardPosition(hero.boardPosition);
-    if (!startTile) return;
-
-    await moveAnimation(this.context, hero, targetTile);
-
-    hero.updatePosition(targetTile.boardPosition);
-    targetTile.hero = hero.exportData();
-    targetTile.setOccupied(true);
-    startTile.removeHero();
-
-    this.afterAction(EAction.MOVE, hero);
-  }
-
   async pushEnemy(attacker: Hero, target: Hero): Promise<void> {
     const attackerTile = this.board.getTileFromBoardPosition(attacker.boardPosition);
     const targetTile = this.board.getTileFromBoardPosition(target.boardPosition);
