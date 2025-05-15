@@ -131,6 +131,8 @@ export class Cleric extends Hero {
       target.currentHealth += this.power * 3;
     }
 
+    if (target.currentHealth > target.maxHealth) target.currentHealth = target.maxHealth;
+
     // Update target tile data
     target.updateTileData();
 
