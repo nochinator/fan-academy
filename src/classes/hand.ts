@@ -31,7 +31,7 @@ export class Hand {
   }
 
   addToHand(units: (IHero | IItem)[]): void {
-    const defaultPositions = [45, 46, 47, 48, 49];
+    const defaultPositions = [45, 46, 47, 48, 49, 50];
 
     let previousIndex = -1;
     defaultPositions.forEach(element => {
