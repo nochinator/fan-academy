@@ -174,8 +174,7 @@ export class GameController {
     deselectUnit(this.context);
   }
 
-  addActionToState(action: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
-    console.log('addActionToState logs');
+  addActionToState(action: EAction, activeUnit?: Hero | Item, targetUnit?: Hero | Item): void {
     // Assign player and opponent data to player1 and player2
     const { player, opponent } = getPlayersKey(this.context);
 
@@ -192,8 +191,8 @@ export class GameController {
       player1: this.context.isPlayerOne ? playerState : opponentState!,
       player2: !this.context.isPlayerOne ? playerState : opponentState!,
       action: {
-        activeUnit: activeUnit.exportData(),
-        targetUnit: targetUnit ? targetUnit.exportData() : activeUnit.exportData(),
+        activeUnit: activeUnit?.exportData(),
+        targetUnit: targetUnit ? targetUnit.exportData() : activeUnit?.exportData(),
         action,
         actionNumber: this.context.currentTurnAction!
       },

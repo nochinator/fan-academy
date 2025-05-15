@@ -33,7 +33,8 @@ export enum EAction {
   SPAWN = 'spawn',
   USE = 'use',
   SHUFFLE = 'shuffle',
-  DRAW = 'draw' // automatic action at the end of a turn
+  DRAW = 'draw', // automatic action at the end of a turn
+  PASS = 'pass' // automatic action if a player sends a turn without taking any actions
 }
 
 export enum EItems {

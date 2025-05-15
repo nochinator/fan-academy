@@ -1,3 +1,4 @@
+import { EAction } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
 
 export class TurnButton {
@@ -11,6 +12,10 @@ export class TurnButton {
     turnButton.on('pointerdown', async () => {
       if (context.currentGame && context.activePlayer === context.userId) {
         console.log('Clicked on send turn');
+
+        // If a player sends a turn without taking any actions, add a PASS action to the game state
+        // TODO: pop-up message if there are still actions to be taken in the turn
+        if (context.currentTurnAction === 1) context.gameController?.addActionToState(EAction.PASS);
 
         this.context.gameController!.endOfTurnActions();
       } else {
