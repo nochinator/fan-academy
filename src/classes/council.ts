@@ -130,6 +130,10 @@ export class Cleric extends Hero {
     } else {
       target.currentHealth += this.power * 3;
     }
+
+    // Update target tile data
+    target.updateTileData();
+
     this.context.gameController?.afterAction(EAction.HEAL, this, target);
   };
 

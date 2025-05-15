@@ -89,7 +89,7 @@ export class Board {
         return;
       }
 
-      if (tile.isFriendly(userId) && maxHealth !== currentHealth) {
+      if (tile.isFriendly(userId) && currentHealth! < maxHealth!) {
         const reticle: Phaser.GameObjects.Image  = target.getByName('healReticle');
         reticle.setVisible(true);
       }

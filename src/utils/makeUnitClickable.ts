@@ -18,15 +18,24 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
     const isEnemy = isHero(unit) && !isFriendly;
     const isSameUnit = activeUnit?.unitId === unit.unitId;
 
+    const healReticle = isHero(unit) ? unit.getByName('healReticle') as Phaser.GameObjects.Image : undefined;
+
+    const attackReticle = isHero(unit) ? unit.getByName('attackReticle') as Phaser.GameObjects.Image : undefined;
+
     // CASE 1: No active unit
     if (!activeUnit && isFriendly) {
-      selectUnit(context, unit);
+      selectUnit(context, unit); // TODO: fix selecting ko'd units
       return;
     }
 
-    // CASE 2: Clicking the active unit deselects it
+    // CASE 2: Clicking the active unit deselects it, unless it's a healer
     if (isSameUnit) {
-      deselectUnit(context);
+      if (activeUnit.canHeal && healReticle?.visible && isHero(unit)) {
+        activeUnit.heal(unit);
+        return;
+      } else {
+        deselectUnit(context);
+      }
       return;
     }
 
@@ -34,8 +43,6 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
     if (activeUnit && !isSameUnit) {
       // CASE 3.1: Clicking an enemy unit
       if (isEnemy) {
-        const attackReticle = unit.getByName('attackReticle') as Phaser.GameObjects.Image;
-
         if (isHero(activeUnit) && attackReticle?.visible) {
           console.log('this logs');
           activeUnit.attack(unit);
@@ -57,7 +64,6 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
           return;
         }
 
-        const healReticle = unit.getByName('healReticle') as Phaser.GameObjects.Image;
         if (activeUnit.canHeal && healReticle?.visible) {
           activeUnit.heal(unit);
           return;
