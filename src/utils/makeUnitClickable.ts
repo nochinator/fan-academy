@@ -24,7 +24,9 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
     // CASE 1: No active unit
     if (!activeUnit && isFriendly) {
-      selectUnit(context, unit); // TODO: fix selecting ko'd units
+      if (isHero(unit) && unit.isKO) return; // Can't select KO'd units
+
+      selectUnit(context, unit);
       return;
     }
 
