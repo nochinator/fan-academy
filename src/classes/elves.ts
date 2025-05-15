@@ -25,9 +25,7 @@ export class Impaler extends Hero {
   }
 
   heal(target: Hero): void {};
-
   revive(target: Hero): void {};
-
   teleport(target: Hero): void {};
 }
 
@@ -41,9 +39,7 @@ export class VoidMonk extends Hero {
   }
 
   heal(target: Hero): void {};
-
   revive(target: Hero): void {};
-
   teleport(target: Hero): void {};
 }
 
@@ -51,15 +47,40 @@ export class Necromancer extends Hero {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createElvesNecromancerData(data));
   }
-  // TODO: add phantom check to attack
   override attack(target: Hero): void {
     console.log('Necromancer attack logs');
+
+    const gameController = this.context.gameController;
+    if (!gameController) {
+      console.error('hero attack() No gameController found');
+      return;
+    }
+
+    if (target.isKO) {
+      const phantom = new Phantom(this.context, {
+        unitId: `${this.context.userId}_phantom_${++this.context.gameController!.phantomCounter}`,
+        boardPosition: target.boardPosition
+      });
+
+      const tile = target.getTile();
+
+      target.removeFromBoard();
+
+      tile.hero = phantom.exportData();
+
+      gameController?.afterAction(EAction.ATTACK, this, target);
+      gameController?.addActionToState(EAction.SPAWN, this, phantom); // Adding action directly to state. It shares the turnActionNumber of the attack
+    } else {
+      target.currentHealth -= this.power;
+
+      if (target.currentHealth <= 0) target.knockedDown();
+
+      gameController?.afterAction(EAction.ATTACK, this, target);
+    }
   }
 
   heal(target: Hero): void {};
-
   revive(target: Hero): void {};
-
   teleport(target: Hero): void {};
 }
 
@@ -101,6 +122,16 @@ export class Phantom extends Hero {
   }
   override attack(target: Hero): void {
     console.log('Phantom attack logs');
+
+    const gameController = this.context.gameController;
+    if (!gameController) {
+      console.error('hero attack() No gameController found');
+      return;
+    }
+    target.currentHealth -= this.power;
+    if (target.currentHealth <= 0) target.knockedDown();
+
+    gameController?.afterAction(EAction.ATTACK, this, target);
   }
 
   heal(target: Hero): void {};

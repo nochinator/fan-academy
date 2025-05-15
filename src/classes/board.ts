@@ -1,4 +1,4 @@
-import { ERange, ETiles } from "../enums/gameEnums";
+import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
 import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { createNewHero, getGridDistance } from "../utils/gameUtils";
@@ -54,26 +54,26 @@ export class Board {
     this.highlightTiles(spawns);
   }
 
-  highlightHeroEnemyTargets(hero: Hero): void {
+  highlightEnemyTargets(hero: Hero): void {
     const tilesInRange: Tile[] = this.getHeroTilesInRange(hero, ERange.ATTACK);
     if (!tilesInRange.length) return;
 
     tilesInRange.forEach(tile => {
-      const target = this.context.children.getByName(tile.hero!.unitId) as Phaser.GameObjects.Container;
+      const target = this.context.children.getByName(tile.hero!.unitId) as Hero;
       const userId = this.context.userId;
       if (!target) {
         console.error('No target found', tile.hero);
         return;
       }
 
-      if (tile.isEnemy(userId)) {
+      if (tile.isEnemy(userId) || hero.unitType === EHeroes.NECROMANCER && target.isKO) {
         const reticle: Phaser.GameObjects.Image = target.getByName('attackReticle');
         reticle.setVisible(true);
       }
     });
   }
 
-  highlighHerotFriendlyTargets(hero: Hero) {
+  highlightFriendlyTargets(hero: Hero) {
     if (!hero.canHeal) return;
 
     const tilesInRange: Tile[] = this.getHeroTilesInRange(hero, ERange.HEAL);

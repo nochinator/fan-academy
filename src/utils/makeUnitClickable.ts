@@ -1,6 +1,7 @@
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
+import { EHeroes } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, isHero, isItem } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
@@ -19,7 +20,6 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
     const isSameUnit = activeUnit?.unitId === unit.unitId;
 
     const healReticle = isHero(unit) ? unit.getByName('healReticle') as Phaser.GameObjects.Image : undefined;
-
     const attackReticle = isHero(unit) ? unit.getByName('attackReticle') as Phaser.GameObjects.Image : undefined;
 
     // CASE 1: No active unit
@@ -60,6 +60,11 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
       // CASE 3.2: Clicking a friendly unit
       if (isHero(unit) && isFriendly) {
+        if (isHero(activeUnit) && activeUnit.unitType === EHeroes.NECROMANCER && unit.isKO) {
+          activeUnit.attack(unit);
+          return;
+        }
+
         if (isItem(activeUnit)) {
           console.log('Missing logic for buffing / healing / reviving units with items');
           deselectUnit(context); // TODO: unit not only is deselected, it is also removed from hand

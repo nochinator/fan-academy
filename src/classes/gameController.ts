@@ -27,6 +27,8 @@ export class GameController {
   turnButton: TurnButton;
   lastTurnState: IGameState;
 
+  phantomCounter: number = 0; // REVIEW:
+
   constructor(context: GameScene) {
     this.context = context;
     this.game = context.currentGame!;
@@ -102,6 +104,7 @@ export class GameController {
 
     if (!unitsToRemove.length) return;
 
+    //TODO: move to its own function
     const animation = (hero: Hero): Promise<void> => {
       return new Promise((resolve) => {
         this.context.tweens.add({
@@ -149,8 +152,8 @@ export class GameController {
     if (hero.boardPosition > 44) this.board.highlightSpawns(this.context.isPlayerOne!);
 
     if (hero.boardPosition < 45) {
-      this.board.highlightHeroEnemyTargets(hero);
-      this.board.highlighHerotFriendlyTargets(hero);
+      this.board.highlightEnemyTargets(hero);
+      this.board.highlightFriendlyTargets(hero);
       this.board.highlightMovementArea(hero);
     }
   }

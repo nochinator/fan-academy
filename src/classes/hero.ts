@@ -175,6 +175,11 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   knockedDown(): void {
+    if (this.unitType === EHeroes.PHANTOM) {
+      this.removeFromBoard();
+      return;
+    }
+
     this.currentHealth = 0;
     this.isKO = true;
     const tile = this.getTile();
@@ -192,7 +197,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.characterImage.angle = 0;
   }
 
-  private getTile(): Tile {
+  getTile(): Tile {
     const tile = this.context?.gameController?.board.getTileFromBoardPosition(this.boardPosition);
     if (!tile) throw new Error('getTile() -> No tile found');
 
