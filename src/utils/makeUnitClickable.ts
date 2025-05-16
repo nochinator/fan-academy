@@ -86,6 +86,7 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
       // If the new unit can't be attacked, healed or teleported, and it's a friendly unit, switch focus to new unit
       if (isFriendly) {
+        if (isHero(unit) && unit.isKO) return;
         deselectUnit(context);
         return selectUnit(context, unit);
       }
