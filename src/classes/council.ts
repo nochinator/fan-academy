@@ -38,9 +38,7 @@ export class Archer extends Hero {
   }
 
   heal(target: Hero): void {};
-
   revive(target: Hero): void {};
-
   teleport(target: Hero): void {};
 }
 
@@ -66,9 +64,7 @@ export class Knight extends Hero {
   }
 
   heal(target: Hero): void {};
-
   revive(target: Hero): void {};
-
   teleport(target: Hero): void {};
 }
 
@@ -82,9 +78,7 @@ export class Wizard extends Hero {
   }
 
   heal(target: Hero): void {};
-
   revive(target: Hero): void {};
-
   teleport(target: Hero): void {};
 }
 
@@ -92,23 +86,58 @@ export class Ninja extends Hero {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilNinjaData(data));
   }
-  // TODO: add teleport function and dmg (m/r)
   override attack(target: Hero): void {
     console.log('Ninja attack logs');
+    const gameController = this.context.gameController!;
+
+    const attackerTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
+    const targetTile = gameController.board.getTileFromBoardPosition(target.boardPosition);
+
+    if (!attackerTile || !targetTile) {
+      console.error('Archer attack() No attacker or target tile found');
+      return;
+    }
+
+    const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
+
+    if (distance === 1) {
+      target.currentHealth -= this.power * 2;
+    } else {
+      target.currentHealth -= this.power;
+    }
+
+    if (target.currentHealth <= 0) target.knockedDown();
+
+    // Update target tile data
+    target.updateTileData();
+
+    gameController?.afterAction(EAction.ATTACK, this, target);
   }
 
+  teleport(target: Hero): void {
+    const gameController = this.context.gameController!;
+
+    const targetDestination = this.getTile();
+    const unitDestination = target.getTile();
+    const targetBoardPosition = target.boardPosition;
+
+    target.updatePosition(this.boardPosition);
+    targetDestination.hero = target.exportData();
+
+    this.updatePosition(targetBoardPosition);
+    unitDestination.hero = this.exportData();
+
+    gameController?.afterAction(EAction.TELEPORT, this, target);
+  };
+
   heal(target: Hero): void {};
-
   revive(target: Hero): void {};
-
-  teleport(target: Hero): void {};
 }
 
 export class Cleric extends Hero {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilClericData(data));
   }
-  // TODO: add healing/revive functions
   override attack(target: Hero): void {
     console.log('Cleric attack logs');
 
@@ -140,7 +169,6 @@ export class Cleric extends Hero {
   };
 
   revive(target: Hero): void {};
-
   teleport(target: Hero): void {};
 }
 

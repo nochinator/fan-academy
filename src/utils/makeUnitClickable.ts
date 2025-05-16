@@ -60,8 +60,15 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
       // CASE 3.2: Clicking a friendly unit
       if (isHero(unit) && isFriendly) {
+        // Necromancer can attack friendly units if they are knocked down to spawn phantoms
         if (isHero(activeUnit) && activeUnit.unitType === EHeroes.NECROMANCER && unit.isKO) {
           activeUnit.attack(unit);
+          return;
+        }
+
+        // Ninja can swap places with any friendly unit on the board
+        if (isHero(activeUnit) && activeUnit.unitType === EHeroes.NINJA) {
+          activeUnit.teleport(unit);
           return;
         }
 

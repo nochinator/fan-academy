@@ -37,6 +37,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   private factionBuffImage: Phaser.GameObjects.Image;
   private attackReticle: Phaser.GameObjects.Image;
   private healReticle: Phaser.GameObjects.Image;
+  private allyReticle: Phaser.GameObjects.Image;
 
   constructor(context: GameScene, data: IHero) {
     const { x, y } = context.centerPoints[data.boardPosition];
@@ -84,9 +85,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     } // Using else here removes a bunch of checks on factionBuff being possibly undefined
     if (!this.factionBuff) this.factionBuffImage.setVisible(false);
 
-    // Add attack and healing reticles
     this.attackReticle = context.add.image(0, -10, 'attackReticle').setOrigin(0.5).setScale(0.8).setName('attackReticle').setVisible(false);
     this.healReticle = context.add.image(0, -10, 'healReticle').setOrigin(0.5).setScale(0.8).setName('healReticle').setVisible(false);
+    this.allyReticle = context.add.image(0, -10, 'allyReticle').setOrigin(0.5).setScale(0.6).setName('allyReticle').setVisible(false);
 
     // Add animations to the reticles // TODO: rotate the animation
     const addTween = (reticle: Phaser.GameObjects.Image) => {
@@ -104,9 +105,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     };
     addTween(this.attackReticle);
     addTween(this.healReticle);
+    addTween(this.allyReticle);
 
     // Add all individual images to container
-    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage, this.attackReticle, this.healReticle]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(this.boardPosition + 10); // REVIEW: depth
+    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage, this.attackReticle, this.healReticle, this.allyReticle]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(this.boardPosition + 10); // REVIEW: depth
 
     // Hide if in deck
     if (this.boardPosition === 51) this.setVisible(false);

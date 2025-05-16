@@ -1,4 +1,3 @@
-import { GameController } from "../../classes/gameController";
 import GameScene from "../game.scene";
 
 export function loadGameAssets(context: GameScene) {
@@ -41,6 +40,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('shiningHelm', './assets/images/factions/common/shining_helm.png');
 
   // Load reticles (attack and healing)
-  context.load.image('attackReticle', './assets/images/gameItems/AttackReticle2-hd.png');
-  context.load.image('healReticle', './assets/images/gameItems/HealReticle-hd.png');
+  context.load.image('attackReticle', './assets/images/gameItems/attack_reticle.png');
+  context.load.image('healReticle', './assets/images/gameItems/heal_reticle.png');
+  context.load.image('allyReticle', './assets/images/gameItems/ally_reticle.png');
 }

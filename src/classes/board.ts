@@ -102,6 +102,23 @@ export class Board {
     this.highlightTiles(tilesInRange);
   }
 
+  highlightTeleportOptions(hero: Hero) {
+    if (hero.unitType === EHeroes.NINJA) {
+      this.tiles.forEach(tile => {
+        if (tile.isFriendly(this.context.userId)) {
+          const target = this.context.children.getByName(tile.hero!.unitId) as Phaser.GameObjects.Container;
+          const reticle: Phaser.GameObjects.Image  = target.getByName('allyReticle');
+          reticle.setVisible(true);
+        }
+      });
+    }
+
+    if (hero.getTile().tileType === ETiles.TELEPORTER) {
+      const teleportTiles: Tile[] = this.tiles.filter(tile => tile.tileType === ETiles.TELEPORTER);
+      this.highlightTiles(teleportTiles);
+    }
+  }
+
   highlightTiles(tiles: Tile[]) {
     tiles.forEach(tile => {
       tile.setHighlight();
@@ -115,9 +132,11 @@ export class Board {
         if (!target) return;
         const attackReticle = target.getByName('attackReticle') as Phaser.GameObjects.Image;
         const healReticle = target.getByName('healReticle') as Phaser.GameObjects.Image;
+        const allyReticle = target.getByName('allyReticle') as Phaser.GameObjects.Image;
 
         attackReticle?.setVisible(false);
         healReticle?.setVisible(false);
+        allyReticle?.setVisible(false);
       }
     });
   }

@@ -1,4 +1,4 @@
-import { EAction } from "../enums/gameEnums";
+import { EAction, EHeroes, ETiles } from "../enums/gameEnums";
 import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
 import { sendTurnMessage } from "../lib/colyseusGameRoom";
 import GameScene from "../scenes/game.scene";
@@ -155,6 +155,8 @@ export class GameController {
       this.board.highlightEnemyTargets(hero);
       this.board.highlightFriendlyTargets(hero);
       this.board.highlightMovementArea(hero);
+
+      if (hero.unitType === EHeroes.NINJA || hero.getTile().tileType === ETiles.TELEPORTER) this.board.highlightTeleportOptions(hero);
     }
   }
 
