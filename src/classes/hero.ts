@@ -176,6 +176,18 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.setScale(1);
   }
 
+  getDamaged(damage: number): void {
+    this.currentHealth -= damage;
+    if (this.currentHealth <= 0) this.knockedDown();
+    this.updateTileData();
+  }
+
+  getHealed(healing: number): void {
+    this.currentHealth += healing;
+    if (this.currentHealth > this.maxHealth) this.currentHealth = this.maxHealth;
+    this.updateTileData();
+  }
+
   knockedDown(): void {
     if (this.unitType === EHeroes.PHANTOM) {
       this.removeFromBoard();

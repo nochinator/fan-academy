@@ -148,3 +148,8 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
     col: targetCol + directionColumn
   };
 }
+
+export function lifeLost(damage: number, health: number, resistance?: number) {
+  const totalDamage = resistance ? damage - damage * resistance / 100 : damage;
+  return totalDamage > health ? health : totalDamage;
+}

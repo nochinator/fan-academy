@@ -24,15 +24,10 @@ export class Archer extends Hero {
     const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
 
     if (distance === 1) {
-      target.currentHealth -= this.power / 2;
+      target.getDamaged(this.power / 2);
     } else {
-      target.currentHealth -= this.power;
+      target.getDamaged(this.power);
     }
-
-    if (target.currentHealth <= 0) target.knockedDown();
-
-    // Update target tile data
-    target.updateTileData();
 
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
@@ -51,13 +46,9 @@ export class Knight extends Hero {
 
     const gameController = this.context.gameController!;
 
-    target.currentHealth -= this.power;
-    if (target.currentHealth <= 0) target.knockedDown();
+    target.getDamaged(this.power);
 
     await gameController.pushEnemy(this, target);
-
-    // Update target tile data
-    target.updateTileData();
 
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
@@ -98,15 +89,10 @@ export class Ninja extends Hero {
     const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
 
     if (distance === 1) {
-      target.currentHealth -= this.power * 2;
+      target.getDamaged(this.power * 2);
     } else {
-      target.currentHealth -= this.power;
+      target.getDamaged(this.power);
     }
-
-    if (target.currentHealth <= 0) target.knockedDown();
-
-    // Update target tile data
-    target.updateTileData();
 
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
@@ -139,27 +125,18 @@ export class Cleric extends Hero {
 
     const gameController = this.context.gameController!;
 
-    target.currentHealth -= this.power;
-    if (target.currentHealth <= 0) target.knockedDown();
-
-    // Update target tile data
-    target.updateTileData();
+    target.getDamaged(this.power);
 
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
 
   override heal(target: Hero): void {
     if (target.currentHealth === 0) {
-      target.currentHealth += this.power * 2;
+      target.getHealed(this.power * 2);
       target.revived();
     } else {
-      target.currentHealth += this.power * 3;
+      target.getHealed(this.power * 3);
     }
-
-    if (target.currentHealth > target.maxHealth) target.currentHealth = target.maxHealth;
-
-    // Update target tile data
-    target.updateTileData();
 
     this.context.gameController?.afterAction(EAction.HEAL, this, target);
   };

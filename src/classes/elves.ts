@@ -2,9 +2,26 @@ import { EAction } from "../enums/gameEnums";
 import { createElvesImpalerData, createElvesNecromancerData, createElvesPhantomData, createElvesPriestessData, createElvesVoidMonkData, createElvesWraithData } from "../gameData/elvesHeroData";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import { lifeLost } from "../utils/gameUtils";
 import { Hero } from "./hero";
 
-export class Impaler extends Hero {
+export abstract class DarkElf extends Hero {
+  constructor(context: GameScene, data: Partial<IHero>) {
+    super(context, createElvesImpalerData(data));
+  }
+
+  lifeSteal(damage: number, health: number): void {
+    const baseAmount = lifeLost(damage, health);
+
+    if (this.factionBuff) {
+      this.getHealed(baseAmount * 67 / 100);
+    } else {
+      this.getHealed(baseAmount * 33 / 100);
+    }
+  }
+}
+
+export class Impaler extends DarkElf {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createElvesImpalerData(data));
   }
@@ -16,8 +33,8 @@ export class Impaler extends Hero {
       console.error('hero attack() No gameController found');
       return;
     }
-    target.currentHealth -= this.power;
-    if (target.currentHealth <= 0) target.knockedDown();
+
+    target.getDamaged(this.power);
 
     await gameController.pullEnemy(this, target);
 
@@ -69,9 +86,7 @@ export class Necromancer extends Hero {
       gameController?.afterAction(EAction.ATTACK, this, target);
       gameController?.addActionToState(EAction.SPAWN, this, phantom); // Adding action directly to state. It shares the turnActionNumber of the attack
     } else {
-      target.currentHealth -= this.power;
-
-      if (target.currentHealth <= 0) target.knockedDown();
+      target.getDamaged(this.power);
 
       gameController?.afterAction(EAction.ATTACK, this, target);
     }
@@ -92,13 +107,11 @@ export class Priestess extends Hero {
 
   override heal(target: Hero): void {
     if (target.currentHealth === 0) {
-      target.currentHealth += this.power / 2;
+      target.getHealed(this.power / 2);
       target.revived();
     } else {
-      target.currentHealth += this.power * 2;
+      target.getHealed(this.power * 2);
     }
-
-    if (target.currentHealth > target.maxHealth) target.currentHealth = target.maxHealth;
 
     // Update target tile data
     target.updateTileData();
@@ -135,8 +148,7 @@ export class Phantom extends Hero {
       console.error('hero attack() No gameController found');
       return;
     }
-    target.currentHealth -= this.power;
-    if (target.currentHealth <= 0) target.knockedDown();
+    target.getDamaged(this.power);
 
     gameController?.afterAction(EAction.ATTACK, this, target);
   }
