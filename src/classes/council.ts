@@ -38,7 +38,6 @@ export class Archer extends Hero {
   }
 
   heal(target: Hero): void {};
-  revive(target: Hero): void {};
   teleport(target: Hero): void {};
 }
 
@@ -64,7 +63,6 @@ export class Knight extends Hero {
   }
 
   heal(target: Hero): void {};
-  revive(target: Hero): void {};
   teleport(target: Hero): void {};
 }
 
@@ -78,7 +76,6 @@ export class Wizard extends Hero {
   }
 
   heal(target: Hero): void {};
-  revive(target: Hero): void {};
   teleport(target: Hero): void {};
 }
 
@@ -131,7 +128,6 @@ export class Ninja extends Hero {
   };
 
   heal(target: Hero): void {};
-  revive(target: Hero): void {};
 }
 
 export class Cleric extends Hero {
@@ -168,7 +164,6 @@ export class Cleric extends Hero {
     this.context.gameController?.afterAction(EAction.HEAL, this, target);
   };
 
-  revive(target: Hero): void {};
   teleport(target: Hero): void {};
 }
 

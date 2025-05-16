@@ -25,7 +25,6 @@ export class Impaler extends Hero {
   }
 
   heal(target: Hero): void {};
-  revive(target: Hero): void {};
   teleport(target: Hero): void {};
 }
 
@@ -39,7 +38,6 @@ export class VoidMonk extends Hero {
   }
 
   heal(target: Hero): void {};
-  revive(target: Hero): void {};
   teleport(target: Hero): void {};
 }
 
@@ -80,7 +78,6 @@ export class Necromancer extends Hero {
   }
 
   heal(target: Hero): void {};
-  revive(target: Hero): void {};
   teleport(target: Hero): void {};
 }
 
@@ -93,9 +90,21 @@ export class Priestess extends Hero {
     console.log('Priestess attack logs');
   }
 
-  heal(target: Hero): void {};
+  override heal(target: Hero): void {
+    if (target.currentHealth === 0) {
+      target.currentHealth += this.power / 2;
+      target.revived();
+    } else {
+      target.currentHealth += this.power * 2;
+    }
 
-  revive(target: Hero): void {};
+    if (target.currentHealth > target.maxHealth) target.currentHealth = target.maxHealth;
+
+    // Update target tile data
+    target.updateTileData();
+
+    this.context.gameController?.afterAction(EAction.HEAL, this, target);
+  };
 
   teleport(target: Hero): void {};
 }
@@ -110,8 +119,6 @@ export class Wraith extends Hero {
   }
 
   heal(target: Hero): void {};
-
-  revive(target: Hero): void {};
 
   teleport(target: Hero): void {};
 }
@@ -135,8 +142,6 @@ export class Phantom extends Hero {
   }
 
   heal(target: Hero): void {};
-
-  revive(target: Hero): void {};
 
   teleport(target: Hero): void {};
 }

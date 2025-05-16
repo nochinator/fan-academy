@@ -263,10 +263,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   abstract attack(target: Hero): void;
-
   abstract heal(target: Hero): void;
-
-  abstract revive(target: Hero): void;
-
   abstract teleport(target: Hero): void;
 }
