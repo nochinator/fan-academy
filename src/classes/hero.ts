@@ -1,7 +1,7 @@
 import { EAction, EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { moveAnimation } from "../utils/gameUtils";
+import { lifeLost, moveAnimation } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Tile } from "./tile";
 
@@ -177,7 +177,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   getDamaged(damage: number): void {
-    this.currentHealth -= damage;
+    // TODO: add damage type
+    const totalDamage = lifeLost(damage, this.currentHealth); // FIXME:
+    this.currentHealth -= totalDamage;
     if (this.currentHealth <= 0) this.knockedDown();
     this.updateTileData();
   }

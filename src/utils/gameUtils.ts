@@ -1,5 +1,5 @@
 import { Archer, Cleric, Knight, Ninja, Wizard } from "../classes/council";
-import { Priestess, Impaler, Necromancer, Phantom, Wraith, VoidMonk } from "../classes/elves";
+import { Priestess, Impaler, Necromancer, Phantom, Wraith, VoidMonk, DarkElf } from "../classes/elves";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
@@ -46,8 +46,8 @@ export function getGridDistance(startRow: number, startColumn: number, targetRow
   return Math.abs(startRow - targetRow) + Math.abs(startColumn - targetColumn);
 }
 
-export function createNewHero(context: GameScene, heroData: IHero): Hero {
-  const heroTypes: Record<EHeroes, () => Hero> = {
+export function createNewHero(context: GameScene, heroData: IHero): Hero | DarkElf {
+  const heroTypes: Record<EHeroes, () => Hero | DarkElf> = {
     [EHeroes.ARCHER]: () => new Archer(context, heroData),
     [EHeroes.CLERIC]: () => new Cleric(context, heroData),
     [EHeroes.KNIGHT]: () => new Knight(context, heroData),

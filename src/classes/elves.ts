@@ -6,8 +6,8 @@ import { lifeLost } from "../utils/gameUtils";
 import { Hero } from "./hero";
 
 export abstract class DarkElf extends Hero {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createElvesImpalerData(data));
+  constructor(context: GameScene, data: IHero) {
+    super(context, data);
   }
 
   lifeSteal(damage: number, health: number): void {
@@ -45,7 +45,7 @@ export class Impaler extends DarkElf {
   teleport(target: Hero): void {};
 }
 
-export class VoidMonk extends Hero {
+export class VoidMonk extends DarkElf {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createElvesVoidMonkData(data));
   }
@@ -58,7 +58,7 @@ export class VoidMonk extends Hero {
   teleport(target: Hero): void {};
 }
 
-export class Necromancer extends Hero {
+export class Necromancer extends DarkElf {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createElvesNecromancerData(data));
   }
@@ -86,6 +86,7 @@ export class Necromancer extends Hero {
       gameController?.afterAction(EAction.ATTACK, this, target);
       gameController?.addActionToState(EAction.SPAWN, this, phantom); // Adding action directly to state. It shares the turnActionNumber of the attack
     } else {
+      this.lifeSteal(this.power, target.currentHealth);// FIXME:
       target.getDamaged(this.power);
 
       gameController?.afterAction(EAction.ATTACK, this, target);
@@ -96,7 +97,7 @@ export class Necromancer extends Hero {
   teleport(target: Hero): void {};
 }
 
-export class Priestess extends Hero {
+export class Priestess extends DarkElf {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createElvesPriestessData(data));
   }
@@ -122,7 +123,7 @@ export class Priestess extends Hero {
   teleport(target: Hero): void {};
 }
 
-export class Wraith extends Hero {
+export class Wraith extends DarkElf {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createElvesWraithData(data));
   }
@@ -156,4 +157,8 @@ export class Phantom extends Hero {
   heal(target: Hero): void {};
 
   teleport(target: Hero): void {};
+}
+
+function createGenericElvesData(data: Partial<IHero>): IHero {
+  throw new Error("Function not implemented.");
 }

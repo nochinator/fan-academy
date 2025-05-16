@@ -170,7 +170,8 @@ export class GameController {
   }
 
   afterAction(actionType: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
-    console.log('After Action Unit', targetUnit ? targetUnit : activeUnit);
+    console.log('After Action Target Unit', targetUnit ? targetUnit : activeUnit);
+    console.log('After Action Active Unit', activeUnit);
     // Add action to current state
     this.addActionToState(actionType, activeUnit, targetUnit);
     // Remove a slice from the action pie
