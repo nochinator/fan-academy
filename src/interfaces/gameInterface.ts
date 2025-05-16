@@ -52,6 +52,7 @@ export interface IHero {
   healingRange: number;
   attackType: EAttackType;
   power: number;
+  powerModifier: number;
   physicalDamageResistance: number;
   magicalDamageResistance: number;
   factionBuff: boolean;

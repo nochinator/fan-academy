@@ -3,7 +3,7 @@ import { Priestess, Impaler, Necromancer, Phantom, Wraith, VoidMonk, DarkElf } f
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EHeroes } from "../enums/gameEnums";
+import { EAttackType, EHeroes } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
@@ -147,9 +147,4 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
     row: targetRow + directionRow,
     col: targetCol + directionColumn
   };
-}
-
-export function lifeLost(damage: number, health: number, resistance?: number) {
-  const totalDamage = resistance ? damage - damage * resistance / 100 : damage;
-  return totalDamage > health ? health : totalDamage;
 }

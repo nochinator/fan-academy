@@ -24,9 +24,9 @@ export class Archer extends Hero {
     const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
 
     if (distance === 1) {
-      target.getDamaged(this.power / 2);
+      target.getDamaged(this.getTotalPower(2), this.attackType);
     } else {
-      target.getDamaged(this.power);
+      target.getDamaged(this.getTotalPower(), this.attackType);
     }
 
     gameController?.afterAction(EAction.ATTACK, this, target);
@@ -46,7 +46,7 @@ export class Knight extends Hero {
 
     const gameController = this.context.gameController!;
 
-    target.getDamaged(this.power);
+    target.getDamaged(this.getTotalPower(), this.attackType);
 
     await gameController.pushEnemy(this, target);
 
@@ -89,9 +89,9 @@ export class Ninja extends Hero {
     const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
 
     if (distance === 1) {
-      target.getDamaged(this.power * 2);
+      target.getDamaged(this.getTotalPower(2), this.attackType);
     } else {
-      target.getDamaged(this.power);
+      target.getDamaged(this.getTotalPower(), this.attackType);
     }
 
     gameController?.afterAction(EAction.ATTACK, this, target);
@@ -125,7 +125,7 @@ export class Cleric extends Hero {
 
     const gameController = this.context.gameController!;
 
-    target.getDamaged(this.power);
+    target.getDamaged(this.getTotalPower(), this.attackType);
 
     gameController?.afterAction(EAction.ATTACK, this, target);
   }

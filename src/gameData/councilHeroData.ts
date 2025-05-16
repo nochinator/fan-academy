@@ -11,7 +11,8 @@ function createGenericCouncilData(data: Partial<IHero>): {
   runeMetal: boolean,
   shiningHelm: boolean,
   belongsTo: number,
-  lastBreath: boolean
+  lastBreath: boolean,
+  powerModifier: number,
 } {
   return {
     class: EClass.HERO,
@@ -23,7 +24,8 @@ function createGenericCouncilData(data: Partial<IHero>): {
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
     shiningHelm: data.shiningHelm ?? false,
-    belongsTo: data.belongsTo ?? 1
+    belongsTo: data.belongsTo ?? 1,
+    powerModifier: data.powerModifier ?? 0
   };
 }
 

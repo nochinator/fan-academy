@@ -2,7 +2,6 @@ import { EAction } from "../enums/gameEnums";
 import { createElvesImpalerData, createElvesNecromancerData, createElvesPhantomData, createElvesPriestessData, createElvesVoidMonkData, createElvesWraithData } from "../gameData/elvesHeroData";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { lifeLost } from "../utils/gameUtils";
 import { Hero } from "./hero";
 
 export abstract class DarkElf extends Hero {
@@ -10,13 +9,11 @@ export abstract class DarkElf extends Hero {
     super(context, data);
   }
 
-  lifeSteal(damage: number, health: number): void {
-    const baseAmount = lifeLost(damage, health);
-
+  lifeSteal(damage: number): void {
     if (this.factionBuff) {
-      this.getHealed(baseAmount * 67 / 100);
+      this.getHealed(damage * 67 / 100);
     } else {
-      this.getHealed(baseAmount * 33 / 100);
+      this.getHealed(damage * 33 / 100);
     }
   }
 }
@@ -34,7 +31,8 @@ export class Impaler extends DarkElf {
       return;
     }
 
-    target.getDamaged(this.power);
+    const damageDone = target.getDamaged(this.getTotalPower(), this.attackType);
+    this.lifeSteal(damageDone);
 
     await gameController.pullEnemy(this, target);
 
@@ -86,8 +84,8 @@ export class Necromancer extends DarkElf {
       gameController?.afterAction(EAction.ATTACK, this, target);
       gameController?.addActionToState(EAction.SPAWN, this, phantom); // Adding action directly to state. It shares the turnActionNumber of the attack
     } else {
-      this.lifeSteal(this.power, target.currentHealth);// FIXME:
-      target.getDamaged(this.power);
+      const damageDone = target.getDamaged(this.getTotalPower(), this.attackType);
+      this.lifeSteal(damageDone);
 
       gameController?.afterAction(EAction.ATTACK, this, target);
     }
@@ -101,9 +99,22 @@ export class Priestess extends DarkElf {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createElvesPriestessData(data));
   }
-  // TODO: add healing and revive
   override attack(target: Hero): void {
     console.log('Priestess attack logs');
+
+    const gameController = this.context.gameController;
+    if (!gameController) {
+      console.error('hero attack() No gameController found');
+      return;
+    }
+
+    const damageDone = target.getDamaged(this.getTotalPower(), this.attackType);
+    this.lifeSteal(damageDone);
+
+    // Apply a 50% debuff to the target's next attack
+    target.modifyPower(-50); // TODO: add debuff animation
+
+    gameController?.afterAction(EAction.ATTACK, this, target);
   }
 
   override heal(target: Hero): void {
@@ -149,7 +160,7 @@ export class Phantom extends Hero {
       console.error('hero attack() No gameController found');
       return;
     }
-    target.getDamaged(this.power);
+    target.getDamaged(this.getTotalPower(), this.attackType);
 
     gameController?.afterAction(EAction.ATTACK, this, target);
   }

@@ -1,7 +1,7 @@
 import { EAction, EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { lifeLost, moveAnimation } from "../utils/gameUtils";
+import { moveAnimation } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Tile } from "./tile";
 
@@ -20,6 +20,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   healingRange: number;
   attackType: EAttackType;
   power: number;
+  powerModifier: number;
   physicalDamageResistance: number;
   magicalDamageResistance: number;
   factionBuff: boolean;
@@ -58,6 +59,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.healingRange = data.healingRange;
     this.attackType = data.attackType;
     this.power = data.power;
+    this.powerModifier = data.powerModifier;
     this.physicalDamageResistance = data.physicalDamageResistance;
     this.magicalDamageResistance = data.magicalDamageResistance;
     this.factionBuff = data.factionBuff;
@@ -156,6 +158,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       healingRange: this.healingRange,
       attackType: this.attackType,
       power: this.power,
+      powerModifier: this.powerModifier,
       physicalDamageResistance: this.physicalDamageResistance,
       magicalDamageResistance: this.magicalDamageResistance,
       factionBuff: this.factionBuff,
@@ -176,12 +179,45 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.setScale(1);
   }
 
-  getDamaged(damage: number): void {
-    // TODO: add damage type
-    const totalDamage = lifeLost(damage, this.currentHealth); // FIXME:
+  getDamaged(damage: number, attackType: EAttackType): number {
+    // Calculate damage after applying resistances
+    const totalDamage = this.lifeLost(damage, attackType);
+
     this.currentHealth -= totalDamage;
+
     if (this.currentHealth <= 0) this.knockedDown();
+
     this.updateTileData();
+
+    return totalDamage; // Return damage taken for lifesteal
+  }
+
+  modifyPower(amount: number): void {
+    this.powerModifier += amount;
+    this.updateTileData();
+  }
+
+  getTotalPower(multiplier = 1): number {
+    if (this.powerModifier === 0) return this.power;
+
+    const totalPower = this.power * multiplier + this.power * this.powerModifier / 100;
+    console.log(totalPower);
+    this.powerModifier = 0;
+    this.updateTileData();
+
+    return totalPower;
+  }
+
+  lifeLost(damage: number, attackType: EAttackType) {
+    const resistance = {
+      [EAttackType.MAGICAL]: this.magicalDamageResistance,
+      [EAttackType.PHYSICAL]: this.physicalDamageResistance
+    };
+
+    const reduction = resistance[attackType];
+
+    const totalDamage = resistance ? damage - damage * reduction / 100 : damage;
+    return totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
   }
 
   getHealed(healing: number): void {
