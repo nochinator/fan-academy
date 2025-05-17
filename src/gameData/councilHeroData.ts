@@ -1,3 +1,4 @@
+import { SuperCharge } from "../classes/item";
 import { EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 
@@ -10,6 +11,7 @@ function createGenericCouncilData(data: Partial<IHero>): {
   factionBuff: boolean,
   runeMetal: boolean,
   shiningHelm: boolean,
+  superCharge: boolean,
   belongsTo: number,
   lastBreath: boolean,
   powerModifier: number,
@@ -24,6 +26,7 @@ function createGenericCouncilData(data: Partial<IHero>): {
     factionBuff: data.factionBuff ?? false,
     runeMetal: data.runeMetal ?? false,
     shiningHelm: data.shiningHelm ?? false,
+    superCharge: data.superCharge ?? false,
     belongsTo: data.belongsTo ?? 1,
     powerModifier: data.powerModifier ?? 0
   };

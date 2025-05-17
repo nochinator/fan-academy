@@ -65,6 +65,7 @@ function createCouncilDeck(userId: string): (IHero | IItem)[] {
       // Can remove knocked-out enemies from the field.
       unitId: `${userId}_inferno_${index}`,
       faction: EFaction.COUNCIL,
+      dealsDamage: true,
       itemType: EItems.INFERNO
     });
     const superCharge = createItemData( {
@@ -151,7 +152,8 @@ function createElvesDeck(userId: string): (IHero | IItem)[] {
       //   As a second example, if there were 7 allied units, and the harvest dealt 780 damage, then H = 1/(3+7) x 780, which is 1/10 x 780, which is 78, which rounds to 80
       unitId: `${userId}_soulHarvest_${index}`,
       faction: EFaction.DARK_ELVES,
-      itemType: EItems.SOUL_HARVEST
+      itemType: EItems.SOUL_HARVEST,
+      dealsDamage: true
     });
 
     const superCharge = createItemData( {

@@ -1,8 +1,9 @@
-import { EAction, EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
+import { EAction, EAttackType, EClass, EFaction, EHeroes, EItems } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { moveAnimation } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
+import { Item } from "./item";
 import { Tile } from "./tile";
 
 export abstract class Hero extends Phaser.GameObjects.Container {
@@ -26,19 +27,20 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   factionBuff: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
+  superCharge: boolean;
   isActiveValue: boolean;
   belongsTo: number;
   canHeal: boolean;
 
   context: GameScene;
 
-  private characterImage: Phaser.GameObjects.Image;
-  private runeMetalImage: Phaser.GameObjects.Image;
-  private shiningHelmImage: Phaser.GameObjects.Image;
-  private factionBuffImage: Phaser.GameObjects.Image;
-  private attackReticle: Phaser.GameObjects.Image;
-  private healReticle: Phaser.GameObjects.Image;
-  private allyReticle: Phaser.GameObjects.Image;
+  characterImage: Phaser.GameObjects.Image;
+  runeMetalImage: Phaser.GameObjects.Image;
+  shiningHelmImage: Phaser.GameObjects.Image;
+  factionBuffImage: Phaser.GameObjects.Image;
+  attackReticle: Phaser.GameObjects.Image;
+  healReticle: Phaser.GameObjects.Image;
+  allyReticle: Phaser.GameObjects.Image;
 
   constructor(context: GameScene, data: IHero) {
     const { x, y } = context.centerPoints[data.boardPosition];
@@ -65,6 +67,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.factionBuff = data.factionBuff;
     this.runeMetal = data.runeMetal;
     this.shiningHelm = data.shiningHelm;
+    this.superCharge = data.superCharge;
     this.isActiveValue = false;
     this.belongsTo = data.belongsTo ?? 1;
     this.canHeal = data.canHeal ?? false;
@@ -164,6 +167,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       factionBuff: this.factionBuff,
       runeMetal: this.runeMetal,
       shiningHelm: this.shiningHelm,
+      superCharge: this.superCharge,
       belongsTo: this.belongsTo,
       canHeal: this.canHeal
     };
@@ -179,13 +183,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.setScale(1);
   }
 
-  getDamaged(damage: number, attackType: EAttackType): number {
+  getsDamaged(damage: number, attackType: EAttackType): number {
     // Calculate damage after applying resistances
-    const totalDamage = this.lifeLost(damage, attackType);
+    const totalDamage = this.getLifeLost(damage, attackType);
 
     this.currentHealth -= totalDamage;
 
-    if (this.currentHealth <= 0) this.knockedDown();
+    if (this.currentHealth <= 0) this.getsKnockedDown();
 
     this.updateTileData();
 
@@ -208,7 +212,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     return totalPower;
   }
 
-  lifeLost(damage: number, attackType: EAttackType) {
+  getLifeLost(damage: number, attackType: EAttackType) {
     const resistance = {
       [EAttackType.MAGICAL]: this.magicalDamageResistance,
       [EAttackType.PHYSICAL]: this.physicalDamageResistance
@@ -220,15 +224,30 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     return totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
   }
 
-  getHealed(healing: number): void {
+  getsHealed(healing: number): void {
+    if (this.isKO) this.getsRevived();
+
     this.currentHealth += healing;
     if (this.currentHealth > this.maxHealth) this.currentHealth = this.maxHealth;
+
     this.updateTileData();
   }
 
-  knockedDown(): void {
+  private getsRevived(): void {
+    this.isKO = false;
+    this.lastBreath = false;
+    this.characterImage.angle = 0;
+  }
+
+  increaseMaxHealth(amount: number): void {
+    this.maxHealth += amount;
+    this.currentHealth += amount;
+    this.updateTileData();
+  }
+
+  getsKnockedDown(): void {
     if (this.unitType === EHeroes.PHANTOM) {
-      this.removeFromBoard();
+      this.removeFromGame();
       return;
     }
 
@@ -240,13 +259,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // TODO: Switch to KO'd image
     this.characterImage.angle = 90; // REVIEW: p1 units are face down, P2 face up
-  }
-
-  revived(): void {
-    this.isKO = false;
-    this.lastBreath = false;
-    this.updateTileData();
-    this.characterImage.angle = 0;
   }
 
   getTile(): Tile {
@@ -262,7 +274,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     tile.setOccupied(!this.isKO);
   }
 
-  removeFromBoard(): void {
+  removeFromGame(): void {
     // Remove animations
     this.scene.tweens.killTweensOf(this);
 
@@ -295,10 +307,11 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     targetTile.setOccupied(true);
     startTile.removeHero();
 
-    gameController.afterAction(EAction.MOVE, this);
+    gameController.afterAction(EAction.MOVE, startTile.boardPosition, targetTile.boardPosition);
   }
 
   spawn(tile: Tile): void {
+    const startingPosition = this.boardPosition;
     const gameController = this.context.gameController!;
     gameController.hand.removeFromHand(this);
 
@@ -309,10 +322,56 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Update tile data
     this.updateTileData();
 
-    gameController.afterAction(EAction.SPAWN, this);
+    gameController.afterAction(EAction.SPAWN, startingPosition, tile.boardPosition);
   }
 
   abstract attack(target: Hero): void;
   abstract heal(target: Hero): void;
   abstract teleport(target: Hero): void;
+  abstract equipFactionBuff(handPosition: number): void;
+
+  isAlreadyEquipped(item: Item): boolean {
+    const map: Partial<Record<EItems, boolean>> = {
+      [EItems.DRAGON_SCALE]: this.factionBuff,
+      [EItems.SOUL_STONE]: this.factionBuff,
+      [EItems.RUNE_METAL]: this.runeMetal,
+      [EItems.SHINING_HELM]: this.shiningHelm,
+      [EItems.SUPERCHARGE]: this.superCharge
+    };
+
+    return !!map[item.itemType];
+  }
+
+  equipShiningHelm(handPosition: number): void {
+    this.shiningHelm = true;
+    this.magicalDamageResistance += 20;
+
+    this.increaseMaxHealth(this.maxHealth * 10 / 100);
+
+    this.shiningHelmImage.setVisible(true);
+    this.updateTileData();
+
+    this.context.gameController?.afterAction(EAction.USE, handPosition, this.boardPosition);
+  }
+
+  equipRunemetal(handPosition: number): void {
+    this.runeMetal = true;
+    this.runeMetalImage.setVisible(true);
+    this.power += this.power * 50 / 100;
+
+    this.runeMetalImage.setVisible(true);
+    this.updateTileData();
+
+    this.context.gameController!.afterAction(EAction.USE, handPosition, this.boardPosition);
+  }
+
+  equipSuperCharge(handPosition: number): void {
+    this.powerModifier += 300;
+
+    // TODO: add visual effect
+    // FIXME: add a different kind of check for supercharge, since they can't stack
+    this.updateTileData();
+
+    this.context.gameController!.afterAction(EAction.USE, handPosition, this.boardPosition);
+  }
 }

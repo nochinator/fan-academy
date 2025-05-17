@@ -2,7 +2,7 @@ import { EAction, EHeroes, ETiles } from "../enums/gameEnums";
 import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
 import { sendTurnMessage } from "../lib/colyseusGameRoom";
 import GameScene from "../scenes/game.scene";
-import { getNewPositionAfterForce, isHero, moveAnimation, forcedMoveAnimation } from "../utils/gameUtils";
+import { forcedMoveAnimation, getNewPositionAfterForce } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -113,7 +113,7 @@ export class GameController {
           duration: 500,
           ease: 'Linear',
           onComplete: () => {
-            hero.removeFromBoard();
+            hero.removeFromGame();
             console.log('Unit removed from board!');
             console.log('Hero', hero);
             console.log('Tiles', this.board.tiles);
@@ -169,19 +169,16 @@ export class GameController {
     console.log(`A tile ${tile.tileType} has been clicked`);
   }
 
-  afterAction(actionType: EAction, activeUnit: Hero | Item, targetUnit?: Hero | Item): void {
-    console.log('After Action Target Unit', targetUnit ? targetUnit : activeUnit);
-    console.log('After Action Active Unit', activeUnit);
+  afterAction(actionType: EAction, activePosition: number, targetPosition?: number): void {
     // Add action to current state
-    this.addActionToState(actionType, activeUnit, targetUnit);
+    this.addActionToState(actionType, activePosition, targetPosition);
     // Remove a slice from the action pie
     this.actionPie.hideActionSlice(this.context.currentTurnAction!++);
     // Deselect unit and clear highlights
     deselectUnit(this.context);
   }
 
-  addActionToState(action: EAction, activeUnit?: Hero | Item, targetUnit?: Hero | Item): void {
-    // Assign player and opponent data to player1 and player2
+  addActionToState(action: EAction, actorPosition: number, targetPosition?: number): void {
     const { player, opponent } = getPlayersKey(this.context);
 
     const playerState: IPlayerState = {
@@ -197,8 +194,8 @@ export class GameController {
       player1: this.context.isPlayerOne ? playerState : opponentState!,
       player2: !this.context.isPlayerOne ? playerState : opponentState!,
       action: {
-        activeUnit: activeUnit?.exportData(),
-        targetUnit: targetUnit ? targetUnit.exportData() : activeUnit?.exportData(),
+        actorPosition,
+        targetPosition: targetPosition ? targetPosition : actorPosition,
         action,
         actionNumber: this.context.currentTurnAction!
       },

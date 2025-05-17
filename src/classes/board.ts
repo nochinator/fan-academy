@@ -33,12 +33,16 @@ export class Board {
     return grid;
   }
 
-  getTileFromCoordinates(row: number, col: number) {
-    return this.tiles.find(tile => tile.row === row && tile.col === col);
+  getTileFromCoordinates(row: number, col: number): Tile {
+    const result = this.tiles.find(tile => tile.row === row && tile.col === col);
+    if (!result) throw new Error('Board getTile() No tile found');
+    return result;
   }
 
-  getTileFromBoardPosition(boardPosition: number) {
-    return this.tiles.find(tile => tile.boardPosition === boardPosition);
+  getTileFromBoardPosition(boardPosition: number): Tile {
+    const result = this.tiles.find(tile => tile.boardPosition === boardPosition);
+    if (!result) throw new Error('Board getTile() No tile found');
+    return result;
   }
 
   getBoardState(): ITile[] {
@@ -180,5 +184,32 @@ export class Board {
     });
 
     return inRangeTiles;
+  }
+
+  getAreaOfEffectTiles(tile: Tile): Tile[] {
+    const totalRows = 4;
+    const totalCols = 8;
+    const areaTiles: Tile[] = [];
+
+    // Loop through the 3x3 square centered on the target tile
+    for (let rowOffset = -1; rowOffset <= 1; rowOffset++) {
+      for (let colOffset = -1; colOffset <= 1; colOffset++) {
+        const currentRow = tile.row + rowOffset;
+        const currentCol = tile.col + colOffset;
+
+        // Check that the current tile is within the bounds of the map
+        const isRowValid = currentRow >= 0 && currentRow <= totalRows;
+        const isColValid = currentCol >= 0 && currentCol <= totalCols;
+
+        if (isRowValid && isColValid) {
+          const aoeTile = this.getTileFromCoordinates(currentRow, currentCol);
+          areaTiles.push(aoeTile);
+        } else {
+          console.warn('Invalid tile coordinates skipped:', currentRow, currentCol);
+        }
+      }
+    }
+
+    return areaTiles;
   }
 }

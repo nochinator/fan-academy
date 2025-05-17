@@ -1,6 +1,6 @@
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { createNewHero, isHero, isItem } from "../utils/gameUtils";
+import { createNewHero, createNewItem, isHero, isItem } from "../utils/gameUtils";
 import { getCurrentPlayer } from "../utils/playerUtils";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -26,7 +26,7 @@ export class Hand {
 
   renderUnit(unit: IHero | IItem): Hero | Item {
     if (isHero(unit)) return createNewHero(this.context, unit);
-    if (isItem(unit)) return new Item(this.context, unit);
+    if (isItem(unit)) return createNewItem(this.context, unit);
     throw new Error('Unit passed to renderUnit is not a recognized type');
   }
 

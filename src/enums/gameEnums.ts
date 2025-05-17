@@ -31,6 +31,7 @@ export enum EAction {
   ATTACK = 'attack',
   HEAL = 'heal',
   SPAWN = 'spawn',
+  SPAWN_PHANTOM = 'phantom',
   USE = 'use',
   SHUFFLE = 'shuffle',
   TELEPORT = 'teleport',

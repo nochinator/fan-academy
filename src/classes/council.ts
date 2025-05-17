@@ -1,11 +1,32 @@
-import { EAction } from "../enums/gameEnums";
+import { EAction, EAttackType, EItems, ETiles } from "../enums/gameEnums";
 import { createCouncilArcherData, createCouncilClericData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "../gameData/councilHeroData";
-import { IHero } from "../interfaces/gameInterface";
+import { createItemData } from "../gameData/itemData";
+import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { getGridDistance } from "../utils/gameUtils";
+import { getGridDistance, isHero, isItem } from "../utils/gameUtils";
 import { Hero } from "./hero";
+import { Item } from "./item";
+import { Tile } from "./tile";
 
-export class Archer extends Hero {
+export abstract class Human extends Hero {
+  constructor(context: GameScene, data: IHero) {
+    super(context, data);
+  }
+
+  equipFactionBuff(handPosition: number): void {
+    this.factionBuff = true;
+    this.factionBuffImage.setVisible(true);
+    this.physicalDamageResistance += 20;
+
+    this.increaseMaxHealth(this.maxHealth * 10 / 100);
+
+    this.updateTileData();
+
+    this.context.gameController!.afterAction(EAction.USE, handPosition, this.boardPosition);
+  }
+}
+
+export class Archer extends Human {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilArcherData(data));
   }
@@ -24,19 +45,19 @@ export class Archer extends Hero {
     const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
 
     if (distance === 1) {
-      target.getDamaged(this.getTotalPower(2), this.attackType);
+      target.getsDamaged(this.getTotalPower(2), this.attackType);
     } else {
-      target.getDamaged(this.getTotalPower(), this.attackType);
+      target.getsDamaged(this.getTotalPower(), this.attackType);
     }
 
-    gameController?.afterAction(EAction.ATTACK, this, target);
+    gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(target: Hero): void {};
   teleport(target: Hero): void {};
 }
 
-export class Knight extends Hero {
+export class Knight extends Human {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilKnightData(data));
   }
@@ -46,18 +67,18 @@ export class Knight extends Hero {
 
     const gameController = this.context.gameController!;
 
-    target.getDamaged(this.getTotalPower(), this.attackType);
+    target.getsDamaged(this.getTotalPower(), this.attackType);
 
     await gameController.pushEnemy(this, target);
 
-    gameController?.afterAction(EAction.ATTACK, this, target);
+    gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(target: Hero): void {};
   teleport(target: Hero): void {};
 }
 
-export class Wizard extends Hero {
+export class Wizard extends Human {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilWizardData(data));
   }
@@ -70,7 +91,7 @@ export class Wizard extends Hero {
   teleport(target: Hero): void {};
 }
 
-export class Ninja extends Hero {
+export class Ninja extends Human {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilNinjaData(data));
   }
@@ -89,12 +110,12 @@ export class Ninja extends Hero {
     const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
 
     if (distance === 1) {
-      target.getDamaged(this.getTotalPower(2), this.attackType);
+      target.getsDamaged(this.getTotalPower(2), this.attackType);
     } else {
-      target.getDamaged(this.getTotalPower(), this.attackType);
+      target.getsDamaged(this.getTotalPower(), this.attackType);
     }
 
-    gameController?.afterAction(EAction.ATTACK, this, target);
+    gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   teleport(target: Hero): void {
@@ -110,13 +131,13 @@ export class Ninja extends Hero {
     this.updatePosition(targetBoardPosition);
     unitDestination.hero = this.exportData();
 
-    gameController?.afterAction(EAction.TELEPORT, this, target);
+    gameController?.afterAction(EAction.TELEPORT, this.boardPosition, target.boardPosition);
   };
 
   heal(target: Hero): void {};
 }
 
-export class Cleric extends Hero {
+export class Cleric extends Human {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilClericData(data));
   }
@@ -125,52 +146,88 @@ export class Cleric extends Hero {
 
     const gameController = this.context.gameController!;
 
-    target.getDamaged(this.getTotalPower(), this.attackType);
+    target.getsDamaged(this.getTotalPower(), this.attackType);
 
-    gameController?.afterAction(EAction.ATTACK, this, target);
+    gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   override heal(target: Hero): void {
-    if (target.currentHealth === 0) {
-      target.getHealed(this.power * 2);
-      target.revived();
+    if (target.isKO) {
+      target.getsHealed(this.power * 2);
     } else {
-      target.getHealed(this.power * 3);
+      target.getsHealed(this.power * 3);
     }
 
-    this.context.gameController?.afterAction(EAction.HEAL, this, target);
+    this.context.gameController?.afterAction(EAction.HEAL, this.boardPosition, target.boardPosition);
   };
 
   teleport(target: Hero): void {};
 }
 
-// FIXME:
-// export class ShiningHelm extends Item {
-//   constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
-//     super(context, createItemData({
-//       unitId,
-//       itemType: EItems.SHINING_HELM,
-//       boardPosition,
-//     }));
-//   }
-// }
+export class DragonScale extends Item {
+  constructor(context: GameScene, data: Partial<IItem>) {
+    super(context, createItemData(data));
+  }
 
-// export class HealingPotion extends Item {
-//   constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
-//     super(context, createItemData({
-//       unitId,
-//       itemType: EItems.HEALING_POTION,
-//       boardPosition
-//     }));
-//   }
-// }
+  use(target: Hero): void {
+    target.equipFactionBuff(this.boardPosition);
+    this.removeFromGame();
+  }
+}
 
-// export class Inferno extends Item {
-//   constructor(context: GameScene, unitId: string, boardPosition: number = 51) {
-//     super(context, {
-//       unitId,
-//       itemType: EItems.INFERNO,
-//       boardPosition
-//     });
-//   }
-// }
+export class HealingPotion extends Item {
+  constructor(context: GameScene, data: Partial<IItem>) {
+    super(context, createItemData(data));
+  }
+
+  use(target: Hero): void {
+    const healingAmount = target.isKO ? 100 : 1000;
+    target.getsHealed(healingAmount);
+
+    this.context.gameController?.afterAction(EAction.USE, this.boardPosition, target.boardPosition);
+
+    this.removeFromGame();
+  }
+}
+
+export class Inferno extends Item {
+  constructor(context: GameScene, data: Partial<IItem>) {
+    super(context, createItemData({
+      dealsDamage: true,
+      ...data
+    }));
+  }
+
+  use(targetTile: Tile): void {
+    // Inferno removes KO'd enemy units
+
+    const board = this.context.gameController?.board;
+    if (!board) throw new Error('Inferno use() board not found');
+
+    const areOfEffect = board.getAreaOfEffectTiles(targetTile);
+
+    const enemyHeroTiles = areOfEffect?.filter(tile => tile.isEnemy(this.context.userId));
+
+    const enemyCrystalTiles = areOfEffect?.filter(tile => tile.tileType === ETiles.CRYSTAL);
+
+    enemyHeroTiles?.forEach(tile => {
+      const hero = board.units.find(unit => unit.boardPosition === tile.boardPosition);
+      if (!hero) throw new Error('Inferno use() hero not found');
+
+      if (hero.isKO){
+        hero.removeFromGame();
+        return;
+      }
+
+      hero.getsDamaged(350, EAttackType.MAGICAL);
+    });
+
+    enemyCrystalTiles.forEach(tile => {
+      // TODO: I need a crystal class with a check to see if the crystal is friendly
+    });
+
+    this.context.gameController?.afterAction(EAction.USE, this.boardPosition, targetTile.boardPosition);
+
+    this.removeFromGame();
+  }
+}

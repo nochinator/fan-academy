@@ -1,10 +1,11 @@
 import { EClass, EFaction, EItems } from "../enums/gameEnums";
+import { createItemData } from "../gameData/itemData";
 import { IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Hero } from "./hero";
 
-export class Item extends Phaser.GameObjects.Image {
+export abstract class Item extends Phaser.GameObjects.Image {
   class: EClass = EClass.ITEM;
   faction: EFaction;
   unitId: string;
@@ -80,37 +81,56 @@ export class Item extends Phaser.GameObjects.Image {
     console.log(`${this.unitId} is now active`);
     this.setScale(1);
 
-    this.highlightMovementTiles();
-    this.highlightEnemiesInRange();
+    // this.highlightMovementTiles();
+    // this.highlightEnemiesInRange();
   }
 
   onDeactivate() {
     console.log(`${this.unitId} is now inactive`);
     this.setScale(0.8);
-
-    this.clearHighlights();
   }
 
-  highlightMovementTiles() {
-    console.log("Highlighting movement tiles...");
-    // Add logic to highlight movement range tiles
+  removeFromGame(): void {
+    // Remove animations
+    this.scene.tweens.killTweensOf(this);
+
+    this.context.gameController?.hand.removeFromHand(this);
+
+    this.destroy(true);
   }
 
-  highlightEnemiesInRange() {
-    console.log("Highlighting enemies in range...");
-    // Add logic to highlight attackable enemies
+  abstract use(target: any): void;
+}
+
+export class ShiningHelm extends Item {
+  constructor(context: GameScene, data: Partial<IItem>) {
+    super(context, createItemData(data));
   }
 
-  clearHighlights() {
-    console.log("Clearing all highlights...");
-    // Add logic to remove movement/attack highlights
+  use(target: Hero): void {
+    target.equipShiningHelm(this.boardPosition);
+    this.removeFromGame();
+  }
+}
+
+export class RuneMetal extends Item {
+  constructor(context: GameScene, data: Partial<IItem>) {
+    super(context, createItemData(data));
   }
 
-  dealDamage(boardPosition: number): void {
-    // All damage items are AOE, right?
+  use(target: Hero): void {
+    target.equipRunemetal(this.boardPosition);
+    this.removeFromGame();
+  }
+}
+
+export class SuperCharge extends Item {
+  constructor(context: GameScene, data: Partial<IItem>) {
+    super(context, createItemData(data));
   }
 
-  heal(target: Hero): void {
-    // Check if unit can heal and if target should be healed or revived
+  use(target: Hero): void {
+    target.equipSuperCharge(this.boardPosition);
+    this.removeFromGame();
   }
 }

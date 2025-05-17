@@ -9,6 +9,7 @@ import { deselectUnit, selectUnit } from "./playerUtils";
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   unit.on('pointerdown', () => {
     console.log(`Unit in ${unit.boardPosition}`);
+    console.log(unit);
     // Only the active player can click on tiles, and only if they still have actions available
     if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
 
@@ -32,7 +33,7 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
     // CASE 2: Clicking the active unit deselects it, unless it's a healer
     if (isSameUnit) {
-      if (activeUnit.canHeal && healReticle?.visible && isHero(unit)) {
+      if (isHero(activeUnit) && activeUnit.canHeal && healReticle?.visible && isHero(unit)) {
         activeUnit.heal(unit);
         return;
       } else {
@@ -46,14 +47,12 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
       // CASE 3.1: Clicking an enemy unit
       if (isEnemy) {
         if (isHero(activeUnit) && attackReticle?.visible) {
-          console.log('this logs');
           activeUnit.attack(unit);
           return;
         }
 
         if (isItem(activeUnit) && activeUnit.dealsDamage) {
-          activeUnit.dealDamage(unit.boardPosition);
-          deselectUnit(context); // TODO: unit not only is deselected, it is also removed from hand
+          activeUnit.use(unit.getTile());
           return;
         }
       }
@@ -72,14 +71,17 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
           return;
         }
 
-        if (isItem(activeUnit)) {
-          console.log('Missing logic for buffing / healing / reviving units with items');
-          deselectUnit(context); // TODO: unit not only is deselected, it is also removed from hand
+        if (isHero(activeUnit) && activeUnit.canHeal && healReticle?.visible) {
+          activeUnit.heal(unit);
           return;
         }
 
-        if (activeUnit.canHeal && healReticle?.visible) {
-          activeUnit.heal(unit);
+        if (isItem(activeUnit)) {
+          if (unit.isAlreadyEquipped(activeUnit)) return;
+
+          if (activeUnit.dealsDamage) activeUnit.use(unit.getTile());
+          if (!activeUnit.dealsDamage) activeUnit.use(unit);
+
           return;
         }
       }

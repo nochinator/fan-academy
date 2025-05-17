@@ -1,9 +1,9 @@
-import { Archer, Cleric, Knight, Ninja, Wizard } from "../classes/council";
-import { Priestess, Impaler, Necromancer, Phantom, Wraith, VoidMonk, DarkElf } from "../classes/elves";
+import { Archer, Cleric, DragonScale, HealingPotion, Inferno, Knight, Ninja, Wizard } from "../classes/council";
+import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulStone, VoidMonk, Wraith } from "../classes/elves";
 import { Hero } from "../classes/hero";
-import { Item } from "../classes/item";
+import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EAttackType, EHeroes } from "../enums/gameEnums";
+import { EHeroes, EItems } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
@@ -46,8 +46,28 @@ export function getGridDistance(startRow: number, startColumn: number, targetRow
   return Math.abs(startRow - targetRow) + Math.abs(startColumn - targetColumn);
 }
 
-export function createNewHero(context: GameScene, heroData: IHero): Hero | DarkElf {
-  const heroTypes: Record<EHeroes, () => Hero | DarkElf> = {
+export function createNewItem(context: GameScene, itemData: IItem): Item {
+  const itemTypes: Record<EItems, () => Item> = {
+    [EItems.SHINING_HELM]: () => new ShiningHelm(context, itemData),
+    [EItems.SUPERCHARGE]: () => new SuperCharge(context, itemData),
+    [EItems.RUNE_METAL]: () => new RuneMetal(context, itemData),
+
+    [EItems.DRAGON_SCALE]: () => new DragonScale(context, itemData),
+    [EItems.HEALING_POTION]: () => new HealingPotion(context, itemData),
+    [EItems.INFERNO]: () => new Inferno(context, itemData),
+
+    [EItems.MANA_VIAL]: () => new ManaVial(context, itemData),
+    [EItems.SOUL_HARVEST]: () => new SoulHarvest(context, itemData),
+    [EItems.SOUL_STONE]: () => new SoulStone(context, itemData)
+  };
+
+  const createItem = itemTypes[itemData.itemType];
+  if (!createItem) console.error('Error creating item', itemData);
+  return createItem();
+}
+
+export function createNewHero(context: GameScene, heroData: IHero): Hero {
+  const heroTypes: Record<EHeroes, () => Hero> = {
     [EHeroes.ARCHER]: () => new Archer(context, heroData),
     [EHeroes.CLERIC]: () => new Cleric(context, heroData),
     [EHeroes.KNIGHT]: () => new Knight(context, heroData),

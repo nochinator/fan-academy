@@ -1,3 +1,4 @@
+import { SuperCharge } from "../classes/item";
 import { EAction, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 
 /**
@@ -58,6 +59,7 @@ export interface IHero {
   factionBuff: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
+  superCharge: boolean;
   belongsTo: number;
   canHeal: boolean
 }
@@ -90,11 +92,10 @@ export interface IPlayerData {
  * TurnAction Interface
  */
 export interface ITurnAction {
-  activeUnit?: IHero | IItem;
-  targetUnit?: IHero | IItem; // an item can be a target for shuffle
+  actorPosition?: number;
+  targetPosition?: number; // an item can be a target for shuffle
   action: EAction,
   actionNumber: number;
-  // TODO: this needs extra properties so we can replay the action (like start and end board points for example)
 }
 
 /**
