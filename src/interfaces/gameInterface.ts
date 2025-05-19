@@ -96,7 +96,6 @@ export interface ITurnAction {
   targetPosition?: number; // an item can be a target for shuffle
   action: EActionType;
   actionClass: EActionClass,
-  // actionNumber: number;
 }
 
 /**

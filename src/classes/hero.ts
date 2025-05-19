@@ -287,8 +287,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     tile.removeHero();
 
     // Remove hero from board array
-    let  unitsArray = this.context.gameController!.board.units;
-    unitsArray = unitsArray.filter(unit => unit.unitId !== this.unitId);
+    const index = this.context.gameController!.board.units.findIndex(unit => unit.unitId === this.unitId);
+    if (index !== -1) { this.context.gameController!.board.units.splice(index, 1); }
 
     // Destroy container and children
     this.destroy(true);

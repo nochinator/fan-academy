@@ -129,8 +129,9 @@ export class GameController {
       return animation.call(this.context, unit);
     }));
 
-    const lastAction = this.game.currentState[this.game.currentState.length - 1];
-    lastAction.boardState = this.board.getBoardState();
+    this.addActionToState(EActionType.REMOVE_UNITS);
+    // const lastAction = this.game.currentState[this.game.currentState.length - 1];
+    // lastAction.boardState = this.board.getBoardState();
   }
 
   async endOfTurnActions() {
@@ -179,7 +180,7 @@ export class GameController {
     deselectUnit(this.context);
   }
 
-  addActionToState(action: EActionType, actorPosition: number, targetPosition?: number): void {
+  addActionToState(action: EActionType, actorPosition?: number, targetPosition?: number): void {
     const { player, opponent } = getPlayersKey(this.context);
 
     const actionClass = getActionClass(action);
