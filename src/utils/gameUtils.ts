@@ -3,7 +3,7 @@ import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulSt
 import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EHeroes, EItems } from "../enums/gameEnums";
+import { EActionClass, EActionType, EHeroes, EItems } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
@@ -167,4 +167,8 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
     row: targetRow + directionRow,
     col: targetCol + directionColumn
   };
+}
+
+export function getActionClass(action: EActionType): EActionClass {
+  return [EActionType.PASS, EActionType.DRAW, EActionType.REMOVE_UNITS].includes(action) ? EActionClass.AUTO : EActionClass.USER;
 }

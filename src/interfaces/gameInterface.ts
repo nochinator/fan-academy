@@ -1,5 +1,5 @@
 import { SuperCharge } from "../classes/item";
-import { EAction, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems, ETiles } from "../enums/gameEnums";
+import { EActionClass, EActionType, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 
 /**
  * Turn sent interface
@@ -94,8 +94,9 @@ export interface IPlayerData {
 export interface ITurnAction {
   actorPosition?: number;
   targetPosition?: number; // an item can be a target for shuffle
-  action: EAction,
-  actionNumber: number;
+  action: EActionType;
+  actionClass: EActionClass,
+  // actionNumber: number;
 }
 
 /**

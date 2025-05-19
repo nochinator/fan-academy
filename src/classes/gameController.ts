@@ -1,8 +1,8 @@
-import { EAction, EHeroes, ETiles } from "../enums/gameEnums";
+import { EActionClass, EActionType, EHeroes, ETiles } from "../enums/gameEnums";
 import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
 import { sendTurnMessage } from "../lib/colyseusGameRoom";
 import GameScene from "../scenes/game.scene";
-import { forcedMoveAnimation, getNewPositionAfterForce } from "../utils/gameUtils";
+import { forcedMoveAnimation, getActionClass, getNewPositionAfterForce } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -79,8 +79,9 @@ export class GameController {
       player1: this.context.isPlayerOne ? playerState : opponentState!,
       player2: !this.context.isPlayerOne ? playerState : opponentState!,
       action: {
-        action: EAction.DRAW,
-        actionNumber: 6 // REVIEW: always 6?
+        actionClass: EActionClass.AUTO,
+        action: EActionType.DRAW
+
       },
       boardState: this.board.getBoardState()
     });
@@ -169,7 +170,7 @@ export class GameController {
     console.log(`A tile ${tile.tileType} has been clicked`);
   }
 
-  afterAction(actionType: EAction, activePosition: number, targetPosition?: number): void {
+  afterAction(actionType: EActionType, activePosition: number, targetPosition?: number): void {
     // Add action to current state
     this.addActionToState(actionType, activePosition, targetPosition);
     // Remove a slice from the action pie
@@ -178,8 +179,10 @@ export class GameController {
     deselectUnit(this.context);
   }
 
-  addActionToState(action: EAction, actorPosition: number, targetPosition?: number): void {
+  addActionToState(action: EActionType, actorPosition: number, targetPosition?: number): void {
     const { player, opponent } = getPlayersKey(this.context);
+
+    const actionClass = getActionClass(action);
 
     const playerState: IPlayerState = {
       ...this.context[player]!,
@@ -197,7 +200,7 @@ export class GameController {
         actorPosition,
         targetPosition: targetPosition ? targetPosition : actorPosition,
         action,
-        actionNumber: this.context.currentTurnAction!
+        actionClass
       },
       boardState: this.board.getBoardState()
     });

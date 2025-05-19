@@ -1,4 +1,4 @@
-import { EAction, EAttackType, EClass, EFaction, EHeroes, EItems } from "../enums/gameEnums";
+import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { moveAnimation } from "../utils/gameUtils";
@@ -307,7 +307,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     targetTile.setOccupied(true);
     startTile.removeHero();
 
-    gameController.afterAction(EAction.MOVE, startTile.boardPosition, targetTile.boardPosition);
+    gameController.afterAction(EActionType.MOVE, startTile.boardPosition, targetTile.boardPosition);
   }
 
   spawn(tile: Tile): void {
@@ -322,7 +322,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Update tile data
     this.updateTileData();
 
-    gameController.afterAction(EAction.SPAWN, startingPosition, tile.boardPosition);
+    gameController.afterAction(EActionType.SPAWN, startingPosition, tile.boardPosition);
   }
 
   abstract attack(target: Hero): void;
@@ -351,7 +351,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.shiningHelmImage.setVisible(true);
     this.updateTileData();
 
-    this.context.gameController?.afterAction(EAction.USE, handPosition, this.boardPosition);
+    this.context.gameController?.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
   equipRunemetal(handPosition: number): void {
@@ -362,7 +362,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.runeMetalImage.setVisible(true);
     this.updateTileData();
 
-    this.context.gameController!.afterAction(EAction.USE, handPosition, this.boardPosition);
+    this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
   equipSuperCharge(handPosition: number): void {
@@ -372,6 +372,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // FIXME: add a different kind of check for supercharge, since they can't stack
     this.updateTileData();
 
-    this.context.gameController!.afterAction(EAction.USE, handPosition, this.boardPosition);
+    this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 }

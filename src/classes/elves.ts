@@ -1,4 +1,4 @@
-import { EAction } from "../enums/gameEnums";
+import { EActionType } from "../enums/gameEnums";
 import { createElvesImpalerData, createElvesNecromancerData, createElvesPhantomData, createElvesPriestessData, createElvesVoidMonkData, createElvesWraithData } from "../gameData/elvesHeroData";
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
@@ -19,7 +19,7 @@ export abstract class DarkElf extends Hero {
 
     this.updateTileData();
 
-    this.context.gameController!.afterAction(EAction.USE, handPosition, this.boardPosition);
+    this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
   lifeSteal(damage: number): void {
@@ -50,7 +50,7 @@ export class Impaler extends DarkElf {
 
     await gameController.pullEnemy(this, target);
 
-    gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
+    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(target: Hero): void {};
@@ -95,13 +95,13 @@ export class Necromancer extends DarkElf {
 
       tile.hero = phantom.exportData();
 
-      gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
-      gameController?.addActionToState(EAction.SPAWN_PHANTOM, this.boardPosition); // Adding action directly to state. It shares the turnActionNumber of the attack
+      gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+      gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition); // Adding action directly to state. It shares the turnActionNumber of the attack
     } else {
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
       this.lifeSteal(damageDone);
 
-      gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
+      gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     }
   }
 
@@ -128,7 +128,7 @@ export class Priestess extends DarkElf {
     // Apply a 50% debuff to the target's next attack
     target.modifyPower(-50); // TODO: add debuff animation
 
-    gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
+    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   override heal(target: Hero): void {
@@ -138,7 +138,7 @@ export class Priestess extends DarkElf {
       target.getsHealed(this.power * 2);
     }
 
-    this.context.gameController?.afterAction(EAction.HEAL, this.boardPosition, target.boardPosition);
+    this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
 
   teleport(target: Hero): void {};
@@ -171,7 +171,7 @@ export class Phantom extends Hero {
     }
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
-    gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
+    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(target: Hero): void {};
@@ -200,7 +200,7 @@ export class ManaVial extends Item {
     target.getsHealed(1000);
     target.increaseMaxHealth(50);
 
-    this.context.gameController?.afterAction(EAction.USE, this.boardPosition, target.boardPosition);
+    this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
     this.removeFromGame();
   }
 }

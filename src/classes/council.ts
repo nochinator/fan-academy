@@ -1,4 +1,4 @@
-import { EAction, EAttackType, EItems, ETiles } from "../enums/gameEnums";
+import { EActionType, EAttackType, EItems, ETiles } from "../enums/gameEnums";
 import { createCouncilArcherData, createCouncilClericData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "../gameData/councilHeroData";
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
@@ -22,7 +22,7 @@ export abstract class Human extends Hero {
 
     this.updateTileData();
 
-    this.context.gameController!.afterAction(EAction.USE, handPosition, this.boardPosition);
+    this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 }
 
@@ -50,7 +50,7 @@ export class Archer extends Human {
       target.getsDamaged(this.getTotalPower(), this.attackType);
     }
 
-    gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
+    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(target: Hero): void {};
@@ -71,7 +71,7 @@ export class Knight extends Human {
 
     await gameController.pushEnemy(this, target);
 
-    gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
+    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(target: Hero): void {};
@@ -115,7 +115,7 @@ export class Ninja extends Human {
       target.getsDamaged(this.getTotalPower(), this.attackType);
     }
 
-    gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
+    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   teleport(target: Hero): void {
@@ -131,7 +131,7 @@ export class Ninja extends Human {
     this.updatePosition(targetBoardPosition);
     unitDestination.hero = this.exportData();
 
-    gameController?.afterAction(EAction.TELEPORT, this.boardPosition, target.boardPosition);
+    gameController?.afterAction(EActionType.TELEPORT, this.boardPosition, target.boardPosition);
   };
 
   heal(target: Hero): void {};
@@ -148,7 +148,7 @@ export class Cleric extends Human {
 
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
-    gameController?.afterAction(EAction.ATTACK, this.boardPosition, target.boardPosition);
+    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   override heal(target: Hero): void {
@@ -158,7 +158,7 @@ export class Cleric extends Human {
       target.getsHealed(this.power * 3);
     }
 
-    this.context.gameController?.afterAction(EAction.HEAL, this.boardPosition, target.boardPosition);
+    this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
 
   teleport(target: Hero): void {};
@@ -184,7 +184,7 @@ export class HealingPotion extends Item {
     const healingAmount = target.isKO ? 100 : 1000;
     target.getsHealed(healingAmount);
 
-    this.context.gameController?.afterAction(EAction.USE, this.boardPosition, target.boardPosition);
+    this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
 
     this.removeFromGame();
   }
@@ -226,7 +226,7 @@ export class Inferno extends Item {
       // TODO: I need a crystal class with a check to see if the crystal is friendly
     });
 
-    this.context.gameController?.afterAction(EAction.USE, this.boardPosition, targetTile.boardPosition);
+    this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
 
     this.removeFromGame();
   }
