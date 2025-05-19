@@ -1,9 +1,10 @@
+import { Board } from "../classes/board";
 import { Archer, Cleric, DragonScale, HealingPotion, Inferno, Knight, Ninja, Wizard } from "../classes/council";
 import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulStone, VoidMonk, Wraith } from "../classes/elves";
 import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EActionClass, EActionType, EHeroes, EItems } from "../enums/gameEnums";
+import { EActionClass, EActionType, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
@@ -171,4 +172,23 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
 
 export function getActionClass(action: EActionType): EActionClass {
   return [EActionType.PASS, EActionType.DRAW, EActionType.REMOVE_UNITS].includes(action) ? EActionClass.AUTO : EActionClass.USER;
+}
+
+export function getAOETiles(context: GameScene, targetTile: Tile): {
+  enemyHeroTiles: Tile[],
+  enemyCrystalTiles: Tile[]
+} {
+  const board = context.gameController?.board;
+  if (!board) throw new Error('Inferno use() board not found');
+
+  const areOfEffect = board.getAreaOfEffectTiles(targetTile);
+
+  const enemyHeroTiles = areOfEffect?.filter(tile => tile.isEnemy(context.userId));
+
+  const enemyCrystalTiles = areOfEffect?.filter(tile => tile.tileType === ETiles.CRYSTAL);
+
+  return {
+    enemyHeroTiles,
+    enemyCrystalTiles
+  };
 }

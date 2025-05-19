@@ -3,7 +3,7 @@ import { createCouncilArcherData, createCouncilClericData, createCouncilKnightDa
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { getGridDistance, isHero, isItem } from "../utils/gameUtils";
+import { getAOETiles, getGridDistance, isHero, isItem } from "../utils/gameUtils";
 import { Hero } from "./hero";
 import { Item } from "./item";
 import { Tile } from "./tile";
@@ -199,21 +199,13 @@ export class Inferno extends Item {
   }
 
   use(targetTile: Tile): void {
-    // Inferno removes KO'd enemy units
-
-    const board = this.context.gameController?.board;
-    if (!board) throw new Error('Inferno use() board not found');
-
-    const areOfEffect = board.getAreaOfEffectTiles(targetTile);
-
-    const enemyHeroTiles = areOfEffect?.filter(tile => tile.isEnemy(this.context.userId));
-
-    const enemyCrystalTiles = areOfEffect?.filter(tile => tile.tileType === ETiles.CRYSTAL);
+    const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, targetTile);
 
     enemyHeroTiles?.forEach(tile => {
-      const hero = board.units.find(unit => unit.boardPosition === tile.boardPosition);
+      const hero = this.context.gameController?.board.units.find(unit => unit.boardPosition === tile.boardPosition);
       if (!hero) throw new Error('Inferno use() hero not found');
 
+      // Inferno removes KO'd enemy units
       if (hero.isKO){
         hero.removeFromGame();
         return;
