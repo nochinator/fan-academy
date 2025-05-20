@@ -3,7 +3,7 @@ import { createCouncilArcherData, createCouncilClericData, createCouncilKnightDa
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { getAOETiles, getGridDistance, isHero, isItem } from "../utils/gameUtils";
+import { belongsToPlayer, getAOETiles, getGridDistance, isHero, isItem } from "../utils/gameUtils";
 import { Hero } from "./hero";
 import { Item } from "./item";
 import { Tile } from "./tile";
@@ -199,6 +199,9 @@ export class Inferno extends Item {
   }
 
   use(targetTile: Tile): void {
+    // Damages enemy units and crystals, and removes enemy KO'd units
+    const damage = 350;
+
     const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, targetTile);
 
     enemyHeroTiles?.forEach(tile => {
@@ -211,11 +214,16 @@ export class Inferno extends Item {
         return;
       }
 
-      hero.getsDamaged(350, EAttackType.MAGICAL);
+      hero.getsDamaged(damage, EAttackType.MAGICAL);
     });
 
     enemyCrystalTiles.forEach(tile => {
-      // TODO: I need a crystal class with a check to see if the crystal is friendly
+      const crystal = this.context.gameController?.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
+      if (!crystal) throw new Error('Inferno use() crystal not found');
+
+      if (!belongsToPlayer(this.context, crystal)) {
+        crystal.getsDamaged(damage);
+      }
     });
 
     this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);

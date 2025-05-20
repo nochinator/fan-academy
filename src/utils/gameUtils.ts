@@ -1,11 +1,11 @@
-import { Board } from "../classes/board";
 import { Archer, Cleric, DragonScale, HealingPotion, Inferno, Knight, Ninja, Wizard } from "../classes/council";
+import { Crystal } from "../classes/crystal";
 import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulStone, VoidMonk, Wraith } from "../classes/elves";
 import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
 import { EActionClass, EActionType, EHeroes, EItems, ETiles } from "../enums/gameEnums";
-import { IHero, IItem } from "../interfaces/gameInterface";
+import { ICrystal, IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
 // Fisher-Yates shuffle algorithm
@@ -38,9 +38,27 @@ export function isInHand(boardPosition: number): boolean {
   return boardPosition > 44 && boardPosition < 51;
 }
 
-export function belongsToPlayer(context: GameScene, unit: Hero | Item): boolean {
+export function belongsToPlayer(context: GameScene, unit: Hero | Item | ICrystal): boolean {
   const playerNumber = context.isPlayerOne ? 1 : 2;
   return unit.belongsTo === playerNumber;
+}
+
+// Rounds a number to the nearest multiple of 5
+export function roundToFive(amount: number): number {
+  return Math.round(amount / 5) * 5;
+}
+
+export function getCoordinatesFromBoardPosition(boardPosition: number): {
+  row: number,
+  col: number
+} {
+  const cols = 9; // number of columns in the grid
+  const row = Math.floor(boardPosition / cols);
+  const col = boardPosition % cols;
+  return {
+    row,
+    col
+  };
 }
 
 export function getGridDistance(startRow: number, startColumn: number, targetRow: number, targetColumn: number): number {

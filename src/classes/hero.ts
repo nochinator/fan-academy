@@ -3,6 +3,7 @@ import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { moveAnimation } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
+import { Crystal } from "./crystal";
 import { Item } from "./item";
 import { Tile } from "./tile";
 
@@ -94,7 +95,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.healReticle = context.add.image(0, -10, 'healReticle').setOrigin(0.5).setScale(0.8).setName('healReticle').setVisible(false);
     this.allyReticle = context.add.image(0, -10, 'allyReticle').setOrigin(0.5).setScale(0.6).setName('allyReticle').setVisible(false);
 
-    // Add animations to the reticles // TODO: rotate the animation
+    // Add animations to the reticles
     const addTween = (reticle: Phaser.GameObjects.Image) => {
       context.tweens.add({
         targets: reticle,
@@ -206,7 +207,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     const totalPower = this.power * multiplier + this.power * this.powerModifier / 100;
     console.log(totalPower);
-    this.powerModifier = 0;
+    this.powerModifier = 0; // FIXME: the modifier should only be reset after damage is dealt
     this.updateTileData();
 
     return totalPower;
@@ -225,6 +226,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   getsHealed(healing: number): void {
+    if (healing <= 0) return;
     if (this.isKO) this.getsRevived();
 
     this.currentHealth += healing;
@@ -240,6 +242,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   increaseMaxHealth(amount: number): void {
+    if (amount <= 0) return;
+    if (this.isKO) this.getsRevived(); // for Soul Harvest
+
     this.maxHealth += amount;
     this.currentHealth += amount;
     this.updateTileData();
@@ -254,7 +259,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.currentHealth = 0;
     this.isKO = true;
     const tile = this.getTile();
-    tile.setOccupied(false); // REVIEW: might need a rework to function with the necromancer
+    tile.setOccupied(false);
     tile.hero = this.exportData();
 
     // TODO: Switch to KO'd image
@@ -323,6 +328,14 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.updateTileData();
 
     gameController.afterAction(EActionType.SPAWN, startingPosition, tile.boardPosition);
+  }
+
+  attackCrystal(crystal: Crystal): void {
+    // TODO: add check for debuff tiles
+    const totalPower = this.getTotalPower();
+    crystal.getsDamaged(totalPower);
+
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, crystal.boardPosition);
   }
 
   abstract attack(target: Hero): void;

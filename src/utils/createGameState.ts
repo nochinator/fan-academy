@@ -31,6 +31,7 @@ export function createNewGameBoardState(): ITile[] {
     for (let col = 0; col < 9; col++) {
       const { x, y } = centerPoints[boardPosition];
       const specialTile = mapData.find((tile) => tile.col === col && tile.row === row);
+      const isCrystalTile = specialTile?.tileType === ETiles.CRYSTAL;
       const tile = createTileData({
         row,
         col,
@@ -39,10 +40,22 @@ export function createNewGameBoardState(): ITile[] {
         boardPosition,
         tileType: specialTile ? specialTile.tileType : ETiles.BASIC,
         occupied: false,
-        obstacle: specialTile && specialTile.tileType === ETiles.CRYSTAL ? true : false
+        obstacle: isCrystalTile ? true : false,
+        ...isCrystalTile ? {
+          crystal: {
+            belongsTo: col > 4 ? 2 : 1,
+            maxHealth: 4500,
+            currentHealth: 4500,
+            isDestroyed: false,
+            isLastCrystal: false,
+            boardPosition
+          }
+        } : {} // REVIEW:
       });
       newBoard.push(tile);
       boardPosition++;
+
+      if (isCrystalTile) console.log('TileData', tile);
     }}
 
   return newBoard;

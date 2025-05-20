@@ -6,6 +6,7 @@ export function createTileData(data: ITile): ITile {
   const occupied = false;
   const obstacle = false;
   const hero = undefined;
+  const crystal = undefined;
 
   return {
     row: data.row,
@@ -16,6 +17,7 @@ export function createTileData(data: ITile): ITile {
     tileType: data.tileType ?? tileType,
     occupied: data.occupied ?? occupied,
     obstacle: data.obstacle ?? obstacle,
-    hero: data.hero ?? hero
+    hero: data.hero ?? hero,
+    crystal: data.crystal ?? crystal
   };
 }

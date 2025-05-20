@@ -9,10 +9,15 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('speedTile', '/assets/images/gameItems/PremiumTile_Speed-hd.png');
   context.load.image('crystalDamageTile', '/assets/images/gameItems/PremiumTile_VictoryDamageMultiplier-hd.png');
   context.load.image('teleporterTile', '/assets/images/gameItems/PremiumTile_Teleport-hd.png');
+
   // Crystal tile images
-  context.load.image('crystal', '/assets/images/gameItems/crystal_full.png');
+  context.load.image('crystalFull', '/assets/images/gameItems/crystal_full.png');
   context.load.image('pedestal', '/assets/images/gameItems/crystal_pedestal.png');
-  context.load.image('damagedCrystal', '/assets/images/gameItems/crystal_damaged.png');
+  context.load.image('crystalDamaged', '/assets/images/gameItems/crystal_damaged.png');
+  context.load.image('crystalDebuff_1', '/assets/images/gameItems/animations/CrystalDebuff1_BgFlames01-hd.png');
+  context.load.image('crystalDebuff_2', '/assets/images/gameItems/animations/CrystalDebuff1_BgFlames02-hd.png');
+  context.load.image('crystalDebuff_3', '/assets/images/gameItems/animations/CrystalDebuff2_BgFlames01-hd.png');
+  context.load.image('crystalDebuff_4', '/assets/images/gameItems/animations/CrystalDebuff2_BgFlames02-hd.png');
 
   // Loading units
   const councilArray = ['archer', 'cleric', 'knight', 'ninja', 'wizard'];

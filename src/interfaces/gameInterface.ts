@@ -1,4 +1,3 @@
-import { SuperCharge } from "../classes/item";
 import { EActionClass, EActionType, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 
 /**
@@ -20,6 +19,18 @@ export type Coordinates = {
   col?: number
   boardPosition?: number
 };
+
+/**
+ * Crystal Interface
+ */
+export interface ICrystal {
+  belongsTo: number;
+  maxHealth: number;
+  currentHealth: number;
+  isDestroyed: boolean;
+  isLastCrystal: boolean;
+  boardPosition: number;
+}
 
 /**
  * Item Interface
@@ -119,6 +130,7 @@ export interface ITile {
   occupied: boolean;
   obstacle: boolean;
   hero?: IHero | undefined;
+  crystal?: ICrystal | undefined;
 }
 
 /**

@@ -1,3 +1,4 @@
+import { Crystal } from "../classes/crystal";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
@@ -98,6 +99,7 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
 export function makeTileClickable(tile: Tile, context: GameScene): void {
   tile.on('pointerdown', () => {
+    console.log('Clicked tile', tile.boardPosition);
     // Only the active player can click on tiles, and only if they still have actions available
     if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
 
@@ -116,5 +118,24 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
 
     // AOE damaging spells can target empty tiles
     if (isItem(activeUnit) && activeUnit.dealsDamage) activeUnit.use(tile);
+  });
+}
+
+export function makeCrystalClickable(crystal: Crystal, context: GameScene): void {
+  crystal.on('pointerdown', () => {
+    console.log('Crystal ->', crystal);
+    const attackReticle = crystal.attackReticle;
+    const activeUnit = context.activeUnit;
+
+    if (activeUnit) {
+      if (isHero(activeUnit) && attackReticle.visible) {
+        activeUnit.attackCrystal(crystal);
+        return;
+      }
+      if (isItem(activeUnit) && activeUnit?.dealsDamage) {
+        activeUnit.use(crystal.getTile());
+        return;
+      }
+    }
   });
 }

@@ -1,5 +1,5 @@
 import { ETiles } from "../enums/gameEnums";
-import { IHero, ITile } from "../interfaces/gameInterface";
+import { ICrystal, IHero, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeTileClickable } from "../utils/makeUnitClickable";
 
@@ -14,6 +14,7 @@ export class Tile extends Phaser.GameObjects.Container {
   occupied: boolean;
   obstacle: boolean;
   hero: IHero | undefined;
+  crystal: ICrystal | undefined;
   tileSize: number = 90;
   tileType: ETiles;
 
@@ -31,6 +32,7 @@ export class Tile extends Phaser.GameObjects.Container {
     this.occupied = data.occupied;
     this.obstacle = data.obstacle;
     this.hero = data.hero;
+    this.crystal = data.crystal;
     this.boardPosition = data.boardPosition;
 
     // Add base tile shape
@@ -41,22 +43,13 @@ export class Tile extends Phaser.GameObjects.Container {
     // If tileType is not BASIC, add the visual representation
     // TODO: clean the below snippet. Add tint based on player preferred color
     if (this.tileType !== ETiles.BASIC) {
-      let tileIcon;
       if (this.tileType === ETiles.CRYSTAL) {
-        const pedestal = context.add.image(0, 0, 'pedestal').setScale(0.8);
-        this.add(pedestal);
-        const damagedCrystal =  context.add.image(0, 0, 'damagedCrystal').setVisible(false);
-        this.add(damagedCrystal);
-        tileIcon = context.add.image(0, -30, this.tileType).setScale(0.8);
-        const crystalColor = this.col > 4 ? 0x990000 : 0x3399ff;
-        tileIcon.setTint(crystalColor);
         this.occupied = true;
       } else {
-        tileIcon = context.add.image(0, 0, this.tileType);
+        const tileIcon = context.add.image(0, 0, this.tileType);
+        if (this.col > 4) tileIcon.setFlipX(true);
+        this.add(tileIcon);
       }
-      if (this.col > 4) tileIcon.setFlipX(true);
-      // icon.setDisplaySize(60, 60); // or whatever fits nicely
-      this.add(tileIcon);
     }
 
     this.setSize(90, 90).setInteractive().setDepth(2);
@@ -75,7 +68,8 @@ export class Tile extends Phaser.GameObjects.Container {
       boardPosition: this.boardPosition,
       occupied: this.occupied,
       obstacle: this.obstacle,
-      hero: this.hero
+      hero: this.hero,
+      crystal: this.crystal
     };
   }
 

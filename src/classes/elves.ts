@@ -1,8 +1,9 @@
-import { EActionType } from "../enums/gameEnums";
+import { EActionType, EAttackType } from "../enums/gameEnums";
 import { createElvesImpalerData, createElvesNecromancerData, createElvesPhantomData, createElvesPriestessData, createElvesVoidMonkData, createElvesWraithData } from "../gameData/elvesHeroData";
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import { belongsToPlayer, getAOETiles, roundToFive } from "../utils/gameUtils";
 import { Hero } from "./hero";
 import { Item } from "./item";
 import { Tile } from "./tile";
@@ -205,7 +206,6 @@ export class ManaVial extends Item {
   }
 }
 
-// TODO:
 export class SoulHarvest extends Item {
   constructor(context: GameScene, data: Partial<IItem>) {
     super(context, createItemData({
@@ -214,9 +214,53 @@ export class SoulHarvest extends Item {
     }));
   }
 
-  use(targetNewTile: Tile): void {
-    // Damages crystals but doesn't remove enemy units
-    // Revive KO'd friendly units anywhere in the map healing them and raising their life total by the dmg done value
+  use(targetTile: Tile): void {
+    const gameController = this.context.gameController;
+    if (!gameController) {
+      console.error('SoulHarvest use() No gamecontroller');
+      return;
+    }
+    // Damages enemy units and crystals but doesn't remove KO'd enemy units
+    const damage = 100;
+
+    const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, targetTile);
+
+    // Keep track of the cumulative damage done (not attack power used) to enemy heroes (not crystals)
+    let totalDamageInflicted = 0;
+
+    enemyHeroTiles?.forEach(tile => {
+      const hero = gameController.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+
+      if (!hero) throw new Error('Inferno use() hero not found');
+      if (hero.isKO) return;
+
+      totalDamageInflicted += hero.getsDamaged(damage, EAttackType.MAGICAL);
+    });
+
+    enemyCrystalTiles.forEach(tile => {
+      const crystal = gameController.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
+      if (!crystal) throw new Error('Inferno use() crystal not found');
+
+      if (!belongsToPlayer(this.context, crystal)) {
+        crystal.getsDamaged(damage);
+      }
+    });
+
+    // Get total amount of friendly units in the map, including KO'd ones
+    const friendlyUnits = gameController.board.units.filter(unit => unit.belongsTo === this.belongsTo);
+
+    // Divide damage dealt by that number + 3, then round to nearest 5. Formula: 1 / (units + 3) * damage
+    const lifeIncreaseAmount = roundToFive(1 / (friendlyUnits.length + 3) * totalDamageInflicted);
+
+    console.log('totalDamageInflicted', totalDamageInflicted);
+    console.log('friendlyUnits', friendlyUnits);
+    console.log('lifeIncreaseAmount', lifeIncreaseAmount);
+
+    // Increase max health of all units, including KO'd ones, and revive them
+    friendlyUnits.forEach(unit => unit.increaseMaxHealth(lifeIncreaseAmount));
+
+    gameController.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
+
     this.removeFromGame();
   }
 }

@@ -1,7 +1,9 @@
 import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
+import { createCrystalData } from "../gameData/crystalData";
 import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { createNewHero, getGridDistance } from "../utils/gameUtils";
+import { belongsToPlayer, createNewHero, getGridDistance, isHero } from "../utils/gameUtils";
+import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Tile } from "./tile";
 
@@ -15,6 +17,7 @@ export class Board {
   context: GameScene;
   tiles: Tile[];
   units: Hero[] = [];
+  crystals: Crystal[] = [];
 
   constructor(context: GameScene, data: ITile[]) {
     this.context = context;
@@ -26,7 +29,13 @@ export class Board {
 
     tiles.forEach(tile => {
       const newTile = new Tile(this.context, tile);
+      console.log('TileType', newTile.tileType);
       if (newTile.hero) this.units.push(createNewHero(this.context, newTile.hero));
+      if (newTile.crystal) {
+        console.log('this logs');
+        const crystalData = createCrystalData(newTile.crystal);
+        this.crystals.push(new Crystal(this.context, crystalData ));
+      }
       grid.push(newTile);
     });
 
@@ -63,14 +72,15 @@ export class Board {
     if (!tilesInRange.length) return;
 
     tilesInRange.forEach(tile => {
-      const target = this.context.children.getByName(tile.hero!.unitId) as Hero;
+      const target = tile.hero ? this.units.find(unit => unit.unitId === tile.hero!.unitId) : tile.crystal ? this.crystals.find(crystal => crystal.boardPosition === tile.crystal?.boardPosition) : undefined;
       const userId = this.context.userId;
       if (!target) {
         console.error('No target found', tile.hero);
         return;
       }
 
-      if (tile.isEnemy(userId) || hero.unitType === EHeroes.NECROMANCER && target.isKO) {
+      // Highlight enemy units, enemy crystals and any KO'd unit if Necromancer
+      if (tile.isEnemy(userId) || tile.crystal &&  !belongsToPlayer(this.context, tile.crystal) || hero.unitType === EHeroes.NECROMANCER && target instanceof Hero && target.isKO) {
         const reticle: Phaser.GameObjects.Image = target.getByName('attackReticle');
         reticle.setVisible(true);
       }
@@ -84,19 +94,17 @@ export class Board {
     if (!tilesInRange.length) return;
 
     tilesInRange.forEach(tile => {
-      const target = this.context.children.getByName(tile.hero!.unitId) as Phaser.GameObjects.Container;
-      const userId = this.context.userId;
-      const maxHealth = tile.hero?.maxHealth;
-      const currentHealth = tile.hero?.currentHealth;
+      if (tile.crystal) return;
+      const target = this.units.find(unit => unit.unitId === tile.hero?.unitId);
       if (!target) {
-        console.error('No healing target found', tile.hero);
+        console.error('No healing target found', tile);
         return;
       }
+      const userId = this.context.userId;
+      const maxHealth = target.maxHealth;
+      const currentHealth = target.currentHealth;
 
-      if (tile.isFriendly(userId) && currentHealth! < maxHealth!) {
-        const reticle: Phaser.GameObjects.Image  = target.getByName('healReticle');
-        reticle.setVisible(true);
-      }
+      if (tile.isFriendly(userId) && currentHealth! < maxHealth!) target.healReticle.setVisible(true);
     });
   }
 
@@ -110,9 +118,12 @@ export class Board {
     if (hero.unitType === EHeroes.NINJA) {
       this.tiles.forEach(tile => {
         if (tile.isFriendly(this.context.userId)) {
-          const target = this.context.children.getByName(tile.hero!.unitId) as Phaser.GameObjects.Container;
-          const reticle: Phaser.GameObjects.Image  = target.getByName('allyReticle');
-          reticle.setVisible(true);
+          const target = this.units.find(unit => unit.unitId === tile.hero!.unitId);
+          if (!target) {
+            console.error('No teleport target found', tile);
+            return;
+          }
+          target.allyReticle.setVisible(true);
         }
       });
     }
@@ -131,8 +142,9 @@ export class Board {
 
   removeReticles(): void {
     this.tiles.forEach(tile => {
-      if (tile.hero) {
-        const target = this.context.children.getByName(tile.hero.unitId) as Phaser.GameObjects.Container;
+      if (tile.hero || tile.crystal) {
+        const target = tile.hero ? this.units.find(unit => unit.unitId === tile.hero!.unitId) : tile.crystal ? this.crystals.find(crystal => crystal.boardPosition === tile.crystal?.boardPosition) : undefined;
+
         if (!target) return;
         const attackReticle = target.getByName('attackReticle') as Phaser.GameObjects.Image;
         const healReticle = target.getByName('healReticle') as Phaser.GameObjects.Image;
@@ -173,13 +185,12 @@ export class Board {
     }
 
     this.tiles.forEach(tile => {
-      // const distance = Math.abs(tile.row - heroTile.row) + Math.abs(tile.col - heroTile.col);
       const distance = getGridDistance(tile.row, tile.col, heroTile.row, heroTile.col);
 
       if (distance <= range) {
         if (rangeType === ERange.MOVE && !tile.isOccupied()) inRangeTiles.push(tile);
 
-        if ((rangeType === ERange.ATTACK || rangeType === ERange.HEAL) && tile.hero) inRangeTiles.push(tile);
+        if ((rangeType === ERange.ATTACK || rangeType === ERange.HEAL) && (tile.hero || tile.crystal)) inRangeTiles.push(tile);
       }
     });
 
