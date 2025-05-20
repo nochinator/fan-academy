@@ -5,6 +5,7 @@ import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, createNewHero, getGridDistance, isHero } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
+import { Item } from "./item";
 import { Tile } from "./tile";
 
 export class Board {
@@ -130,6 +131,24 @@ export class Board {
       const teleportTiles: Tile[] = this.tiles.filter(tile => tile.tileType === ETiles.TELEPORTER);
       this.highlightTiles(teleportTiles);
     }
+  }
+
+  highlightEquipmentTargets(item: Item): void {
+    const tilesToHighlight: Tile[] = [];
+
+    this.units.forEach(hero => {
+      if (hero.belongsTo !== item.belongsTo) return;
+      if (hero.isAlreadyEquipped(item)) return;
+      if (item.canHeal && hero.isFullHP()) return;
+
+      tilesToHighlight.push(hero.getTile());
+    });
+
+    this.highlightTiles(tilesToHighlight);
+  }
+
+  highlightAllBoard() {
+    this.highlightTiles(this.tiles);
   }
 
   highlightTiles(tiles: Tile[]) {

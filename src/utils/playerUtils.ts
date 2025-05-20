@@ -30,6 +30,7 @@ export function isValidPassword(password: string): boolean {
 }
 
 export function selectUnit(context: GameScene, unit: Hero | Item): void {
+  console.log('Select unit logs');
   unit.isActive = true;
   context.activeUnit = unit;
 

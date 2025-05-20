@@ -164,7 +164,11 @@ export class GameController {
 
   onItemClicked(item: Item) {
     console.log(`An item ${item.unitId} has been clicked`);
-    // this.board.highlighHerotFriendlyTargets(item); // TODO: create equivalent for items
+    if (item.dealsDamage) {
+      this.board.highlightAllBoard();
+    } else {
+      this.board.highlightEquipmentTargets(item);
+    }
   }
 
   onTileClicked(tile: Tile) {

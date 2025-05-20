@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { moveAnimation } from "../utils/gameUtils";
+import { moveAnimation, roundToFive } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
 import { Item } from "./item";
@@ -245,8 +245,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (amount <= 0) return;
     if (this.isKO) this.getsRevived(); // for Soul Harvest
 
-    this.maxHealth += amount;
-    this.currentHealth += amount;
+    const roundedHealtGain = roundToFive(amount);
+    this.maxHealth += roundedHealtGain;
+    this.currentHealth += roundedHealtGain;
     this.updateTileData();
   }
 
@@ -342,6 +343,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   abstract heal(target: Hero): void;
   abstract teleport(target: Hero): void;
   abstract equipFactionBuff(handPosition: number): void;
+
+  isFullHP(): boolean {
+    return this.maxHealth === this.currentHealth;
+  }
 
   isAlreadyEquipped(item: Item): boolean {
     const map: Partial<Record<EItems, boolean>> = {

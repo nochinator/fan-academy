@@ -58,7 +58,8 @@ function createCouncilDeck(userId: string): (IHero | IItem)[] {
     const healingPotion = createItemData( {
       unitId: `${userId}_healingPotion_${index}`,
       faction: EFaction.COUNCIL,
-      itemType: EItems.HEALING_POTION
+      itemType: EItems.HEALING_POTION,
+      canHeal: true
     });
     const inferno = createItemData( {
       //  High-damage attack spell that does 350 magical damage in a 3x3 area.
@@ -141,7 +142,8 @@ function createElvesDeck(userId: string): (IHero | IItem)[] {
       //  Does not revive
       unitId: `${userId}_manaVial_${index}`,
       faction: EFaction.DARK_ELVES,
-      itemType: EItems.MANA_VIAL
+      itemType: EItems.MANA_VIAL,
+      canHeal: true
     });
 
     const soulHarvest = createItemData( {

@@ -26,9 +26,11 @@ export abstract class DarkElf extends Hero {
   lifeSteal(damage: number): void {
     if (this.factionBuff) {
       console.log('Soul Stone equipped');
-      this.getsHealed(damage * 67 / 100);
+      const roundedHealing = roundToFive(damage * 67 / 100);
+      this.getsHealed(roundedHealing);
     } else {
-      this.getsHealed(damage * 33 / 100);
+      const roundedHealing = roundToFive(damage * 33 / 100);
+      this.getsHealed(roundedHealing);
     }
   }
 }
