@@ -109,6 +109,8 @@ export class Ninja extends Human {
 
     const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
 
+    console.log('distance', distance);
+
     if (distance === 1) {
       target.getsDamaged(this.getTotalPower(2), this.attackType);
     } else {

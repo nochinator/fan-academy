@@ -203,10 +203,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   getTotalPower(multiplier = 1): number {
-    if (this.powerModifier === 0) return this.power;
+    if (this.powerModifier === 0) return this.power * multiplier;
 
     const totalPower = this.power * multiplier + this.power * this.powerModifier / 100;
-    console.log(totalPower);
+
     this.powerModifier = 0; // FIXME: the modifier should only be reset after damage is dealt
     this.updateTileData();
 

@@ -29,10 +29,8 @@ export class Board {
 
     tiles.forEach(tile => {
       const newTile = new Tile(this.context, tile);
-      console.log('TileType', newTile.tileType);
       if (newTile.hero) this.units.push(createNewHero(this.context, newTile.hero));
       if (newTile.crystal) {
-        console.log('this logs');
         const crystalData = createCrystalData(newTile.crystal);
         this.crystals.push(new Crystal(this.context, crystalData ));
       }
