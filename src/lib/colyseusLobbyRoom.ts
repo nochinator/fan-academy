@@ -8,7 +8,7 @@ export async function connectToGameLobby(client: Client | undefined, userId: str
 
   try {
     console.log('Connecting to game lobby...');
-    const lobby = await client.create('lobby', { userId });
+    const lobby = await client.joinOrCreate('lobby', { userId });
 
     lobby.onMessage('newGameListUpdate', async (message) => {
       console.log('A game has been added', message);

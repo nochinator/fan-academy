@@ -19,6 +19,8 @@ export async function createGame(context: UIScene, faction: IFaction | undefined
 
     subscribeToGameListeners(room, context);
 
+    context.currentRoom = room;
+
     console.log("Created and joined room:", room.name);
   } catch (error) {
     console.error("Failed to create or join room:", error);
@@ -32,22 +34,19 @@ export async function joinGame(client: Client | undefined, userId: string | unde
   }
 
   let room: Room;
+
   try {
-    room = await client.joinById(roomId, {
-      roomId,
-      userId
-    });
-
-    console.log("Joined room:", room.name);
-  } catch (error) {
-    console.error("Recreating room...");
-
-    room = await client.create('game_room', {
+    room = await client.joinOrCreate("game_room", {
       userId,
       roomId
     });
 
-    console.log('Recreated room:', room.roomId);
+    console.log("Joined or created room:", room.roomId);
+
+    context.currentRoom = room;
+  } catch (error) {
+    console.error("Failed to join or create room", error);
+    return undefined;
   }
 
   subscribeToGameListeners(room, context);
