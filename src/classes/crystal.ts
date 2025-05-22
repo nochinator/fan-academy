@@ -1,4 +1,4 @@
-import { ETiles } from "../enums/gameEnums";
+import { EAttackType, ETiles } from "../enums/gameEnums";
 import { ICrystal } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
@@ -15,11 +15,13 @@ export class Crystal extends Phaser.GameObjects.Container {
   context: GameScene;
 
   pedestalImage: Phaser.GameObjects.Image;
-  crystalFull: Phaser.GameObjects.Image;
-  crystalDamaged: Phaser.GameObjects.Image;
+  crystalImage: Phaser.GameObjects.Image;
   singleCrystalDebuff: Phaser.GameObjects.Image;
   doubleCrystalDebuff: Phaser.GameObjects.Image;
   attackReticle: Phaser.GameObjects.Image;
+
+  debuffEventSingle: Phaser.Time.TimerEvent;
+  debuffEventDouble: Phaser.Time.TimerEvent;
 
   constructor(context: GameScene, data: ICrystal) {
     const { x, y } = context.centerPoints[data.boardPosition];
@@ -34,12 +36,11 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.boardPosition = data.boardPosition;
 
     this.pedestalImage = context.add.image(0, 0, 'pedestal').setScale(0.8);
-    this.crystalFull = context.add.image(0, -30, 'crystalFull').setScale(0.8);
-    this.crystalDamaged =  context.add.image(0, 0, 'crystalDamaged').setVisible(false);
+    const crystalTexture = data.currentHealth <= data.maxHealth / 2 ? 'crystalDamaged' : 'crystalFull';
+    this.crystalImage = context.add.image(0, -30, crystalTexture).setScale(0.8);
 
     const crystalColor = data.belongsTo === 1 ? 0x990000 : 0x3399ff;
-    this.crystalFull.setTint(crystalColor);
-    this.crystalDamaged.setTint(crystalColor);
+    this.crystalImage.setTint(crystalColor);
 
     // Debuff images and animation
     this.singleCrystalDebuff = context.add.image(0, -30, 'crystalDebuff_1').setVisible(false);
@@ -49,7 +50,7 @@ export class Crystal extends Phaser.GameObjects.Container {
 
     const crystalDebuffEvent = (debuffImage: Phaser.GameObjects.Image, texture1: string, texture2: string) => {
       let frame = 0;
-      this.scene.time.addEvent({
+      return this.scene.time.addEvent({
         delay: 100, // milliseconds between frames
         loop: true,
         callback: () => {
@@ -58,8 +59,8 @@ export class Crystal extends Phaser.GameObjects.Container {
         }
       });};
 
-    crystalDebuffEvent(this.singleCrystalDebuff, 'crystalDebuff_1', 'crystalDebuff_2');
-    crystalDebuffEvent(this.doubleCrystalDebuff, 'crystalDebuff_3', 'crystalDebuff_4');
+    this.debuffEventSingle = crystalDebuffEvent(this.singleCrystalDebuff, 'crystalDebuff_1', 'crystalDebuff_2');
+    this.debuffEventDouble = crystalDebuffEvent(this.doubleCrystalDebuff, 'crystalDebuff_3', 'crystalDebuff_4');
 
     // Attack reticle and animation
     this.attackReticle = context.add.image(0, -10, 'attackReticle').setOrigin(0.5).setScale(0.8).setName('attackReticle').setVisible(false);
@@ -78,7 +79,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
     addTween(this.attackReticle);
 
-    this.add([this.pedestalImage, this.crystalFull, this.crystalDamaged, this.singleCrystalDebuff, this.doubleCrystalDebuff, this.attackReticle]).setSize(90, 95).setInteractive().setDepth(this.boardPosition + 10); // REVIEW: not setting name
+    this.add([this.pedestalImage, this.crystalImage, this.singleCrystalDebuff, this.doubleCrystalDebuff, this.attackReticle]).setSize(90, 95).setInteractive().setDepth(this.boardPosition + 10); // REVIEW: not setting name
 
     makeCrystalClickable(this, this.context);
 
@@ -105,29 +106,46 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
   }
 
-  getsDamaged(damage: number): void {
-    // TODO: healthbar animation
-    this.currentHealth -= damage;
+  getsDamaged(damage: number, attackType?: EAttackType): void {
+    // TODO: healthbar animation and check for exact damage received (not power)
+    const totalDamage = damage > this.currentHealth ? this.currentHealth : damage;
+    this.currentHealth -= totalDamage;
 
-    if (this.currentHealth === this.maxHealth / 2) {
-      this.crystalFull.setVisible(false); // TODO: change textures
-      this.crystalDamaged.setVisible(true);
+    if (this.currentHealth <= this.maxHealth / 2) {
+      this.crystalImage.setTexture('crystalDamaged'); // FIXME: below 50%, this changes the texture every time the crystal is damaged
     }
 
-    if (damage <= 0) this.getsDestroyed();
+    this.updateTileData();
+    if (this.currentHealth <= 0) this.removeFromGame(); // TODO: destruction animation
   }
 
-  getsDestroyed(): void {
+  removeFromGame(): void {
     if (this.isLastCrystal) console.log('GAME OVER FUNCTION HERE');
 
     const tile = this.getTile();
     tile.crystal = undefined;
+    tile.occupied = false;
+    tile.obstacle = false;
     tile.tileType = ETiles.BASIC;
 
-    const otherCrystalTile = this.context.gameController?.board.tiles.find(tile => tile.crystal?.belongsTo === this.belongsTo); // REVIEW: Removed the boardPosition check since in theory there is only one crystal left
+    const otherCrystal = this.context.gameController?.board.crystals.find(crystal => crystal.belongsTo === this.belongsTo);
+    if (!otherCrystal) throw new Error('Crystal getsDestroyed() No other crystal found');
 
-    if (!otherCrystalTile) throw new Error('Crystal getsDestroyed() No other crystal found');
+    otherCrystal.isLastCrystal = true;
+    otherCrystal.updateTileData();
 
-    otherCrystalTile.crystal!.isLastCrystal = true;
+    // Remove animations
+    this.scene.tweens.killTweensOf(this);
+
+    this.list.forEach(child => {
+      this.scene.tweens.killTweensOf(child);
+    });
+
+    // Remove events
+    this.debuffEventSingle.remove(false);
+    this.debuffEventDouble.remove(false);
+
+    // Destroy container and children
+    this.destroy(true);
   }
 }

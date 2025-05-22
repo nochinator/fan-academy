@@ -1,36 +1,33 @@
-import { EFaction } from "../../enums/gameEnums";
+import { EFaction, EGameStatus } from "../../enums/gameEnums";
 import { IGame, IPlayerData } from "../../interfaces/gameInterface";
 import { createGame } from "../../lib/colyseusGameRoom";
-import { deleteGame, getGameList } from "../../queries/gameQueries";
+import { deleteGame } from "../../queries/gameQueries";
 import { createNewGameBoardState, createNewGameFactionState } from "../../utils/createGameState";
 import UIScene from "../ui.scene";
 import { accessGame } from "./gameMenuUI";
 import { loadProfilePictures } from "./profilePictures";
 
-export async function createGameList(context: UIScene, colyseusGameList?: IGame[]) {
-  // Check if the game list is coming from a colyseus update or if it needs to be fetched
-  let gameList: IGame[];
-  if (colyseusGameList) {
-    gameList = colyseusGameList;
-  } else {
-    gameList = await getGameList(context.userId!);
+export async function createGameList(context: UIScene) {
+  if (!context.gameList) {
+    console.error('createGameList() no gameList in context');
+    return;
   }
 
-  // If the game list already exists in the scene, remove it before re-rendering
-  context.gameListContainer?.destroy(true);
+  if (context.gameListContainer) context.gameListContainer.destroy(true); // Need to remove the old container before adding a new one
 
   // Split game list and split it into 3 arrays, depending on status
   const listPlayerTurnArray: IGame[] = [];
   const listOpponentTurnArray: IGame[] = [];
   const listSearchingArray: IGame[] = [];
 
-  gameList.forEach((game: IGame )=> {
+  context.gameList.forEach((game: IGame )=> {
     if (game.status === 'searching') listSearchingArray.push(game);
     if (game.status === 'playing' && game.activePlayer === context.userId) listPlayerTurnArray.push(game);
     if (game.status === 'playing' && game.activePlayer !== context.userId) listOpponentTurnArray.push(game);
   });
+
   // Load oponents' profile pictures
-  await loadProfilePictures(context, gameList);
+  await loadProfilePictures(context); // REVIEW: since we have the game list from Scene creation, we don't need to load this here
 
   // Setting spacing for the positioning of the items in the list
   const gameListButtonHeight = 142;
@@ -43,10 +40,10 @@ export async function createGameList(context: UIScene, colyseusGameList?: IGame[
 
   // Calculate content height for scrolling
   const totalSections = (listPlayerTurnArray.length ? 1 : 0) + (listOpponentTurnArray.length ? 1 : 0) + (listSearchingArray.length ? 1 : 0);
-  const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * gameList.length + ( textListHeight * totalSections + 200); // 200 = newGameButton + some padding to make sure the last item always displays fully
+  const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * context.gameList.length + ( textListHeight * totalSections + 200); // 200 = newGameButton + some padding to make sure the last item always displays fully
 
   // Creating a container for the game list and adding it to the context (scene)
-  const gameListContainer = context.add.container(19, 65);
+  const gameListContainer = context.add.container(19, 65); // Setting a variable to save having to write 'context.' every time
   context.gameListContainer = gameListContainer;
 
   // Function for adding elements to the container
@@ -65,35 +62,38 @@ export async function createGameList(context: UIScene, colyseusGameList?: IGame[
       let opponentProfilePicture;
       let opponentNameText;
 
+      const setOpponentNameText = (name: string) => {
+        return context.add.text(200, lastListItemY + gameListButtonHeight / 2 - 33, name, {
+          fontSize: 50,
+          fontFamily: "proLight"
+        });
+      };
+
       if (opponent) {
         opponentFactionImage = context.add.image(510, lastListItemY + gameListButtonHeight / 2, opponent.faction).setScale(0.4);
-        opponentNameText = context.add.text(200, lastListItemY + gameListButtonHeight / 2 - 33, opponent.userData.username, {
-          fontSize: 50,
-          fontFamily: "proLight"
-        });
         opponentProfilePicture = context.add.image(632, lastListItemY + gameListButtonHeight / 2, opponent.userData.username).setFlipX(true).setScale(0.4);
+        opponentNameText = setOpponentNameText(opponent.userData.username);
       } else {
         opponentFactionImage = context.add.image(510, lastListItemY + gameListButtonHeight / 2, 'unknownFaction');
-        opponentNameText = context.add.text(200, lastListItemY + gameListButtonHeight / 2 - 33, 'Searching...', {
-          fontSize: 50,
-          fontFamily: "proLight"
-        });
         opponentProfilePicture = context.add.image(632, lastListItemY + gameListButtonHeight / 2, 'unknownOpponent').setFlipX(true).setScale(0.4);
+        opponentNameText = setOpponentNameText('Searching...');
       }
 
-      // Add an X button to each game in the list
+      // Add a 'close' button to games looking for players
       const closeButton = context.add.image(gameListButtonWidth - 30, lastListItemY, 'closeButton').setOrigin(0).setVisible(false);
-      if (game.status === 'searching') {
+      if (game.status === EGameStatus.SEARCHING) {
         closeButton.setVisible(true).setInteractive();
         closeButton.on('pointerdown', async () => {
           console.log('Clicked on X button!');
           await deleteGame(context.userId, game._id);
+          const deletedGameIndex = context.gameList!.findIndex(listItem => listItem._id === game._id);
+          context.gameList!.splice(deletedGameIndex, 1);
           createGameList(context);
         });
       }
 
       // Make the game accessible -only for games already playing. // REVIEW: what about games already finished?
-      if (game.status === 'playing' && opponent) {
+      if (game.status === EGameStatus.PLAYING) {
         gameListButtonImage.setInteractive();
         gameListButtonImage.on('pointerdown', async () => {
           await accessGame(context, game);
@@ -138,12 +138,17 @@ export async function createGameList(context: UIScene, colyseusGameList?: IGame[
   lastListItemY += 150;
 
   gameListContainer.add([newGameButton, newGameText, councilEmblem, elvesEmblem]);
-  // Check the arrays one by one, adding the elements in order
-  if (listPlayerTurnArray.length) {
-    const playerTurnText = context.add.text(30, lastListItemY, 'Your turn', {
+
+  // Check the arrays one by one, adding the elements in order // FIXME: need to order them from longest time since it was your turn to shortest
+  const setHeaderText = (header: string) => {
+    return context.add.text(30, lastListItemY, header, {
       fontSize: 50,
       fontFamily: "proLight"
     });
+  };
+
+  if (listPlayerTurnArray.length) {
+    const playerTurnText = setHeaderText('Your turn');
     gameListContainer.add(playerTurnText);
 
     createGameListItem(listPlayerTurnArray);
@@ -151,10 +156,7 @@ export async function createGameList(context: UIScene, colyseusGameList?: IGame[
   }
 
   if (listOpponentTurnArray.length) {
-    const opponentTurnText = context.add.text(30, lastListItemY, "Opponent's turn", {
-      fontSize: 50,
-      fontFamily: "proLight"
-    });
+    const opponentTurnText = setHeaderText("Opponent's turn");
     gameListContainer.add(opponentTurnText);
 
     createGameListItem(listOpponentTurnArray);
@@ -162,11 +164,7 @@ export async function createGameList(context: UIScene, colyseusGameList?: IGame[
   }
 
   if (listSearchingArray.length) {
-    const searchingText = context.add.text(30, lastListItemY, 'Searching for players', {
-      fontSize: 50,
-      fontFamily: "proLight"
-    });
-
+    const searchingText = setHeaderText('Searching for players');
     gameListContainer.add(searchingText);
 
     createGameListItem(listSearchingArray);

@@ -5,7 +5,7 @@ import { EActionClass, EActionType, EAttackType, EClass, EFaction, EGameStatus, 
  */
 export interface ITurnSentMessage {
   roomId: string;
-  game: IGame;
+  previousTurn: IGameState[],
   newActivePlayer: string;
 }
 
@@ -150,7 +150,8 @@ export interface IGameState {
 export interface IGame {
   _id: string;
   players: IPlayerData[];
-  gameState: IGameState[][];
+  gameState?: IGameState[][];
+  previousTurn: IGameState[];
   currentState: IGameState[];
   currentTurn: number;
   winCondition?: string;
@@ -158,5 +159,4 @@ export interface IGame {
   status: EGameStatus;
   createdAt: Date;
   activePlayer: string;
-  // TODO: add a mapType field that is enum. The enum will be used to render a specific tile combination for that map
 }

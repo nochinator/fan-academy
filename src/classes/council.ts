@@ -4,6 +4,7 @@ import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, getAOETiles, getGridDistance, isHero, isItem } from "../utils/gameUtils";
+import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
 import { Tile } from "./tile";
@@ -30,19 +31,8 @@ export class Archer extends Human {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilArcherData(data));
   }
-  override attack(target: Hero): void {
-    console.log('Archer attack logs');
-    const gameController = this.context.gameController!;
-
-    const attackerTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
-    const targetTile = gameController.board.getTileFromBoardPosition(target.boardPosition);
-
-    if (!attackerTile || !targetTile) {
-      console.error('Archer attack() No attacker or target tile found');
-      return;
-    }
-
-    const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
+  attack(target: Hero | Crystal): void {
+    const distance = this.getDistanceToTarget(target);
 
     if (distance === 1) {
       target.getsDamaged(this.getTotalPower(2), this.attackType);
@@ -50,7 +40,7 @@ export class Archer extends Human {
       target.getsDamaged(this.getTotalPower(), this.attackType);
     }
 
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(target: Hero): void {};
@@ -62,14 +52,12 @@ export class Knight extends Human {
     super(context, createCouncilKnightData(data));
   }
 
-  override async attack(target: Hero): Promise<void> {
-    console.log('Knight attack logs');
-
+  async attack(target: Hero | Crystal): Promise<void> {
     const gameController = this.context.gameController!;
 
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
-    await gameController.pushEnemy(this, target);
+    if (target instanceof Hero) await gameController.pushEnemy(this, target);
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -83,8 +71,8 @@ export class Wizard extends Human {
     super(context, createCouncilWizardData(data));
   }
   // TODO: add chain attack
-  override attack(target: Hero): void {
-    console.log('Wizard attack logs');
+  attack(target: Hero | Crystal): void {
+
   }
 
   heal(target: Hero): void {};
@@ -95,8 +83,7 @@ export class Ninja extends Human {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilNinjaData(data));
   }
-  override attack(target: Hero): void {
-    console.log('Ninja attack logs');
+  attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
 
     const attackerTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
@@ -143,9 +130,7 @@ export class Cleric extends Human {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilClericData(data));
   }
-  override attack(target: Hero): void {
-    console.log('Cleric attack logs');
-
+  attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
 
     target.getsDamaged(this.getTotalPower(), this.attackType);
@@ -153,7 +138,7 @@ export class Cleric extends Human {
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  override heal(target: Hero): void {
+  heal(target: Hero): void {
     if (target.isKO) {
       target.getsHealed(this.power * 2);
     } else {

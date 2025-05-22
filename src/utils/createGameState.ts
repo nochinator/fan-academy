@@ -54,8 +54,6 @@ export function createNewGameBoardState(): ITile[] {
       });
       newBoard.push(tile);
       boardPosition++;
-
-      if (isCrystalTile) console.log('TileData', tile);
     }}
 
   return newBoard;

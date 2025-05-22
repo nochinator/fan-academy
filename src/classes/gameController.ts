@@ -32,8 +32,7 @@ export class GameController {
   constructor(context: GameScene) {
     this.context = context;
     this.game = context.currentGame!;
-    const gameState = this.game.gameState[this.game.gameState.length - 1];
-    this.lastTurnState =  gameState[gameState.length - 1];
+    this.lastTurnState =  context.currentGame.previousTurn[context.currentGame.previousTurn.length - 1]; // REVIEW:
     this.gameUI = new GameUI(context); // TODO: add depth to UI and board assets
     this.board = new Board(context, this.lastTurnState.boardState);
     context.player1 = this.lastTurnState.player1;
@@ -147,6 +146,11 @@ export class GameController {
     this.context.activePlayer = this.context.opponentId;
 
     sendTurnMessage(this.context.currentRoom, this.context.currentGame.currentState, this.context.opponentId);
+
+    // Update game directly // REVIEW:
+    this.context.currentGame.activePlayer = this.context.opponentId;
+    this.context.currentGame.currentState = [];
+    this.context.currentGame.previousTurn = [];
   }
 
   onHeroClicked(hero: Hero) {
@@ -188,6 +192,8 @@ export class GameController {
     const { player, opponent } = getPlayersKey(this.context);
 
     const actionClass = getActionClass(action);
+
+    console.log('TILES', this.board.tiles);
 
     const playerState: IPlayerState = {
       ...this.context[player]!,

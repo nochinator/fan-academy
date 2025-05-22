@@ -130,7 +130,7 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
 
     if (activeUnit) {
       if (isHero(activeUnit) && attackReticle.visible) {
-        activeUnit.attackCrystal(crystal);
+        activeUnit.attack(crystal);
         return;
       }
       if (isItem(activeUnit) && activeUnit?.dealsDamage) {

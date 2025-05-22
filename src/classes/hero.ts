@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { moveAnimation, roundToFive } from "../utils/gameUtils";
+import { getGridDistance, moveAnimation, roundToFive } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
 import { Item } from "./item";
@@ -300,6 +300,20 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.destroy(true);
   }
 
+  getDistanceToTarget(target: Hero | Crystal): number {
+    const gameController = this.context.gameController!;
+
+    const attackerTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
+    const targetTile = gameController.board.getTileFromBoardPosition(target.boardPosition);
+
+    if (!attackerTile || !targetTile) {
+      console.error('Archer attack() No attacker or target tile found');
+      return 0;
+    }
+
+    return getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
+  }
+
   async move(targetTile: Tile): Promise<void> {
     const gameController = this.context.gameController!;
 
@@ -331,15 +345,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     gameController.afterAction(EActionType.SPAWN, startingPosition, tile.boardPosition);
   }
 
-  attackCrystal(crystal: Crystal): void {
-    // TODO: add check for debuff tiles
-    const totalPower = this.getTotalPower();
-    crystal.getsDamaged(totalPower);
-
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, crystal.boardPosition);
-  }
-
-  abstract attack(target: Hero): void;
+  abstract attack(target: Hero | Crystal): void;
   abstract heal(target: Hero): void;
   abstract teleport(target: Hero): void;
   abstract equipFactionBuff(handPosition: number): void;

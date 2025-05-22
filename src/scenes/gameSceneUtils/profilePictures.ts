@@ -1,22 +1,28 @@
-import { IGame } from "../../interfaces/gameInterface";
 import UIScene from "../ui.scene";
 
-export async function loadProfilePictures(context: UIScene, gameList: IGame[]): Promise<void> {
-  if (gameList.length === 0) return;
+export async function loadProfilePictures(context: UIScene): Promise<void> {
+  if (!context.gameList) return;
+
+  console.log('GameList', context.gameList);
 
   const allPlayerObjects: {
     username: string,
     picture: string
   }[] = [];
 
-  gameList.forEach((game) => {
+  context.gameList.forEach((game) => {
     const oponent  = game.players.find(player => player.userData._id !== context.userId);
+
+    console.log('oponent', oponent);
+    console.log('oponent', oponent?.userData.username);
 
     if (oponent) allPlayerObjects.push({
       username: oponent.userData.username,
       picture: oponent.userData.picture
     });
   });
+
+  console.log('allPlayerObjects', allPlayerObjects);
 
   // Remove duplicates
   const uniqueOponents: {
@@ -28,6 +34,10 @@ export async function loadProfilePictures(context: UIScene, gameList: IGame[]): 
       picture: string
     }>()).values()
   );
+
+  console.log('allPlayerObjects2', allPlayerObjects);
+
+  console.log('uniqueOponents', uniqueOponents);
 
   uniqueOponents.forEach( oponent => {
     console.log(oponent);
