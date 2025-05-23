@@ -392,10 +392,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   equipSuperCharge(handPosition: number): void {
+    this.superCharge = true;
     this.powerModifier += 300;
 
     // TODO: add visual effect
-    // FIXME: add a different kind of check for supercharge, since they can't stack
     this.updateTileData();
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
