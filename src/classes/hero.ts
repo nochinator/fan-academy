@@ -333,7 +333,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   spawn(tile: Tile): void {
     const startingPosition = this.boardPosition;
     const gameController = this.context.gameController!;
+
     gameController.hand.removeFromHand(this);
+    gameController.board.units.push(this);
 
     // Flip image if player is player 2
     if (this.belongsTo === 2) (this.getByName('body') as Phaser.GameObjects.Image)?.setFlipX(true);

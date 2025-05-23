@@ -137,6 +137,7 @@ export class Board {
     const tilesToHighlight: Tile[] = [];
 
     this.units.forEach(hero => {
+      console.log(hero, hero.isAlreadyEquipped(item));
       if (hero.belongsTo !== item.belongsTo) return;
       if (hero.isAlreadyEquipped(item)) return;
       if (item.canHeal && hero.isFullHP()) return;
