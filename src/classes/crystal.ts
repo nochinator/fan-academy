@@ -128,7 +128,13 @@ export class Crystal extends Phaser.GameObjects.Container {
     tile.obstacle = false;
     tile.tileType = ETiles.BASIC;
 
-    const otherCrystal = this.context.gameController?.board.crystals.find(crystal => crystal.belongsTo === this.belongsTo);
+    // Remove destoyed crystal from the board array
+    const crystalArray = this.context.gameController!.board.crystals;
+    const index = crystalArray.findIndex(crystal => crystal.boardPosition === this.boardPosition);
+    crystalArray.splice(index, 1);
+
+    // Update the remaining crystal
+    const otherCrystal = crystalArray.find(crystal => crystal.belongsTo === this.belongsTo);
     if (!otherCrystal) throw new Error('Crystal getsDestroyed() No other crystal found');
 
     otherCrystal.isLastCrystal = true;
