@@ -1,5 +1,6 @@
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
+import { game } from "../main";
 import GameScene from "../scenes/game.scene";
 import { getGridDistance, moveAnimation, roundToFive } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
@@ -327,6 +328,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (!startTile) return;
 
     await moveAnimation(this.context, this, targetTile);
+
+    // Stomp KO'd units
+    if (targetTile.hero && targetTile.hero.isKO) {
+      const hero = gameController.board.units.find(unit => unit.unitId === targetTile.hero?.unitId);
+      if (!hero) console.error('move() Found heroData on targetTile, but no Hero to remove', targetTile);
+      hero?.removeFromGame();
+    }
 
     this.updatePosition(targetTile.boardPosition);
     targetTile.hero = this.exportData();

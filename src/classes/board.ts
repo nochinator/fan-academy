@@ -79,9 +79,15 @@ export class Board {
         return;
       }
 
-      // Highlight enemy units, enemy crystals and any KO'd unit if Necromancer or Wraith
+      /**
+       * Show attack reticle if one of the below is true:
+       *  -target is an enemy hero and it's not KO
+       *  -target is an enemy crystal
+       *  -target is KO and active unit is a Necro
+       *  -target is KO and active unit is a Wraith that is not fully leveled (max 3 units consumed)
+       */
       if (
-        tile.isEnemy(userId) ||
+        tile.isEnemy(userId) && target instanceof Hero && !target.isKO ||
         tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
         hero.unitType === EHeroes.NECROMANCER  && target instanceof Hero && target.isKO ||
         hero.unitType === EHeroes.WRAITH && hero.unitsConsumed < 3 && target instanceof Hero && target.isKO) {

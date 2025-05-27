@@ -53,6 +53,12 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
           return;
         }
 
+        // Stomp enemy KO'd units
+        if (isHero(activeUnit) && unit.isKO) {
+          const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
+          activeUnit.move(unitTile);
+        }
+
         if (isItem(activeUnit) && activeUnit.dealsDamage) {
           activeUnit.use(unit.getTile());
           return;
@@ -61,11 +67,17 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
       // CASE 3.2: Clicking a friendly unit on the board
       if (isHero(unit) && isFriendly && unit.boardPosition < 45) {
-        // Necromancer and Wraith can target friendly units if they are knocked down
+        // Necromancer and Wraith can target friendly units if they are knocked down. NOTE: this check should always go before the stomping check
         console.log('ActiveUnitType', activeUnit);
         if (isHero(activeUnit) && [EHeroes.NECROMANCER, EHeroes.WRAITH].includes(activeUnit.unitType) && unit.isKO && attackReticle?.visible) {
           activeUnit.attack(unit);
           return;
+        }
+
+        // Stomp friendly KO'd units, unless you are a Necromancer
+        if (isHero(activeUnit) && unit.isKO && activeUnit.unitType !== EHeroes.NECROMANCER) {
+          const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
+          activeUnit.move(unitTile);
         }
 
         // Ninja can swap places with any friendly unit on the board
