@@ -5,7 +5,7 @@ import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
 import { EActionClass, EActionType, EHeroes, EItems, ETiles } from "../enums/gameEnums";
-import { ICrystal, IHero, IItem } from "../interfaces/gameInterface";
+import { Coordinates, ICrystal, IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
 // Fisher-Yates shuffle algorithm
@@ -38,7 +38,7 @@ export function isInHand(boardPosition: number): boolean {
   return boardPosition > 44 && boardPosition < 51;
 }
 
-export function belongsToPlayer(context: GameScene, unit: Hero | Item | ICrystal): boolean {
+export function belongsToPlayer(context: GameScene, unit: Hero | IHero | Item | IItem | Crystal | ICrystal): boolean {
   const playerNumber = context.isPlayerOne ? 1 : 2;
   return unit.belongsTo === playerNumber;
 }
@@ -209,4 +209,15 @@ export function getAOETiles(context: GameScene, targetTile: Tile): {
     enemyHeroTiles,
     enemyCrystalTiles
   };
+}
+
+export function isOnBoard(position: number): boolean {
+  return position >= 0 && position <= 44;
+}
+
+export function canBeAttacked(context: GameScene, tile: Tile): boolean {
+  let result = false;
+  if (tile.hero && !belongsToPlayer(context, tile.hero)) result = true;
+  if (tile.crystal && !belongsToPlayer(context, tile.crystal)) result = true;
+  return result;
 }

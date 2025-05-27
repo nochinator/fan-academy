@@ -2,7 +2,7 @@ import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
 import { createCrystalData } from "../gameData/crystalData";
 import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, createNewHero, getGridDistance, isHero } from "../utils/gameUtils";
+import { belongsToPlayer, createNewHero, getGridDistance, isHero, isOnBoard, canBeAttacked } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -240,5 +240,76 @@ export class Board {
     }
 
     return areaTiles;
+  }
+
+  // REVIEW: used only by the wizard's attack
+  getAdjacentEnemyTiles(boardPosition: number, ignorePosition: number[] = []): Tile[] {
+    const adjacentBoardPositions = [-10, -9, -8, -1, +1, +8, +9, +10];
+
+    const adjacentTiles: Tile[] = [];
+
+    adjacentBoardPositions.forEach(adjacentBp => {
+      const tilePosition = boardPosition + adjacentBp;
+
+      if (isOnBoard(tilePosition)) {
+        const tile = this.getTileFromBoardPosition(tilePosition);
+
+        if (canBeAttacked(this.context, tile) &&
+        !ignorePosition.includes(tile.boardPosition)) {
+          adjacentTiles.push(tile);
+        }}
+    });
+
+    if (!adjacentTiles.length) console.error('getAdjacentTiles() No tiles found');
+
+    return adjacentTiles;
+  }
+
+  // REVIEW: used only by the wizard's attack
+  getAttackDirection(attackerBP: number, targetBP: number): number {
+    console.log('GAD() Target and attacker BP', targetBP, attackerBP);
+    const distance =  targetBP - attackerBP;
+
+    console.log('getAttackDirection() Distance:', distance);
+
+    let direction: number;
+
+    switch (distance) {
+      case -18:
+      case -9:
+        direction = 1;
+        break;
+      case -8:
+        direction = 2;
+        break;
+      case 1:
+      case 2:
+        direction = 3;
+        break;
+      case 10:
+        direction = 4;
+        break;
+      case 9:
+      case 18:
+        direction = 5;
+        break;
+      case 8:
+        direction = 6;
+        break;
+      case -1:
+      case -2:
+        direction = 7;
+        break;
+      case -10:
+        direction = 8;
+        break;
+      default:
+        direction = 0;
+        break;
+    }
+
+    if (direction === 0) console.error(`getAttackDirection() No direction found between: ${attackerBP} and ${targetBP}`);
+
+    return direction;
   }
 }

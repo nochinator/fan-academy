@@ -185,6 +185,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   getsDamaged(damage: number, attackType: EAttackType): number {
+    // Flash the unit red
+    this.characterImage.setTint(0xff0000); // TODO: remove once I get floating dmg numbers working
+    this.scene.time.delayedCall(1000, () => this.characterImage.clearTint());
+
     // Calculate damage after applying resistances
     const totalDamage = this.getLifeLost(damage, attackType);
 
@@ -207,7 +211,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     const totalPower = this.power * multiplier + this.power * this.powerModifier / 100;
 
-    this.powerModifier = 0; // FIXME: the modifier should only be reset after damage is dealt
     this.updateTileData();
 
     return totalPower;

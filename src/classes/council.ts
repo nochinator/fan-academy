@@ -1,9 +1,10 @@
-import { EActionType, EAttackType, EItems, ETiles } from "../enums/gameEnums";
+import { EActionType, EAttackType } from "../enums/gameEnums";
 import { createCouncilArcherData, createCouncilClericData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "../gameData/councilHeroData";
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, getAOETiles, getGridDistance, isHero, isItem } from "../utils/gameUtils";
+import { belongsToPlayer, getAOETiles, getGridDistance } from "../utils/gameUtils";
+import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -40,6 +41,8 @@ export class Archer extends Human {
       target.getsDamaged(this.getTotalPower(), this.attackType);
     }
 
+    this.powerModifier = 0;
+
     this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -59,6 +62,8 @@ export class Knight extends Human {
 
     if (target instanceof Hero) await gameController.pushEnemy(this, target);
 
+    this.powerModifier = 0;
+
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -70,9 +75,98 @@ export class Wizard extends Human {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createCouncilWizardData(data));
   }
-  // TODO: add chain attack
   attack(target: Hero | Crystal): void {
+    const gameController = this.context.gameController!;
 
+    // Get directions for finding out the next targets
+    const attackDirection = gameController.board.getAttackDirection(this.boardPosition, target.boardPosition);
+    const opponentDirection = this.context.isPlayerOne ? [2, 3, 4] : [6, 7, 8];
+
+    // Get targets
+    const secondTarget = this.getNextTarget(target, attackDirection, opponentDirection, gameController.board, false);
+    let thirdTarget: Hero | Crystal | undefined;
+    if (secondTarget) thirdTarget = this.getNextTarget(secondTarget, attackDirection, opponentDirection, gameController.board, false, [target.boardPosition, secondTarget.boardPosition]);
+
+    // Apply damage to targets
+    target.getsDamaged(this.getTotalPower(), this.attackType);
+    if (secondTarget) secondTarget.getsDamaged(this.getTotalPower(), this.attackType);
+    if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower(), this.attackType);
+
+    this.powerModifier = 0;
+
+    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+  }
+
+  getNextTarget(target: Hero | Crystal, attackDirection: number, opponentDirection: number[], board: Board, isLastTarget: boolean, toIgnore?: number[]): Hero | Crystal {
+    const positionsToIgnore = toIgnore ? toIgnore : [target.boardPosition];
+    const adjacentEnemies = board.getAdjacentEnemyTiles(target.boardPosition, positionsToIgnore);
+
+    let maxScore = -1;
+    let bestTarget: Tile | undefined;
+
+    for (const enemyTile of adjacentEnemies) {
+      const enemyTileDirection = board.getAttackDirection(target.boardPosition, enemyTile.boardPosition);
+
+      let score = 0;
+
+      /**
+       *  An enemy unit gets points for:
+       *    -being in the same direction of the attack
+       *    -being in the general direction of the attack
+       *    -being in the direction of the oponent's side of the board
+       *    -being in an orthogonal direction (tie breaker)
+       *    -having an adjacent enemy unit (the attack prioritizes number of target versus direction)
+       *  */
+      if (enemyTileDirection === attackDirection) score += 2;
+      if (this.getGeneralDirections(attackDirection).includes(enemyTileDirection)) score += 1.5;
+      if (opponentDirection.includes(enemyTileDirection)) score += 1;
+      if ([1, 3, 5, 7].includes(enemyTileDirection)) score += 1;
+
+      if (!isLastTarget) {
+        const enemyHasAdjacentEnemies = board.getAdjacentEnemyTiles(enemyTile.boardPosition, [enemyTile.boardPosition]);
+        if (enemyHasAdjacentEnemies.length) {
+          score += 1.5;
+        }
+      }
+
+      if (score > maxScore) {
+        maxScore = score;
+        bestTarget = enemyTile;
+      }
+
+      if (maxScore === 6) break;
+    }
+
+    console.log('best target is', bestTarget);
+    if (!bestTarget) {
+      throw new Error("getNextTarget() No suitable adjacent target found.");
+    }
+
+    if (bestTarget.hero) {
+      const hero = board.units.find(unit => unit.unitId === bestTarget.hero!.unitId);
+      if (hero) return hero;
+    }
+
+    if (bestTarget.crystal) {
+      const crystal = board.crystals.find(c => c.boardPosition === bestTarget.crystal!.boardPosition);
+      if (crystal) return crystal;
+    }
+
+    throw new Error("getNextTarget() Target found on tile, but not in board units or crystals");
+  }
+
+  private getGeneralDirections(direction: number): number[] {
+    switch (direction) {
+      case 1: return [1, 2, 8];
+      case 2: return [[1, 2, 8], [2, 3, 4]].flat();
+      case 3: return [2, 3, 4];
+      case 4: return [[2, 3, 4], [4, 5, 6]].flat();
+      case 5: return [4, 5, 6];
+      case 6: return [[4, 5, 6], [6, 7, 8]].flat();
+      case 7: return [6, 7, 8];
+      case 8: return [[1, 2, 8], [6, 7, 8]].flat();
+      default: return [];
+    }
   }
 
   heal(target: Hero): void {};
@@ -104,6 +198,8 @@ export class Ninja extends Human {
       target.getsDamaged(this.getTotalPower(), this.attackType);
     }
 
+    this.powerModifier = 0;
+
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -134,6 +230,8 @@ export class Cleric extends Human {
     const gameController = this.context.gameController!;
 
     target.getsDamaged(this.getTotalPower(), this.attackType);
+
+    this.powerModifier = 0;
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
