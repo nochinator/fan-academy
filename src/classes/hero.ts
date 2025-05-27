@@ -32,6 +32,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   isActiveValue: boolean;
   belongsTo: number;
   canHeal: boolean;
+  unitsConsumed: number;
 
   context: GameScene;
 
@@ -72,6 +73,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.isActiveValue = false;
     this.belongsTo = data.belongsTo ?? 1;
     this.canHeal = data.canHeal ?? false;
+    this.unitsConsumed = data.unitsConsumed ?? 0;
 
     // Create the unit's image and images for its upgrades
     this.characterImage = context.add.image(0, -10, this.unitType).setOrigin(0.5).setName('body');
@@ -170,7 +172,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       shiningHelm: this.shiningHelm,
       superCharge: this.superCharge,
       belongsTo: this.belongsTo,
-      canHeal: this.canHeal
+      canHeal: this.canHeal,
+      unitsConsumed: this.unitsConsumed
     };
   }
 
@@ -209,7 +212,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   getTotalPower(multiplier = 1): number {
     if (this.powerModifier === 0) return this.power * multiplier;
 
-    const totalPower = this.power * multiplier + this.power * this.powerModifier / 100;
+    const totalPower = this.power * this.powerModifier / 100 * multiplier;
 
     this.updateTileData();
 

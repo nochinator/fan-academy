@@ -61,8 +61,9 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
       // CASE 3.2: Clicking a friendly unit on the board
       if (isHero(unit) && isFriendly && unit.boardPosition < 45) {
-        // Necromancer can attack friendly units if they are knocked down to spawn phantoms
-        if (isHero(activeUnit) && activeUnit.unitType === EHeroes.NECROMANCER && unit.isKO) {
+        // Necromancer and Wraith can target friendly units if they are knocked down
+        console.log('ActiveUnitType', activeUnit);
+        if (isHero(activeUnit) && [EHeroes.NECROMANCER, EHeroes.WRAITH].includes(activeUnit.unitType) && unit.isKO && attackReticle?.visible) {
           activeUnit.attack(unit);
           return;
         }

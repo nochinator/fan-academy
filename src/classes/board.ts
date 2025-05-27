@@ -2,7 +2,7 @@ import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
 import { createCrystalData } from "../gameData/crystalData";
 import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, createNewHero, getGridDistance, isHero, isOnBoard, canBeAttacked } from "../utils/gameUtils";
+import { belongsToPlayer, createNewHero, getGridDistance } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -79,8 +79,12 @@ export class Board {
         return;
       }
 
-      // Highlight enemy units, enemy crystals and any KO'd unit if Necromancer
-      if (tile.isEnemy(userId) || tile.crystal &&  !belongsToPlayer(this.context, tile.crystal) || hero.unitType === EHeroes.NECROMANCER && target instanceof Hero && target.isKO) {
+      // Highlight enemy units, enemy crystals and any KO'd unit if Necromancer or Wraith
+      if (
+        tile.isEnemy(userId) ||
+        tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
+        hero.unitType === EHeroes.NECROMANCER  && target instanceof Hero && target.isKO ||
+        hero.unitType === EHeroes.WRAITH && hero.unitsConsumed < 3 && target instanceof Hero && target.isKO) {
         const reticle: Phaser.GameObjects.Image = target.getByName('attackReticle');
         reticle.setVisible(true);
       }

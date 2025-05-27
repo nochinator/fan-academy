@@ -144,6 +144,7 @@ export function createElvesWraithData(data: Partial<IHero>): IHero {
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     canHeal: false,
+    unitsConsumed: data.unitsConsumed ?? 0,
     ...createGenericElvesData(data)
   };
 }

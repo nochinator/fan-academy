@@ -105,7 +105,7 @@ export class VoidMonk extends DarkElf {
     // Apply damage to targets
     target.getsDamaged(this.getTotalPower(), this.attackType);
     if (splashedEnemies.length) {
-      const splashDamage = roundToFive(this.getTotalPower() * 67.5 / 100);
+      const splashDamage = this.getTotalPower() * 67.5 / 100;
       console.log('splashDamage', splashDamage);
       splashedEnemies.forEach(enemy => enemy.getsDamaged(splashDamage, this.attackType));
     }
@@ -214,9 +214,25 @@ export class Wraith extends DarkElf {
   constructor(context: GameScene, data: Partial<IHero>) {
     super(context, createElvesWraithData(data));
   }
-  // TODO: add consuming units
   attack(target: Hero | Crystal): void {
     console.log('Wraith attack logs');
+
+    if (target instanceof Hero && target.isKO) {
+      target.removeFromGame();
+
+      if (this.unitsConsumed < 3) {
+        this.increaseMaxHealth(100);
+        this.power += 50;
+        this.unitsConsumed++;
+        this.updateTileData();
+      }
+    } else {
+      target.getsDamaged(this.getTotalPower(), this.attackType);
+
+      this.powerModifier = 0;
+    }
+
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(target: Hero): void {};
