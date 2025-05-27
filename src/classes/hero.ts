@@ -190,7 +190,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.scene.time.delayedCall(1000, () => this.characterImage.clearTint());
 
     // Calculate damage after applying resistances
-    const totalDamage = this.getLifeLost(damage, attackType);
+    const totalDamage = roundToFive(this.getLifeLost(damage, attackType));
 
     this.currentHealth -= totalDamage;
 

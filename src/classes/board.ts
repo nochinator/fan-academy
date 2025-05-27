@@ -242,30 +242,7 @@ export class Board {
     return areaTiles;
   }
 
-  // REVIEW: used only by the wizard's attack
-  getAdjacentEnemyTiles(boardPosition: number, ignorePosition: number[] = []): Tile[] {
-    const adjacentBoardPositions = [-10, -9, -8, -1, +1, +8, +9, +10];
-
-    const adjacentTiles: Tile[] = [];
-
-    adjacentBoardPositions.forEach(adjacentBp => {
-      const tilePosition = boardPosition + adjacentBp;
-
-      if (isOnBoard(tilePosition)) {
-        const tile = this.getTileFromBoardPosition(tilePosition);
-
-        if (canBeAttacked(this.context, tile) &&
-        !ignorePosition.includes(tile.boardPosition)) {
-          adjacentTiles.push(tile);
-        }}
-    });
-
-    if (!adjacentTiles.length) console.error('getAdjacentTiles() No tiles found');
-
-    return adjacentTiles;
-  }
-
-  // REVIEW: used only by the wizard's attack
+  // Used for Wizard and VoidMonk's attacks
   getAttackDirection(attackerBP: number, targetBP: number): number {
     console.log('GAD() Target and attacker BP', targetBP, attackerBP);
     const distance =  targetBP - attackerBP;

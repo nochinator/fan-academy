@@ -3,7 +3,7 @@ import { createElvesImpalerData, createElvesNecromancerData, createElvesPhantomD
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, getAOETiles, roundToFive } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, getAOETiles, isOnBoard, roundToFive } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -70,6 +70,60 @@ export class VoidMonk extends DarkElf {
   // TODO: add aoe to attack
   attack(target: Hero | Crystal): void {
     console.log('VoidMonk attack logs');
+    const board = this.context.gameController!.board;
+
+    // Get the direction of the attack and offset tiles
+    const attackDirection = board.getAttackDirection(this.boardPosition, target.boardPosition);
+
+    const offsetTiles = this.getOffsetTiles(target.boardPosition, attackDirection);
+
+    if (!offsetTiles.length) throw new Error(`voidMonk attack() No offsetTiles: ${this.boardPosition}, ${target.boardPosition}`);
+
+    // Get enemies in offset tiles, if any
+    const splashedEnemies: (Hero | Crystal)[] = [];
+
+    for (const offset of offsetTiles) {
+      const tileBP = target.boardPosition + offset;
+      if (!isOnBoard(tileBP)) continue;
+
+      const tile = board.getTileFromBoardPosition(tileBP);
+      if (!tile) throw new Error(`voidMonk attack() No tile found`);
+
+      if (!canBeAttacked(this.context, tile)) continue;
+
+      if (tile.hero) {
+        const hero = board.units.find(unit => unit.unitId === tile.hero!.unitId);
+        if (hero) splashedEnemies.push(hero);
+      }
+
+      if (tile.crystal) {
+        const crystal = board.crystals.find(c => c.boardPosition === tile.crystal!.boardPosition);
+        if (crystal) splashedEnemies.push(crystal);
+      }
+    };
+
+    // Apply damage to targets
+    target.getsDamaged(this.getTotalPower(), this.attackType);
+    if (splashedEnemies.length) {
+      const splashDamage = roundToFive(this.getTotalPower() * 67.5 / 100);
+      console.log('splashDamage', splashDamage);
+      splashedEnemies.forEach(enemy => enemy.getsDamaged(splashDamage, this.attackType));
+    }
+
+    this.powerModifier = 0;
+
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+  }
+
+  getOffsetTiles(target: number, attackDirection: number): number[] {
+    // Direction can only be 1, 3, 5 or 7
+    switch (attackDirection) {
+      case 1: return [-1, 1, -9];
+      case 3: return [-9, 1, 9];
+      case 5: return [-1, 1, 9];
+      case 7: return [-9, -1, 9];
+      default: return [];
+    }
   }
 
   heal(target: Hero): void {};

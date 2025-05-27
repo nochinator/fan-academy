@@ -3,7 +3,7 @@ import { createCouncilArcherData, createCouncilClericData, createCouncilKnightDa
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, getAOETiles, getGridDistance } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, getAOETiles, getGridDistance, isOnBoard } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -99,7 +99,7 @@ export class Wizard extends Human {
 
   getNextTarget(target: Hero | Crystal, attackDirection: number, opponentDirection: number[], board: Board, isLastTarget: boolean, toIgnore?: number[]): Hero | Crystal {
     const positionsToIgnore = toIgnore ? toIgnore : [target.boardPosition];
-    const adjacentEnemies = board.getAdjacentEnemyTiles(target.boardPosition, positionsToIgnore);
+    const adjacentEnemies = this.getAdjacentEnemyTiles(target.boardPosition, positionsToIgnore);
 
     let maxScore = -1;
     let bestTarget: Tile | undefined;
@@ -123,7 +123,7 @@ export class Wizard extends Human {
       if ([1, 3, 5, 7].includes(enemyTileDirection)) score += 1;
 
       if (!isLastTarget) {
-        const enemyHasAdjacentEnemies = board.getAdjacentEnemyTiles(enemyTile.boardPosition, [enemyTile.boardPosition]);
+        const enemyHasAdjacentEnemies = this.getAdjacentEnemyTiles(enemyTile.boardPosition, [enemyTile.boardPosition]);
         if (enemyHasAdjacentEnemies.length) {
           score += 1.5;
         }
@@ -153,6 +153,28 @@ export class Wizard extends Human {
     }
 
     throw new Error("getNextTarget() Target found on tile, but not in board units or crystals");
+  }
+
+  getAdjacentEnemyTiles(boardPosition: number, ignorePosition: number[] = []): Tile[] {
+    const adjacentBoardPositions = [-10, -9, -8, -1, +1, +8, +9, +10];
+
+    const adjacentTiles: Tile[] = [];
+
+    adjacentBoardPositions.forEach(adjacentBp => {
+      const tilePosition = boardPosition + adjacentBp;
+
+      if (isOnBoard(tilePosition)) {
+        const tile = this.context.gameController!.board.getTileFromBoardPosition(tilePosition);
+
+        if (canBeAttacked(this.context, tile) &&
+        !ignorePosition.includes(tile.boardPosition)) {
+          adjacentTiles.push(tile);
+        }}
+    });
+
+    if (!adjacentTiles.length) console.error('getAdjacentTiles() No tiles found');
+
+    return adjacentTiles;
   }
 
   private getGeneralDirections(direction: number): number[] {
