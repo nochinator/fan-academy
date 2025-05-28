@@ -19,6 +19,7 @@ export class Crystal extends Phaser.GameObjects.Container {
   singleCrystalDebuff: Phaser.GameObjects.Image;
   doubleCrystalDebuff: Phaser.GameObjects.Image;
   attackReticle: Phaser.GameObjects.Image;
+  blockedLOS: Phaser.GameObjects.Image;
 
   debuffEventSingle: Phaser.Time.TimerEvent;
   debuffEventDouble: Phaser.Time.TimerEvent;
@@ -38,6 +39,8 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.pedestalImage = context.add.image(0, 0, 'pedestal').setScale(0.8);
     const crystalTexture = data.currentHealth <= data.maxHealth / 2 ? 'crystalDamaged' : 'crystalFull';
     this.crystalImage = context.add.image(0, -30, crystalTexture).setScale(0.8);
+
+    this.blockedLOS = context.add.image(0, -10, 'blockedLOS').setOrigin(0.5).setName('blockedLOS').setVisible(false);
 
     const crystalColor = data.belongsTo === 1 ? 0x990000 : 0x3399ff;
     this.crystalImage.setTint(crystalColor);
@@ -79,7 +82,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
     addTween(this.attackReticle);
 
-    this.add([this.pedestalImage, this.crystalImage, this.singleCrystalDebuff, this.doubleCrystalDebuff, this.attackReticle]).setSize(90, 95).setInteractive().setDepth(this.boardPosition + 10); // REVIEW: not setting name
+    this.add([this.pedestalImage, this.crystalImage, this.singleCrystalDebuff, this.doubleCrystalDebuff, this.attackReticle, this.blockedLOS]).setSize(90, 95).setInteractive().setDepth(this.boardPosition + 10); // REVIEW: not setting name
 
     makeCrystalClickable(this, this.context);
 

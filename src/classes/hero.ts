@@ -1,6 +1,5 @@
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
-import { game } from "../main";
 import GameScene from "../scenes/game.scene";
 import { getGridDistance, moveAnimation, roundToFive } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
@@ -44,6 +43,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   attackReticle: Phaser.GameObjects.Image;
   healReticle: Phaser.GameObjects.Image;
   allyReticle: Phaser.GameObjects.Image;
+  blockedLOS: Phaser.GameObjects.Image;
 
   constructor(context: GameScene, data: IHero) {
     const { x, y } = context.centerPoints[data.boardPosition];
@@ -99,7 +99,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.allyReticle = context.add.image(0, -10, 'allyReticle').setOrigin(0.5).setScale(0.6).setName('allyReticle').setVisible(false);
 
     // Add animations to the reticles
-    const addTween = (reticle: Phaser.GameObjects.Image) => {
+    const addReticleTween = (reticle: Phaser.GameObjects.Image) => {
       context.tweens.add({
         targets: reticle,
         angle: 360,
@@ -112,12 +112,23 @@ export abstract class Hero extends Phaser.GameObjects.Container {
         }
       });
     };
-    addTween(this.attackReticle);
-    addTween(this.healReticle);
-    addTween(this.allyReticle);
+    addReticleTween(this.attackReticle);
+    addReticleTween(this.healReticle);
+    addReticleTween(this.allyReticle);
+
+    // Add blocke LOS and its animation
+    this.blockedLOS = context.add.image(0, -10, 'blockedLOS').setOrigin(0.5).setName('blockedLOS').setVisible(false);
+    context.tweens.add({
+      targets: this.blockedLOS,
+      scale: 1.2,
+      duration: 1000,     // 800ms to scale up
+      yoyo: true,        // Return to original scale
+      repeat: -1,        // Repeat forever
+      ease: 'Sine.easeInOut'  // Smooth in and out
+    });
 
     // Add all individual images to container
-    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage, this.attackReticle, this.healReticle, this.allyReticle]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(this.boardPosition + 10); // REVIEW: depth
+    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage, this.attackReticle, this.healReticle, this.allyReticle, this.blockedLOS]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(this.boardPosition + 10); // REVIEW: depth
 
     // Hide if in deck
     if (this.boardPosition === 51) this.setVisible(false);

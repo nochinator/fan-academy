@@ -2,7 +2,8 @@ import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
 import { createCrystalData } from "../gameData/crystalData";
 import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, createNewHero, getGridDistance } from "../utils/gameUtils";
+import { belongsToPlayer, createNewHero, getCoordinatesFromBoardPosition, getGridDistance, isOnBoard } from "../utils/gameUtils";
+import { Cleric } from "./council";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -71,6 +72,8 @@ export class Board {
     const tilesInRange: Tile[] = this.getHeroTilesInRange(hero, ERange.ATTACK);
     if (!tilesInRange.length) return;
 
+    const enemyLOSCheck: (Hero | Crystal)[] = [];
+
     tilesInRange.forEach(tile => {
       const target = tile.hero ? this.units.find(unit => unit.unitId === tile.hero!.unitId) : tile.crystal ? this.crystals.find(crystal => crystal.boardPosition === tile.crystal?.boardPosition) : undefined;
       const userId = this.context.userId;
@@ -78,6 +81,12 @@ export class Board {
         console.error('No target found', tile.hero);
         return;
       }
+
+      /**
+       * for each target, we gotta check the bp or coordinates in relation with the attacker. then if there is a friendly unit or crystal in between, LOS is blocked
+       *
+       *
+       */
 
       /**
        * Show attack reticle if one of the below is true:
@@ -91,10 +100,23 @@ export class Board {
         tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
         hero.unitType === EHeroes.NECROMANCER  && target instanceof Hero && target.isKO ||
         hero.unitType === EHeroes.WRAITH && hero.unitsConsumed < 3 && target instanceof Hero && target.isKO) {
-        const reticle: Phaser.GameObjects.Image = target.getByName('attackReticle');
-        reticle.setVisible(true);
+        enemyLOSCheck.push(target);
       }
     });
+
+    const enemiesToHighlight: (Hero | Crystal)[] = [];
+    const enemiesBlocked: (Hero | Crystal)[] = [];
+
+    enemyLOSCheck.forEach((enemy: Hero | Crystal) => {
+      if (this.hasLineOfSight(hero, enemy)) {
+        enemiesToHighlight.push(enemy);
+      } else {
+        enemiesBlocked.push(enemy);
+      }
+    });
+
+    enemiesToHighlight.forEach(enemy => enemy.attackReticle.setVisible(true));
+    enemiesBlocked.forEach(enemy => enemy.blockedLOS.setVisible(true));
   }
 
   highlightFriendlyTargets(hero: Hero) {
@@ -174,13 +196,14 @@ export class Board {
         const target = tile.hero ? this.units.find(unit => unit.unitId === tile.hero!.unitId) : tile.crystal ? this.crystals.find(crystal => crystal.boardPosition === tile.crystal?.boardPosition) : undefined;
 
         if (!target) return;
-        const attackReticle = target.getByName('attackReticle') as Phaser.GameObjects.Image;
-        const healReticle = target.getByName('healReticle') as Phaser.GameObjects.Image;
-        const allyReticle = target.getByName('allyReticle') as Phaser.GameObjects.Image;
 
-        attackReticle?.setVisible(false);
-        healReticle?.setVisible(false);
-        allyReticle?.setVisible(false);
+        target.attackReticle.setVisible(false);
+        target.blockedLOS.setVisible(false);
+
+        if (target instanceof Hero) {
+          target.healReticle.setVisible(false);
+          target.allyReticle.setVisible(false);
+        }
       }
     });
   }
@@ -262,6 +285,7 @@ export class Board {
     let direction: number;
 
     switch (distance) {
+      case -27:
       case -18:
       case -9:
         direction = 1;
@@ -271,6 +295,7 @@ export class Board {
         break;
       case 1:
       case 2:
+      case 3:
         direction = 3;
         break;
       case 10:
@@ -278,6 +303,7 @@ export class Board {
         break;
       case 9:
       case 18:
+      case 27:
         direction = 5;
         break;
       case 8:
@@ -285,6 +311,7 @@ export class Board {
         break;
       case -1:
       case -2:
+      case -3:
         direction = 7;
         break;
       case -10:
@@ -298,5 +325,96 @@ export class Board {
     if (direction === 0) console.error(`getAttackDirection() No direction found between: ${attackerBP} and ${targetBP}`);
 
     return direction;
+  }
+
+  hasLineOfSight(attacker: Hero, target: (Hero | Crystal)): boolean {
+    if (this.isAdjacent(attacker, target)) return true;
+
+    const attackerCoords = getCoordinatesFromBoardPosition(attacker.boardPosition);
+    const targetCoords = getCoordinatesFromBoardPosition(target.boardPosition);
+
+    if (attackerCoords.row === targetCoords.row || attackerCoords.col === targetCoords.col) {
+      const atrtackDirection = this.getAttackDirection(attacker.boardPosition, target.boardPosition);
+
+      const attackDirectionOffsetMap: Record<string, number[]> = {
+        1: [-18, -9],
+        3: [1, 2],
+        5: [9, 18],
+        7: [-1, -2]
+      };
+
+      const offsets = attackDirectionOffsetMap[atrtackDirection];
+
+      for (const offset of offsets) {
+        const positionToCheck = attacker.boardPosition + offset; // should never be out of bounds
+
+        if (positionToCheck === target.boardPosition) return true; // don't block self
+        const tile = this.getTileFromBoardPosition(positionToCheck);
+
+        if (
+          tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
+          tile.hero && !belongsToPlayer(this.context, tile.hero)) {
+          return false;
+        }
+      }
+    }
+
+    const coordKey = (row: number, col: number): string => `${row}, ${col}`;
+
+    const tileOffsetMap: Record<string, [number, number][]> = {
+      '1, 2': [[0, 1], [1, 1]],
+      '1, -2': [[0, -1], [1, -1]], // corrected
+
+      '-1, 2': [[1, 0], [1, 1]],
+      '-1, -2': [[0, -1], [-1, -1]],
+
+      '2, 1': [[1, 0], [1, 1]],
+      '2, -1': [[1, 0], [1, -1]],
+
+      '-2, 1': [[-1, 0], [-1, 1]],
+      '-2, -1': [[-1, 0], [-1, -1]]
+    };
+
+    const getOffset = {
+      row: targetCoords.row - attackerCoords.row,
+      col: targetCoords.col - attackerCoords.col
+    };
+
+    const tileCoordKey = coordKey(getOffset.row, getOffset.col);
+    const offsetsToCheck = tileOffsetMap[tileCoordKey];
+
+    let result: boolean | undefined;
+
+    for (const offset of offsetsToCheck) {
+      const tileRow = attackerCoords.row + offset[0];
+      const tileCol = attackerCoords.col + offset[1];
+
+      const isWrongRow = tileRow < 0 || tileRow > 4;
+      const isWrongCol = tileCol < 0 || tileCol > 8;
+      if (isWrongRow || isWrongCol) continue;
+
+      const tile = this.getTileFromCoordinates(tileRow, tileCol);
+
+      if (tile.boardPosition === target.boardPosition) return true; // don't block self
+
+      if (
+        tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
+        tile.hero && !belongsToPlayer(this.context, tile.hero)) {
+        result = false;
+        break;
+      }
+    };
+
+    return result !== false;
+  }
+
+  isAdjacent(hero: Hero, unitToCompare: Hero | Crystal): boolean {
+    const heroCoordinates = getCoordinatesFromBoardPosition(hero.boardPosition);
+    const unitCoordinates = getCoordinatesFromBoardPosition(unitToCompare.boardPosition);
+
+    const row = Math.abs(heroCoordinates.row - unitCoordinates.row);
+    const col = Math.abs(heroCoordinates.col - unitCoordinates.col);
+
+    return col <= 1 && row <= 1 && !(row === 0 && col === 0);
   }
 }

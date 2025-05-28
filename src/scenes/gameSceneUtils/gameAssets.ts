@@ -48,4 +48,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('attackReticle', './assets/images/gameItems/attack_reticle.png');
   context.load.image('healReticle', './assets/images/gameItems/heal_reticle.png');
   context.load.image('allyReticle', './assets/images/gameItems/ally_reticle.png');
+
+  // Blocked line of sight
+  context.load.image('blockedLOS', './assets/images/gameItems/blocked_los.png');
 }
