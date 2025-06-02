@@ -381,25 +381,29 @@ export class Board {
 
     let result: boolean | undefined;
 
-    for (const offset of offsetsToCheck) {
-      const tileRow = attackerCoords.row + offset[0];
-      const tileCol = attackerCoords.col + offset[1];
+    console.log('offsetsToCheck', offsetsToCheck);
+    if (offsetsToCheck && offsetsToCheck.length) {
+      console.log('this logs');
+      for (const offset of offsetsToCheck) {
+        const tileRow = attackerCoords.row + offset[0];
+        const tileCol = attackerCoords.col + offset[1];
 
-      const isWrongRow = tileRow < 0 || tileRow > 4;
-      const isWrongCol = tileCol < 0 || tileCol > 8;
-      if (isWrongRow || isWrongCol) continue;
+        const isWrongRow = tileRow < 0 || tileRow > 4;
+        const isWrongCol = tileCol < 0 || tileCol > 8;
+        if (isWrongRow || isWrongCol) continue;
 
-      const tile = this.getTileFromCoordinates(tileRow, tileCol);
+        const tile = this.getTileFromCoordinates(tileRow, tileCol);
 
-      if (tile.boardPosition === target.boardPosition) return true; // don't block self
+        if (tile.boardPosition === target.boardPosition) return true; // don't block self
 
-      if (
-        tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
+        if (
+          tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
         tile.hero && !belongsToPlayer(this.context, tile.hero)) {
-        result = false;
-        break;
-      }
-    };
+          result = false;
+          break;
+        }
+      };
+    }
 
     return result !== false;
   }
