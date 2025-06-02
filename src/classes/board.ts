@@ -2,8 +2,7 @@ import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
 import { createCrystalData } from "../gameData/crystalData";
 import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, createNewHero, getCoordinatesFromBoardPosition, getGridDistance, isOnBoard } from "../utils/gameUtils";
-import { Cleric } from "./council";
+import { belongsToPlayer, createNewHero, getCoordinatesFromBoardPosition, getGridDistance } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -277,10 +276,7 @@ export class Board {
 
   // Used for Wizard and VoidMonk's attacks
   getAttackDirection(attackerBP: number, targetBP: number): number {
-    console.log('GAD() Target and attacker BP', targetBP, attackerBP);
     const distance =  targetBP - attackerBP;
-
-    console.log('getAttackDirection() Distance:', distance);
 
     let direction: number;
 

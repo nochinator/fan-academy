@@ -116,15 +116,15 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     addReticleTween(this.healReticle);
     addReticleTween(this.allyReticle);
 
-    // Add blocke LOS and its animation
+    // Add blocked LOS and its animation
     this.blockedLOS = context.add.image(0, -10, 'blockedLOS').setOrigin(0.5).setName('blockedLOS').setVisible(false);
     context.tweens.add({
       targets: this.blockedLOS,
       scale: 1.2,
-      duration: 1000,     // 800ms to scale up
-      yoyo: true,        // Return to original scale
-      repeat: -1,        // Repeat forever
-      ease: 'Sine.easeInOut'  // Smooth in and out
+      duration: 1000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
     });
 
     // Add all individual images to container
