@@ -42,6 +42,7 @@ export class Archer extends Human {
     }
 
     this.powerModifier = 0;
+    if (this.superCharge) this.superCharge = false;
 
     this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -63,6 +64,7 @@ export class Knight extends Human {
     if (target instanceof Hero) await gameController.pushEnemy(this, target);
 
     this.powerModifier = 0;
+    if (this.superCharge) this.superCharge = false;
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -93,6 +95,7 @@ export class Wizard extends Human {
     if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower(), this.attackType);
 
     this.powerModifier = 0;
+    if (this.superCharge) this.superCharge = false;
 
     gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -221,6 +224,7 @@ export class Ninja extends Human {
     }
 
     this.powerModifier = 0;
+    if (this.superCharge) this.superCharge = false;
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -254,6 +258,7 @@ export class Cleric extends Human {
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
     this.powerModifier = 0;
+    if (this.superCharge) this.superCharge = false;
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }

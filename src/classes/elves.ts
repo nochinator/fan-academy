@@ -55,6 +55,7 @@ export class Impaler extends DarkElf {
     if (target instanceof Hero) await gameController.pullEnemy(this, target);
 
     this.powerModifier = 0;
+    if (this.superCharge) this.superCharge = false;
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -111,6 +112,7 @@ export class VoidMonk extends DarkElf {
     }
 
     this.powerModifier = 0;
+    if (this.superCharge) this.superCharge = false;
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -156,6 +158,7 @@ export class Necromancer extends DarkElf {
       tile.hero = phantom.exportData();
 
       this.powerModifier = 0;
+      if (this.superCharge) this.superCharge = false;
 
       gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
       gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition); // Adding action directly to state. It shares the turnActionNumber of the attack
@@ -164,6 +167,7 @@ export class Necromancer extends DarkElf {
       if (damageDone) this.lifeSteal(damageDone);
 
       this.powerModifier = 0;
+      if (this.superCharge) this.superCharge = false;
 
       gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     }
@@ -193,6 +197,7 @@ export class Priestess extends DarkElf {
     if (target instanceof Hero) target.modifyPower(-50); // TODO: add debuff animation
 
     this.powerModifier = 0;
+    if (this.superCharge) this.superCharge = false;
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -230,7 +235,7 @@ export class Wraith extends DarkElf {
       target.getsDamaged(this.getTotalPower(), this.attackType);
 
       this.powerModifier = 0;
-    }
+      if (this.superCharge) this.superCharge = false;}
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -254,6 +259,7 @@ export class Phantom extends Hero {
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
     this.powerModifier = 0;
+    if (this.superCharge) this.superCharge = false;
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
