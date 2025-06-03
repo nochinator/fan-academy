@@ -1,6 +1,7 @@
 import { Client, Room } from "colyseus.js";
-import { IFaction, IGameState, ITile, ITurnSentMessage } from "../interfaces/gameInterface";
+import { IFaction, IGameOver, IGameState, ILastTurnMessage, ITile, ITurnSentMessage } from "../interfaces/gameInterface";
 import UIScene from "../scenes/ui.scene";
+import { EWinConditions } from "../enums/gameEnums";
 
 export async function createGame(context: UIScene, faction: IFaction | undefined, boardState: ITile[] | undefined ): Promise<void> {
   const { colyseusClient, userId } = context;
@@ -76,9 +77,20 @@ function subscribeToGameListeners(room: Room, context: UIScene): void {
       });
     }
   });
+
+  room.onMessage("lastTurnPlayed", (message: ILastTurnMessage) => {
+    console.log("Game over:", message);
+
+    if (message.roomId === context.currentRoom?.roomId) {
+      // TODO: add replay feature for opponent
+      // Plus a 5 sec winning/losing animation before closing the game
+    }
+
+    context.scene.get('GameScene').scene.stop();
+  });
 }
 
-export function sendTurnMessage(currentRoom: Room | undefined, currentTurn: IGameState[] | undefined, newActivePlayer: string | undefined): void {
+export function sendTurnMessage(currentRoom: Room | undefined, currentTurn: IGameState[] | undefined, newActivePlayer: string | undefined, gameOver?: IGameOver): void {
   if (!currentRoom || !currentTurn || !newActivePlayer) {
     console.error('Error sending turn, missing one or more params:');
     console.log('Current Room -> ', currentRoom);
@@ -91,7 +103,8 @@ export function sendTurnMessage(currentRoom: Room | undefined, currentTurn: IGam
   currentRoom.send("turnSent", {
     _id: currentRoom.roomId,
     turn: currentTurn,
-    newActivePlayer
+    newActivePlayer,
+    gameOver
   });
 
   console.log("Turn message sent...");

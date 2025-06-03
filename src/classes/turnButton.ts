@@ -10,14 +10,23 @@ export class TurnButton {
 
     // Sending a turn
     turnButton.on('pointerdown', async () => {
+      const gameController = this.context.gameController!;
+
       if (context.currentGame && context.activePlayer === context.userId) {
         console.log('Clicked on send turn');
 
         // If a player sends a turn without taking any actions, add a PASS action to the game state
         // TODO: pop-up message if there are still actions to be taken in the turn
-        if (context.currentTurnAction === 1) context.gameController?.addActionToState(EActionType.PASS);
+        if (context.currentTurnAction === 1) gameController.addActionToState(EActionType.PASS);
 
-        this.context.gameController!.endOfTurnActions();
+        // Remove KO'd units before end of turn actions to handle a possible game over
+        await gameController.removeKOUnits();
+
+        if (context.gameOver) {
+          await gameController.handleGameOver();
+        } else {
+          gameController.endOfTurnActions();
+        }
       } else {
         console.log('Clicked on send turn but... not your turn'); // TODO: remove after testing
       }

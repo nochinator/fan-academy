@@ -9,15 +9,13 @@ export function createCouncilFactionData(userId: string): IFaction {
   const unitsInDeck = createCouncilDeck(userId);
   const unitsInHand =  unitsInDeck.splice(0, 6);
   const factionName = EFaction.COUNCIL;
-  const cristalOneHealth =  4500;
-  const cristalTwoHealth =  4500;
+  const unitsLeft = 13;
 
   return {
     factionName,
     unitsInDeck,
     unitsInHand,
-    cristalOneHealth,
-    cristalTwoHealth
+    unitsLeft
   };
 }
 
@@ -92,15 +90,12 @@ export function createElvesFactionData(userId: string): IFaction {
   const unitsInDeck = createElvesDeck(userId);
   const unitsInHand =  unitsInDeck.splice(0, 6);
   const factionName = EFaction.DARK_ELVES;
-  const cristalOneHealth =  4500;
-  const cristalTwoHealth =  4500;
-
+  const unitsLeft = 13;
   return {
     factionName,
     unitsInDeck,
     unitsInHand,
-    cristalOneHealth,
-    cristalTwoHealth
+    unitsLeft
   };
 }
 

@@ -1,4 +1,4 @@
-import { EAttackType, ETiles } from "../enums/gameEnums";
+import { EAttackType, ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
@@ -123,8 +123,6 @@ export class Crystal extends Phaser.GameObjects.Container {
   }
 
   removeFromGame(): void {
-    if (this.isLastCrystal) console.log('GAME OVER FUNCTION HERE');
-
     const tile = this.getTile();
     tile.crystal = undefined;
     tile.occupied = false;
@@ -136,12 +134,19 @@ export class Crystal extends Phaser.GameObjects.Container {
     const index = crystalArray.findIndex(crystal => crystal.boardPosition === this.boardPosition);
     crystalArray.splice(index, 1);
 
-    // Update the remaining crystal
-    const otherCrystal = crystalArray.find(crystal => crystal.belongsTo === this.belongsTo);
-    if (!otherCrystal) throw new Error('Crystal getsDestroyed() No other crystal found');
+    // Update the remaining crystal or set gameOver
+    if (this.isLastCrystal) {
+      this.context.gameOver = {
+        winCondition: EWinConditions.CRYSTAL,
+        winner: this.context.activePlayer!
+      };
+    } else {
+      const otherCrystal = crystalArray.find(crystal => crystal.belongsTo === this.belongsTo);
+      if (!otherCrystal) throw new Error('Crystal getsDestroyed() No other crystal found');
 
-    otherCrystal.isLastCrystal = true;
-    otherCrystal.updateTileData();
+      otherCrystal.isLastCrystal = true;
+      otherCrystal.updateTileData();
+    }
 
     // Remove animations
     this.scene.tweens.killTweensOf(this);

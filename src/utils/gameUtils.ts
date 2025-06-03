@@ -4,8 +4,8 @@ import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulSt
 import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EActionClass, EActionType, EHeroes, EItems, ETiles } from "../enums/gameEnums";
-import { Coordinates, ICrystal, IHero, IItem } from "../interfaces/gameInterface";
+import { EActionClass, EActionType, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
+import { Coordinates, ICrystal, IHero, IItem, IPlayerState } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
 // Fisher-Yates shuffle algorithm
@@ -221,4 +221,28 @@ export function canBeAttacked(context: GameScene, tile: Tile): boolean {
   if (tile.hero && !belongsToPlayer(context, tile.hero)) result = true;
   if (tile.crystal && !belongsToPlayer(context, tile.crystal)) result = true;
   return result;
+}
+
+export function updateUnitsLeft(context: GameScene, hero: Hero): void {
+  let affectedPlayer: IPlayerState | undefined;
+  let otherPlayer: IPlayerState | undefined;
+
+  if (hero.unitId.includes(context.player1!.playerId)) {
+    affectedPlayer = context.player1;
+    otherPlayer = context.player2;
+  } else {
+    affectedPlayer = context.player2;
+    otherPlayer = context.player1;
+  }
+
+  if (!affectedPlayer || !otherPlayer) throw new Error('updateUnitsLeft() No players found');
+
+  const unitsLeft = --affectedPlayer.factionData.unitsLeft;
+
+  console.log('unitsLeft', unitsLeft);
+
+  if (unitsLeft === 0) context.gameOver = {
+    winCondition: EWinConditions.UNITS,
+    winner: otherPlayer.playerId
+  };
 }

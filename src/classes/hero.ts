@@ -1,7 +1,7 @@
-import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems } from "../enums/gameEnums";
+import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems, EWinConditions } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { getGridDistance, moveAnimation, roundToFive } from "../utils/gameUtils";
+import { getGridDistance, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
 import { Item } from "./item";
@@ -313,6 +313,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Remove hero from board array
     const index = this.context.gameController!.board.units.findIndex(unit => unit.unitId === this.unitId);
     if (index !== -1) { this.context.gameController!.board.units.splice(index, 1); }
+
+    // Update hero counter
+    if (this.unitType !== EHeroes.PHANTOM) updateUnitsLeft(this.context, this);
 
     // Destroy container and children
     this.destroy(true);

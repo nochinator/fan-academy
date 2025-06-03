@@ -41,6 +41,21 @@ export async function connectToGameLobby(client: Client | undefined, userId: str
 
       await createGameList(context);
     });
+
+    lobby.onMessage('gameOverUpdate', async (message: {
+      gameId: string,
+      userIds: string[]
+    }) => {
+      console.log('A game has ended, removing it from the game list');
+      if (!context.gameList) console.error('gameOverUpdate - No context.gameList found');
+
+      // Remove game from the list and re-render it
+      const isInArrayIndex = context.gameList!.findIndex(game => game._id === message.gameId);
+      if (isInArrayIndex !== -1) context.gameList?.splice(isInArrayIndex, 1);
+
+      await createGameList(context);
+      console.log('Finished game removed');
+    });
   } catch (error) {
     console.log('Error joining lobby ->', error);
   }

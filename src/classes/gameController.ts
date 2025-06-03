@@ -1,4 +1,4 @@
-import { EActionClass, EActionType, EHeroes, ETiles } from "../enums/gameEnums";
+import { EActionClass, EActionType, EHeroes, ETiles, EWinConditions } from "../enums/gameEnums";
 import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
 import { sendTurnMessage } from "../lib/colyseusGameRoom";
 import GameScene from "../scenes/game.scene";
@@ -50,6 +50,14 @@ export class GameController {
     this.context.scene.restart();
   }
 
+  async handleGameOver(): Promise<void> {
+    sendTurnMessage(this.context.currentRoom, this.context.currentGame.currentState, this.context.opponentId, this.context.gameOver);
+
+    this.context.activePlayer = undefined; // REVIEW:
+
+    console.log(' GAME ENDS! THE WINNER IS', this.context.gameOver?.winner);
+  }
+
   getDeck() {
     return this.deck.getDeck();
   }
@@ -87,7 +95,6 @@ export class GameController {
   }
 
   async removeKOUnits() {
-    console.log('removeKOUnits this logs');
     // Remove KO'd units from the board
     const unitsToRemove: Hero[] = [];
 
@@ -129,13 +136,9 @@ export class GameController {
     }));
 
     this.addActionToState(EActionType.REMOVE_UNITS);
-    // const lastAction = this.game.currentState[this.game.currentState.length - 1];
-    // lastAction.boardState = this.board.getBoardState();
   }
 
   async endOfTurnActions() {
-    // Remove KO'd units
-    await this.removeKOUnits();
     // If a unit was currently selected, de-select it
     if (this.context.activeUnit) deselectUnit(this.context);
     // Refresh actionPie, draw units and update door banner
@@ -215,6 +218,9 @@ export class GameController {
       },
       boardState: this.board.getBoardState()
     });
+
+    // Check if the game is over
+    if (this.context.gameOver) this.handleGameOver();
   }
 
   async pushEnemy(attacker: Hero, target: Hero): Promise<void> {

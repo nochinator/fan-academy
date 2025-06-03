@@ -1,12 +1,33 @@
-import { EActionClass, EActionType, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems, ETiles } from "../enums/gameEnums";
+import { EActionClass, EActionType, EAttackType, EClass, EFaction, EGameStatus, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
 
 /**
- * Turn sent interface
+ * Game Over Interface
+ */
+export interface IGameOver {
+  winCondition: EWinConditions,
+  winner: string
+}
+
+/**
+ * Turn Sent interface
  */
 export interface ITurnSentMessage {
   roomId: string;
   previousTurn: IGameState[],
-  newActivePlayer: string;
+  newActivePlayer: string,
+  gameOver?: IGameOver
+}
+
+/**
+ * Last Turn Recevied interface
+ */
+export interface ILastTurnMessage {
+  roomId: string;
+  previousTurn: IGameState[],
+  finishedAt: Date,
+  winCondition: EWinConditions,
+  winner: string,
+  userIds: string[]
 }
 
 /**
@@ -84,8 +105,7 @@ export interface IFaction {
   factionName: string;
   unitsInHand: (IHero | IItem)[];
   unitsInDeck: (IHero | IItem)[];
-  cristalOneHealth: number;
-  cristalTwoHealth: number;
+  unitsLeft: number;
 }
 
 /**
@@ -152,12 +172,13 @@ export interface IGame {
   _id: string;
   players: IPlayerData[];
   gameState?: IGameState[][];
-  previousTurn: IGameState[];
   currentState: IGameState[];
+  previousTurn: IGameState[];
   currentTurn: number;
-  winCondition?: string;
-  winner?: string;
+  gameOver?: IGameOver,
   status: EGameStatus;
   createdAt: Date;
+  finishedAt: Date;
+  lastPlayedAt: Date;
   activePlayer: string;
 }
