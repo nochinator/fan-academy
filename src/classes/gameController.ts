@@ -100,7 +100,6 @@ export class GameController {
 
     this.board.units.forEach(unit => {
       if (unit.isKO) {
-        console.log('lastBreath', unit.lastBreath);
         if (unit.lastBreath) unitsToRemove.push(unit);
         if (!unit.lastBreath) {
           unit.lastBreath = true;
@@ -109,33 +108,32 @@ export class GameController {
       }
     });
 
-    if (!unitsToRemove.length) return;
-
-    //TODO: move to its own function
-    const animation = (hero: Hero): Promise<void> => {
-      return new Promise((resolve) => {
-        this.context.tweens.add({
-          targets: hero,
-          alpha: 0,
-          duration: 500,
-          ease: 'Linear',
-          onComplete: () => {
-            hero.removeFromGame();
-            console.log('Unit removed from board!');
-            console.log('Hero', hero);
-            console.log('Tiles', this.board.tiles);
-            resolve();
-          }
+    if (unitsToRemove.length) {
+      const animation = (hero: Hero): Promise<void> => {
+        return new Promise((resolve) => {
+          this.context.tweens.add({
+            targets: hero,
+            alpha: 0,
+            duration: 500,
+            ease: 'Linear',
+            onComplete: () => {
+              hero.removeFromGame();
+              console.log('Unit removed from board!');
+              console.log('Hero', hero);
+              console.log('Tiles', this.board.tiles);
+              resolve();
+            }
+          });
         });
-      });
-    };
+      };
 
-    await Promise.all(unitsToRemove.map(unit => {
-      console.log('Unit board position', unit.boardPosition);
-      return animation.call(this.context, unit);
-    }));
+      await Promise.all(unitsToRemove.map(unit => {
+        console.log('Unit board position', unit.boardPosition);
+        return animation.call(this.context, unit);
+      }));
+    }
 
-    this.addActionToState(EActionType.REMOVE_UNITS);
+    this.addActionToState(EActionType.REMOVE_UNITS); // REVIEW: this step needs to happen every turn in order to update the tiles
   }
 
   async endOfTurnActions() {
