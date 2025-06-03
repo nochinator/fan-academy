@@ -2,9 +2,9 @@ import { Crystal } from "../classes/crystal";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EHeroes } from "../enums/gameEnums";
+import { EHeroes, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, isHero, isItem } from "./gameUtils";
+import { belongsToPlayer, isHero, isItem, isOnBoard } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
@@ -20,6 +20,7 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
     const isFriendly = belongsToPlayer(context, unit);
     const isEnemy = isHero(unit) && !isFriendly;
     const isSameUnit = activeUnit?.unitId === unit.unitId;
+    console.log('UNIT', unit);
 
     const healReticle = isHero(unit) ? unit.getByName('healReticle') as Phaser.GameObjects.Image : undefined;
     const attackReticle = isHero(unit) ? unit.getByName('attackReticle') as Phaser.GameObjects.Image : undefined;
@@ -74,21 +75,31 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
           return;
         }
 
-        // Stomp friendly KO'd units, unless you are a Necromancer
-        if (isHero(activeUnit) && unit.isKO && activeUnit.unitType !== EHeroes.NECROMANCER) {
-          const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
-          activeUnit.move(unitTile);
-        }
+        if (isHero(activeUnit)) {
+          // Spawn stomp friendly units with a unit from hand
+          const unitTile = unit.getTile();
+          if (unit.isKO && unitTile && unitTile.tileType === ETiles.SPAWN && unitTile.isHighlighted && activeUnit.boardPosition >= 45) {
+            activeUnit.spawn(unitTile);
+            return;
+          }
 
-        // Ninja can swap places with any friendly unit on the board
-        if (isHero(activeUnit) && activeUnit.unitType === EHeroes.NINJA) {
-          activeUnit.teleport(unit);
-          return;
-        }
+          // Stomp friendly KO'd units, unless you are a Necromancer
+          if (unit.isKO && activeUnit.unitType !== EHeroes.NECROMANCER) {
+            const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
+            activeUnit.move(unitTile);
+            return;
+          }
 
-        if (isHero(activeUnit) && activeUnit.canHeal && healReticle?.visible) {
-          activeUnit.heal(unit);
-          return;
+          // Ninja can swap places with any friendly unit on the board
+          if (activeUnit.unitType === EHeroes.NINJA) {
+            activeUnit.teleport(unit);
+            return;
+          }
+
+          if (activeUnit.canHeal && healReticle?.visible) {
+            activeUnit.heal(unit);
+            return;
+          }
         }
 
         if (isItem(activeUnit)) {
@@ -126,7 +137,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
 
     // If hero is in hand and clicked tile is highlighted, spawn
     if (activeUnit.boardPosition > 44 && tile.isHighlighted) {
-      if (isHero(activeUnit)) activeUnit.spawn(tile);
+      if (isHero(activeUnit) && !tile.isOccupied()) activeUnit.spawn(tile);
       if (isItem(activeUnit) && activeUnit.dealsDamage) gameController.aoeSpell(tile);
     }
 

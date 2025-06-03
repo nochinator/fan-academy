@@ -286,6 +286,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   getTile(): Tile {
+    console.log('Unitype', this.unitType);
     const tile = this.context?.gameController?.board.getTileFromBoardPosition(this.boardPosition);
     if (!tile) throw new Error('getTile() -> No tile found');
 
@@ -361,6 +362,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   spawn(tile: Tile): void {
     const startingPosition = this.boardPosition;
     const gameController = this.context.gameController!;
+
+    // Stomp KO'd units
+    if (tile.hero && tile.hero.isKO) {
+      const hero = gameController.board.units.find(unit => unit.unitId === tile.hero?.unitId);
+      if (!hero) console.error('spawn() Found heroData on tile, but no Hero to remove', tile);
+      hero?.removeFromGame();
+    }
 
     gameController.hand.removeFromHand(this);
     gameController.board.units.push(this);
