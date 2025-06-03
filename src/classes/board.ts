@@ -4,6 +4,7 @@ import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, createNewHero, getCoordinatesFromBoardPosition, getGridDistance, isEnemySpawn } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
+import { ManaVial } from "./elves";
 import { Hero } from "./hero";
 import { Item } from "./item";
 import { Tile } from "./tile";
@@ -179,6 +180,7 @@ export class Board {
       if (hero.belongsTo !== item.belongsTo) return;
       if (hero.isAlreadyEquipped(item)) return;
       if (item.canHeal && hero.isFullHP()) return;
+      if (item.canHeal && item instanceof ManaVial && hero.isKO) return;
 
       tilesToHighlight.push(hero.getTile());
     });
