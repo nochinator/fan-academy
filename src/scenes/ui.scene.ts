@@ -21,7 +21,6 @@ export default class UIScene extends Phaser.Scene {
 
   async init(data: { userId: string, }) {
     this.userId = data.userId;
-    console.log('datauserid', data.userId);
   }
 
   preload() {
@@ -32,7 +31,6 @@ export default class UIScene extends Phaser.Scene {
     connectToGameLobby(this.colyseusClient, this.userId, this);
 
     this.gameList = await getGameList(this.userId);
-    console.log('UIScene gameList', this.gameList);
 
     // UI background
     this.add.image(0, 0, 'uiBackground').setOrigin(0, 0);

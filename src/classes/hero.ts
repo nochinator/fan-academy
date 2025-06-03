@@ -286,7 +286,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   getTile(): Tile {
-    console.log('Unitype', this.unitType);
     const tile = this.context?.gameController?.board.getTileFromBoardPosition(this.boardPosition);
     if (!tile) throw new Error('getTile() -> No tile found');
 

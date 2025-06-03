@@ -140,7 +140,6 @@ export class Wizard extends Human {
       if (maxScore === 6) break;
     }
 
-    console.log('best target is', bestTarget);
     if (!bestTarget) {
       throw new Error("getNextTarget() No suitable adjacent target found.");
     }
@@ -214,8 +213,6 @@ export class Ninja extends Human {
     }
 
     const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
-
-    console.log('distance', distance);
 
     if (distance === 1) {
       target.getsDamaged(this.getTotalPower(2), this.attackType);

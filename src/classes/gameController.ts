@@ -118,9 +118,7 @@ export class GameController {
             ease: 'Linear',
             onComplete: () => {
               hero.removeFromGame();
-              console.log('Unit removed from board!');
-              console.log('Hero', hero);
-              console.log('Tiles', this.board.tiles);
+              console.log('Unit removed from board!', hero);
               resolve();
             }
           });
@@ -128,7 +126,6 @@ export class GameController {
       };
 
       await Promise.all(unitsToRemove.map(unit => {
-        console.log('Unit board position', unit.boardPosition);
         return animation.call(this.context, unit);
       }));
     }
@@ -194,8 +191,6 @@ export class GameController {
 
     const actionClass = getActionClass(action);
 
-    console.log('TILES', this.board.tiles);
-
     const playerState: IPlayerState = {
       ...this.context[player]!,
       factionData: {
@@ -233,7 +228,7 @@ export class GameController {
 
     // If the tile is beyond the boundaries of the map, ignore
     if (newPosition.row > 4 || newPosition.col > 8) {
-      console.log('pushEnemy() Cant push enemy out of the map');
+      console.error('pushEnemy() Cant push enemy out of the map');
       return;
     }
 
@@ -243,7 +238,7 @@ export class GameController {
       return;
     }
     if (targetNewTile?.isOccupied()) {
-      console.log('pushEnemy() Destination tile is occupied');
+      console.error('pushEnemy() Destination tile is occupied');
       return;
     }
 
@@ -271,7 +266,7 @@ export class GameController {
       return;
     }
     if (targetNewTile?.isOccupied()) {
-      console.log('pullEnemy() Destination tile is occupied');
+      console.error('pullEnemy() Destination tile is occupied');
       return;
     }
 

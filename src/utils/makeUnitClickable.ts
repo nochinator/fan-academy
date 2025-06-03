@@ -10,25 +10,20 @@ import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   unit.on('pointerdown', () => {
-    console.log(`Unit in ${unit.boardPosition}`);
-    console.log(unit);
+    console.log(`Unit in ${unit.boardPosition}`, unit);
     // Only the active player can click on tiles, and only if they still have actions available
     if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
-
-    console.log('currentturnaction', context.currentTurnAction);
 
     const activeUnit = context.activeUnit;
     const isFriendly = belongsToPlayer(context, unit);
     const isEnemy = isHero(unit) && !isFriendly;
     const isSameUnit = activeUnit?.unitId === unit.unitId;
-    console.log('UNIT', unit);
 
     const healReticle = isHero(unit) ? unit.getByName('healReticle') as Phaser.GameObjects.Image : undefined;
     const attackReticle = isHero(unit) ? unit.getByName('attackReticle') as Phaser.GameObjects.Image : undefined;
 
     // CASE 1: No active unit
     if (!activeUnit && isFriendly) {
-      console.log('Case 1 logs');
       if (isHero(unit) && unit.isKO) return; // Can't select KO'd units
 
       selectUnit(context, unit);
@@ -76,7 +71,6 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
       // CASE 3.2: Clicking a friendly unit on the board
       if (isHero(unit) && isFriendly && unit.boardPosition < 45) {
         // Necromancer and Wraith can target friendly units if they are knocked down. NOTE: this check should always go before the stomping check
-        console.log('ActiveUnitType', activeUnit);
         if (isHero(activeUnit) && [EHeroes.NECROMANCER, EHeroes.WRAITH].includes(activeUnit.unitType) && unit.isKO && attackReticle?.visible) {
           activeUnit.attack(unit);
           return;
@@ -131,7 +125,7 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
 export function makeTileClickable(tile: Tile, context: GameScene): void {
   tile.on('pointerdown', () => {
-    console.log('Clicked tile', tile.boardPosition);
+    console.log('Clicked tile', tile.boardPosition, tile);
     // Only the active player can click on tiles, and only if they still have actions available
     if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
 

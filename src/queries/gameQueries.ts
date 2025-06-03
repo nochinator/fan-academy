@@ -23,7 +23,7 @@ export async function getGameList(userId: string): Promise<IGame[] | []> {
 // Delete a game searching for players
 export async function deleteGame(userId: string | undefined, gameId: string | undefined): Promise<IGame | null> {
   if (!userId || !gameId) {
-    console.log('Error deleting game, missing userId | gameId');
+    console.error('Error deleting game, missing userId | gameId');
     return null;
   }
   console.log('Deleting game...');
@@ -38,7 +38,7 @@ export async function deleteGame(userId: string | undefined, gameId: string | un
   console.log('Deleted game data', data);
 
   if (result.status !== 200) {
-    console.log('Error deleting  game...'); // TODO: throw errors
+    console.error('Error deleting  game...'); // TODO: throw errors
     return null;
   }
 

@@ -393,7 +393,6 @@ export class Board {
 
     console.log('offsetsToCheck', offsetsToCheck);
     if (offsetsToCheck && offsetsToCheck.length) {
-      console.log('this logs');
       for (const offset of offsetsToCheck) {
         const tileRow = attackerCoords.row + offset[0];
         const tileCol = attackerCoords.col + offset[1];

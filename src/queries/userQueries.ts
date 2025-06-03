@@ -14,20 +14,19 @@ export async function loginQuery(username: string, password: string) {
 
     if (response.ok) {
       console.log('Successful login! :)');
-      console.log(data);
       return {
         success: true,
         user: data.user
       };
     } else {
-      console.log('Server responded with an error:', data.message || 'Unknown error');
+      console.error('Server responded with an error:', data.message || 'Unknown error');
       return {
         success: false,
         error: data.message || 'Unknown error'
       };
     }
   } catch(error) {
-    console.log('Error login in: ', error);
+    console.error('Error login in: ', error);
     return {
       success: false,
       error: 'Network error. Please try again.'
@@ -64,7 +63,7 @@ export async function signUpQuery(email: string, username: string, password: str
       };
     }
   } catch (error) {
-    console.log('Network error signing up:', error);
+    console.error('Network error signing up:', error);
     return {
       success: false,
       error: 'Network error. Please try again.'
@@ -85,7 +84,7 @@ export async function authCheck(): Promise<string | undefined> {
   });
 
   if (result.status != 200) {
-    console.log('User not authenticated...');
+    console.error('User not authenticated...');
     return undefined;
   }
 

@@ -26,7 +26,6 @@ export abstract class DarkElf extends Hero {
 
   lifeSteal(damage: number): void {
     if (this.factionBuff) {
-      console.log('Soul Stone equipped');
       const roundedHealing = roundToFive(damage * 67 / 100);
       this.getsHealed(roundedHealing);
     } else {
@@ -41,8 +40,6 @@ export class Impaler extends DarkElf {
     super(context, createElvesImpalerData(data));
   }
   async attack(target: Hero | Crystal): Promise<void> {
-    console.log('Impaler attack logs');
-
     const gameController = this.context.gameController;
     if (!gameController) {
       console.error('hero attack() No gameController found');
@@ -70,7 +67,6 @@ export class VoidMonk extends DarkElf {
   }
   // TODO: add aoe to attack
   attack(target: Hero | Crystal): void {
-    console.log('VoidMonk attack logs');
     const board = this.context.gameController!.board;
 
     // Get the direction of the attack and offset tiles
@@ -107,7 +103,6 @@ export class VoidMonk extends DarkElf {
     target.getsDamaged(this.getTotalPower(), this.attackType);
     if (splashedEnemies.length) {
       const splashDamage = this.getTotalPower() * 67.5 / 100;
-      console.log('splashDamage', splashDamage);
       splashedEnemies.forEach(enemy => enemy.getsDamaged(splashDamage, this.attackType));
     }
 
@@ -137,8 +132,6 @@ export class Necromancer extends DarkElf {
     super(context, createElvesNecromancerData(data));
   }
   attack(target: Hero | Crystal): void {
-    console.log('Necromancer attack logs');
-
     const gameController = this.context.gameController;
     if (!gameController) {
       console.error('hero attack() No gameController found');
@@ -182,8 +175,6 @@ export class Priestess extends DarkElf {
     super(context, createElvesPriestessData(data));
   }
   attack(target: Hero | Crystal): void {
-    console.log('Priestess attack logs');
-
     const gameController = this.context.gameController;
     if (!gameController) {
       console.error('hero attack() No gameController found');
@@ -220,8 +211,6 @@ export class Wraith extends DarkElf {
     super(context, createElvesWraithData(data));
   }
   attack(target: Hero | Crystal): void {
-    console.log('Wraith attack logs');
-
     if (target instanceof Hero && target.isKO) {
       target.removeFromGame();
 
@@ -249,8 +238,6 @@ export class Phantom extends Hero {
     super(context, createElvesPhantomData(data));
   }
   attack(target: Hero | Crystal): void {
-    console.log('Phantom attack logs');
-
     const gameController = this.context.gameController;
     if (!gameController) {
       console.error('hero attack() No gameController found');
@@ -340,10 +327,6 @@ export class SoulHarvest extends Item {
 
     // Divide damage dealt by that number + 3, then round to nearest 5. Formula: 1 / (units + 3) * damage
     const lifeIncreaseAmount = roundToFive(1 / (friendlyUnits.length + 3) * totalDamageInflicted);
-
-    console.log('totalDamageInflicted', totalDamageInflicted);
-    console.log('friendlyUnits', friendlyUnits);
-    console.log('lifeIncreaseAmount', lifeIncreaseAmount);
 
     // Increase max health of all units, including KO'd ones, and revive them
     friendlyUnits.forEach(unit => unit.increaseMaxHealth(lifeIncreaseAmount));

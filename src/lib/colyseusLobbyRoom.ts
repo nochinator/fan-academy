@@ -57,6 +57,6 @@ export async function connectToGameLobby(client: Client | undefined, userId: str
       console.log('Finished game removed');
     });
   } catch (error) {
-    console.log('Error joining lobby ->', error);
+    console.error('Error joining lobby ->', error);
   }
 };

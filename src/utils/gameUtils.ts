@@ -101,7 +101,6 @@ export function createNewHero(context: GameScene, heroData: IHero): Hero {
     [EHeroes.WRAITH]: () => new Wraith(context, heroData)
   };
 
-  if (EHeroes.WRAITH === heroData.unitType) console.log('Wraith', heroData.unitsConsumed);
   const createHero = heroTypes[heroData.unitType];
   if (!createHero) console.error('Error creating hero', heroData);
   return createHero();
@@ -134,7 +133,6 @@ export async function moveAnimation(context: GameScene, hero: Hero, targetTile: 
         duration: 300,
         ease: 'Linear',
         onComplete: () => {
-          console.log('Move complete!');
           context.input.enabled = true;
           if (temporaryFlip) unitImage.setFlipX(!unitImage.flipX);
           resolve();

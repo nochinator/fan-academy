@@ -5,7 +5,7 @@ import UIScene from "../scenes/ui.scene";
 export async function createGame(context: UIScene, faction: IFaction | undefined, boardState: ITile[] | undefined ): Promise<void> {
   const { colyseusClient, userId } = context;
   if (!colyseusClient || !userId || !faction) {
-    console.log('createGame error: missing one of client / userId / faction');
+    console.error('createGame error: missing one of client / userId / faction');
     return;
   }
   try {
@@ -29,7 +29,7 @@ export async function createGame(context: UIScene, faction: IFaction | undefined
 
 export async function joinGame(client: Client | undefined, userId: string | undefined, roomId: string, context: UIScene): Promise<Room | undefined> {
   if( !client || !userId || !roomId) {
-    console.log('joinGame, { client | userid | gameid } missing');
+    console.error('joinGame, { client | userid | gameid } missing');
     return undefined;
   }
 
@@ -66,8 +66,6 @@ function subscribeToGameListeners(room: Room, context: UIScene): void {
       currentGame.activePlayer = message.newActivePlayer;
       currentGame.previousTurn = message.previousTurn;
 
-      console.log('currentGame', currentGame);
-
       context.scene.get('GameScene').scene.restart({
         userId: context.userId,
         colyseusClient: context.colyseusClient,
@@ -92,10 +90,6 @@ function subscribeToGameListeners(room: Room, context: UIScene): void {
 export function sendTurnMessage(currentRoom: Room | undefined, currentTurn: IGameState[] | undefined, newActivePlayer: string | undefined, gameOver?: IGameOver): void {
   if (!currentRoom || !currentTurn || !newActivePlayer) {
     console.error('Error sending turn, missing one or more params:');
-    console.log('Current Room -> ', currentRoom);
-    console.log('Current Turn -> ', currentTurn);
-    console.log('newActivePlayer -> ', newActivePlayer);
-
     return;
   }
 

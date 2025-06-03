@@ -84,7 +84,6 @@ export async function createGameList(context: UIScene) {
       if (game.status === EGameStatus.SEARCHING) {
         closeButton.setVisible(true).setInteractive();
         closeButton.on('pointerdown', async () => {
-          console.log('Clicked on X button!');
           await deleteGame(context.userId, game._id);
           const deletedGameIndex = context.gameList!.findIndex(listItem => listItem._id === game._id);
           context.gameList!.splice(deletedGameIndex, 1);
