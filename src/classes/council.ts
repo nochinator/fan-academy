@@ -36,7 +36,7 @@ export class Archer extends Human {
     const distance = this.getDistanceToTarget(target);
 
     if (distance === 1) {
-      target.getsDamaged(this.getTotalPower(2), this.attackType);
+      target.getsDamaged(this.getTotalPower(0.5), this.attackType);
     } else {
       target.getsDamaged(this.getTotalPower(), this.attackType);
     }
