@@ -120,6 +120,8 @@ export async function createGameList(context: UIScene) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL);
       const boardState = createNewGameBoardState();
       await createGame(context, playerFaction, boardState);
+      await context.currentRoom?.leave();
+      context.currentRoom = undefined;
     } else {
       console.error('No userId when creating a new game');
     }
@@ -130,6 +132,8 @@ export async function createGameList(context: UIScene) {
       const playerFaction = createNewGameFactionState(context.userId, EFaction.DARK_ELVES);
       const boardState = createNewGameBoardState();
       await createGame(context, playerFaction, boardState);
+      await context.currentRoom?.leave();
+      context.currentRoom = undefined;
     } else {
       console.error('No userId when creating a new game');
     }

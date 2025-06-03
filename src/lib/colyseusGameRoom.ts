@@ -1,7 +1,6 @@
 import { Client, Room } from "colyseus.js";
 import { IFaction, IGameOver, IGameState, ILastTurnMessage, ITile, ITurnSentMessage } from "../interfaces/gameInterface";
 import UIScene from "../scenes/ui.scene";
-import { EWinConditions } from "../enums/gameEnums";
 
 export async function createGame(context: UIScene, faction: IFaction | undefined, boardState: ITile[] | undefined ): Promise<void> {
   const { colyseusClient, userId } = context;
