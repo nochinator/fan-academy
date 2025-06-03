@@ -398,7 +398,7 @@ export class Board {
 
         if (
           tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
-        tile.hero && !belongsToPlayer(this.context, tile.hero)) {
+        tile.hero && !belongsToPlayer(this.context, tile.hero) && !tile.hero.isKO) {
           result = false;
           break;
         }
