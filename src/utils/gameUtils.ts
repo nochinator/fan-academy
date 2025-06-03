@@ -246,3 +246,7 @@ export function updateUnitsLeft(context: GameScene, hero: Hero): void {
     winner: otherPlayer.playerId
   };
 }
+
+export function isEnemySpawn(context: GameScene, tile: Tile): boolean {
+  return tile.tileType === ETiles.SPAWN && (context.isPlayerOne ? tile.col > 5 : tile.col < 5);
+}

@@ -2,7 +2,7 @@ import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
 import { createCrystalData } from "../gameData/crystalData";
 import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, createNewHero, getCoordinatesFromBoardPosition, getGridDistance } from "../utils/gameUtils";
+import { belongsToPlayer, createNewHero, getCoordinatesFromBoardPosition, getGridDistance, isEnemySpawn } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -62,8 +62,15 @@ export class Board {
     this.tiles.forEach(tile => tile.clearHighlight());
   }
 
-  highlightSpawns(isPlayerOne: boolean) {
-    const spawns = this.tiles.filter(tile => tile.tileType === ETiles.SPAWN && !tile.isOccupied() && (isPlayerOne ? tile.col < 5 : tile.col > 5));
+  highlightSpawns(unitType: EHeroes) {
+    const spawns: Tile[] = [];
+
+    this.tiles.forEach(tile => {
+      const enemySpawn = isEnemySpawn(this.context, tile);
+      if (tile.tileType === ETiles.SPAWN && !enemySpawn) spawns.push(tile);
+      if (tile.hero && tile.hero.isKO && unitType === EHeroes.WRAITH && !enemySpawn) spawns.push(tile);
+    });
+
     this.highlightTiles(spawns);
   }
 
@@ -239,9 +246,7 @@ export class Board {
 
       if (distance <= range) {
         if (rangeType === ERange.MOVE && !tile.isOccupied()) {
-          const isEnemySpawn = tile.tileType === ETiles.SPAWN && (hero.belongsTo === 1 ? tile.col > 5 : tile.col < 5);
-
-          if (!isEnemySpawn) inRangeTiles.push(tile);
+          if (!isEnemySpawn(this.context, tile)) inRangeTiles.push(tile);
         }
         if ((rangeType === ERange.ATTACK || rangeType === ERange.HEAL) && (tile.hero || tile.crystal)) inRangeTiles.push(tile);
       }

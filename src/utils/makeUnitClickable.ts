@@ -1,4 +1,5 @@
 import { Crystal } from "../classes/crystal";
+import { Wraith } from "../classes/elves";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
@@ -47,6 +48,12 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
     // CASE 3: There is already an active unit
     if (activeUnit && !isSameUnit) {
+      // Unique case: Wraith can spawn on a KO'd unit
+      if (isHero(unit) && unit.isKO && isHero(activeUnit) && activeUnit.unitType === EHeroes.WRAITH && activeUnit.boardPosition >= 45) {
+        activeUnit.spawn(unit.getTile());
+        return;
+      }
+
       // CASE 3.1: Clicking an enemy unit
       if (isEnemy) {
         if (isHero(activeUnit) && attackReticle?.visible) {
@@ -78,7 +85,7 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
         if (isHero(activeUnit)) {
           // Spawn stomp friendly units with a unit from hand
           const unitTile = unit.getTile();
-          if (unit.isKO && unitTile && unitTile.tileType === ETiles.SPAWN && unitTile.isHighlighted && activeUnit.boardPosition >= 45) {
+          if (unit.isKO && unitTile.tileType === ETiles.SPAWN && unitTile.isHighlighted && activeUnit.boardPosition >= 45) {
             activeUnit.spawn(unitTile);
             return;
           }

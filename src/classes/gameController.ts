@@ -156,7 +156,7 @@ export class GameController {
 
   onHeroClicked(hero: Hero) {
     console.log(`A hero in position ${hero.boardPosition} has been clicked`);
-    if (hero.boardPosition > 44) this.board.highlightSpawns(this.context.isPlayerOne!);
+    if (hero.boardPosition > 44) this.board.highlightSpawns(hero.unitType);
 
     if (hero.boardPosition < 45) {
       this.board.highlightEnemyTargets(hero);
