@@ -238,8 +238,11 @@ export class Board {
       const distance = getGridDistance(tile.row, tile.col, heroTile.row, heroTile.col);
 
       if (distance <= range) {
-        if (rangeType === ERange.MOVE && !tile.isOccupied()) inRangeTiles.push(tile);
+        if (rangeType === ERange.MOVE && !tile.isOccupied()) {
+          const isEnemySpawn = tile.tileType === ETiles.SPAWN && (hero.belongsTo === 1 ? tile.col > 5 : tile.col < 5);
 
+          if (!isEnemySpawn) inRangeTiles.push(tile);
+        }
         if ((rangeType === ERange.ATTACK || rangeType === ERange.HEAL) && (tile.hero || tile.crystal)) inRangeTiles.push(tile);
       }
     });
