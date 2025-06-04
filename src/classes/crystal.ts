@@ -2,6 +2,7 @@ import { EAttackType, ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
+import { FloatingText } from "./floatingText";
 import { HealthBar } from "./healthBar";
 import { Tile } from "./tile";
 
@@ -125,6 +126,9 @@ export class Crystal extends Phaser.GameObjects.Container {
 
     // Update hp bar
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
+
+    // Show damage numbers
+    new FloatingText(this.context, this.x, this.y - 50, totalDamage.toString());
 
     this.updateTileData();
     if (this.currentHealth <= 0) this.removeFromGame(); // TODO: destruction animation

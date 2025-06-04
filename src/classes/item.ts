@@ -80,9 +80,6 @@ export abstract class Item extends Phaser.GameObjects.Image {
   onActivate() {
     console.log(`${this.unitId} is now active`);
     this.setScale(1);
-
-    // this.highlightMovementTiles();
-    // this.highlightEnemiesInRange();
   }
 
   onDeactivate() {

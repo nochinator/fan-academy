@@ -56,4 +56,16 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('HpBackground', './assets/images/gameItems/hp_background.png');
   context.load.image('HpAlly', './assets/images/gameItems/hp_green.png');
   context.load.image('HpEnemy', './assets/images/gameItems/hp_red.png');
+
+  // Floating text fonts
+  context.load.atlas(
+    'greenFont',
+    './assets/fonts/green_font.png',
+    './assets/fonts/green_font.json'
+  );
+  context.load.atlas(
+    'redFont',
+    './assets/fonts/red_font.png',
+    './assets/fonts/red_font.json'
+  );
 }

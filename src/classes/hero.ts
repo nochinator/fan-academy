@@ -4,6 +4,7 @@ import GameScene from "../scenes/game.scene";
 import { getGridDistance, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
+import { FloatingText } from "./floatingText";
 import { HealthBar } from "./healthBar";
 import { Item } from "./item";
 import { Tile } from "./tile";
@@ -219,6 +220,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Update hp bar
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
+    // Show damage numbers
+    new FloatingText(this.context, this.x, this.y - 50, totalDamage.toString());
+
     this.updateTileData();
 
     return totalDamage; // Return damage taken for lifesteal
@@ -255,8 +259,21 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (healing <= 0) return;
     if (this.isKO) this.getsRevived();
 
-    this.currentHealth += healing;
-    if (this.currentHealth > this.maxHealth) this.currentHealth = this.maxHealth;
+    let actualHealing: number;
+
+    if (this.currentHealth + healing >= this.maxHealth) {
+      actualHealing = this.maxHealth - this.currentHealth;
+      this.currentHealth = this.maxHealth;
+    } else {
+      this.currentHealth += healing;
+      actualHealing = healing;
+    }
+
+    // Update hp bar
+    this.healthBar.setHealth(this.maxHealth, this.currentHealth);
+
+    // Show healing numbers
+    new FloatingText(this.context, this.x, this.y - 50, actualHealing.toString(), true);
 
     this.updateTileData();
   }
@@ -277,6 +294,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // Update hp bar
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
+
+    // Show healing numbers
+    new FloatingText(this.context, this.x, this.y - 50, amount.toString(), true);
 
     this.updateTileData();
   }
