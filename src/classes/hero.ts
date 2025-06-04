@@ -1,9 +1,10 @@
-import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems, EWinConditions } from "../enums/gameEnums";
+import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { getGridDistance, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
+import { HealthBar } from "./healthBar";
 import { Item } from "./item";
 import { Tile } from "./tile";
 
@@ -45,6 +46,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   allyReticle: Phaser.GameObjects.Image;
   blockedLOS: Phaser.GameObjects.Image;
 
+  healthBar: HealthBar;
+
   constructor(context: GameScene, data: IHero) {
     const { x, y } = context.centerPoints[data.boardPosition];
     super(context, x, y);
@@ -75,6 +78,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.belongsTo = data.belongsTo ?? 1;
     this.canHeal = data.canHeal ?? false;
     this.unitsConsumed = data.unitsConsumed ?? 0;
+
+    this.healthBar = new HealthBar(context, data, -38, -60);
+    if (this.boardPosition >= 45) this.healthBar.setVisible(false);
 
     // Create the unit's image and images for its upgrades
     this.characterImage = context.add.image(0, -10, this.unitType).setOrigin(0.5).setName('body');
@@ -128,7 +134,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     });
 
     // Add all individual images to container
-    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage, this.attackReticle, this.healReticle, this.allyReticle, this.blockedLOS]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(this.boardPosition + 10); // REVIEW: depth
+    this.add([this.characterImage, this.runeMetalImage, this.factionBuffImage, this.shiningHelmImage, this.healthBar, this.attackReticle, this.healReticle, this.allyReticle, this.blockedLOS]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(this.boardPosition + 10); // REVIEW: depth
 
     // Hide if in deck
     if (this.boardPosition === 51) this.setVisible(false);
@@ -208,8 +214,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const totalDamage = roundToFive(this.getLifeLost(damage, attackType));
 
     this.currentHealth -= totalDamage;
-
     if (this.currentHealth <= 0) this.getsKnockedDown();
+
+    // Update hp bar
+    this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
     this.updateTileData();
 
@@ -266,6 +274,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const roundedHealtGain = roundToFive(amount);
     this.maxHealth += roundedHealtGain;
     this.currentHealth += roundedHealtGain;
+
+    // Update hp bar
+    this.healthBar.setHealth(this.maxHealth, this.currentHealth);
+
     this.updateTileData();
   }
 
@@ -378,6 +390,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.updatePosition(tile.boardPosition);
     // Update tile data
     this.updateTileData();
+
+    this.healthBar.setVisible(true);
 
     gameController.afterAction(EActionType.SPAWN, startingPosition, tile.boardPosition);
   }

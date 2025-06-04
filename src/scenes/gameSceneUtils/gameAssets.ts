@@ -51,4 +51,9 @@ export function loadGameAssets(context: GameScene) {
 
   // Blocked line of sight
   context.load.image('blockedLOS', './assets/images/gameItems/blocked_los.png');
+
+  // Health bar
+  context.load.image('HpBackground', './assets/images/gameItems/hp_background.png');
+  context.load.image('HpAlly', './assets/images/gameItems/hp_green.png');
+  context.load.image('HpEnemy', './assets/images/gameItems/hp_red.png');
 }

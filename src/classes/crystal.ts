@@ -2,6 +2,7 @@ import { EAttackType, ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
+import { HealthBar } from "./healthBar";
 import { Tile } from "./tile";
 
 export class Crystal extends Phaser.GameObjects.Container {
@@ -24,6 +25,8 @@ export class Crystal extends Phaser.GameObjects.Container {
   debuffEventSingle: Phaser.Time.TimerEvent;
   debuffEventDouble: Phaser.Time.TimerEvent;
 
+  healthBar: HealthBar;
+
   constructor(context: GameScene, data: ICrystal) {
     const { x, y } = context.centerPoints[data.boardPosition];
     super(context, x, y);
@@ -35,6 +38,8 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.isDestroyed = data.isDestroyed;
     this.isLastCrystal = data.isLastCrystal;
     this.boardPosition = data.boardPosition;
+
+    this.healthBar = new HealthBar(context, data, -38, -70);
 
     this.pedestalImage = context.add.image(0, 0, 'pedestal').setScale(0.8);
     const crystalTexture = data.currentHealth <= data.maxHealth / 2 ? 'crystalDamaged' : 'crystalFull';
@@ -82,7 +87,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
     addTween(this.attackReticle);
 
-    this.add([this.pedestalImage, this.crystalImage, this.singleCrystalDebuff, this.doubleCrystalDebuff, this.attackReticle, this.blockedLOS]).setSize(90, 95).setInteractive().setDepth(this.boardPosition + 10); // REVIEW: not setting name
+    this.add([this.pedestalImage, this.crystalImage, this.singleCrystalDebuff, this.doubleCrystalDebuff, this.healthBar, this.attackReticle, this.blockedLOS]).setSize(90, 95).setInteractive().setDepth(this.boardPosition + 10); // REVIEW: not setting name
 
     makeCrystalClickable(this, this.context);
 
@@ -117,6 +122,9 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.currentHealth <= this.maxHealth / 2) {
       this.crystalImage.setTexture('crystalDamaged'); // FIXME: below 50%, this changes the texture every time the crystal is damaged
     }
+
+    // Update hp bar
+    this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
     this.updateTileData();
     if (this.currentHealth <= 0) this.removeFromGame(); // TODO: destruction animation
