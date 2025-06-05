@@ -3,7 +3,7 @@ import { createElvesImpalerData, createElvesNecromancerData, createElvesPhantomD
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, getAOETiles, isOnBoard, roundToFive } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, flipOnAttack, getAOETiles, isOnBoard, roundToFive } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -40,11 +40,9 @@ export class Impaler extends DarkElf {
     super(context, createElvesImpalerData(data));
   }
   async attack(target: Hero | Crystal): Promise<void> {
-    const gameController = this.context.gameController;
-    if (!gameController) {
-      console.error('hero attack() No gameController found');
-      return;
-    }
+    const gameController = this.context.gameController!;
+
+    flipOnAttack(this.context, this, target);
 
     const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
     if (damageDone) this.lifeSteal(damageDone);
@@ -67,6 +65,8 @@ export class VoidMonk extends DarkElf {
   }
   // TODO: add aoe to attack
   attack(target: Hero | Crystal): void {
+    flipOnAttack(this.context, this, target);
+
     const board = this.context.gameController!.board;
 
     // Get the direction of the attack and offset tiles
@@ -132,11 +132,9 @@ export class Necromancer extends DarkElf {
     super(context, createElvesNecromancerData(data));
   }
   attack(target: Hero | Crystal): void {
-    const gameController = this.context.gameController;
-    if (!gameController) {
-      console.error('hero attack() No gameController found');
-      return;
-    }
+    const gameController = this.context.gameController!;
+
+    flipOnAttack(this.context, this, target);
 
     if (target instanceof Hero && target.isKO) {
       const phantom = new Phantom(this.context, {
@@ -175,11 +173,9 @@ export class Priestess extends DarkElf {
     super(context, createElvesPriestessData(data));
   }
   attack(target: Hero | Crystal): void {
-    const gameController = this.context.gameController;
-    if (!gameController) {
-      console.error('hero attack() No gameController found');
-      return;
-    }
+    const gameController = this.context.gameController!;
+
+    flipOnAttack(this.context, this, target);
 
     const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
     if (damageDone) this.lifeSteal(damageDone);
@@ -211,6 +207,8 @@ export class Wraith extends DarkElf {
     super(context, createElvesWraithData(data));
   }
   attack(target: Hero | Crystal): void {
+    flipOnAttack(this.context, this, target);
+
     if (target instanceof Hero && target.isKO) {
       target.removeFromGame();
 
@@ -238,11 +236,10 @@ export class Phantom extends Hero {
     super(context, createElvesPhantomData(data));
   }
   attack(target: Hero | Crystal): void {
-    const gameController = this.context.gameController;
-    if (!gameController) {
-      console.error('hero attack() No gameController found');
-      return;
-    }
+    const gameController = this.context.gameController!;
+
+    flipOnAttack(this.context, this, target);
+
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
     this.powerModifier = 0;

@@ -5,7 +5,7 @@ import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
 import { EActionClass, EActionType, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
-import { Coordinates, ICrystal, IHero, IItem, IPlayerState } from "../interfaces/gameInterface";
+import { ICrystal, IHero, IItem, IPlayerState } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
 // Fisher-Yates shuffle algorithm
@@ -46,19 +46,6 @@ export function belongsToPlayer(context: GameScene, unit: Hero | IHero | Item | 
 // Rounds a number to the nearest multiple of 5
 export function roundToFive(amount: number): number {
   return Math.round(amount / 5) * 5;
-}
-
-export function getCoordinatesFromBoardPosition(boardPosition: number): {
-  row: number,
-  col: number
-} {
-  const cols = 9; // number of columns in the grid
-  const row = Math.floor(boardPosition / cols);
-  const col = boardPosition % cols;
-  return {
-    row,
-    col
-  };
 }
 
 export function getGridDistance(startRow: number, startColumn: number, targetRow: number, targetColumn: number): number {
@@ -247,4 +234,22 @@ export function updateUnitsLeft(context: GameScene, hero: Hero): void {
 
 export function isEnemySpawn(context: GameScene, tile: Tile): boolean {
   return tile.tileType === ETiles.SPAWN && (context.isPlayerOne ? tile.col > 5 : tile.col < 5);
+}
+
+export function flipOnAttack(context: GameScene, attacker: Hero, target: Hero | Crystal): void {
+  const isLookingRight = attacker.belongsTo === 1;
+  const attackerImage = attacker.characterImage;
+
+  console.log('attacker belong to', attacker.belongsTo);
+  console.log('looksRight', attackerImage.flipX);
+
+  if (isLookingRight && target.col > attacker.col) return;
+  if (!isLookingRight && target.col < attacker.col) return;
+
+  if (!isLookingRight) attackerImage.setFlipX(false);
+  if (isLookingRight)  attackerImage.setFlipX(true);
+
+  context.time.delayedCall(1000, () => {
+    attackerImage.setFlipX(!attacker.characterImage.flipX);
+  });
 }

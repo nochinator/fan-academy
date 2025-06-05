@@ -3,7 +3,7 @@ import { createCouncilArcherData, createCouncilClericData, createCouncilKnightDa
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, getAOETiles, getGridDistance, isOnBoard } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, flipOnAttack, getAOETiles, getGridDistance, isOnBoard } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -35,6 +35,8 @@ export class Archer extends Human {
   attack(target: Hero | Crystal): void {
     const distance = this.getDistanceToTarget(target);
 
+    flipOnAttack(this.context, this, target);
+
     if (distance === 1) {
       target.getsDamaged(this.getTotalPower(0.5), this.attackType);
     } else {
@@ -59,6 +61,8 @@ export class Knight extends Human {
   async attack(target: Hero | Crystal): Promise<void> {
     const gameController = this.context.gameController!;
 
+    flipOnAttack(this.context, this, target);
+
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
     if (target instanceof Hero) await gameController.pushEnemy(this, target);
@@ -79,6 +83,8 @@ export class Wizard extends Human {
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
+
+    flipOnAttack(this.context, this, target);
 
     // Get directions for finding out the next targets
     const attackDirection = gameController.board.getAttackDirection(this.boardPosition, target.boardPosition);
@@ -204,6 +210,8 @@ export class Ninja extends Human {
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
 
+    flipOnAttack(this.context, this, target);
+
     const attackerTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
     const targetTile = gameController.board.getTileFromBoardPosition(target.boardPosition);
 
@@ -251,6 +259,8 @@ export class Cleric extends Human {
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
+
+    flipOnAttack(this.context, this, target);
 
     target.getsDamaged(this.getTotalPower(), this.attackType);
 

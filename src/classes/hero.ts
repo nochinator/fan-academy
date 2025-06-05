@@ -15,6 +15,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   unitType: EHeroes;
   unitId: string;
   boardPosition: number;
+  row: number;
+  col: number;
   maxHealth: number;
   currentHealth: number;
   isKO: boolean;
@@ -59,6 +61,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.unitType = data.unitType;
     this.unitId = data.unitId;
     this.boardPosition = data.boardPosition;
+    this.row = data.row;
+    this.col = data.col;
     this.maxHealth = data.maxHealth;
     this.currentHealth = data.currentHealth;
     this.isKO = data.isKO;
@@ -174,6 +178,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       unitType: this.unitType,
       unitId: this.unitId,
       boardPosition: this.boardPosition,
+      row: this.row,
+      col: this.col,
       maxHealth: this.maxHealth,
       currentHealth: this.currentHealth,
       isKO: this.isKO,
