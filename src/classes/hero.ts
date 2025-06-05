@@ -164,11 +164,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     }
   }
 
-  updatePosition(boardPosition: number): void {
-    const { x, y } = this.context.centerPoints[boardPosition];
+  updatePosition(tile: Tile): void {
+    const { x, y } = this.context.centerPoints[tile.boardPosition];
     this.x = x;
     this.y = y;
-    this.boardPosition = boardPosition;
+    this.boardPosition = tile.boardPosition;
+    this.row = tile.row;
+    this.col = tile.col;
   }
 
   exportData(): IHero {
@@ -388,7 +390,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       hero?.removeFromGame();
     }
 
-    this.updatePosition(targetTile.boardPosition);
+    this.updatePosition(targetTile);
     targetTile.hero = this.exportData();
     targetTile.setOccupied(true);
     startTile.removeHero();
@@ -413,7 +415,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Flip image if player is player 2
     if (this.belongsTo === 2) (this.getByName('body') as Phaser.GameObjects.Image)?.setFlipX(true);
     // Position hero on the board
-    this.updatePosition(tile.boardPosition);
+    this.updatePosition(tile);
     // Update tile data
     this.updateTileData();
 

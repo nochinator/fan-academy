@@ -3,7 +3,7 @@ import { createCouncilArcherData, createCouncilClericData, createCouncilKnightDa
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, flipOnAttack, getAOETiles, getGridDistance, isOnBoard } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, turnIfBehind, getAOETiles, getGridDistance, isOnBoard } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -35,7 +35,7 @@ export class Archer extends Human {
   attack(target: Hero | Crystal): void {
     const distance = this.getDistanceToTarget(target);
 
-    flipOnAttack(this.context, this, target);
+    turnIfBehind(this.context, this, target);
 
     if (distance === 1) {
       target.getsDamaged(this.getTotalPower(0.5), this.attackType);
@@ -61,7 +61,7 @@ export class Knight extends Human {
   async attack(target: Hero | Crystal): Promise<void> {
     const gameController = this.context.gameController!;
 
-    flipOnAttack(this.context, this, target);
+    turnIfBehind(this.context, this, target);
 
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
@@ -84,7 +84,7 @@ export class Wizard extends Human {
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
 
-    flipOnAttack(this.context, this, target);
+    turnIfBehind(this.context, this, target);
 
     // Get directions for finding out the next targets
     const attackDirection = gameController.board.getAttackDirection(this.boardPosition, target.boardPosition);
@@ -106,7 +106,7 @@ export class Wizard extends Human {
     gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  getNextTarget(target: Hero | Crystal, attackDirection: number, opponentDirection: number[], board: Board, isLastTarget: boolean, toIgnore?: number[]): Hero | Crystal {
+  getNextTarget(target: Hero | Crystal, attackDirection: number, opponentDirection: number[], board: Board, isLastTarget: boolean, toIgnore?: number[]): Hero | Crystal | undefined {
     const positionsToIgnore = toIgnore ? toIgnore : [target.boardPosition];
     const adjacentEnemies = this.getAdjacentEnemyTiles(target.boardPosition, positionsToIgnore);
 
@@ -147,7 +147,8 @@ export class Wizard extends Human {
     }
 
     if (!bestTarget) {
-      throw new Error("getNextTarget() No suitable adjacent target found.");
+      console.log("getNextTarget() No suitable adjacent target found.");
+      return undefined;
     }
 
     if (bestTarget.hero) {
@@ -180,8 +181,6 @@ export class Wizard extends Human {
         }}
     });
 
-    if (!adjacentTiles.length) console.error('getAdjacentTiles() No tiles found');
-
     return adjacentTiles;
   }
 
@@ -210,7 +209,7 @@ export class Ninja extends Human {
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
 
-    flipOnAttack(this.context, this, target);
+    turnIfBehind(this.context, this, target);
 
     const attackerTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
     const targetTile = gameController.board.getTileFromBoardPosition(target.boardPosition);
@@ -239,12 +238,11 @@ export class Ninja extends Human {
 
     const targetDestination = this.getTile();
     const unitDestination = target.getTile();
-    const targetBoardPosition = target.boardPosition;
 
-    target.updatePosition(this.boardPosition);
+    target.updatePosition(targetDestination);
     targetDestination.hero = target.exportData();
 
-    this.updatePosition(targetBoardPosition);
+    this.updatePosition(unitDestination);
     unitDestination.hero = this.exportData();
 
     gameController?.afterAction(EActionType.TELEPORT, this.boardPosition, target.boardPosition);
@@ -260,7 +258,7 @@ export class Cleric extends Human {
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
 
-    flipOnAttack(this.context, this, target);
+    turnIfBehind(this.context, this, target);
 
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
@@ -271,6 +269,8 @@ export class Cleric extends Human {
   }
 
   heal(target: Hero): void {
+    turnIfBehind(this.context, this, target);
+
     if (target.isKO) {
       target.getsHealed(this.power * 2);
     } else {

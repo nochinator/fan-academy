@@ -48,7 +48,9 @@ export function createNewGameBoardState(): ITile[] {
             currentHealth: 4500,
             isDestroyed: false,
             isLastCrystal: false,
-            boardPosition
+            boardPosition,
+            row,
+            col
           }
         } : {} // REVIEW:
       });

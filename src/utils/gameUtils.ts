@@ -236,15 +236,16 @@ export function isEnemySpawn(context: GameScene, tile: Tile): boolean {
   return tile.tileType === ETiles.SPAWN && (context.isPlayerOne ? tile.col > 5 : tile.col < 5);
 }
 
-export function flipOnAttack(context: GameScene, attacker: Hero, target: Hero | Crystal): void {
+export function turnIfBehind(context: GameScene, attacker: Hero, target: Hero | Crystal): void {
   const isLookingRight = attacker.belongsTo === 1;
   const attackerImage = attacker.characterImage;
 
-  console.log('attacker belong to', attacker.belongsTo);
-  console.log('looksRight', attackerImage.flipX);
+  console.log('attacker belong to 1', attacker.belongsTo === 1);
+  console.log('isFlipped', attackerImage.flipX);
+  console.log(target.col, attacker.col);
 
-  if (isLookingRight && target.col > attacker.col) return;
-  if (!isLookingRight && target.col < attacker.col) return;
+  if (isLookingRight && target.col >= attacker.col) return;
+  if (!isLookingRight && target.col <= attacker.col) return;
 
   if (!isLookingRight) attackerImage.setFlipX(false);
   if (isLookingRight)  attackerImage.setFlipX(true);

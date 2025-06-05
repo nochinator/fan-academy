@@ -1,11 +1,10 @@
 import { Crystal } from "../classes/crystal";
-import { Wraith } from "../classes/elves";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
 import { EHeroes, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, isHero, isItem, isOnBoard } from "./gameUtils";
+import { belongsToPlayer, isHero, isItem } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {

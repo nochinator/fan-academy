@@ -348,6 +348,8 @@ export class Board {
 
       const offsets = attackDirectionOffsetMap[atrtackDirection];
 
+      if (!offsets) return true; // REVIEW: seems to work
+
       for (const offset of offsets) {
         const positionToCheck = attacker.boardPosition + offset; // should never be out of bounds
 

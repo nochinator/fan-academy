@@ -13,7 +13,9 @@ function createGenericElvesData(data: Partial<IHero>): {
   superCharge: boolean,
   belongsTo: number,
   lastBreath: boolean,
-  powerModifier: number
+  powerModifier: number,
+  row: number,
+  col: number
 } {
   return {
     class: EClass.HERO,
@@ -27,7 +29,9 @@ function createGenericElvesData(data: Partial<IHero>): {
     shiningHelm: data.shiningHelm ?? false,
     superCharge: data.superCharge ?? false,
     belongsTo: data.belongsTo ?? 1,
-    powerModifier: data.powerModifier ?? 0
+    powerModifier: data.powerModifier ?? 0,
+    row: data.row ?? 0,
+    col: data.col ?? 0
 
   };
 }

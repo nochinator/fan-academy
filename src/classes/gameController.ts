@@ -246,7 +246,7 @@ export class GameController {
 
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
-    target.updatePosition(targetNewTile.boardPosition);
+    target.updatePosition(targetNewTile);
     targetNewTile.hero = target.exportData();
     targetNewTile.setOccupied(true);
     targetTile.removeHero();
@@ -274,7 +274,7 @@ export class GameController {
 
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
-    target.updatePosition(targetNewTile.boardPosition);
+    target.updatePosition(targetNewTile);
     targetNewTile.hero = target.exportData();
     targetNewTile.setOccupied(true);
     targetTile.removeHero();
