@@ -28,46 +28,80 @@ export class ActionPie extends Phaser.GameObjects.Container {
     this.actionPie5 = context.add.image(-15, -15, 'actionPie').setOrigin(0.5).setRotation(4.7).setName('actionPie5');
     this.actionArrow = context.add.image(-35, 0, 'actionArrow').setOrigin(0.5).setRotation(-0.1).setName('actionArrow').setVisible(false);
 
+    if (context.turnNumber === 0 && context.activePlayer === context.userId) {
+      this.actionPie1.setVisible(false);
+      this.actionPie2.setVisible(false);
+    }
+
     this.add([this.actionCircle, this.actionPie1, this.actionPie2, this.actionPie3, this.actionPie4, this.actionPie5, this.actionArrow]);
 
     context.add.existing(this);
   }
 
   resetActionPie() {
-    this.actionPie1.setVisible(true);
-    this.actionPie2.setVisible(true);
+    if (this.context.turnNumber !== 0) {
+      this.actionPie1.setVisible(true);
+      this.popAnimation(this.actionPie1, true);
+
+      this.actionPie2.setVisible(true);
+      this.popAnimation(this.actionPie2, true);
+    }
     this.actionPie3.setVisible(true);
+    this.popAnimation(this.actionPie3, true);
+
     this.actionPie4.setVisible(true);
+    this.popAnimation(this.actionPie4, true);
+
     this.actionPie5.setVisible(true);
+    this.popAnimation(this.actionPie5, true);
+
     this.actionArrow.setVisible(false);
     this.removeInteractive();
+  }
+
+  popAnimation(image: Phaser.GameObjects.Image, show = false) {
+    if (!image) return;
+
+    const originalIndex = this.getIndex(image); // Save original order
+    this.bringToTop(image); // Temporarily move on top
+
+    this.context.tweens.add({
+      targets: image,
+      scale: 1.5, // Increase the size
+      duration: 100,
+      yoyo: true, // Return to original scale
+      ease: 'Quad.easeInOut',
+      onComplete: () => {
+        image.visible = show;
+        this.moveTo(image, originalIndex);
+      }
+    });
   }
 
   hideActionSlice(actionNumber: number) {
     switch (actionNumber) {
       case 1:
-        this.actionPie1.setVisible(false);
+        this.popAnimation(this.actionPie1);
         this.actionArrow.setVisible(true);
         break;
       case 2:
-        this.actionPie2.setVisible(false);
+        this.popAnimation(this.actionPie2);
         break;
       case 3:
-        this.actionPie3.setVisible(false);
+        this.popAnimation(this.actionPie3);
+        this.actionArrow.setVisible(true);
         break;
       case 4:
-        this.actionPie4.setVisible(false);
+        this.popAnimation(this.actionPie4);
         break;
       case 5:
-        this.actionPie5.setVisible(false);
+        this.popAnimation(this.actionPie5);
         break;
     }
 
     this.setSize(90, 90).setInteractive();
 
     this.on('pointerdown', () => {
-      this.resetActionPie(); // REVIEW: Don't think this is needed
-      this.context.currentTurnAction = 1;
       this.context.gameController!.resetTurn();
     });
   };

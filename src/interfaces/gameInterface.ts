@@ -14,6 +14,7 @@ export interface IGameOver {
 export interface ITurnSentMessage {
   roomId: string;
   previousTurn: IGameState[],
+  turnNumber: number,
   newActivePlayer: string,
   gameOver?: IGameOver
 }
@@ -158,7 +159,6 @@ export interface ITile {
  * GameState Interface
  */
 export interface IGameState {
-  // After a turn is played, a new turn (without action but with the current board state) is created as CurrentTurn
   player1: IPlayerState;
   player2?: IPlayerState;
   boardState: ITile[];
@@ -174,7 +174,7 @@ export interface IGame {
   gameState?: IGameState[][];
   currentState: IGameState[];
   previousTurn: IGameState[];
-  currentTurn: number;
+  turnNumber: number;
   gameOver?: IGameOver,
   status: EGameStatus;
   createdAt: Date;

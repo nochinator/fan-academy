@@ -27,7 +27,7 @@ export async function createGame(context: UIScene, faction: IFaction | undefined
   }
 }
 
-export async function joinGame(client: Client | undefined, userId: string | undefined, roomId: string, context: UIScene): Promise<Room | undefined> {
+export async function joinGame(client: Client, userId: string, roomId: string, context: UIScene): Promise<Room | undefined> {
   if( !client || !userId || !roomId) {
     console.error('joinGame, { client | userid | gameid } missing');
     return undefined;
@@ -65,6 +65,7 @@ function subscribeToGameListeners(room: Room, context: UIScene): void {
 
       currentGame.activePlayer = message.newActivePlayer;
       currentGame.previousTurn = message.previousTurn;
+      currentGame.turnNumber = message.turnNumber;
 
       context.scene.get('GameScene').scene.restart({
         userId: context.userId,
@@ -87,18 +88,19 @@ function subscribeToGameListeners(room: Room, context: UIScene): void {
   });
 }
 
-export function sendTurnMessage(currentRoom: Room | undefined, currentTurn: IGameState[] | undefined, newActivePlayer: string | undefined, gameOver?: IGameOver): void {
+export function sendTurnMessage(currentRoom: Room, currentTurn: IGameState[], newActivePlayer: string, turnNumber: number, gameOver?: IGameOver): void {
   if (!currentRoom || !currentTurn || !newActivePlayer) {
-    console.error('Error sending turn, missing one or more params:');
+    console.error('Error sending turn, missing one or more params');
     return;
   }
 
   currentRoom.send("turnSent", {
     _id: currentRoom.roomId,
-    turn: currentTurn,
+    currentTurn,
     newActivePlayer,
-    gameOver
+    gameOver,
+    turnNumber
   });
 
   console.log("Turn message sent...");
-} // TODO: add a lastTurnSentFunction changing status, winner and victory condition
+}

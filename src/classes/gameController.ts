@@ -51,7 +51,7 @@ export class GameController {
   }
 
   async handleGameOver(): Promise<void> {
-    sendTurnMessage(this.context.currentRoom, this.context.currentGame.currentState, this.context.opponentId, this.context.gameOver);
+    sendTurnMessage(this.context.currentRoom, this.context.currentGame.currentState, this.context.opponentId, ++this.context.turnNumber!, this.context.gameOver);
 
     this.context.activePlayer = undefined; // REVIEW:
 
@@ -142,10 +142,11 @@ export class GameController {
     this.door.updateBannerText();
 
     this.context.activePlayer = this.context.opponentId;
+    this.context.turnNumber!++;
 
-    sendTurnMessage(this.context.currentRoom, this.context.currentGame.currentState, this.context.opponentId);
+    sendTurnMessage(this.context.currentRoom, this.context.currentGame.currentState, this.context.opponentId, this.context.turnNumber!);
 
-    // Update game directly // REVIEW:
+    // Update game directly
     this.context.currentGame.activePlayer = this.context.opponentId;
     this.context.currentGame.currentState = [];
     this.context.currentGame.previousTurn = [];

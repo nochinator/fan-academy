@@ -154,7 +154,7 @@ export class Necromancer extends DarkElf {
       if (this.superCharge) this.superCharge = false;
 
       gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
-      gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition); // Adding action directly to state. It shares the turnActionNumber of the attack
+      gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
     } else {
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
       if (damageDone) this.lifeSteal(damageDone);
