@@ -201,6 +201,7 @@ export class GameController {
     };
     const opponentState = this.context[opponent];
     // Add action to turn state
+    if (!this.game.currentState) this.game.currentState = [];
     this.game.currentState.push({
       player1: this.context.isPlayerOne ? playerState : opponentState!,
       player2: !this.context.isPlayerOne ? playerState : opponentState!,

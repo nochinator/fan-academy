@@ -171,7 +171,6 @@ export interface IGameState {
 export interface IGame {
   _id: string;
   players: IPlayerData[];
-  gameState?: IGameState[][];
   currentState: IGameState[];
   previousTurn: IGameState[];
   turnNumber: number;
