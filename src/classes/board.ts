@@ -2,7 +2,7 @@ import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
 import { createCrystalData } from "../gameData/crystalData";
 import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, createNewHero, getCoordinatesFromBoardPosition, getGridDistance, isEnemySpawn } from "../utils/gameUtils";
+import { belongsToPlayer, createNewHero, getGridDistance, isEnemySpawn } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { ManaVial } from "./elves";
 import { Hero } from "./hero";
@@ -336,10 +336,7 @@ export class Board {
   hasLineOfSight(attacker: Hero, target: (Hero | Crystal)): boolean {
     if (this.isAdjacent(attacker, target)) return true;
 
-    const attackerCoords = getCoordinatesFromBoardPosition(attacker.boardPosition);
-    const targetCoords = getCoordinatesFromBoardPosition(target.boardPosition);
-
-    if (attackerCoords.row === targetCoords.row || attackerCoords.col === targetCoords.col) {
+    if (attacker.row === target.row || attacker.col === target.col) {
       const atrtackDirection = this.getAttackDirection(attacker.boardPosition, target.boardPosition);
 
       const attackDirectionOffsetMap: Record<string, number[]> = {
@@ -382,8 +379,8 @@ export class Board {
     };
 
     const getOffset = {
-      row: targetCoords.row - attackerCoords.row,
-      col: targetCoords.col - attackerCoords.col
+      row: target.row - attacker.row,
+      col: target.col - attacker.col
     };
 
     const tileCoordKey = coordKey(getOffset.row, getOffset.col);
@@ -394,8 +391,8 @@ export class Board {
     console.log('offsetsToCheck', offsetsToCheck);
     if (offsetsToCheck && offsetsToCheck.length) {
       for (const offset of offsetsToCheck) {
-        const tileRow = attackerCoords.row + offset[0];
-        const tileCol = attackerCoords.col + offset[1];
+        const tileRow = attacker.row + offset[0];
+        const tileCol = attacker.col + offset[1];
 
         const isWrongRow = tileRow < 0 || tileRow > 4;
         const isWrongCol = tileCol < 0 || tileCol > 8;
@@ -418,11 +415,8 @@ export class Board {
   }
 
   isAdjacent(hero: Hero, unitToCompare: Hero | Crystal): boolean {
-    const heroCoordinates = getCoordinatesFromBoardPosition(hero.boardPosition);
-    const unitCoordinates = getCoordinatesFromBoardPosition(unitToCompare.boardPosition);
-
-    const row = Math.abs(heroCoordinates.row - unitCoordinates.row);
-    const col = Math.abs(heroCoordinates.col - unitCoordinates.col);
+    const row = Math.abs(hero.row - unitToCompare.row);
+    const col = Math.abs(hero.col - unitToCompare.col);
 
     return col <= 1 && row <= 1 && !(row === 0 && col === 0);
   }

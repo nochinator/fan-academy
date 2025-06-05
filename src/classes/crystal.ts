@@ -13,6 +13,8 @@ export class Crystal extends Phaser.GameObjects.Container {
   isDestroyed: boolean;
   isLastCrystal: boolean;
   boardPosition: number;
+  row: number;
+  col: number;
 
   context: GameScene;
 
@@ -39,6 +41,8 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.isDestroyed = data.isDestroyed;
     this.isLastCrystal = data.isLastCrystal;
     this.boardPosition = data.boardPosition;
+    this.row = data.row;
+    this.col = data.col;
 
     this.healthBar = new HealthBar(context, data, -38, -70);
 
@@ -111,7 +115,9 @@ export class Crystal extends Phaser.GameObjects.Container {
       currentHealth: this.currentHealth,
       isDestroyed: this.isDestroyed,
       isLastCrystal: this.isLastCrystal,
-      boardPosition: this.boardPosition
+      boardPosition: this.boardPosition,
+      row: this.row,
+      col: this.col
     };
   }
 
