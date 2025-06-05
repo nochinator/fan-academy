@@ -229,7 +229,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
     // Show damage numbers
-    new FloatingText(this.context, this.x, this.y - 50, totalDamage.toString());
+    if (totalDamage > 0) new FloatingText(this.context, this.x, this.y - 50, totalDamage.toString());
 
     this.updateTileData();
 
@@ -281,7 +281,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
     // Show healing numbers
-    new FloatingText(this.context, this.x, this.y - 50, actualHealing.toString(), true);
+    if (actualHealing > 0) new FloatingText(this.context, this.x, this.y - 50, actualHealing.toString(), true);
 
     this.updateTileData();
   }

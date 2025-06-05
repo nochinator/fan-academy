@@ -121,8 +121,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
   }
 
-  getsDamaged(damage: number, attackType?: EAttackType): void {
-    // TODO: healthbar animation and check for exact damage received (not power)
+  getsDamaged(damage: number): void {
     const totalDamage = damage > this.currentHealth ? this.currentHealth : damage;
     this.currentHealth -= totalDamage;
 
@@ -134,7 +133,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
     // Show damage numbers
-    new FloatingText(this.context, this.x, this.y - 50, totalDamage.toString());
+    if (totalDamage > 0) new FloatingText(this.context, this.x, this.y - 50, totalDamage.toString());
 
     this.updateTileData();
     if (this.currentHealth <= 0) this.removeFromGame(); // TODO: destruction animation
