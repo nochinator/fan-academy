@@ -1,8 +1,8 @@
 import GameScene from "../scenes/game.scene";
 
 export class FloatingText extends Phaser.GameObjects.Container {
-  constructor(scene: GameScene, x: number, y: number, text: string, isHealing = false) {
-    super(scene, x, y);
+  constructor(context: GameScene, x: number, y: number, text: string, isHealing = false) {
+    super(context, x, y);
 
     const fontKey = isHealing ? 'greenFont' : 'redFont';
     const scale = isHealing ? 0.7 : 0.5;
@@ -10,14 +10,14 @@ export class FloatingText extends Phaser.GameObjects.Container {
     // Measure scaled width
     let totalWidth = 0;
     for (const char of text) {
-      const frame = scene.textures.get(fontKey).get(char);
+      const frame = context.textures.get(fontKey).get(char);
       if (frame) totalWidth += frame.width * scale;
     }
 
     let offsetX = -totalWidth / 2;
 
     for (const char of text) {
-      const sprite = scene.add.image(0, 0, fontKey, char)
+      const sprite = context.add.image(0, 0, fontKey, char)
         .setOrigin(0, 0.7)
         .setScale(scale);
 
@@ -30,9 +30,9 @@ export class FloatingText extends Phaser.GameObjects.Container {
     }
 
     this.setDepth(1000);
-    scene.add.existing(this);
+    context.add.existing(this);
 
-    scene.tweens.add({
+    context.tweens.add({
       targets: this,
       y: y - 30,
       duration: 1500,
