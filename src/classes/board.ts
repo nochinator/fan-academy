@@ -154,23 +154,25 @@ export class Board {
   }
 
   highlightTeleportOptions(hero: Hero) {
-    if (hero.unitType === EHeroes.NINJA) {
-      this.tiles.forEach(tile => {
-        if (tile.isFriendly(this.context.userId)) {
-          const target = this.units.find(unit => unit.unitId === tile.hero!.unitId);
-          if (!target) {
-            console.error('No teleport target found', tile);
-            return;
-          }
-          target.allyReticle.setVisible(true);
-        }
-      });
-    }
-
+    // Teleporting tile
     if (hero.getTile().tileType === ETiles.TELEPORTER) {
       const teleportTiles: Tile[] = this.tiles.filter(tile => tile.tileType === ETiles.TELEPORTER);
       this.highlightTiles(teleportTiles);
     }
+
+    // Ninja teleporting
+    if (hero.unitType !== EHeroes.NINJA) return;
+
+    const friendlyUnitsOnBoard: Hero[] = [];
+    this.units.forEach(unit => {
+      if (hero.belongsTo === unit.belongsTo) friendlyUnitsOnBoard.push(unit);
+    });
+
+    if (friendlyUnitsOnBoard.length <= 1) return;
+
+    friendlyUnitsOnBoard.forEach(unit => {
+      unit.allyReticle.setVisible(true);
+    });
   }
 
   highlightEquipmentTargets(item: Item): void {
