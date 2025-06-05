@@ -26,7 +26,8 @@ export async function connectToGameLobby(client: Client | undefined, userId: str
     lobby.onMessage('gameListUpdate', async (message: {
       gameId: string,
       previousTurn: IGameState[],
-      newActivePlayer: string
+      newActivePlayer: string,
+      turnNumber: number
     }) => {
       console.log('A game has been updated', message);
 
@@ -37,6 +38,7 @@ export async function connectToGameLobby(client: Client | undefined, userId: str
 
         game.previousTurn = message.previousTurn;
         game.activePlayer = message.newActivePlayer;
+        game.turnNumber = message.turnNumber;
       }
 
       await createGameList(context);
