@@ -43,8 +43,11 @@ export async function createGameList(context: UIScene) {
   const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * context.gameList.length + ( textListHeight * totalSections + 200); // 200 = newGameButton + some padding to make sure the last item always displays fully
 
   // Creating a container for the game list and adding it to the context (scene)
-  const gameListContainer = context.add.container(19, 65); // Setting a variable to save having to write 'context.' every time
+  const gameListContainer = context.add.container(19, 65); // Setting a variable to save not having to write 'context' every time
   context.gameListContainer = gameListContainer;
+
+  // Set a variable to refer to the active game image -used to highlight the active game in the UI
+  let activeGameImage: Phaser.GameObjects.Image;
 
   // Function for adding elements to the container
   const createGameListItem = (gameListArray: IGame[]) => {
@@ -55,7 +58,7 @@ export async function createGameList(context: UIScene) {
 
       lastListItemY += ( index === 0 ? textListHeight : gameListButtonHeight) + gameListButtonSpacing;
 
-      const gameListButtonImage = context.add.image(0, lastListItemY, "gameListButton").setOrigin(0);
+      const gameListButtonImage = context.add.image(0, lastListItemY, "gameListButton").setOrigin(0).setTint(0xBBBBBB);;
       const playerFactionImage =  context.add.image(90, lastListItemY + gameListButtonHeight / 2, player.faction).setScale(0.4);
 
       let opponentFactionImage;
@@ -95,6 +98,11 @@ export async function createGameList(context: UIScene) {
       if (game.status === EGameStatus.PLAYING) {
         gameListButtonImage.setInteractive();
         gameListButtonImage.on('pointerdown', async () => {
+          // Highlight the game in the UI
+          if (activeGameImage) activeGameImage.setTint(0xBBBBBB);
+          activeGameImage = gameListButtonImage;
+          activeGameImage.clearTint();
+
           await accessGame(context, game);
         });
       }
@@ -210,9 +218,4 @@ export async function createGameList(context: UIScene) {
       });
     }
   });
-
-  // context.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
-  //   isHovered = pointer.x >= 19 && pointer.x <= 19 + visibleWidth &&
-  //   pointer.y >= 65 && pointer.y <= 65 + visibleHeight;
-  // }); // FIXME: remove if no used
 }
