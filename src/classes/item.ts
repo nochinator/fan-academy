@@ -40,8 +40,24 @@ export abstract class Item extends Phaser.GameObjects.Image {
     // Making the item not visible if it's in the deck (board position 51)
     if (this.boardPosition === 51) this.setVisible(false).disableInteractive();
 
-    const displaySize = this.itemType === EItems.SUPERCHARGE || this.itemType === EItems.SHINING_HELM ? 55 : 100; // REVIEW: better way of doing this
-    context.add.existing(this).setDisplaySize(displaySize, displaySize).setDepth(this.boardPosition + 10).setInteractive().setName(this.unitId);
+    // Setting the image size. SuperCharge and ShinningHelm icons have slighty different sizes
+    let displayWidth: number;
+    let displayHeight: number;
+
+    displayWidth = 100;
+    displayHeight = 100;
+
+    if (this instanceof SuperCharge) {
+      displayWidth = 55;
+      displayHeight = 55;
+    }
+
+    if (this instanceof ShiningHelm) {
+      displayWidth = 45;
+      displayHeight = 65;
+    }
+
+    context.add.existing(this).setDisplaySize(displayWidth, displayHeight).setDepth(this.boardPosition + 10).setInteractive().setName(this.unitId);
   }
 
   get isActive() {
