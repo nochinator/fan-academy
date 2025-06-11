@@ -39,8 +39,6 @@ export function selectUnit(context: GameScene, unit: Hero | Item): void {
 }
 
 export function deselectUnit(context: GameScene): void {
-  console.log('this logs 4');
-
   context.activeUnit!.isActive = false;
   context.activeUnit = undefined;
   // Clear highlighted tiles, if any

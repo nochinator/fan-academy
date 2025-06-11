@@ -273,7 +273,6 @@ export class Wraith extends DarkElf {
       }
     }
 
-    console.log('this logs 1');
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 

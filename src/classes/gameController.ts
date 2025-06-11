@@ -181,11 +181,9 @@ export class GameController {
   afterAction(actionType: EActionType, activePosition: number, targetPosition?: number): void {
     // Add action to current state
     this.addActionToState(actionType, activePosition, targetPosition);
-    console.log('this logs 2');
 
     // Remove a slice from the action pie
     this.actionPie.hideActionSlice(this.context.currentTurnAction!++);
-    console.log('this logs 3');
     // Deselect unit and clear highlights
     deselectUnit(this.context);
   }

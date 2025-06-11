@@ -50,7 +50,6 @@ export class Board {
   }
 
   getTileFromBoardPosition(boardPosition: number): Tile {
-    console.log('TILES', this.tiles);
     const result = this.tiles.find(tile => tile.boardPosition === boardPosition);
     if (!result) throw new Error('Board getTile() No tile found');
     return result;
@@ -218,7 +217,6 @@ export class Board {
         }
       }
     });
-    console.log('this logs 5');
   }
 
   getHeroTilesInRange(hero: Hero, rangeType: ERange): Tile[] {

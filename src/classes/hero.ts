@@ -320,7 +320,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
         console.log('frame', frame, this.unitType);
         if (frame === textures.length) {
-          console.log('this logsss');
           image.setVisible(false);
           event.remove();
         }
