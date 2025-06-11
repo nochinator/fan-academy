@@ -72,20 +72,20 @@ export function createNewItem(context: GameScene, itemData: IItem): Item {
   return createItem();
 }
 
-export function createNewHero(context: GameScene, heroData: IHero): Hero {
+export function createNewHero(context: GameScene, heroData: IHero, tileType?: ETiles): Hero {
   const heroTypes: Record<EHeroes, () => Hero> = {
-    [EHeroes.ARCHER]: () => new Archer(context, heroData),
-    [EHeroes.CLERIC]: () => new Cleric(context, heroData),
-    [EHeroes.KNIGHT]: () => new Knight(context, heroData),
-    [EHeroes.NINJA]: () => new Ninja(context, heroData),
-    [EHeroes.WIZARD]: () => new Wizard(context, heroData),
+    [EHeroes.ARCHER]: () => new Archer(context, heroData, tileType),
+    [EHeroes.CLERIC]: () => new Cleric(context, heroData, tileType),
+    [EHeroes.KNIGHT]: () => new Knight(context, heroData, tileType),
+    [EHeroes.NINJA]: () => new Ninja(context, heroData, tileType),
+    [EHeroes.WIZARD]: () => new Wizard(context, heroData, tileType),
 
-    [EHeroes.PRIESTESS]: () => new Priestess(context, heroData),
-    [EHeroes.IMPALER]: () => new Impaler(context, heroData),
-    [EHeroes.NECROMANCER]: () => new Necromancer(context, heroData),
-    [EHeroes.PHANTOM]: () => new Phantom(context, heroData),
-    [EHeroes.VOIDMONK]: () => new VoidMonk(context, heroData),
-    [EHeroes.WRAITH]: () => new Wraith(context, heroData)
+    [EHeroes.PRIESTESS]: () => new Priestess(context, heroData, tileType),
+    [EHeroes.IMPALER]: () => new Impaler(context, heroData, tileType),
+    [EHeroes.NECROMANCER]: () => new Necromancer(context, heroData, tileType),
+    [EHeroes.PHANTOM]: () => new Phantom(context, heroData, tileType),
+    [EHeroes.VOIDMONK]: () => new VoidMonk(context, heroData, tileType),
+    [EHeroes.WRAITH]: () => new Wraith(context, heroData, tileType)
   };
 
   const createHero = heroTypes[heroData.unitType];

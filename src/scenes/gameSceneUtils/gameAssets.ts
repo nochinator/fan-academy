@@ -10,6 +10,53 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('crystalDamageTile', '/assets/images/gameItems/PremiumTile_VictoryDamageMultiplier-hd.png');
   context.load.image('teleporterTile', '/assets/images/gameItems/PremiumTile_Teleport-hd.png');
 
+  // Special tiles animation
+  context.load.image('crystalDamageAnim_1', '/assets/images/gameItems/animations/CrystalPremiumTile_BottomSplash01-hd.png');
+  context.load.image('crystalDamageAnim_2', '/assets/images/gameItems/animations/CrystalPremiumTile_BottomSplash02-hd.png');
+  context.load.image('crystalDamageAnim_3', '/assets/images/gameItems/animations/CrystalPremiumTile_BottomSplash03-hd.png');
+
+  context.load.image('magicalResistanceAnim_1', '/assets/images/gameItems/animations/ResistPremiumTile_BottomSplash01-hd.png');
+  context.load.image('magicalResistanceAnim_2', '/assets/images/gameItems/animations/ResistPremiumTile_BottomSplash02-hd.png');
+  context.load.image('magicalResistanceAnim_3', '/assets/images/gameItems/animations/ResistPremiumTile_BottomSplash03-hd.png');
+
+  context.load.image('physicalResistanceAnim_1', '/assets/images/gameItems/animations/ShieldPremiumTile_BottomSplash01-hd.png');
+  context.load.image('physicalResistanceAnim_2', '/assets/images/gameItems/animations/ShieldPremiumTile_BottomSplash02-hd.png');
+  context.load.image('physicalResistanceAnim_3', '/assets/images/gameItems/animations/ShieldPremiumTile_BottomSplash03-hd.png');
+
+  context.load.image('powerTileAnim_1', '/assets/images/gameItems/animations/SwordPremiumTile_BottomSplash01-hd.png');
+  context.load.image('powerTileAnim_2', '/assets/images/gameItems/animations/SwordPremiumTile_BottomSplash02-hd.png');
+  context.load.image('powerTileAnim_3', '/assets/images/gameItems/animations/SwordPremiumTile_BottomSplash03-hd.png');
+
+  // Item animations
+  context.load.image('superChargeAnim_1', '/assets/images/gameItems/animations/Scroll_Backspash01-hd.png');
+  context.load.image('superChargeAnim_2', '/assets/images/gameItems/animations/Scroll_Backspash02-hd.png');
+  context.load.image('superChargeAnim_3', '/assets/images/gameItems/animations/Scroll_Backspash03-hd.png');
+
+  context.load.image('soulHarvestAnim_1', '/assets/images/gameItems/animations/SoulHarvest_Explosion01-hd.png');
+  context.load.image('soulHarvestAnim_2', '/assets/images/gameItems/animations/SoulHarvest_Explosion02-hd.png');
+  context.load.image('soulHarvestAnim_3', '/assets/images/gameItems/animations/SoulHarvest_Explosion03-hd.png');
+
+  context.load.image('infernoAnim_1', '/assets/images/gameItems/animations/Inferno_Fireball01-hd.png');
+  context.load.image('infernoAnim_2', '/assets/images/gameItems/animations/Inferno_Fireball02-hd.png');
+  context.load.image('infernoAnim_3', '/assets/images/gameItems/animations/Inferno_Fireball03-hd.png');
+  context.load.image('infernoAnim_4', '/assets/images/gameItems/animations/Inferno_Fireball04-hd.png');
+  context.load.image('infernoAnim_5', '/assets/images/gameItems/animations/Inferno_Fireball05-hd.png');
+  context.load.image('infernoAnim_6', '/assets/images/gameItems/animations/Inferno_Fireball06-hd.png');
+
+  // Character animations
+  context.load.image('smokeAnim_1', '/assets/images/gameItems/animations/NinjaSmoke_Puff01-hd.png');
+  context.load.image('smokeAnim_2', '/assets/images/gameItems/animations/NinjaSmoke_Puff02-hd.png');
+  context.load.image('smokeAnim_3', '/assets/images/gameItems/animations/NinjaSmoke_Puff03-hd.png');
+
+  context.load.image('reviveAnim_1', '/assets/images/gameItems/animations/Revive_Backsplash01-hd.png');
+  context.load.image('reviveAnim_2', '/assets/images/gameItems/animations/Revive_Backsplash02-hd.png');
+  context.load.image('reviveAnim_3', '/assets/images/gameItems/animations/Revive_Backsplash03-hd.png');
+
+  context.load.image('phantomSpawnAnim_1', '/assets/images/gameItems/animations/PhantomSpawn_Explosion01-hd.png');
+  context.load.image('phantomSpawnAnim_2', '/assets/images/gameItems/animations/PhantomSpawn_Explosion02-hd.png');
+
+  context.load.image('debuff', '/assets/images/gameItems/animations/MoveDebuff_PurpleGlow-hd.png');
+
   // Crystal tile images
   context.load.image('crystalFull', '/assets/images/gameItems/crystal_full.png');
   context.load.image('pedestal', '/assets/images/gameItems/crystal_pedestal.png');

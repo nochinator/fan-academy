@@ -24,6 +24,7 @@ export class Board {
   constructor(context: GameScene, data: ITile[]) {
     this.context = context;
     this.tiles = this.createTileGrid(data);
+    this.crystals.forEach(crystal => crystal.updateDebuffAnimation(crystal.debuffLevel));
   }
 
   createTileGrid(tiles: ITile[]) {
@@ -31,10 +32,10 @@ export class Board {
 
     tiles.forEach(tile => {
       const newTile = new Tile(this.context, tile);
-      if (newTile.hero) this.units.push(createNewHero(this.context, newTile.hero));
+      if (newTile.hero) this.units.push(createNewHero(this.context, newTile.hero, newTile.tileType));
       if (newTile.crystal) {
         const crystalData = createCrystalData(newTile.crystal);
-        this.crystals.push(new Crystal(this.context, crystalData ));
+        this.crystals.push(new Crystal(this.context, crystalData, tile));
       }
       grid.push(newTile);
     });
@@ -49,6 +50,7 @@ export class Board {
   }
 
   getTileFromBoardPosition(boardPosition: number): Tile {
+    console.log('TILES', this.tiles);
     const result = this.tiles.find(tile => tile.boardPosition === boardPosition);
     if (!result) throw new Error('Board getTile() No tile found');
     return result;
@@ -216,6 +218,7 @@ export class Board {
         }
       }
     });
+    console.log('this logs 5');
   }
 
   getHeroTilesInRange(hero: Hero, rangeType: ERange): Tile[] {

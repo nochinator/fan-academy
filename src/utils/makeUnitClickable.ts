@@ -83,6 +83,11 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
             return;
           }
 
+          if (activeUnit.canHeal && healReticle?.visible) {
+            activeUnit.heal(unit);
+            return;
+          }
+
           // Stomp friendly KO'd units, unless you are a Necromancer
           if (unit.isKO && activeUnit.unitType !== EHeroes.NECROMANCER) {
             const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
@@ -93,11 +98,6 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
           // Ninja can swap places with any friendly unit on the board
           if (activeUnit.unitType === EHeroes.NINJA) {
             activeUnit.teleport(unit);
-            return;
-          }
-
-          if (activeUnit.canHeal && healReticle?.visible) {
-            activeUnit.heal(unit);
             return;
           }
         }

@@ -1,4 +1,4 @@
-import { EActionType, EAttackType } from "../enums/gameEnums";
+import { EActionType, EAttackType, ETiles } from "../enums/gameEnums";
 import { createElvesImpalerData, createElvesNecromancerData, createElvesPhantomData, createElvesPriestessData, createElvesVoidMonkData, createElvesWraithData } from "../gameData/elvesHeroData";
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
@@ -10,8 +10,8 @@ import { Item } from "./item";
 import { Tile } from "./tile";
 
 export abstract class DarkElf extends Hero {
-  constructor(context: GameScene, data: IHero) {
-    super(context, data);
+  constructor(context: GameScene, data: IHero, tileType?: ETiles) {
+    super(context, data, tileType);
   }
 
   equipFactionBuff(handPosition: number): void {
@@ -36,8 +36,8 @@ export abstract class DarkElf extends Hero {
 }
 
 export class Impaler extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createElvesImpalerData(data));
+  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
+    super(context, createElvesImpalerData(data), tileType);
   }
   async attack(target: Hero | Crystal): Promise<void> {
     const gameController = this.context.gameController!;
@@ -50,7 +50,14 @@ export class Impaler extends DarkElf {
     if (target instanceof Hero) await gameController.pullEnemy(this, target);
 
     this.powerModifier = 0;
-    if (this.superCharge) this.superCharge = false;
+    if (this.isDebuffed) {
+      this.isDebuffed = false;
+      this.debuffImage.setVisible(false);
+    }
+    if (this.superCharge) {
+      this.superCharge = false;
+      this.superChargeAnim.setVisible(false);
+    }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -60,8 +67,8 @@ export class Impaler extends DarkElf {
 }
 
 export class VoidMonk extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createElvesVoidMonkData(data));
+  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
+    super(context, createElvesVoidMonkData(data), tileType);
   }
   // TODO: add aoe to attack
   attack(target: Hero | Crystal): void {
@@ -107,7 +114,14 @@ export class VoidMonk extends DarkElf {
     }
 
     this.powerModifier = 0;
-    if (this.superCharge) this.superCharge = false;
+    if (this.isDebuffed) {
+      this.isDebuffed = false;
+      this.debuffImage.setVisible(false);
+    }
+    if (this.superCharge) {
+      this.superCharge = false;
+      this.superChargeAnim.setVisible(false);
+    }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -128,8 +142,8 @@ export class VoidMonk extends DarkElf {
 }
 
 export class Necromancer extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createElvesNecromancerData(data));
+  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
+    super(context, createElvesNecromancerData(data), tileType);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -137,19 +151,26 @@ export class Necromancer extends DarkElf {
     turnIfBehind(this.context, this, target);
 
     if (target instanceof Hero && target.isKO) {
+      const tile = target.getTile();
+
       const phantom = new Phantom(this.context, {
         unitId: `${this.context.userId}_phantom_${++this.context.gameController!.phantomCounter}`,
         boardPosition: target.boardPosition
-      });
-
-      const tile = target.getTile();
+      }, tile.tileType, true);
 
       target.removeFromGame();
 
       tile.hero = phantom.exportData();
 
       this.powerModifier = 0;
-      if (this.superCharge) this.superCharge = false;
+      if (this.isDebuffed) {
+        this.isDebuffed = false;
+        this.debuffImage.setVisible(false);
+      }
+      if (this.superCharge) {
+        this.superCharge = false;
+        this.superChargeAnim.setVisible(false);
+      }
 
       gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
       gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
@@ -158,7 +179,14 @@ export class Necromancer extends DarkElf {
       if (damageDone) this.lifeSteal(damageDone);
 
       this.powerModifier = 0;
-      if (this.superCharge) this.superCharge = false;
+      if (this.isDebuffed) {
+        this.isDebuffed = false;
+        this.debuffImage.setVisible(false);
+      }
+      if (this.superCharge) {
+        this.superCharge = false;
+        this.superChargeAnim.setVisible(false);
+      }
 
       gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     }
@@ -169,8 +197,8 @@ export class Necromancer extends DarkElf {
 }
 
 export class Priestess extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createElvesPriestessData(data));
+  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
+    super(context, createElvesPriestessData(data), tileType);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -181,10 +209,21 @@ export class Priestess extends DarkElf {
     if (damageDone) this.lifeSteal(damageDone);
 
     // Apply a 50% debuff to the target's next attack
-    if (target instanceof Hero) target.modifyPower(-50); // TODO: add debuff animation
+    if (target instanceof Hero) {
+      target.modifyPower(-50);
+      target.isDebuffed = true;
+      target.debuffImage.setVisible(true);
+    }
 
     this.powerModifier = 0;
-    if (this.superCharge) this.superCharge = false;
+    if (this.isDebuffed) {
+      this.isDebuffed = false;
+      this.debuffImage.setVisible(false);
+    }
+    if (this.superCharge) {
+      this.superCharge = false;
+      this.superChargeAnim.setVisible(false);
+    }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -205,8 +244,8 @@ export class Priestess extends DarkElf {
 }
 
 export class Wraith extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createElvesWraithData(data));
+  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
+    super(context, createElvesWraithData(data), tileType);
   }
   attack(target: Hero | Crystal): void {
     turnIfBehind(this.context, this, target);
@@ -224,8 +263,17 @@ export class Wraith extends DarkElf {
       target.getsDamaged(this.getTotalPower(), this.attackType);
 
       this.powerModifier = 0;
-      if (this.superCharge) this.superCharge = false;}
+      if (this.isDebuffed) {
+        this.isDebuffed = false;
+        this.debuffImage.setVisible(false);
+      }
+      if (this.superCharge) {
+        this.superCharge = false;
+        this.superChargeAnim.setVisible(false);
+      }
+    }
 
+    console.log('this logs 1');
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -234,9 +282,19 @@ export class Wraith extends DarkElf {
 }
 
 export class Phantom extends Hero {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createElvesPhantomData(data));
+  spawnAnim?: Phaser.GameObjects.Image;
+
+  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles, spawned = false) {
+    super(context, createElvesPhantomData(data), tileType);
+
+    if (spawned) {
+      this.spawnAnim = context.add.image(0, -15, 'phantomSpawnAnim_1').setOrigin(0.5).setScale(0.9);
+
+      this.add([this.spawnAnim]);
+      this.singleTween(this.spawnAnim, 200);
+    }
   }
+
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
 
@@ -245,7 +303,14 @@ export class Phantom extends Hero {
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
     this.powerModifier = 0;
-    if (this.superCharge) this.superCharge = false;
+    if (this.isDebuffed) {
+      this.isDebuffed = false;
+      this.debuffImage.setVisible(false);
+    }
+    if (this.superCharge) {
+      this.superCharge = false;
+      this.superChargeAnim.setVisible(false);
+    }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }

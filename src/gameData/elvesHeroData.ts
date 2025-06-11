@@ -15,7 +15,8 @@ function createGenericElvesData(data: Partial<IHero>): {
   lastBreath: boolean,
   powerModifier: number,
   row: number,
-  col: number
+  col: number,
+  isDebuffed: boolean
 } {
   return {
     class: EClass.HERO,
@@ -31,8 +32,8 @@ function createGenericElvesData(data: Partial<IHero>): {
     belongsTo: data.belongsTo ?? 1,
     powerModifier: data.powerModifier ?? 0,
     row: data.row ?? 0,
-    col: data.col ?? 0
-
+    col: data.col ?? 0,
+    isDebuffed: data.isDebuffed ?? false
   };
 }
 

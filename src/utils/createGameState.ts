@@ -50,7 +50,8 @@ export function createNewGameBoardState(): ITile[] {
             isLastCrystal: false,
             boardPosition,
             row,
-            col
+            col,
+            debuffLevel: 0
           }
         } : {} // REVIEW:
       });

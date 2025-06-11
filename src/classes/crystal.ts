@@ -1,5 +1,5 @@
-import { EAttackType, ETiles, EWinConditions } from "../enums/gameEnums";
-import { ICrystal } from "../interfaces/gameInterface";
+import { ETiles, EWinConditions } from "../enums/gameEnums";
+import { ICrystal, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
 import { FloatingText } from "./floatingText";
@@ -15,6 +15,7 @@ export class Crystal extends Phaser.GameObjects.Container {
   boardPosition: number;
   row: number;
   col: number;
+  debuffLevel: number;
 
   context: GameScene;
 
@@ -30,19 +31,20 @@ export class Crystal extends Phaser.GameObjects.Container {
 
   healthBar: HealthBar;
 
-  constructor(context: GameScene, data: ICrystal) {
+  constructor(context: GameScene, data: ICrystal, tile: ITile) {
     const { x, y } = context.centerPoints[data.boardPosition];
     super(context, x, y);
     this.context = context;
 
-    this.belongsTo = data.belongsTo;
     this.maxHealth = data.maxHealth;
     this.currentHealth = data.currentHealth;
     this.isDestroyed = data.isDestroyed;
     this.isLastCrystal = data.isLastCrystal;
     this.boardPosition = data.boardPosition;
-    this.row = data.row;
-    this.col = data.col;
+    this.row = tile.row;
+    this.col = tile.col;
+    this.belongsTo = tile.col > 4 ? 2 : 1;
+    this.debuffLevel = data.debuffLevel;
 
     this.healthBar = new HealthBar(context, data, -38, -70);
 
@@ -52,14 +54,12 @@ export class Crystal extends Phaser.GameObjects.Container {
 
     this.blockedLOS = context.add.image(0, -10, 'blockedLOS').setOrigin(0.5).setName('blockedLOS').setVisible(false);
 
-    const crystalColor = data.belongsTo === 1 ? 0x990000 : 0x3399ff;
+    const crystalColor = this.belongsTo === 1 ?  0x3399ff : 0x990000; // TODO: set this up to the players color
     this.crystalImage.setTint(crystalColor);
 
     // Debuff images and animation
     this.singleCrystalDebuff = context.add.image(0, -30, 'crystalDebuff_1').setVisible(false);
     this.doubleCrystalDebuff = context.add.image(0, -30, 'crystalDebuff_3').setVisible(false);
-    this.singleCrystalDebuff.setTint(crystalColor);
-    this.doubleCrystalDebuff.setTint(crystalColor);
 
     const crystalDebuffEvent = (debuffImage: Phaser.GameObjects.Image, texture1: string, texture2: string) => {
       let frame = 0;
@@ -99,7 +99,37 @@ export class Crystal extends Phaser.GameObjects.Container {
     context.add.existing(this);
   }
 
+  updateDebuffAnimation(newLevel: number): void {
+    console.log('debufflevel', this.debuffLevel);
+    switch (newLevel) {
+      case 0:
+        this.singleCrystalDebuff.setVisible(false);
+        this.doubleCrystalDebuff.setVisible(false);
+        break;
+
+      case 1:
+        this.singleCrystalDebuff.setVisible(true);
+        this.doubleCrystalDebuff.setVisible(false);
+        break;
+
+      case 2:
+        this.singleCrystalDebuff.setVisible(false);
+        this.doubleCrystalDebuff.setVisible(true);
+        break;
+
+      default:
+        console.error('updateDebuffAnimation() level and case dont match');
+        break;
+    }
+
+    if (newLevel !== this.debuffLevel) {
+      this.debuffLevel = newLevel;
+      this.updateTileData();
+    }
+  }
+
   getTile(): Tile {
+    console.log('BP', this.boardPosition);
     const tile = this.context?.gameController?.board.getTileFromBoardPosition(this.boardPosition);
     if (!tile) throw new Error('getTile() -> No tile found');
 
@@ -117,7 +147,8 @@ export class Crystal extends Phaser.GameObjects.Container {
       isLastCrystal: this.isLastCrystal,
       boardPosition: this.boardPosition,
       row: this.row,
-      col: this.col
+      col: this.col,
+      debuffLevel: this.debuffLevel
     };
   }
 

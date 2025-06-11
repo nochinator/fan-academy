@@ -1,4 +1,4 @@
-import { EActionType, EAttackType } from "../enums/gameEnums";
+import { EActionType, EAttackType, ETiles } from "../enums/gameEnums";
 import { createCouncilArcherData, createCouncilClericData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "../gameData/councilHeroData";
 import { createItemData } from "../gameData/itemData";
 import { IHero, IItem } from "../interfaces/gameInterface";
@@ -11,8 +11,8 @@ import { Item } from "./item";
 import { Tile } from "./tile";
 
 export abstract class Human extends Hero {
-  constructor(context: GameScene, data: IHero) {
-    super(context, data);
+  constructor(context: GameScene, data: IHero, tileType?: ETiles) {
+    super(context, data, tileType);
   }
 
   equipFactionBuff(handPosition: number): void {
@@ -29,8 +29,8 @@ export abstract class Human extends Hero {
 }
 
 export class Archer extends Human {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createCouncilArcherData(data));
+  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
+    super(context, createCouncilArcherData(data), tileType);
   }
   attack(target: Hero | Crystal): void {
     const distance = this.getDistanceToTarget(target);
@@ -44,7 +44,14 @@ export class Archer extends Human {
     }
 
     this.powerModifier = 0;
-    if (this.superCharge) this.superCharge = false;
+    if (this.isDebuffed) {
+      this.isDebuffed = false;
+      this.debuffImage.setVisible(false);
+    }
+    if (this.superCharge) {
+      this.superCharge = false;
+      this.superChargeAnim.setVisible(false);
+    }
 
     this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -54,8 +61,8 @@ export class Archer extends Human {
 }
 
 export class Knight extends Human {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createCouncilKnightData(data));
+  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
+    super(context, createCouncilKnightData(data), tileType);
   }
 
   async attack(target: Hero | Crystal): Promise<void> {
@@ -68,7 +75,14 @@ export class Knight extends Human {
     if (target instanceof Hero) await gameController.pushEnemy(this, target);
 
     this.powerModifier = 0;
-    if (this.superCharge) this.superCharge = false;
+    if (this.isDebuffed) {
+      this.isDebuffed = false;
+      this.debuffImage.setVisible(false);
+    }
+    if (this.superCharge) {
+      this.superCharge = false;
+      this.superChargeAnim.setVisible(false);
+    }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -78,8 +92,8 @@ export class Knight extends Human {
 }
 
 export class Wizard extends Human {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createCouncilWizardData(data));
+  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
+    super(context, createCouncilWizardData(data), tileType);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -101,7 +115,14 @@ export class Wizard extends Human {
     if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower(), this.attackType);
 
     this.powerModifier = 0;
-    if (this.superCharge) this.superCharge = false;
+    if (this.isDebuffed) {
+      this.isDebuffed = false;
+      this.debuffImage.setVisible(false);
+    }
+    if (this.superCharge) {
+      this.superCharge = false;
+      this.superChargeAnim.setVisible(false);
+    }
 
     gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -203,8 +224,8 @@ export class Wizard extends Human {
 }
 
 export class Ninja extends Human {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createCouncilNinjaData(data));
+  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
+    super(context, createCouncilNinjaData(data), tileType);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -228,7 +249,14 @@ export class Ninja extends Human {
     }
 
     this.powerModifier = 0;
-    if (this.superCharge) this.superCharge = false;
+    if (this.isDebuffed) {
+      this.isDebuffed = false;
+      this.debuffImage.setVisible(false);
+    }
+    if (this.superCharge) {
+      this.superCharge = false;
+      this.superChargeAnim.setVisible(false);
+    }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -238,6 +266,10 @@ export class Ninja extends Human {
 
     const targetDestination = this.getTile();
     const unitDestination = target.getTile();
+
+    // Smoke bomb animation
+    this.singleTween(this.smokeAnim!, 500);
+    target.singleTween(target.smokeAnim!, 500);
 
     target.updatePosition(targetDestination);
     targetDestination.hero = target.exportData();
@@ -252,8 +284,8 @@ export class Ninja extends Human {
 }
 
 export class Cleric extends Human {
-  constructor(context: GameScene, data: Partial<IHero>) {
-    super(context, createCouncilClericData(data));
+  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
+    super(context, createCouncilClericData(data), tileType);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -263,7 +295,14 @@ export class Cleric extends Human {
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
     this.powerModifier = 0;
-    if (this.superCharge) this.superCharge = false;
+    if (this.isDebuffed) {
+      this.isDebuffed = false;
+      this.debuffImage.setVisible(false);
+    }
+    if (this.superCharge) {
+      this.superCharge = false;
+      this.superChargeAnim.setVisible(false);
+    }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }

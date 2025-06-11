@@ -52,6 +52,7 @@ export interface ICrystal {
   isDestroyed: boolean;
   isLastCrystal: boolean;
   boardPosition: number;
+  debuffLevel: number;
   row: number;
   col: number;
 }
@@ -98,8 +99,9 @@ export interface IHero {
   shiningHelm: boolean;
   superCharge: boolean;
   belongsTo: number;
-  canHeal: boolean
-  unitsConsumed?: number
+  canHeal: boolean;
+  unitsConsumed?: number;
+  isDebuffed: boolean;
 }
 
 /**
