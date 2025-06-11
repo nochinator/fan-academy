@@ -611,7 +611,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   equipRunemetal(handPosition: number): void {
     this.runeMetal = true;
     this.runeMetalImage.setVisible(true);
-    this.power += this.power * 50 / 100;
+    this.power += this.power * 0.5;
 
     this.runeMetalImage.setVisible(true);
     this.updateTileData();

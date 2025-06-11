@@ -153,8 +153,9 @@ export class Crystal extends Phaser.GameObjects.Container {
   }
 
   getsDamaged(damage: number): void {
-    const totalDamage = damage > this.currentHealth ? this.currentHealth : damage;
-    this.currentHealth -= totalDamage;
+    const totalDamage = damage * (1 + this.debuffLevel * 0.5);
+    const damageTaken = totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
+    this.currentHealth -= damageTaken;
 
     if (this.currentHealth <= this.maxHealth / 2) {
       this.crystalImage.setTexture('crystalDamaged'); // FIXME: below 50%, this changes the texture every time the crystal is damaged
@@ -164,7 +165,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
     // Show damage numbers
-    if (totalDamage > 0) new FloatingText(this.context, this.x, this.y - 50, totalDamage.toString());
+    if (damageTaken > 0) new FloatingText(this.context, this.x, this.y - 50, damageTaken.toString());
 
     this.updateTileData();
     if (this.currentHealth <= 0) this.removeFromGame(); // TODO: destruction animation

@@ -17,7 +17,7 @@ export abstract class DarkElf extends Hero {
   equipFactionBuff(handPosition: number): void {
     this.factionBuff = true;
     this.factionBuffImage.setVisible(true);
-    this.increaseMaxHealth(this.maxHealth * 10 / 100);
+    this.increaseMaxHealth(this.maxHealth * 0.1);
 
     this.updateTileData();
 
@@ -26,10 +26,10 @@ export abstract class DarkElf extends Hero {
 
   lifeSteal(damage: number): void {
     if (this.factionBuff) {
-      const roundedHealing = roundToFive(damage * 67 / 100);
+      const roundedHealing = roundToFive(damage * 0.67);
       this.getsHealed(roundedHealing);
     } else {
-      const roundedHealing = roundToFive(damage * 33 / 100);
+      const roundedHealing = roundToFive(damage * 0.33);
       this.getsHealed(roundedHealing);
     }
   }
