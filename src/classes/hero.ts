@@ -182,7 +182,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.powerTileEvent = this.continuousEvent(this.powerTileAnim, ['powerTileAnim_1', 'powerTileAnim_2', 'powerTileAnim_3']);
 
     this.magicalResistanceTileAnim = context.add.image(0, 25, 'magicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tileType === ETiles.POWER) {
+    if (tileType === ETiles.MAGICAL_RESISTANCE) {
       this.magicalResistanceTileAnim.setVisible(true);
     } else {
       this.magicalResistanceTileAnim.setVisible(false);
@@ -191,7 +191,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.magicalResistanceTileEvent = this.continuousEvent(this.magicalResistanceTileAnim, ['magicalResistanceAnim_1', 'magicalResistanceAnim_2', 'magicalResistanceAnim_3']);
 
     this.physicalResistanceTileAnim = context.add.image(0, 25, 'physicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tileType === ETiles.POWER) {
+    if (tileType === ETiles.PHYSICAL_RESISTANCE) {
       this.physicalResistanceTileAnim.setVisible(true);
     } else {
       this.physicalResistanceTileAnim.setVisible(false);
@@ -235,8 +235,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     makeUnitClickable(this, context);
 
-    this.scene.input.enableDebug(this);
-
+    // this.scene.input.enableDebug(this); // REVIEW:
     context.add.existing(this);
   }
 
