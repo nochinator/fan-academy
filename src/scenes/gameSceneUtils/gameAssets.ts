@@ -71,9 +71,13 @@ export function loadGameAssets(context: GameScene) {
   const darkElvesArray = ['priestess', 'impaler', 'necromancer', 'phantom', 'voidmonk', 'wraith'];
 
   // TODO: a check should be made to see if both factions are needed
-  councilArray.forEach( asset => { context.load.image(asset, `/assets/images/factions/council/${asset}.png`);
+  councilArray.forEach( asset => {
+    context.load.image(asset, `/assets/images/factions/council/${asset}.png`);
+    context.load.image(`${asset}CardPic`, `/assets/images/profilePics/${asset}_v1-hd.jpg`); // Unit picture for its unit card
   });
-  darkElvesArray.forEach( asset => { context.load.image(asset, `/assets/images/factions/darkElves/${asset}.png`);
+  darkElvesArray.forEach( asset => {
+    context.load.image(asset, `/assets/images/factions/darkElves/${asset}.png`);
+    context.load.image(`${asset}CardPic`, `/assets/images/profilePics/${asset}_v1-hd.jpg`); // Unit picture for its unit card
   });
 
   // Council
@@ -115,4 +119,19 @@ export function loadGameAssets(context: GameScene) {
     './assets/fonts/red_font.png',
     './assets/fonts/red_font.json'
   );
+
+  // Unit card images -the unit picture is loaded above, alognside the profile pictures
+  context.load.image('cardBackground', './assets/images/gameItems/card/HelpTooltip_BG-hd.png');
+  context.load.image('cardSeparator', './assets/images/gameItems/card/HelpTooltip_Separator.png');
+  context.load.image('hpBackground', './assets/images/gameItems/card/HelpTooltip_InsetHP-hd.png');
+  context.load.image('hpBar', './assets/images/gameItems/card/HelpTooltip_HPBar-hd.png');
+  context.load.image('magicalDamage', './assets/images/gameItems/card/TooltipIcon_MagicDmg-hd.png');
+  context.load.image('physicalDamage', './assets/images/gameItems/card/TooltipIcon_PhysDmg-hd.png');
+  context.load.image('magicalResistance', './assets/images/gameItems/card/TooltipIcon_MagicRes-hd.png');
+  context.load.image('physicalResistance', './assets/images/gameItems/card/TooltipIcon_PhysDef-hd.png');
+  context.load.image('movementRange', './assets/images/gameItems/card/TooltipIcon_Movement-hd.png');
+  context.load.image('attackRange', './assets/images/gameItems/card/TooltipIcon_Range-hd.png');
+  context.load.image('movementSquare', './assets/images/gameItems/card/TooltipIcon_MovementTile-hd.png');
+  context.load.image('attackSquare', './assets/images/gameItems/card/TooltipIcon_RangeTile-hd.png');
+  context.load.image('hpIcon', './assets/images/gameItems/card/HelpTooltip_HP-hd.png');
 }

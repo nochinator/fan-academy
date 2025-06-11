@@ -103,3 +103,17 @@ export enum ERange {
   ATTACK = 'attack',
   HEAL = 'healing'
 }
+
+export enum ECardType {
+  SHOOTER = 'Shooter',
+  FIGHTER = 'Fighter',
+  CASTER = 'Caster',
+  SUPPORT = 'Support',
+  EQUIPMENT = 'Equipment',
+  BUFF = 'Buff',
+  VICTORY = 'Victory Unit',
+  SUPER = 'Super Unit',
+  SUMMONED = 'Summoned',
+  SPELL = 'Spell',
+  CONSUMABLE = 'Consumable'
+}

@@ -19,6 +19,7 @@ export abstract class DarkElf extends Hero {
     this.factionBuffImage.setVisible(true);
     this.increaseMaxHealth(this.maxHealth * 0.1);
 
+    this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
     this.updateTileData();
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
@@ -53,6 +54,7 @@ export class Impaler extends DarkElf {
     if (this.isDebuffed) {
       this.isDebuffed = false;
       this.debuffImage.setVisible(false);
+      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     }
     if (this.superCharge) {
       this.superCharge = false;
@@ -117,6 +119,7 @@ export class VoidMonk extends DarkElf {
     if (this.isDebuffed) {
       this.isDebuffed = false;
       this.debuffImage.setVisible(false);
+      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     }
     if (this.superCharge) {
       this.superCharge = false;
@@ -166,6 +169,7 @@ export class Necromancer extends DarkElf {
       if (this.isDebuffed) {
         this.isDebuffed = false;
         this.debuffImage.setVisible(false);
+        this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
       }
       if (this.superCharge) {
         this.superCharge = false;
@@ -182,6 +186,7 @@ export class Necromancer extends DarkElf {
       if (this.isDebuffed) {
         this.isDebuffed = false;
         this.debuffImage.setVisible(false);
+        this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
       }
       if (this.superCharge) {
         this.superCharge = false;
@@ -209,16 +214,18 @@ export class Priestess extends DarkElf {
     if (damageDone) this.lifeSteal(damageDone);
 
     // Apply a 50% debuff to the target's next attack
-    if (target instanceof Hero) {
+    if (target instanceof Hero && !target.isDebuffed) {
       target.modifyPower(-50);
       target.isDebuffed = true;
       target.debuffImage.setVisible(true);
+      target.unitCard.updateCardPower(target.getTotalPower(), target.basePower, target.isDebuffed);
     }
 
     this.powerModifier = 0;
     if (this.isDebuffed) {
       this.isDebuffed = false;
       this.debuffImage.setVisible(false);
+      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     }
     if (this.superCharge) {
       this.superCharge = false;
@@ -266,6 +273,7 @@ export class Wraith extends DarkElf {
       if (this.isDebuffed) {
         this.isDebuffed = false;
         this.debuffImage.setVisible(false);
+        this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
       }
       if (this.superCharge) {
         this.superCharge = false;
@@ -305,6 +313,7 @@ export class Phantom extends Hero {
     if (this.isDebuffed) {
       this.isDebuffed = false;
       this.debuffImage.setVisible(false);
+      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     }
     if (this.superCharge) {
       this.superCharge = false;

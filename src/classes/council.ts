@@ -20,8 +20,9 @@ export abstract class Human extends Hero {
     this.factionBuffImage.setVisible(true);
     this.physicalDamageResistance += 20;
 
-    this.increaseMaxHealth(this.maxHealth * 10 / 100);
+    this.increaseMaxHealth(this.maxHealth * 0.1);
 
+    this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
     this.updateTileData();
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
@@ -47,6 +48,7 @@ export class Archer extends Human {
     if (this.isDebuffed) {
       this.isDebuffed = false;
       this.debuffImage.setVisible(false);
+      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     }
     if (this.superCharge) {
       this.superCharge = false;
@@ -78,6 +80,7 @@ export class Knight extends Human {
     if (this.isDebuffed) {
       this.isDebuffed = false;
       this.debuffImage.setVisible(false);
+      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     }
     if (this.superCharge) {
       this.superCharge = false;
@@ -118,6 +121,7 @@ export class Wizard extends Human {
     if (this.isDebuffed) {
       this.isDebuffed = false;
       this.debuffImage.setVisible(false);
+      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     }
     if (this.superCharge) {
       this.superCharge = false;
@@ -252,6 +256,7 @@ export class Ninja extends Human {
     if (this.isDebuffed) {
       this.isDebuffed = false;
       this.debuffImage.setVisible(false);
+      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     }
     if (this.superCharge) {
       this.superCharge = false;
@@ -298,6 +303,7 @@ export class Cleric extends Human {
     if (this.isDebuffed) {
       this.isDebuffed = false;
       this.debuffImage.setVisible(false);
+      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     }
     if (this.superCharge) {
       this.superCharge = false;

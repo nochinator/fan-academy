@@ -8,118 +8,144 @@ import { belongsToPlayer, isHero, isItem } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
-  unit.on('pointerdown', () => {
-    console.log(`Unit in ${unit.boardPosition}`, unit);
-    // Only the active player can click on tiles, and only if they still have actions available
-    if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
+  unit.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+    if (pointer.button === 0) handleOnUnitLeftClick(unit, context);
 
-    const activeUnit = context.activeUnit;
-    const isFriendly = belongsToPlayer(context, unit);
-    const isEnemy = isHero(unit) && !isFriendly;
-    const isSameUnit = activeUnit?.unitId === unit.unitId;
-
-    const healReticle = isHero(unit) ? unit.getByName('healReticle') as Phaser.GameObjects.Image : undefined;
-    const attackReticle = isHero(unit) ? unit.getByName('attackReticle') as Phaser.GameObjects.Image : undefined;
-
-    // CASE 1: No active unit
-    if (!activeUnit && isFriendly) {
-      if (isHero(unit) && unit.isKO) return; // Can't select KO'd units
-
-      selectUnit(context, unit);
-      return;
-    }
-
-    // CASE 2: Clicking the active unit deselects it, unless it's a healer
-    if (isSameUnit) {
-      if (isHero(activeUnit) && activeUnit.canHeal && healReticle?.visible && isHero(unit)) {
-        activeUnit.heal(unit);
-        return;
-      } else {
-        deselectUnit(context);
-      }
-      return;
-    }
-
-    // CASE 3: There is already an active unit
-    if (activeUnit && !isSameUnit) {
-      // Unique case: Wraith can spawn on a KO'd unit
-      if (isHero(unit) && unit.isKO && isHero(activeUnit) && activeUnit.unitType === EHeroes.WRAITH && activeUnit.boardPosition >= 45) {
-        activeUnit.spawn(unit.getTile());
-        return;
-      }
-
-      // CASE 3.1: Clicking an enemy unit
-      if (isEnemy) {
-        if (isHero(activeUnit) && attackReticle?.visible) {
-          activeUnit.attack(unit);
-          return;
-        }
-
-        // Stomp enemy KO'd units
-        if (isHero(activeUnit) && unit.isKO) {
-          const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
-          activeUnit.move(unitTile);
-        }
-
-        if (isItem(activeUnit) && activeUnit.dealsDamage) {
-          activeUnit.use(unit.getTile());
-          return;
-        }
-      }
-
-      // CASE 3.2: Clicking a friendly unit on the board
-      if (isHero(unit) && isFriendly && unit.boardPosition < 45) {
-        // Necromancer and Wraith can target friendly units if they are knocked down. NOTE: this check should always go before the stomping check
-        if (isHero(activeUnit) && [EHeroes.NECROMANCER, EHeroes.WRAITH].includes(activeUnit.unitType) && unit.isKO && attackReticle?.visible) {
-          activeUnit.attack(unit);
-          return;
-        }
-
-        if (isHero(activeUnit)) {
-          // Spawn stomp friendly units with a unit from hand
-          const unitTile = unit.getTile();
-          if (unit.isKO && unitTile.tileType === ETiles.SPAWN && unitTile.isHighlighted && activeUnit.boardPosition >= 45) {
-            activeUnit.spawn(unitTile);
-            return;
-          }
-
-          if (activeUnit.canHeal && healReticle?.visible) {
-            activeUnit.heal(unit);
-            return;
-          }
-
-          // Stomp friendly KO'd units, unless you are a Necromancer
-          if (unit.isKO && activeUnit.unitType !== EHeroes.NECROMANCER) {
-            const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
-            activeUnit.move(unitTile);
-            return;
-          }
-
-          // Ninja can swap places with any friendly unit on the board
-          if (activeUnit.unitType === EHeroes.NINJA) {
-            activeUnit.teleport(unit);
-            return;
-          }
-        }
-
-        if (isItem(activeUnit)) {
-          if (unit.isAlreadyEquipped(activeUnit)) return;
-
-          if (activeUnit.dealsDamage) activeUnit.use(unit.getTile());
-          if (!activeUnit.dealsDamage) activeUnit.use(unit);
-
-          return;
-        }
-      }
-
-      // If the new unit can't be attacked, healed or teleported, and it's a friendly unit, switch focus to new unit
-      if (isFriendly) {
-        if (isHero(unit) && unit.isKO) return;
-        deselectUnit(context);
-        return selectUnit(context, unit);
+    if (pointer.button === 2) {
+      if (isHero(unit)) {
+        // context.children.bringToTop(unit);
+        unit.setDepth(1001);
+        unit.unitCard.setVisible(true); // TODO: adapt for items as well
       }
     }
   });
+
+  unit.on('pointerover', (pointer: Phaser.Input.Pointer) => {
+    if (pointer.rightButtonDown()) {
+      unit.setDepth(1001);
+      if (isHero(unit)) unit.unitCard.setVisible(true);
+    }
+  });
+
+  unit.on('pointerout', () => {
+    if (isHero(unit)) {
+      unit.setDepth(unit.boardPosition + 10);
+      unit.unitCard.setVisible(false);
+    }
+  });
+}
+
+function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
+  console.log(`Unit in ${unit.boardPosition}`, unit);
+  // Only the active player can click on tiles, and only if they still have actions available
+  if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
+
+  const activeUnit = context.activeUnit;
+  const isFriendly = belongsToPlayer(context, unit);
+  const isEnemy = isHero(unit) && !isFriendly;
+  const isSameUnit = activeUnit?.unitId === unit.unitId;
+
+  const healReticle = isHero(unit) ? unit.getByName('healReticle') as Phaser.GameObjects.Image : undefined;
+  const attackReticle = isHero(unit) ? unit.getByName('attackReticle') as Phaser.GameObjects.Image : undefined;
+
+  // CASE 1: No active unit
+  if (!activeUnit && isFriendly) {
+    if (isHero(unit) && unit.isKO) return; // Can't select KO'd units
+
+    selectUnit(context, unit);
+    return;
+  }
+
+  // CASE 2: Clicking the active unit deselects it, unless it's a healer
+  if (isSameUnit) {
+    if (isHero(activeUnit) && activeUnit.canHeal && healReticle?.visible && isHero(unit)) {
+      activeUnit.heal(unit);
+      return;
+    } else {
+      deselectUnit(context);
+    }
+    return;
+  }
+
+  // CASE 3: There is already an active unit
+  if (activeUnit && !isSameUnit) {
+    // Unique case: Wraith can spawn on a KO'd unit
+    if (isHero(unit) && unit.isKO && isHero(activeUnit) && activeUnit.unitType === EHeroes.WRAITH && activeUnit.boardPosition >= 45) {
+      activeUnit.spawn(unit.getTile());
+      return;
+    }
+
+    // CASE 3.1: Clicking an enemy unit
+    if (isEnemy) {
+      if (isHero(activeUnit) && attackReticle?.visible) {
+        activeUnit.attack(unit);
+        return;
+      }
+
+      // Stomp enemy KO'd units
+      if (isHero(activeUnit) && unit.isKO) {
+        const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
+        activeUnit.move(unitTile);
+      }
+
+      if (isItem(activeUnit) && activeUnit.dealsDamage) {
+        activeUnit.use(unit.getTile());
+        return;
+      }
+    }
+
+    // CASE 3.2: Clicking a friendly unit on the board
+    if (isHero(unit) && isFriendly && unit.boardPosition < 45) {
+      // Necromancer and Wraith can target friendly units if they are knocked down. NOTE: this check should always go before the stomping check
+      if (isHero(activeUnit) && [EHeroes.NECROMANCER, EHeroes.WRAITH].includes(activeUnit.unitType) && unit.isKO && attackReticle?.visible) {
+        activeUnit.attack(unit);
+        return;
+      }
+
+      if (isHero(activeUnit)) {
+        // Spawn stomp friendly units with a unit from hand
+        const unitTile = unit.getTile();
+        if (unit.isKO && unitTile.tileType === ETiles.SPAWN && unitTile.isHighlighted && activeUnit.boardPosition >= 45) {
+          activeUnit.spawn(unitTile);
+          return;
+        }
+
+        if (activeUnit.canHeal && healReticle?.visible) {
+          activeUnit.heal(unit);
+          return;
+        }
+
+        // Stomp friendly KO'd units, unless you are a Necromancer
+        if (unit.isKO && activeUnit.unitType !== EHeroes.NECROMANCER) {
+          const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
+          activeUnit.move(unitTile);
+          return;
+        }
+
+        // Ninja can swap places with any friendly unit on the board
+        if (activeUnit.unitType === EHeroes.NINJA) {
+          activeUnit.teleport(unit);
+          return;
+        }
+      }
+
+      if (isItem(activeUnit)) {
+        if (unit.isAlreadyEquipped(activeUnit) || unit.unitType === EHeroes.PHANTOM) return;
+
+        if (activeUnit.dealsDamage) activeUnit.use(unit.getTile());
+        if (!activeUnit.dealsDamage) activeUnit.use(unit);
+
+        return;
+      }
+    }
+
+    // If the new unit can't be attacked, healed or teleported, and it's a friendly unit, switch focus to new unit
+    if (isFriendly) {
+      if (isHero(unit) && unit.isKO) return;
+      deselectUnit(context);
+      return selectUnit(context, unit);
+    }
+  }
 }
 
 export function makeTileClickable(tile: Tile, context: GameScene): void {

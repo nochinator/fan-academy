@@ -3,6 +3,7 @@ import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { getGridDistance, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
+import { HeroCard } from "./card";
 import { Crystal } from "./crystal";
 import { FloatingText } from "./floatingText";
 import { HealthBar } from "./healthBar";
@@ -26,9 +27,12 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   healingRange: number;
   attackType: EAttackType;
   power: number;
+  basePower: number;
   powerModifier: number;
   physicalDamageResistance: number;
+  basePhysicalDamageResistance: number;
   magicalDamageResistance: number;
+  baseMagicalDamageResistance: number;
   factionBuff: boolean;
   runeMetal: boolean;
   shiningHelm: boolean;
@@ -40,6 +44,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   isDebuffed: boolean;
 
   context: GameScene;
+  unitCard: HeroCard;
 
   characterImage: Phaser.GameObjects.Image;
   runeMetalImage: Phaser.GameObjects.Image;
@@ -90,9 +95,12 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.healingRange = data.healingRange;
     this.attackType = data.attackType;
     this.power = data.power;
+    this.basePower = data.basePower;
     this.powerModifier = data.powerModifier;
     this.physicalDamageResistance = data.physicalDamageResistance;
+    this.basePhysicalDamageResistance = data.basePhysicalDamageResistance;
     this.magicalDamageResistance = data.magicalDamageResistance;
+    this.baseMagicalDamageResistance = data.baseMagicalDamageResistance;
     this.factionBuff = data.factionBuff;
     this.runeMetal = data.runeMetal;
     this.shiningHelm = data.shiningHelm;
@@ -102,6 +110,12 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.canHeal = data.canHeal ?? false;
     this.unitsConsumed = data.unitsConsumed ?? 0;
     this.isDebuffed = data.isDebuffed;
+
+    this.unitCard = new HeroCard(context, {
+      ...data,
+      currentPower: this.getTotalPower()
+    });
+    this.unitCard.setVisible(false);
 
     this.healthBar = new HealthBar(context, data, -38, -60);
     if (this.boardPosition >= 45) this.healthBar.setVisible(false);
@@ -131,7 +145,12 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.attackReticle = context.add.image(0, -10, 'attackReticle').setOrigin(0.5).setScale(0.8).setName('attackReticle').setVisible(false);
     this.healReticle = context.add.image(0, -10, 'healReticle').setOrigin(0.5).setScale(0.8).setName('healReticle').setVisible(false);
     this.allyReticle = context.add.image(0, -10, 'allyReticle').setOrigin(0.5).setScale(0.6).setName('allyReticle').setVisible(false);
-    this.debuffImage = context.add.image(0, -10, 'debuff').setOrigin(0.5).setScale(2.5).setName('debuff').setVisible(false);
+    this.debuffImage = context.add.image(0, -10, 'debuff').setOrigin(0.5).setScale(2.5).setName('debuff');
+    if (this.isDebuffed) {
+      this.debuffImage.setVisible(true);
+    } else {
+      this.debuffImage.setVisible(false);
+    }
 
     // Add animations to the reticles
     const addCirclingTween = (reticle: Phaser.GameObjects.Image) => {
@@ -212,9 +231,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // Add all individual images to container
     this.add([
+      this.debuffImage,
       this.superChargeAnim,
       this.reviveAnim,
-      this.debuffImage,
       this.characterImage,
       this.runeMetalImage,
       this.factionBuffImage,
@@ -228,14 +247,15 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.healReticle,
       this.allyReticle,
       ...this.smokeAnim ? [this.smokeAnim] : [],
-      this.blockedLOS]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(this.boardPosition + 10); // REVIEW: depth
+      this.blockedLOS,
+      this.unitCard
+    ]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(this.boardPosition + 10); // REVIEW: depth
 
     // Hide if in deck
     if (this.boardPosition === 51) this.setVisible(false);
 
     makeUnitClickable(this, context);
 
-    // this.scene.input.enableDebug(this); // REVIEW:
     context.add.existing(this);
   }
 
@@ -279,9 +299,12 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       healingRange: this.healingRange,
       attackType: this.attackType,
       power: this.power,
+      basePower: this.basePower,
       powerModifier: this.powerModifier,
       physicalDamageResistance: this.physicalDamageResistance,
+      basePhysicalDamageResistance: this.basePhysicalDamageResistance,
       magicalDamageResistance: this.magicalDamageResistance,
+      baseMagicalDamageResistance: this.baseMagicalDamageResistance,
       factionBuff: this.factionBuff,
       runeMetal: this.runeMetal,
       shiningHelm: this.shiningHelm,
@@ -369,6 +392,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Show damage numbers
     if (totalDamage > 0) new FloatingText(this.context, this.x, this.y - 50, totalDamage.toString());
 
+    this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
     this.updateTileData();
 
     return totalDamage; // Return damage taken for lifesteal
@@ -382,9 +406,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   getTotalPower(multiplier = 1): number {
     if (this.powerModifier === 0) return this.power * multiplier;
 
-    const totalPower = this.power * this.powerModifier / 100 * multiplier;
+    const totalPower = this.power + this.power * this.powerModifier / 100 * multiplier;
 
-    this.updateTileData();
+    // this.updateTileData(); // REVIEW: Needed ?
 
     return totalPower;
   }
@@ -421,6 +445,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Show healing numbers
     if (actualHealing > 0) new FloatingText(this.context, this.x, this.y - 50, actualHealing.toString(), true);
 
+    this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
     this.updateTileData();
   }
 
@@ -445,6 +470,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Show healing numbers
     new FloatingText(this.context, this.x, this.y - 50, amount.toString(), true);
 
+    this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
     this.updateTileData();
   }
 
@@ -602,6 +628,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.increaseMaxHealth(this.maxHealth * 10 / 100);
 
     this.shiningHelmImage.setVisible(true);
+
+    this.unitCard.updateCardMagicalResistance(this.magicalDamageResistance);
     this.updateTileData();
 
     this.context.gameController?.afterAction(EActionType.USE, handPosition, this.boardPosition);
@@ -613,6 +641,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.power += this.power * 0.5;
 
     this.runeMetalImage.setVisible(true);
+    this.unitCard.updateCardPower(this.getTotalPower(), this.basePower);
     this.updateTileData();
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
@@ -622,7 +651,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.superCharge = true;
     this.powerModifier += 300;
 
-    // TODO: add visual effect
+    this.unitCard.updateCardPower(this.getTotalPower(), this.basePower);
     this.updateTileData();
 
     this.superChargeAnim.setVisible(true);

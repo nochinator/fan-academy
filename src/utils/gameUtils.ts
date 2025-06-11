@@ -4,7 +4,7 @@ import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulSt
 import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EActionClass, EActionType, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
+import { EActionClass, EActionType, ECardType, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, IHero, IItem, IPlayerState } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
@@ -253,4 +253,102 @@ export function turnIfBehind(context: GameScene, attacker: Hero, target: Hero | 
   context.time.delayedCall(1000, () => {
     attackerImage.setFlipX(!attacker.characterImage.flipX);
   });
+}
+
+export function getCardText(unit: EHeroes | EItems): {
+  cardType: ECardType,
+  cardText: string
+} {
+  const unitMap = {
+    [EHeroes.ARCHER]: {
+      cardType: ECardType.SHOOTER,
+      cardText: "Marksman who does high damage to enemies at range. Weak melee attack."
+    },
+    [EHeroes.CLERIC]: {
+      cardType: ECardType.SUPPORT,
+      cardText: "Spellcaster who revives and heals allies. Attacks enemies at range."
+    },
+    [EHeroes.KNIGHT]: {
+      cardType: ECardType.FIGHTER,
+      cardText: "Heavily armored and an excellent defender. His attacks knock back enemies."
+    },
+    [EHeroes.NINJA]: {
+      cardType: ECardType.SUPER,
+      cardText: "Deals double damage in melee range. He can teleport to allies."
+    },
+    [EHeroes.WIZARD]: {
+      cardType: ECardType.CASTER,
+      cardText: "Powerful spellcaster, damages groups of enemies with chain lightning."
+    },
+
+    [EHeroes.PRIESTESS]: {
+      cardType: ECardType.SUPPORT,
+      cardText: "She can heal up to 3 tiles away, and weakens enemy attacks."
+    },
+    [EHeroes.IMPALER]: {
+      cardType: ECardType.SHOOTER,
+      cardText: "Wields a powerful harpoon that can pull enemies close."
+    },
+    [EHeroes.NECROMANCER]: {
+      cardType: ECardType.CASTER,
+      cardText: "Dark caster who can create Phantoms from fallen units."
+    },
+    [EHeroes.PHANTOM]: {
+      cardType: ECardType.SUMMONED,
+      cardText: "A summoned phantom from beyond."
+    },
+    [EHeroes.VOIDMONK]: {
+      cardType: ECardType.FIGHTER,
+      cardText: "Strong melee fighter whose hits do splash damage."
+    },
+    [EHeroes.WRAITH]: {
+      cardType: ECardType.SUPER,
+      cardText: "A terror who gains max health and power by draining K.O.'d units."
+    },
+
+    [EItems.SHINING_HELM]: {
+      cardType: ECardType.EQUIPMENT,
+      cardText: "Adds 20% magical defense, and 10% max health."
+    },
+    [EItems.SUPERCHARGE]: {
+      cardType: ECardType.BUFF,
+      cardText: "Multiplies adn ally's attack power by 3 for one attack."
+    },
+    [EItems.RUNE_METAL]: {
+      cardType: ECardType.EQUIPMENT,
+      cardText: "Permanently increases and ally's power by 50%."
+    },
+
+    [EItems.DRAGON_SCALE]: {
+      cardType: ECardType.EQUIPMENT,
+      cardText: "Adds 20% physical defense, and 10% max health."
+    },
+    [EItems.HEALING_POTION]: {
+      cardType: ECardType.CONSUMABLE,
+      cardText: "Heals and ally for 1000 HP, or revives an ally with 100 HP."
+    },
+    [EItems.INFERNO]: {
+      cardType: ECardType.SPELL,
+      cardText: "Damages all enemies in a 3x3 area and destroys knocked-out units."
+    },
+
+    [EItems.MANA_VIAL]: {
+      cardType: ECardType.CONSUMABLE,
+      cardText: "Heals an ally for 1000 HP and increases max health by 50 HP."
+    },
+    [EItems.SOUL_HARVEST]: {
+      cardType: ECardType.SPELL,
+      cardText: "Drains health from enemies in a 3x3 area. Increases max health for all allies and revives knocked-out units."
+    },
+    [EItems.SOUL_STONE]: {
+      cardType: ECardType.EQUIPMENT,
+      cardText: "Doubles the effect of a unit's life leech and increases max health by 50 HP"
+    }
+  };
+
+  return unitMap[unit];
+}
+
+export function capitalize(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }

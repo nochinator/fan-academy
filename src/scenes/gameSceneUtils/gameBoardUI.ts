@@ -17,6 +17,6 @@ export function loadGameBoardUI(context: GameScene): void {
 
   context.load.image('playerBanner', '/assets/images/gameItems/player_banner.png');
   context.load.image('vsBanner', '/assets/images/gameItems/vs_banner.png');
-  context.load.image('playerOnePortrait', '/assets/images/profilePics/Archer_v1-hd.jpg');
-  context.load.image('playerTwoPortrait', '/assets/images/profilePics/Phantom_v2-hd.jpg');
+  context.load.image('playerOnePortrait', '/assets/images/profilePics/archer_v1-hd.jpg'); // TODO: link to user profile pic
+  context.load.image('playerTwoPortrait', '/assets/images/profilePics/phantom_v2-hd.jpg');
 }

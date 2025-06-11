@@ -62,6 +62,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.input.mouse!.disableContextMenu();
     this.gameController = new GameController(this);
   }
 };

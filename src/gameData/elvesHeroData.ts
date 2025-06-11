@@ -52,6 +52,9 @@ export function createElvesImpalerData(data: Partial<IHero>): IHero {
     healingRange: 0,
     attackType: EAttackType.PHYSICAL,
     power: data.power ?? power,
+    basePower: power,
+    basePhysicalDamageResistance: physicalDamageResistance,
+    baseMagicalDamageResistance: magicalDamageResistance,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     canHeal: false,
@@ -75,6 +78,9 @@ export function createElvesPriestessData(data: Partial<IHero>): IHero {
     healingRange: 3,
     attackType: EAttackType.MAGICAL,
     power: data.power ?? power,
+    basePower: power,
+    basePhysicalDamageResistance: physicalDamageResistance,
+    baseMagicalDamageResistance: magicalDamageResistance,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     canHeal: true
@@ -99,6 +105,9 @@ export function createElvesVoidMonkData(data: Partial<IHero>): IHero {
     healingRange: 0,
     attackType: EAttackType.PHYSICAL,
     power: data.power ?? power,
+    basePower: power,
+    basePhysicalDamageResistance: physicalDamageResistance,
+    baseMagicalDamageResistance: magicalDamageResistance,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     canHeal: false,
@@ -122,6 +131,9 @@ export function createElvesNecromancerData(data: Partial<IHero>): IHero {
     healingRange: 0,
     attackType: EAttackType.MAGICAL,
     power: data.power ?? power,
+    basePower: power,
+    basePhysicalDamageResistance: physicalDamageResistance,
+    baseMagicalDamageResistance: magicalDamageResistance,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     canHeal: false,
@@ -146,6 +158,9 @@ export function createElvesWraithData(data: Partial<IHero>): IHero {
     healingRange: 0,
     attackType: EAttackType.MAGICAL,
     power: data.power ?? power,
+    basePower: power,
+    basePhysicalDamageResistance: physicalDamageResistance,
+    baseMagicalDamageResistance: magicalDamageResistance,
     physicalDamageResistance: data.physicalDamageResistance ?? physicalDamageResistance,
     magicalDamageResistance: data.magicalDamageResistance ?? magicalDamageResistance,
     canHeal: false,
@@ -155,7 +170,7 @@ export function createElvesWraithData(data: Partial<IHero>): IHero {
 }
 
 export function createElvesPhantomData(data: Partial<IHero>): IHero {
-  // Cannot be buffed or healed, disappears if KO'd
+  // Cannot be equipped, buffed or healed, disappears if KO'd
   return {
     unitType: EHeroes.PHANTOM,
     maxHealth: 100,
@@ -165,8 +180,11 @@ export function createElvesPhantomData(data: Partial<IHero>): IHero {
     healingRange: 0,
     attackType: EAttackType.MAGICAL,
     power: 100,
+    basePower: 100,
     physicalDamageResistance: 0,
+    basePhysicalDamageResistance: 0,
     magicalDamageResistance: 0,
+    baseMagicalDamageResistance: 0,
     canHeal: false,
     ...createGenericElvesData(data)
   };
