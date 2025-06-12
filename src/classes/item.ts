@@ -4,8 +4,9 @@ import { IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Hero } from "./hero";
+import { ItemCard } from "./itemCard";
 
-export abstract class Item extends Phaser.GameObjects.Image {
+export abstract class Item extends Phaser.GameObjects.Container {
   class: EClass = EClass.ITEM;
   faction: EFaction;
   unitId: string;
@@ -15,14 +16,19 @@ export abstract class Item extends Phaser.GameObjects.Image {
   belongsTo: number;
   canHeal: boolean;
   dealsDamage: boolean;
+  itemImage: Phaser.GameObjects.Image;
 
   context: GameScene;
 
+  unitCard: ItemCard;
+
   constructor(context: GameScene, data: IItem) {
     const { x, y } = context.centerPoints[data.boardPosition];
-    const texture = data.itemType;
-    super(context, x, y - 20, texture);
+    super(context, x, y - 20); // REVIEW: -20 ?
     this.context = context;
+
+    this.unitCard = new ItemCard(context, data);
+    this.unitCard.setVisible(false);
 
     // Interface properties assignment
     this.unitId = data.unitId;
@@ -34,6 +40,8 @@ export abstract class Item extends Phaser.GameObjects.Image {
     this.canHeal = data.canHeal ?? false;
     this.dealsDamage = data.dealsDamage ?? false;
 
+    this.itemImage = context.add.image(0, 0, this.itemType).setOrigin(0.5).setName('itemImage');
+
     // Add listener for clicking on the unit
     makeUnitClickable(this, context);
 
@@ -41,23 +49,22 @@ export abstract class Item extends Phaser.GameObjects.Image {
     if (this.boardPosition === 51) this.setVisible(false).disableInteractive();
 
     // Setting the image size. SuperCharge and ShinningHelm icons have slighty different sizes
-    let displayWidth: number;
-    let displayHeight: number;
-
-    displayWidth = 100;
-    displayHeight = 100;
+    this.itemImage.displayWidth = 110;
+    this.itemImage.displayHeight = 110;
 
     if (this instanceof SuperCharge) {
-      displayWidth = 55;
-      displayHeight = 55;
+      this.itemImage.displayWidth = 55;
+      this.itemImage.displayHeight = 55;
     }
 
     if (this instanceof ShiningHelm) {
-      displayWidth = 45;
-      displayHeight = 65;
+      this.itemImage.displayWidth = 45;
+      this.itemImage.displayHeight = 65;
     }
 
-    context.add.existing(this).setDisplaySize(displayWidth, displayHeight).setDepth(this.boardPosition + 10).setInteractive().setName(this.unitId);
+    this.add([this.itemImage, this.unitCard]).setSize(50, 50).setDepth(this.boardPosition + 10).setInteractive().setName(this.unitId);
+
+    context.add.existing(this);
   }
 
   get isActive() {
@@ -95,12 +102,12 @@ export abstract class Item extends Phaser.GameObjects.Image {
 
   onActivate() {
     console.log(`${this.unitId} is now active`);
-    this.setScale(1);
+    this.setScale(1.2);
   }
 
   onDeactivate() {
     console.log(`${this.unitId} is now inactive`);
-    this.setScale(0.8);
+    this.setScale(1);
   }
 
   removeFromGame(): void {

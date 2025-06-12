@@ -312,7 +312,7 @@ export function getCardText(unit: EHeroes | EItems): {
     },
     [EItems.SUPERCHARGE]: {
       cardType: ECardType.BUFF,
-      cardText: "Multiplies adn ally's attack power by 3 for one attack."
+      cardText: "Multiplies an ally's attack power by 3 for one attack."
     },
     [EItems.RUNE_METAL]: {
       cardType: ECardType.EQUIPMENT,

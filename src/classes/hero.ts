@@ -3,7 +3,7 @@ import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { getGridDistance, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
-import { HeroCard } from "./card";
+import { HeroCard } from "./heroCard";
 import { Crystal } from "./crystal";
 import { FloatingText } from "./floatingText";
 import { HealthBar } from "./healthBar";
@@ -641,7 +641,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.power += this.power * 0.5;
 
     this.runeMetalImage.setVisible(true);
-    this.unitCard.updateCardPower(this.getTotalPower(), this.basePower);
+    this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     this.updateTileData();
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
@@ -651,7 +651,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.superCharge = true;
     this.powerModifier += 300;
 
-    this.unitCard.updateCardPower(this.getTotalPower(), this.basePower);
+    this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     this.updateTileData();
 
     this.superChargeAnim.setVisible(true);

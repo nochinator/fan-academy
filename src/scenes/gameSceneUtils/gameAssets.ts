@@ -1,3 +1,4 @@
+import { EItems } from "../../enums/gameEnums";
 import GameScene from "../game.scene";
 
 export function loadGameAssets(context: GameScene) {
@@ -78,6 +79,11 @@ export function loadGameAssets(context: GameScene) {
   darkElvesArray.forEach( asset => {
     context.load.image(asset, `/assets/images/factions/darkElves/${asset}.png`);
     context.load.image(`${asset}CardPic`, `/assets/images/profilePics/${asset}_v1-hd.jpg`); // Unit picture for its unit card
+  });
+
+  // Loading item card icons
+  Object.entries(EItems).forEach(([key, value]) => {
+    context.load.image(`${value}CardPic`, `/assets/images/profilePics/${value}.jpg`);
   });
 
   // Council

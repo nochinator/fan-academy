@@ -39,10 +39,10 @@ export class HeroCard extends Phaser.GameObjects.Container {
 
     // Background, unit image, name and type, and separator
     this.cardBackgroundImage = context.add.image(10, 10, 'cardBackground');
-    this.unitPictureImage = context.add.image(-130, -140, `${data.unitType!}CardPic`).setOrigin(0.5).setScale(0.4);
+    this.unitPictureImage = context.add.image(-130, -140, `${data.unitType}CardPic`).setOrigin(0.5).setScale(0.4);
     this.cardSeparatorImage = context.add.image(50, -100, 'cardSeparator').setOrigin(0.5).setScale(1.3);
 
-    const { cardText, cardType } = getCardText(data.unitType!);
+    const { cardText, cardType } = getCardText(data.unitType);
     this.cardNameText = this.context.add.text(55, -170, capitalize(data.unitType), {
       fontFamily: "proLight",
       fontSize: 50,
@@ -125,7 +125,7 @@ export class HeroCard extends Phaser.GameObjects.Container {
       fontSize: 25,
       color: '#ffffff',
       wordWrap: {
-        width: this.cardBackgroundImage.width - 40,
+        width: this.cardBackgroundImage.width - 50,
         useAdvancedWrap: true
       }
     }).setOrigin(0.5);

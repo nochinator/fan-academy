@@ -12,26 +12,21 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
     if (pointer.button === 0) handleOnUnitLeftClick(unit, context);
 
     if (pointer.button === 2) {
-      if (isHero(unit)) {
-        // context.children.bringToTop(unit);
-        unit.setDepth(1001);
-        unit.unitCard.setVisible(true); // TODO: adapt for items as well
-      }
+      unit.setDepth(1001);
+      unit.unitCard.setVisible(true);
     }
   });
 
   unit.on('pointerover', (pointer: Phaser.Input.Pointer) => {
     if (pointer.rightButtonDown()) {
       unit.setDepth(1001);
-      if (isHero(unit)) unit.unitCard.setVisible(true);
+      unit.unitCard.setVisible(true);
     }
   });
 
   unit.on('pointerout', () => {
-    if (isHero(unit)) {
-      unit.setDepth(unit.boardPosition + 10);
-      unit.unitCard.setVisible(false);
-    }
+    unit.setDepth(unit.boardPosition + 10);
+    unit.unitCard.setVisible(false);
   });
 }
 
