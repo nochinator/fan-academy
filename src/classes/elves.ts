@@ -10,8 +10,8 @@ import { Item } from "./item";
 import { Tile } from "./tile";
 
 export abstract class DarkElf extends Hero {
-  constructor(context: GameScene, data: IHero, tileType?: ETiles) {
-    super(context, data, tileType);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
 
   equipFactionBuff(handPosition: number): void {
@@ -37,8 +37,8 @@ export abstract class DarkElf extends Hero {
 }
 
 export class Impaler extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
-    super(context, createElvesImpalerData(data), tileType);
+  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
+    super(context, createElvesImpalerData(data), tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
     const gameController = this.context.gameController!;
@@ -69,8 +69,8 @@ export class Impaler extends DarkElf {
 }
 
 export class VoidMonk extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
-    super(context, createElvesVoidMonkData(data), tileType);
+  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
+    super(context, createElvesVoidMonkData(data), tile);
   }
   // TODO: add aoe to attack
   attack(target: Hero | Crystal): void {
@@ -145,8 +145,8 @@ export class VoidMonk extends DarkElf {
 }
 
 export class Necromancer extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
-    super(context, createElvesNecromancerData(data), tileType);
+  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
+    super(context, createElvesNecromancerData(data), tile);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -159,7 +159,7 @@ export class Necromancer extends DarkElf {
       const phantom = new Phantom(this.context, {
         unitId: `${this.context.userId}_phantom_${++this.context.gameController!.phantomCounter}`,
         boardPosition: target.boardPosition
-      }, tile.tileType, true);
+      }, tile, true);
 
       target.removeFromGame();
 
@@ -202,8 +202,8 @@ export class Necromancer extends DarkElf {
 }
 
 export class Priestess extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
-    super(context, createElvesPriestessData(data), tileType);
+  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
+    super(context, createElvesPriestessData(data), tile);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -251,8 +251,8 @@ export class Priestess extends DarkElf {
 }
 
 export class Wraith extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
-    super(context, createElvesWraithData(data), tileType);
+  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
+    super(context, createElvesWraithData(data), tile);
   }
   attack(target: Hero | Crystal): void {
     turnIfBehind(this.context, this, target);
@@ -291,12 +291,13 @@ export class Wraith extends DarkElf {
 export class Phantom extends Hero {
   spawnAnim?: Phaser.GameObjects.Image;
 
-  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles, spawned = false) {
-    super(context, createElvesPhantomData(data), tileType);
+  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile, spawned = false) {
+    super(context, createElvesPhantomData(data), tile);
 
-    if (spawned) {
+    if (spawned && tile) {
       this.spawnAnim = context.add.image(0, -15, 'phantomSpawnAnim_1').setOrigin(0.5).setScale(0.9);
 
+      this.specialTileCheck(tile);
       this.add([this.spawnAnim]);
       this.singleTween(this.spawnAnim, 200);
     }

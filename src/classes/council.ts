@@ -11,8 +11,8 @@ import { Item } from "./item";
 import { Tile } from "./tile";
 
 export abstract class Human extends Hero {
-  constructor(context: GameScene, data: IHero, tileType?: ETiles) {
-    super(context, data, tileType);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
 
   equipFactionBuff(handPosition: number): void {
@@ -30,8 +30,8 @@ export abstract class Human extends Hero {
 }
 
 export class Archer extends Human {
-  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
-    super(context, createCouncilArcherData(data), tileType);
+  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
+    super(context, createCouncilArcherData(data), tile);
   }
   attack(target: Hero | Crystal): void {
     const distance = this.getDistanceToTarget(target);
@@ -63,8 +63,8 @@ export class Archer extends Human {
 }
 
 export class Knight extends Human {
-  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
-    super(context, createCouncilKnightData(data), tileType);
+  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
+    super(context, createCouncilKnightData(data), tile);
   }
 
   async attack(target: Hero | Crystal): Promise<void> {
@@ -95,8 +95,8 @@ export class Knight extends Human {
 }
 
 export class Wizard extends Human {
-  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
-    super(context, createCouncilWizardData(data), tileType);
+  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
+    super(context, createCouncilWizardData(data), tile);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -228,8 +228,8 @@ export class Wizard extends Human {
 }
 
 export class Ninja extends Human {
-  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
-    super(context, createCouncilNinjaData(data), tileType);
+  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
+    super(context, createCouncilNinjaData(data), tile);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -289,8 +289,8 @@ export class Ninja extends Human {
 }
 
 export class Cleric extends Human {
-  constructor(context: GameScene, data: Partial<IHero>, tileType?: ETiles) {
-    super(context, createCouncilClericData(data), tileType);
+  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
+    super(context, createCouncilClericData(data), tile);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;

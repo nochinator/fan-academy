@@ -74,7 +74,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   healthBar: HealthBar;
 
-  constructor(context: GameScene, data: IHero, tileType?: ETiles) {
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
     const { x, y } = context.centerPoints[data.boardPosition];
     super(context, x, y);
     this.context = context;
@@ -184,7 +184,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // Add special tile and character animations
     this.crystalDebuffTileAnim = context.add.image(0, 25, 'crystalDamageAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tileType === ETiles.CRYSTAL_DAMAGE) {
+    if (tile?.tileType === ETiles.CRYSTAL_DAMAGE) {
       this.crystalDebuffTileAnim.setVisible(true);
     } else {
       this.crystalDebuffTileAnim.setVisible(false);
@@ -192,7 +192,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.crystalDebuffEvent = this.continuousEvent(this.crystalDebuffTileAnim, ['crystalDamageAnim_1', 'crystalDamageAnim_2', 'crystalDamageAnim_3']);
 
     this.powerTileAnim = context.add.image(0, 25, 'powerTileAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tileType === ETiles.POWER) {
+    if (tile?.tileType === ETiles.POWER) {
       this.powerTileAnim.setVisible(true);
     } else {
       this.powerTileAnim.setVisible(false);
@@ -201,7 +201,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.powerTileEvent = this.continuousEvent(this.powerTileAnim, ['powerTileAnim_1', 'powerTileAnim_2', 'powerTileAnim_3']);
 
     this.magicalResistanceTileAnim = context.add.image(0, 25, 'magicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tileType === ETiles.MAGICAL_RESISTANCE) {
+    if (tile?.tileType === ETiles.MAGICAL_RESISTANCE) {
       this.magicalResistanceTileAnim.setVisible(true);
     } else {
       this.magicalResistanceTileAnim.setVisible(false);
@@ -210,7 +210,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.magicalResistanceTileEvent = this.continuousEvent(this.magicalResistanceTileAnim, ['magicalResistanceAnim_1', 'magicalResistanceAnim_2', 'magicalResistanceAnim_3']);
 
     this.physicalResistanceTileAnim = context.add.image(0, 25, 'physicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tileType === ETiles.PHYSICAL_RESISTANCE) {
+    if (tile?.tileType === ETiles.PHYSICAL_RESISTANCE) {
       this.physicalResistanceTileAnim.setVisible(true);
     } else {
       this.physicalResistanceTileAnim.setVisible(false);
@@ -513,6 +513,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // Remove hero data from tile
     const tile = this.getTile();
+    if (tile.tileType === ETiles.CRYSTAL_DAMAGE) this.updateCrystals(false);
     tile.removeHero();
 
     // Remove hero from board array
@@ -564,7 +565,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     }
 
     // Check if the unit is leaving or entering a special tile and apply any effects
-    this.specialTileCheck(startTile, targetTile);
+    this.specialTileCheck(targetTile, startTile);
 
     this.updatePosition(targetTile);
     targetTile.hero = this.exportData();
@@ -594,6 +595,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.updatePosition(tile);
     // Update tile data
     this.updateTileData();
+
+    // A Wraith can spawn on a special tile. Phantom spawning is handled within its class
+    this.specialTileCheck(tile);
 
     this.healthBar.setVisible(true);
 
@@ -659,42 +663,42 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
-  specialTileCheck(currentTile: Tile, targetTile: Tile): void {
-    const updateCrystals = (increase: boolean) => {
-      this.context.gameController!.board.crystals.forEach(crystal => {
-        console.log('crystal', crystal.boardPosition, crystal.debuffLevel);
-        if (crystal.belongsTo !== this.belongsTo) {
-          let newLevel: number = 0;
+  private  updateCrystals(increase: boolean): void {
+    this.context.gameController!.board.crystals.forEach(crystal => {
+      console.log('crystal', crystal.boardPosition, crystal.debuffLevel);
+      if (crystal.belongsTo !== this.belongsTo) {
+        let newLevel: number = 0;
 
-          if (increase) newLevel = crystal.debuffLevel + 1;
-          if (!increase) newLevel = crystal.debuffLevel - 1;
+        if (increase) newLevel = crystal.debuffLevel + 1;
+        if (!increase) newLevel = crystal.debuffLevel - 1;
 
-          crystal.updateDebuffAnimation(newLevel);
-        }
-      });
-    };
+        crystal.updateDebuffAnimation(newLevel);
+      }
+    });
+  };
 
+  specialTileCheck(targetTile: Tile, currentTile?: Tile): void {
     // If hero is leaving a special tile
-    if (currentTile.tileType === ETiles.CRYSTAL_DAMAGE) {
-      updateCrystals(false);
+    if (currentTile?.tileType === ETiles.CRYSTAL_DAMAGE) {
+      this.updateCrystals(false);
       this.crystalDebuffTileAnim.setVisible(false);
     }
-    if (currentTile.tileType === ETiles.POWER) {
+    if (currentTile?.tileType === ETiles.POWER) {
       this.power -= 100;
       this.powerTileAnim.setVisible(false);
     }
-    if (currentTile.tileType === ETiles.MAGICAL_RESISTANCE) {
+    if (currentTile?.tileType === ETiles.MAGICAL_RESISTANCE) {
       this.magicalDamageResistance -= 20;
       this.magicalResistanceTileAnim.setVisible(false);
     }
-    if (currentTile.tileType === ETiles.PHYSICAL_RESISTANCE) {
+    if (currentTile?.tileType === ETiles.PHYSICAL_RESISTANCE) {
       this.physicalDamageResistance -= 20;
       this.physicalResistanceTileAnim.setVisible(false);
     }
 
     // If hero is entering a special tile
     if (targetTile.tileType === ETiles.CRYSTAL_DAMAGE) {
-      updateCrystals(true);
+      this.updateCrystals(true);
       this.crystalDebuffTileAnim.setVisible(true);
     }
     if (targetTile.tileType === ETiles.POWER) {

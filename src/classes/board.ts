@@ -4,7 +4,7 @@ import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, createNewHero, getGridDistance, isEnemySpawn } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
-import { ManaVial } from "./elves";
+import { ManaVial, Phantom } from "./elves";
 import { Hero } from "./hero";
 import { Item } from "./item";
 import { Tile } from "./tile";
@@ -32,7 +32,7 @@ export class Board {
 
     tiles.forEach(tile => {
       const newTile = new Tile(this.context, tile);
-      if (newTile.hero) this.units.push(createNewHero(this.context, newTile.hero, newTile.tileType));
+      if (newTile.hero) this.units.push(createNewHero(this.context, newTile.hero, newTile));
       if (newTile.crystal) {
         const crystalData = createCrystalData(newTile.crystal);
         this.crystals.push(new Crystal(this.context, crystalData, tile));
@@ -181,6 +181,7 @@ export class Board {
 
     this.units.forEach(hero => {
       if (hero.belongsTo !== item.belongsTo) return;
+      if (hero instanceof Phantom) return;
       if (hero.isAlreadyEquipped(item)) return;
       if (item.canHeal && hero.isFullHP()) return;
       if (item.canHeal && item instanceof ManaVial && hero.isKO) return;
