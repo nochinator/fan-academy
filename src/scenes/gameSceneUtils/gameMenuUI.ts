@@ -13,6 +13,9 @@ export function loadGameMenuUI(context: UIScene) {
   context.load.image('unknownFaction', '/assets/ui/used/unknown_faction.png');
   context.load.image('unknownOpponent', '/assets/images/profilePics/unknownAvatar-hd.jpg');
   context.load.image('closeButton', '/assets/ui/used/close_button.png');
+
+  context.load.image('popupBackground', '/assets/images/gameItems/NextGameButton-hd.png');
+  context.load.image('popupButton', '/assets/images/gameItems/ColorSwatch_Color-hd.png');
 }
 
 export async function accessGame(context: UIScene, game: IGame): Promise<void> {

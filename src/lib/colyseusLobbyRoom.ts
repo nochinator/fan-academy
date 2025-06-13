@@ -1,14 +1,13 @@
-import { Client } from "colyseus.js";
+import { Client, Room } from "colyseus.js";
 import { createGameList } from "../scenes/gameSceneUtils/gameList";
 import UIScene from "../scenes/ui.scene";
 import { IGameState } from "../interfaces/gameInterface";
 
-export async function connectToGameLobby(client: Client | undefined, userId: string | undefined, context: UIScene): Promise<void> {
-  if (!client || !userId) return;
-
+export async function connectToGameLobby(client: Client, userId: string, context: UIScene): Promise<Room> {
+  let lobby;
   try {
     console.log('Connecting to game lobby...');
-    const lobby = await client.joinOrCreate('lobby', { userId });
+    lobby = await client.joinOrCreate('lobby', { userId });
 
     lobby.onMessage('newGameListUpdate', async (message) => {
       console.log('A game has been added', message);
@@ -61,4 +60,7 @@ export async function connectToGameLobby(client: Client | undefined, userId: str
   } catch (error) {
     console.error('Error joining lobby ->', error);
   }
+
+  if (!lobby) throw new Error('connectToGameLobby() No lobby found');
+  return lobby;
 };
