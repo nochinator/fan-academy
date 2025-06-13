@@ -15,6 +15,9 @@ export function loadGameBoardUI(context: GameScene): void {
 
   context.load.image('turnButton', '/assets/ui/used/turn_button.png');
 
+  context.load.image('popupBackground', '/assets/images/gameItems/NextGameButton-hd.png');
+  context.load.image('popupButton', '/assets/images/gameItems/ColorSwatch_Color-hd.png');
+
   context.load.image('playerBanner', '/assets/images/gameItems/player_banner.png');
   context.load.image('vsBanner', '/assets/images/gameItems/vs_banner.png');
   context.load.image('playerOnePortrait', '/assets/images/profilePics/archer_v1-hd.jpg'); // TODO: link to user profile pic

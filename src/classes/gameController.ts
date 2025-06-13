@@ -14,6 +14,7 @@ import { Hero } from "./hero";
 import { Item } from "./item";
 import { Tile } from "./tile";
 import { TurnButton } from "./turnButton";
+import { TurnWarningPopup } from "./turnPopup";
 
 export class GameController {
   context: GameScene;
@@ -25,6 +26,7 @@ export class GameController {
   actionPie: ActionPie;
   door: Door;
   turnButton: TurnButton;
+  turnPopup: TurnWarningPopup;
   lastTurnState: IGameState;
 
   phantomCounter: number = 0; // REVIEW:
@@ -43,6 +45,7 @@ export class GameController {
     this.hand = new Hand(context);
     this.actionPie = new ActionPie(context);
     this.turnButton = new TurnButton(context);
+    this.turnPopup = new TurnWarningPopup(context);
     this.door = new Door(context);
   }
 
@@ -133,7 +136,13 @@ export class GameController {
     this.addActionToState(EActionType.REMOVE_UNITS); // REVIEW: this step needs to happen every turn in order to update the tiles
   }
 
-  async endOfTurnActions() {
+  hasActionsLeft(): boolean {
+    if (this.context.turnNumber === 0 && this.context.currentTurnAction! < 4) return true;
+    if (this.context.currentTurnAction! < 6) return true;
+    return false;
+  }
+
+  async endOfTurnActions(): Promise<void> {
     // If a unit was currently selected, de-select it
     if (this.context.activeUnit) deselectUnit(this.context);
     // Refresh actionPie, draw units and update door banner
@@ -279,9 +288,5 @@ export class GameController {
     targetNewTile.hero = target.exportData();
     targetNewTile.setOccupied(true);
     targetTile.removeHero();
-  }
-
-  aoeSpell(tile: Tile): void {
-
   }
 }
