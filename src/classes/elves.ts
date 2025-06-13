@@ -17,6 +17,7 @@ export abstract class DarkElf extends Hero {
   equipFactionBuff(handPosition: number): void {
     this.factionBuff = true;
     this.factionBuffImage.setVisible(true);
+    this.characterImage.setTexture(this.updateCharacterImage());
     this.increaseMaxHealth(this.maxHealth * 0.1);
 
     this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);

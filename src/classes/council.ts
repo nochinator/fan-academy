@@ -18,6 +18,8 @@ export abstract class Human extends Hero {
   equipFactionBuff(handPosition: number): void {
     this.factionBuff = true;
     this.factionBuffImage.setVisible(true);
+    this.characterImage.setTexture(this.updateCharacterImage());
+
     this.physicalDamageResistance += 20;
 
     this.increaseMaxHealth(this.maxHealth * 0.1);

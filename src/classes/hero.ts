@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { getGridDistance, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
+import { getGridDistance, moveAnimation, positionHeroImage, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { HeroCard } from "./heroCard";
 import { Crystal } from "./crystal";
@@ -117,11 +117,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     });
     this.unitCard.setVisible(false);
 
-    this.healthBar = new HealthBar(context, data, -38, -60);
+    this.healthBar = new HealthBar(context, data, -38, -75);
     if (this.boardPosition >= 45) this.healthBar.setVisible(false);
 
     // Create the unit's image and images for its upgrades
-    this.characterImage = context.add.image(0, -10, this.unitType).setOrigin(0.5).setName('body');
+    const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1);
+    this.characterImage = context.add.image(charImageX, charImageY, this.updateCharacterImage()).setOrigin(0.5).setName('body');
+
     if (this.belongsTo === 2 && this.boardPosition < 45) this.characterImage.setFlipX(true);
     if (this.isKO) this.characterImage.angle = 90;
 
@@ -183,7 +185,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     });
 
     // Add special tile and character animations
-    this.crystalDebuffTileAnim = context.add.image(0, 25, 'crystalDamageAnim_1').setOrigin(0.5).setScale(0.6);
+    this.crystalDebuffTileAnim = context.add.image(0, 30, 'crystalDamageAnim_1').setOrigin(0.5).setScale(0.6);
     if (tile?.tileType === ETiles.CRYSTAL_DAMAGE) {
       this.crystalDebuffTileAnim.setVisible(true);
     } else {
@@ -191,7 +193,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     }
     this.crystalDebuffEvent = this.continuousEvent(this.crystalDebuffTileAnim, ['crystalDamageAnim_1', 'crystalDamageAnim_2', 'crystalDamageAnim_3']);
 
-    this.powerTileAnim = context.add.image(0, 25, 'powerTileAnim_1').setOrigin(0.5).setScale(0.6);
+    this.powerTileAnim = context.add.image(0, 27, 'powerTileAnim_1').setOrigin(0.5).setScale(0.6);
     if (tile?.tileType === ETiles.POWER) {
       this.powerTileAnim.setVisible(true);
     } else {
@@ -200,7 +202,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.powerTileEvent = this.continuousEvent(this.powerTileAnim, ['powerTileAnim_1', 'powerTileAnim_2', 'powerTileAnim_3']);
 
-    this.magicalResistanceTileAnim = context.add.image(0, 25, 'magicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
+    this.magicalResistanceTileAnim = context.add.image(0, 30, 'magicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
     if (tile?.tileType === ETiles.MAGICAL_RESISTANCE) {
       this.magicalResistanceTileAnim.setVisible(true);
     } else {
@@ -209,7 +211,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.magicalResistanceTileEvent = this.continuousEvent(this.magicalResistanceTileAnim, ['magicalResistanceAnim_1', 'magicalResistanceAnim_2', 'magicalResistanceAnim_3']);
 
-    this.physicalResistanceTileAnim = context.add.image(0, 25, 'physicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
+    this.physicalResistanceTileAnim = context.add.image(0, 30, 'physicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
     if (tile?.tileType === ETiles.PHYSICAL_RESISTANCE) {
       this.physicalResistanceTileAnim.setVisible(true);
     } else {
@@ -632,6 +634,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.increaseMaxHealth(this.maxHealth * 10 / 100);
 
     this.shiningHelmImage.setVisible(true);
+    this.characterImage.setTexture(this.updateCharacterImage());
 
     this.unitCard.updateCardMagicalResistance(this.magicalDamageResistance);
     this.updateTileData();
@@ -645,6 +648,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.power += this.power * 0.5;
 
     this.runeMetalImage.setVisible(true);
+    this.characterImage.setTexture(this.updateCharacterImage());
+
     this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
     this.updateTileData();
 
@@ -713,5 +718,19 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.physicalDamageResistance += 20;
       this.physicalResistanceTileAnim.setVisible(true);
     }
+  }
+
+  updateCharacterImage(): string {
+    if (this.unitType === EHeroes.PHANTOM) return 'phantom_1';
+
+    if (this.runeMetal && this.factionBuff && this.shiningHelm) return `${this.unitType}_8`;
+    if (this.runeMetal && this.shiningHelm) return `${this.unitType}_7`;
+    if (this.factionBuff && this.shiningHelm) return `${this.unitType}_6`;
+    if (this.factionBuff && this.runeMetal) return `${this.unitType}_5`;
+    if (this.factionBuff) return `${this.unitType}_4`;
+    if (this.shiningHelm) return `${this.unitType}_3`;
+    if (this.runeMetal) return `${this.unitType}_2`;
+
+    return `${this.unitType}_1`;
   }
 }

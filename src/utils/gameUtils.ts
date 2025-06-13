@@ -352,3 +352,129 @@ export function getCardText(unit: EHeroes | EItems): {
 export function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean): {
+  charImageX: number,
+  charImageY: number
+} {
+  const x = 0;
+  const y = -10;
+
+  const playerIndex = belongsToP1 ? 1 : 2;
+
+  const unitMap = {
+    [EHeroes.ARCHER]: {
+      1: {
+        charImageX: x,
+        charImageY: y
+      },
+      2: {
+        charImageX: x,
+        charImageY: y
+      }
+    },
+    [EHeroes.CLERIC]: {
+      1: {
+        charImageX: x,
+        charImageY: y
+      },
+      2: {
+        charImageX: x,
+        charImageY: y
+      }
+    },
+    [EHeroes.KNIGHT]: {
+      1: {
+        charImageX: x,
+        charImageY: y
+      },
+      2: {
+        charImageX: x,
+        charImageY: y
+      }
+    },
+    [EHeroes.NINJA]: {
+      1: {
+        charImageX: x,
+        charImageY: y
+      },
+      2: {
+        charImageX: x,
+        charImageY: y
+      }
+    },
+    [EHeroes.WIZARD]: {
+      1: {
+        charImageX: x,
+        charImageY: y - 5
+      },
+      2: {
+        charImageX: x - 10,
+        charImageY: y - 5
+      }
+    },
+
+    [EHeroes.PRIESTESS]: {
+      1: {
+        charImageX: x + 20,
+        charImageY: y - 10
+      },
+      2: {
+        charImageX: x - 15,
+        charImageY: y - 10
+      }
+    },
+    [EHeroes.IMPALER]: {
+      1: {
+        charImageX: x,
+        charImageY: y - 5
+      },
+      2: {
+        charImageX: x - 15,
+        charImageY: y - 5
+      }
+    },
+    [EHeroes.NECROMANCER]: {
+      1: {
+        charImageX: x + 20,
+        charImageY: y - 10
+      },
+      2: {
+        charImageX: x + 20,
+        charImageY: y - 10
+      }
+    },
+    [EHeroes.PHANTOM]: {
+      1: {
+        charImageX: x,
+        charImageY: y + 10
+      },
+      2: {
+        charImageX: x,
+        charImageY: y + 10
+      }
+    },
+    [EHeroes.VOIDMONK]: {
+      1: {
+        charImageX: x,
+        charImageY: y - 10
+      },
+      2: {
+        charImageX: x,
+        charImageY: y - 10
+      }
+    },
+    [EHeroes.WRAITH]: {
+      1: {
+        charImageX: x,
+        charImageY: y
+      },
+      2: {
+        charImageX: x,
+        charImageY: y
+      }
+    }
+  };
+
+  return unitMap[unitType][playerIndex];
+}

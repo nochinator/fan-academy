@@ -1,4 +1,4 @@
-import { EItems } from "../../enums/gameEnums";
+import { EHeroes, EItems } from "../../enums/gameEnums";
 import GameScene from "../game.scene";
 
 export function loadGameAssets(context: GameScene) {
@@ -72,12 +72,20 @@ export function loadGameAssets(context: GameScene) {
   const darkElvesArray = ['priestess', 'impaler', 'necromancer', 'phantom', 'voidmonk', 'wraith'];
 
   // TODO: a check should be made to see if both factions are needed
-  councilArray.forEach( asset => {
-    context.load.image(asset, `/assets/images/factions/council/${asset}.png`);
+  councilArray.forEach(asset => {
+    for (let i = 1; i <= 7; i++) {
+      context.load.image(`${asset}_${i}`, `/assets/images/factions/council/${asset}/${asset}_${i}.png`);
+    }
     context.load.image(`${asset}CardPic`, `/assets/images/profilePics/${asset}_v1-hd.jpg`); // Unit picture for its unit card
   });
-  darkElvesArray.forEach( asset => {
-    context.load.image(asset, `/assets/images/factions/darkElves/${asset}.png`);
+  darkElvesArray.forEach(asset => {
+    if (asset !== EHeroes.PHANTOM) {
+      for (let i = 1; i <= 7; i++) {
+        context.load.image(`${asset}_${i}`, `/assets/images/factions/darkElves/${asset}/${asset}_${i}.png`);
+      }
+    } else {
+      context.load.image(`${asset}_1`, `/assets/images/factions/darkElves/${asset}/${asset}_1.png`);
+    }
     context.load.image(`${asset}CardPic`, `/assets/images/profilePics/${asset}_v1-hd.jpg`); // Unit picture for its unit card
   });
 

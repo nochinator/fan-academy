@@ -2,7 +2,6 @@ import { Client, Room } from "colyseus.js";
 import { GameController } from "../classes/gameController";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
-import { EWinConditions } from "../enums/gameEnums";
 import { Coordinates, IGame, IGameOver, IPlayerData, IPlayerState } from "../interfaces/gameInterface";
 import { calculateAllCenterPoints } from "../utils/boardCalculations";
 import { loadGameAssets } from "./gameSceneUtils/gameAssets";
