@@ -6,6 +6,8 @@ export default class MainMenuScene extends Phaser.Scene {
   userId: string | undefined;
   gameList: string | undefined;
 
+  currentSubScene: string | undefined;
+
   constructor() {
     super({ key: 'MainMenuScene' });
   }
@@ -76,7 +78,12 @@ export default class MainMenuScene extends Phaser.Scene {
       y: menuButtonHeight + 299,
       imageKey: 'mainMenuButton',
       text: 'Leaderboard',
-      font: '70px proHeavy'
+      font: '70px proHeavy',
+      callback: () => {
+        if (this.currentSubScene) this.scene.stop(this.currentSubScene);
+        this.scene.launch('LeaderboardScene', { userId: this.userId });
+        this.currentSubScene = 'LeaderboardScene';
+      }
     });
     const aboutButton = createMainMenuButton({
       thisParam: this,
@@ -94,7 +101,11 @@ export default class MainMenuScene extends Phaser.Scene {
       imageKey: 'playButton',
       text: 'Play!',
       font: '130px proHeavy',
-      callback: () => { this.scene.start('UIScene', { userId: this.userId });}
+      callback: () => {
+        if (this.currentSubScene) this.scene.stop(this.currentSubScene);
+        this.scene.start('UIScene', { userId: this.userId });
+        this.currentSubScene = 'UIScene';
+      }
     });
 
     // this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {

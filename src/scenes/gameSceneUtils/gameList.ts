@@ -124,7 +124,7 @@ export async function createGameList(context: UIScene) {
   councilEmblem.on('pointerdown', async () => {
     // Create the faction's deck and starting hand
     if (context.userId) {
-      const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL);
+      const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL); // FIXME: need to move this to the backend
       const boardState = createNewGameBoardState();
       await createGame(context, playerFaction, boardState);
       await context.currentRoom?.leave();

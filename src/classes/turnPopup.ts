@@ -21,7 +21,7 @@ export class TurnWarningPopup extends Phaser.GameObjects.Container {
     // Used to block the user from clicking on some other part of the game
     this.blockingLayer = context.add.rectangle(0, 0, 2000, 2000, 0x000000, 0.001) // Almost invisible
       .setOrigin(0.5)
-      .setInteractive(); // Blocks clicks from passing through
+      .setInteractive();
 
     this.backgroundImage = context.add.image(0, 0, 'popupBackground').setDisplaySize(500, 300);
     this.okButtonImage = context.add.image(-90, 60, 'popupButton').setTint(0x007BFF).setDisplaySize(110, 60).setInteractive();

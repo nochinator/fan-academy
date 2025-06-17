@@ -1,3 +1,5 @@
+import { IUser, IUserStats } from "../interfaces/userInterface";
+
 export async function loginQuery(username: string, password: string) {
   try {
     const response = await fetch('http://localhost:3003/users/login', {
@@ -93,3 +95,29 @@ export async function authCheck(): Promise<string | undefined> {
   console.log('User authenticated...', userId);
   return userId;
 };
+
+/**
+ * Used to populate the leaderboard
+ */
+export async function getLeaderBoard(): Promise<{
+  username: string,
+  picture: string,
+  stats: IUserStats
+}[] | null> {
+  console.log('Fetching leaderboard data...');
+
+  const result = await fetch('http://localhost:3003/users/leaderboard', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include'
+  });
+
+  const data = await result.json();
+
+  if (result.status !== 200) {
+    console.error('Error getting leaderboard data...'); // TODO: throw errors
+    return null;
+  }
+
+  return data;
+}

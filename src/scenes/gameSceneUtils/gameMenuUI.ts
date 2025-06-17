@@ -5,7 +5,7 @@ import UIScene from "../ui.scene";
 
 export function loadGameMenuUI(context: UIScene) {
   context.load.image('uiBackground', '/assets/ui/used/game_screen.png');
-  context.load.image('createGame', '/assets/ui/used/create_game.png');
+  context.load.image('gameBackground', '/assets/ui/used/create_game.png');
   context.load.image('gameListButton', '/assets/ui/used/game_list_premade.png');
   context.load.image('newGameButton', '/assets/ui/used/new_game_btn.png');
   context.load.image(EFaction.COUNCIL, '/assets/ui/used/council_emblem.png');
