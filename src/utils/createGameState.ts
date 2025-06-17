@@ -53,7 +53,7 @@ export function createNewGameBoardState(): ITile[] {
             col,
             debuffLevel: 0
           }
-        } : {} // REVIEW:
+        } : {}
       });
       newBoard.push(tile);
       boardPosition++;

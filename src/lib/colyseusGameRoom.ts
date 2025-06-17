@@ -1,8 +1,9 @@
 import { Client, Room } from "colyseus.js";
-import { IFaction, IGameOver, IGameState, ILastTurnMessage, ITile, ITurnSentMessage } from "../interfaces/gameInterface";
+import { EFaction } from "../enums/gameEnums";
+import { IGameOver, IGameState, ILastTurnMessage, ITurnSentMessage } from "../interfaces/gameInterface";
 import UIScene from "../scenes/ui.scene";
 
-export async function createGame(context: UIScene, faction: IFaction | undefined, boardState: ITile[] | undefined ): Promise<void> {
+export async function createGame(context: UIScene, faction: EFaction): Promise<void> {
   const { colyseusClient, userId } = context;
   if (!colyseusClient || !userId || !faction) {
     console.error('createGame error: missing one of client / userId / faction');
@@ -13,8 +14,7 @@ export async function createGame(context: UIScene, faction: IFaction | undefined
 
     const room = await colyseusClient.create('game_room', {
       userId,
-      faction,
-      boardState
+      faction
     });
 
     subscribeToGameListeners(room, context);

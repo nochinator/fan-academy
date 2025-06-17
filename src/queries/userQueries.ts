@@ -100,6 +100,7 @@ export async function authCheck(): Promise<string | undefined> {
  * Used to populate the leaderboard
  */
 export async function getLeaderBoard(): Promise<{
+  _id: string,
   username: string,
   picture: string,
   stats: IUserStats
@@ -118,6 +119,8 @@ export async function getLeaderBoard(): Promise<{
     console.error('Error getting leaderboard data...'); // TODO: throw errors
     return null;
   }
+
+  console.log('Leaderboard data fetched');
 
   return data;
 }

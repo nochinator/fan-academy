@@ -1,4 +1,5 @@
 import { EFaction } from "../enums/gameEnums";
+import { newGameChallenge } from "../queries/gameQueries";
 import LeaderboardScene from "../scenes/leaderboard.scene";
 import { truncateText } from "../utils/gameUtils";
 
@@ -17,7 +18,7 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
   popupText: Phaser.GameObjects.Text;
   cancelButtonText: Phaser.GameObjects.Text;
 
-  constructor(context: LeaderboardScene, username: string) {
+  constructor(context: LeaderboardScene, username: string, opponentId: string) {
     super(context, challengePopupCoordinates.x, challengePopupCoordinates.y);
 
     // Used to block the user from clicking on some other part of the game
@@ -48,14 +49,16 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    this.councilButtonImage.on('pointerdown', () => {
+    this.councilButtonImage.on('pointerdown', async () => {
       this.setVisible(false);
       console.log('Sent a challenge as the Council');
+      await newGameChallenge(context.userId, EFaction.COUNCIL, opponentId);
     });
 
-    this.elvesButtonImage.on('pointerdown', () => {
+    this.elvesButtonImage.on('pointerdown', async () => {
       this.setVisible(false);
       console.log('Sent a challenge as the Dark Elves');
+      await newGameChallenge(context.userId, EFaction.DARK_ELVES, opponentId);
     });
 
     this.cancelButtonImage.on('pointerdown', () => {

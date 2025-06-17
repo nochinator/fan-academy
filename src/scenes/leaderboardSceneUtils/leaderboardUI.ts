@@ -16,6 +16,7 @@ export function loadLeaderboardUI(context: LeaderboardScene): void {
 }
 
 export function createLeaderboard(context: LeaderboardScene, data: {
+  _id: string,
   username: string,
   picture: string,
   stats: IUserStats
@@ -54,22 +55,24 @@ export function createLeaderboard(context: LeaderboardScene, data: {
 
   startingCoords.y += 20;
 
-  data.forEach(user => {
+  data.forEach(player => {
     startingCoords.y += 50;
     const row = context.add.container(startingCoords.x, startingCoords.y);
 
-    const usernameText = context.add.text(100, 0, truncateText(user.username, 13), smallStyle);
-    const totalGames = context.add.text(350, 0, `${user.stats.totalGames}`, smallStyle);
-    const totalWins = context.add.text(550, 0, `${user.stats.totalWins}`, smallStyle);
-    const councilWins = context.add.text(750, 0, `${user.stats.councilWins}`, smallStyle);
-    const elvesWins = context.add.text(950, 0, `${user.stats.elvesWins}`, smallStyle);
+    const usernameText = context.add.text(100, 0, truncateText(player.username, 13), smallStyle);
+    const totalGames = context.add.text(350, 0, `${player.stats.totalGames}`, smallStyle);
+    const totalWins = context.add.text(550, 0, `${player.stats.totalWins}`, smallStyle);
+    const councilWins = context.add.text(750, 0, `${player.stats.councilWins}`, smallStyle);
+    const elvesWins = context.add.text(950, 0, `${player.stats.elvesWins}`, smallStyle);
 
     const challengeIcon = context.add.image(1030, 15, 'challengeIcon').setInteractive();
 
     challengeIcon.on('pointerdown', () => {
       console.log('Clicked on challenge icon');
-      new ChallengePopup(context, user.username);
+      new ChallengePopup(context, player.username, player._id);
     });
+
+    if (player._id === context.userId) challengeIcon.setVisible(false).disableInteractive();
 
     row.add([usernameText, totalGames, totalWins, councilWins, elvesWins, challengeIcon]);
   });

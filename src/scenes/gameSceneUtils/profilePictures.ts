@@ -3,8 +3,6 @@ import UIScene from "../ui.scene";
 export async function loadProfilePictures(context: UIScene): Promise<void> {
   if (!context.gameList) return;
 
-  console.log('GameList', context.gameList);
-
   const allPlayerObjects: {
     username: string,
     picture: string
@@ -36,7 +34,6 @@ export async function loadProfilePictures(context: UIScene): Promise<void> {
 
   return new Promise((resolve) => {
     context.load.once('complete', () => {
-      console.log('Profile pictures loaded');
       resolve();
     });
     context.load.start(); // Start loading after setting up the event listener

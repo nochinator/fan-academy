@@ -1,3 +1,4 @@
+import { EFaction } from "../enums/gameEnums";
 import { IGame } from "../interfaces/gameInterface";
 
 export async function getGameList(userId: string): Promise<IGame[] | []> {
@@ -20,14 +21,10 @@ export async function getGameList(userId: string): Promise<IGame[] | []> {
   return games;
 }
 
-// Delete a game searching for players
-export async function deleteGame(userId: string | undefined, gameId: string | undefined): Promise<IGame | null> {
-  if (!userId || !gameId) {
-    console.error('Error deleting game, missing userId | gameId');
-    return null;
-  }
-  console.log('Deleting game...');
-  const url = `http://localhost:3003/games/delete?userId=${encodeURIComponent(userId)}&gameId=${encodeURIComponent(gameId)}`;
+// Challenge a player to a game
+export async function newGameChallenge(userId: string, faction: EFaction, opponentId: string): Promise<any> {
+  console.log('Sending challenge to player... ');
+  const url = `http://localhost:3003/games/newGame?userId=${encodeURIComponent(userId)}&faction=${encodeURIComponent(faction)}&opponentId=${encodeURIComponent(opponentId)}`;
   const result = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -35,13 +32,12 @@ export async function deleteGame(userId: string | undefined, gameId: string | un
   });
 
   const data = await result.json();
-  console.log('Deleted game data', data);
 
   if (result.status !== 200) {
-    console.error('Error deleting  game...'); // TODO: throw errors
+    console.error('Error sending challenge...'); // TODO: throw errors
     return null;
   }
 
-  console.log('Game deleted...');
+  console.log('Challenge sent', data);
   return data;
 }

@@ -1,8 +1,7 @@
 import { EFaction, EGameStatus } from "../../enums/gameEnums";
 import { IGame, IPlayerData } from "../../interfaces/gameInterface";
 import { createGame } from "../../lib/colyseusGameRoom";
-import { deleteGame } from "../../queries/gameQueries";
-import { createNewGameBoardState, createNewGameFactionState } from "../../utils/createGameState";
+import { sendDeletedGameMessage } from "../../lib/colyseusLobbyRoom";
 import UIScene from "../ui.scene";
 import { accessGame } from "./gameMenuUI";
 import { loadProfilePictures } from "./profilePictures";
@@ -15,15 +14,21 @@ export async function createGameList(context: UIScene) {
 
   if (context.gameListContainer) context.gameListContainer.destroy(true); // Need to remove the old container before adding a new one
 
-  // Split game list and split it into 3 arrays, depending on status
+  // Split game list and split it into arrays, depending on status
   const listPlayerTurnArray: IGame[] = [];
   const listOpponentTurnArray: IGame[] = [];
   const listSearchingArray: IGame[] = [];
+  const listChallengeSentArray: IGame[] = [];
+  const listChallengeReceivedArray: IGame[] = [];
 
   context.gameList.forEach((game: IGame )=> {
-    if (game.status === 'searching') listSearchingArray.push(game);
-    if (game.status === 'playing' && game.activePlayer === context.userId) listPlayerTurnArray.push(game);
-    if (game.status === 'playing' && game.activePlayer !== context.userId) listOpponentTurnArray.push(game);
+    if (game.status === EGameStatus.SEARCHING) listSearchingArray.push(game);
+    if (game.status === EGameStatus.PLAYING && game.activePlayer === context.userId) listPlayerTurnArray.push(game);
+    if (game.status === EGameStatus.PLAYING && game.activePlayer !== context.userId) listOpponentTurnArray.push(game);
+    if (game.status === EGameStatus.CHALLENGE) {
+      if (game.players[0].userData._id === context.userId) listChallengeSentArray.push(game);
+      if (game.players[1].userData._id === context.userId) listChallengeReceivedArray.push(game);
+    }
   });
 
   // Load oponents' profile pictures
@@ -39,7 +44,7 @@ export async function createGameList(context: UIScene) {
   let lastListItemY = 0;
 
   // Calculate content height for scrolling
-  const totalSections = (listPlayerTurnArray.length ? 1 : 0) + (listOpponentTurnArray.length ? 1 : 0) + (listSearchingArray.length ? 1 : 0);
+  const totalSections = (listPlayerTurnArray.length ? 1 : 0) + (listOpponentTurnArray.length ? 1 : 0) + (listSearchingArray.length ? 1 : 0) + (listChallengeSentArray.length ? 1 : 0) + (listChallengeReceivedArray.length ? 1 : 0);
   const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * context.gameList.length + ( textListHeight * totalSections + 200); // 200 = newGameButton + some padding to make sure the last item always displays fully
 
   // Creating a container for the game list and adding it to the context (scene)
@@ -59,7 +64,14 @@ export async function createGameList(context: UIScene) {
       lastListItemY += ( index === 0 ? textListHeight : gameListButtonHeight) + gameListButtonSpacing;
 
       const gameListButtonImage = context.add.image(0, lastListItemY, "gameListButton").setOrigin(0).setTint(0xBBBBBB);;
-      const playerFactionImage =  context.add.image(90, lastListItemY + gameListButtonHeight / 2, player.faction).setScale(0.4);
+      const playerFactionIcon = player.faction ? {
+        faction: player.faction,
+        scale: 0.4
+      } : {
+        faction: 'unknownFaction',
+        scale: 1.2
+      };
+      const playerFactionImage =  context.add.image(90, lastListItemY + gameListButtonHeight / 2, playerFactionIcon.faction).setScale(playerFactionIcon.scale);
 
       let opponentFactionImage;
       let opponentProfilePicture;
@@ -84,12 +96,10 @@ export async function createGameList(context: UIScene) {
 
       // Add a 'close' button to games looking for players
       const closeButton = context.add.image(gameListButtonWidth - 30, lastListItemY, 'closeButton').setOrigin(0).setVisible(false);
-      if (game.status === EGameStatus.SEARCHING) {
+      if (game.status === EGameStatus.SEARCHING || game.status === EGameStatus.CHALLENGE) {
         closeButton.setVisible(true).setInteractive();
         closeButton.on('pointerdown', async () => {
-          await deleteGame(context.userId, game._id);
-          const deletedGameIndex = context.gameList!.findIndex(listItem => listItem._id === game._id);
-          context.gameList!.splice(deletedGameIndex, 1);
+          sendDeletedGameMessage(context.lobbyRoom!, game._id, context.userId);
           createGameList(context);
         });
       }
@@ -124,9 +134,9 @@ export async function createGameList(context: UIScene) {
   councilEmblem.on('pointerdown', async () => {
     // Create the faction's deck and starting hand
     if (context.userId) {
-      const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL); // FIXME: need to move this to the backend
-      const boardState = createNewGameBoardState();
-      await createGame(context, playerFaction, boardState);
+      // const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL); // FIXME: need to move this to the backend
+      // const boardState = createNewGameBoardState();
+      await createGame(context, EFaction.COUNCIL);
       await context.currentRoom?.leave();
       context.currentRoom = undefined;
     } else {
@@ -136,9 +146,9 @@ export async function createGameList(context: UIScene) {
   elvesEmblem.on('pointerdown', async () => {
     // Create the faction's deck and starting hand
     if (context.userId) {
-      const playerFaction = createNewGameFactionState(context.userId, EFaction.DARK_ELVES);
-      const boardState = createNewGameBoardState();
-      await createGame(context, playerFaction, boardState);
+      // const playerFaction = createNewGameFactionState(context.userId, EFaction.DARK_ELVES);
+      // const boardState = createNewGameBoardState();
+      await createGame(context, EFaction.DARK_ELVES);
       await context.currentRoom?.leave();
       context.currentRoom = undefined;
     } else {
@@ -158,6 +168,7 @@ export async function createGameList(context: UIScene) {
     });
   };
 
+  // TODO: Turn all this if length into a function
   if (listPlayerTurnArray.length) {
     const playerTurnText = setHeaderText('Your turn');
     gameListContainer.add(playerTurnText);
@@ -179,6 +190,22 @@ export async function createGameList(context: UIScene) {
     gameListContainer.add(searchingText);
 
     createGameListItem(listSearchingArray);
+    lastListItemY += gameListButtonHeight + gameListButtonSpacing;
+  }
+
+  if (listChallengeReceivedArray.length) {
+    const challengeReceivedText = setHeaderText('Challenges received');
+    gameListContainer.add(challengeReceivedText);
+
+    createGameListItem(listChallengeReceivedArray);
+    lastListItemY += gameListButtonHeight + gameListButtonSpacing;
+  }
+
+  if (listChallengeSentArray.length) {
+    const challengeSentText = setHeaderText('Challenges sent');
+    gameListContainer.add(challengeSentText);
+
+    createGameListItem(listChallengeSentArray);
     lastListItemY += gameListButtonHeight + gameListButtonSpacing;
   }
 

@@ -6,7 +6,8 @@ export enum EAttackType {
 export enum EGameStatus {
   SEARCHING = 'searching',
   PLAYING = 'playing',
-  FINISHED = 'finished'
+  FINISHED = 'finished',
+  CHALLENGE = 'challenge'
 };
 
 export enum EGameTermination {
