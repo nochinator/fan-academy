@@ -21,4 +21,10 @@ export class Deck {
   removeFromDeck(amount: number): (IHero | IItem)[] {
     return this.deck.splice(0, amount);
   }
+
+  addToDeck(unit: IHero | IItem): (IHero | IItem)[] {
+    this.deck.push(unit);
+    console.log('DECK', this.deck);
+    return this.deck;
+  }
 }

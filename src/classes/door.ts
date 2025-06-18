@@ -1,4 +1,6 @@
+import { EActionType } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
+import { isInHand } from "../utils/gameUtils";
 import { getCurrentPlayer } from "../utils/playerUtils";
 
 export class Door extends Phaser.GameObjects.Container {
@@ -28,6 +30,34 @@ export class Door extends Phaser.GameObjects.Container {
     this.add([this.doorClosed, this.doorOpen, this.doorBanner, this.bannerText]);
 
     this.setSize(70, 100).setInteractive();
+
+    this.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.button === 0 && context.activeUnit && isInHand(context.activeUnit.boardPosition)) {
+        const activePosition = context.activeUnit.boardPosition;
+        context.activeUnit.shuffleInDeck();
+
+        this.updateBannerText();
+
+        // Add action to state
+        context.gameController?.afterAction(EActionType.SHUFFLE, activePosition, 51 );
+      }
+
+      if (pointer.button === 2) {
+        console.log('Add list of items in Deck here');
+      }
+    });
+
+    this.on('pointerover', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.rightButtonDown()) {
+        // this.setDepth(1001);
+        // this.unitCard.setVisible(true);
+      }
+    });
+
+    this.on('pointerout', () => {
+      // unit.setDepth(unit.boardPosition + 10);
+      // unit.unitCard.setVisible(false);
+    });
 
     context.add.existing(this);
   }

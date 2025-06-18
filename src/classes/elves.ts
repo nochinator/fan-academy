@@ -162,7 +162,7 @@ export class Necromancer extends DarkElf {
         boardPosition: target.boardPosition
       }, tile, true);
 
-      target.removeFromGame();
+      target.removeFromBoard();
 
       tile.hero = phantom.exportData();
 
@@ -259,7 +259,7 @@ export class Wraith extends DarkElf {
     turnIfBehind(this.context, this, target);
 
     if (target instanceof Hero && target.isKO) {
-      target.removeFromGame();
+      target.removeFromBoard();
 
       if (this.unitsConsumed < 3) {
         this.increaseMaxHealth(100);

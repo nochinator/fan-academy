@@ -110,6 +110,16 @@ export abstract class Item extends Phaser.GameObjects.Container {
     this.setScale(1);
   }
 
+  shuffleInDeck(): void {
+    this.boardPosition = 51;
+
+    const unitData = this.exportData();
+
+    this.context.gameController!.deck.addToDeck(unitData);
+
+    this.removeFromGame();
+  }
+
   removeFromGame(): void {
     // Remove animations
     this.scene.tweens.killTweensOf(this);

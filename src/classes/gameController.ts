@@ -120,7 +120,7 @@ export class GameController {
             duration: 500,
             ease: 'Linear',
             onComplete: () => {
-              hero.removeFromGame();
+              hero.removeFromBoard();
               console.log('Unit removed from board!', hero);
               resolve();
             }
