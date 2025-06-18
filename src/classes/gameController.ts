@@ -1,6 +1,6 @@
 import { EActionClass, EActionType, EHeroes, ETiles, EWinConditions } from "../enums/gameEnums";
 import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
-import { sendTurnMessage } from "../lib/colyseusGameRoom";
+import { sendTurnMessage } from "../colyseus/colyseusGameRoom";
 import GameScene from "../scenes/game.scene";
 import { forcedMoveAnimation, getActionClass, getNewPositionAfterForce } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";

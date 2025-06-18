@@ -1,5 +1,5 @@
 import { EChallengePopup, EFaction } from "../enums/gameEnums";
-import { sendChallengeAcceptedMessage } from "../lib/colyseusLobbyRoom";
+import { sendChallengeAcceptedMessage } from "../colyseus/colyseusLobbyRoom";
 import { newGameChallenge } from "../queries/gameQueries";
 import LeaderboardScene from "../scenes/leaderboard.scene";
 import UIScene from "../scenes/ui.scene";

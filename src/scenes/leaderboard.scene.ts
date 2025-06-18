@@ -18,15 +18,6 @@ export default class LeaderboardScene extends Phaser.Scene {
   }
 
   async create() {
-    /**
- *  Query the db to get the number of players:
- *    profile pic
- *    name
- *    games finished
- *    total wins
- *    council wins
- *    elves wins
- *  */
     this.add.image(396, 14, 'gameBackground').setOrigin(0, 0).setScale(1.07, 1.2);
 
     const leaderboardData = await getLeaderBoard();

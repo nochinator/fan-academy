@@ -1,4 +1,4 @@
-import createMainMenuButton from "../lib/buttons";
+import createMainMenuButton from "./mainMenuUtils/buttons";
 import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 import { isValidPassword } from "../utils/playerUtils";
 

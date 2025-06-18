@@ -1,6 +1,6 @@
 import { Client, Room } from "colyseus.js";
 import { loadGameMenuUI } from "./gameSceneUtils/gameMenuUI";
-import { connectToGameLobby } from "../lib/colyseusLobbyRoom";
+import { connectToGameLobby } from "../colyseus/colyseusLobbyRoom";
 import { createGameList } from "./gameSceneUtils/gameList";
 import { IGame } from "../interfaces/gameInterface";
 import { getGameList } from "../queries/gameQueries";

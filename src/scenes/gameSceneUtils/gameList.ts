@@ -1,8 +1,8 @@
 import { ChallengePopup } from "../../classes/challengePopup";
 import { EChallengePopup, EFaction, EGameStatus } from "../../enums/gameEnums";
 import { IGame, IPlayerData } from "../../interfaces/gameInterface";
-import { createGame } from "../../lib/colyseusGameRoom";
-import { sendDeletedGameMessage } from "../../lib/colyseusLobbyRoom";
+import { createGame } from "../../colyseus/colyseusGameRoom";
+import { sendDeletedGameMessage } from "../../colyseus/colyseusLobbyRoom";
 import UIScene from "../ui.scene";
 import { accessGame } from "./gameMenuUI";
 import { loadProfilePictures } from "./profilePictures";
@@ -145,8 +145,6 @@ export async function createGameList(context: UIScene) {
   councilEmblem.on('pointerdown', async () => {
     // Create the faction's deck and starting hand
     if (context.userId) {
-      // const playerFaction = createNewGameFactionState(context.userId, EFaction.COUNCIL); // FIXME: need to move this to the backend
-      // const boardState = createNewGameBoardState();
       await createGame(context, EFaction.COUNCIL);
       await context.currentRoom?.leave();
       context.currentRoom = undefined;
@@ -157,8 +155,6 @@ export async function createGameList(context: UIScene) {
   elvesEmblem.on('pointerdown', async () => {
     // Create the faction's deck and starting hand
     if (context.userId) {
-      // const playerFaction = createNewGameFactionState(context.userId, EFaction.DARK_ELVES);
-      // const boardState = createNewGameBoardState();
       await createGame(context, EFaction.DARK_ELVES);
       await context.currentRoom?.leave();
       context.currentRoom = undefined;

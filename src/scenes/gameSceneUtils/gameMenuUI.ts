@@ -1,6 +1,6 @@
 import { EFaction } from "../../enums/gameEnums";
 import { IGame } from "../../interfaces/gameInterface";
-import { joinGame } from "../../lib/colyseusGameRoom";
+import { joinGame } from "../../colyseus/colyseusGameRoom";
 import UIScene from "../ui.scene";
 
 export function loadGameMenuUI(context: UIScene) {
