@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { getGridDistance, moveAnimation, positionHeroImage, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
+import { getGridDistance, isInHand, moveAnimation, positionHeroImage, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { HeroCard } from "./heroCard";
 import { Crystal } from "./crystal";
@@ -121,11 +121,12 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (this.boardPosition >= 45) this.healthBar.setVisible(false);
 
     // Create the unit's image and images for its upgrades
-    const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1);
+    const inHand = isInHand(this.boardPosition);
+    const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, inHand);
     this.characterImage = context.add.image(charImageX, charImageY, this.updateCharacterImage()).setOrigin(0.5).setName('body');
-
+    if (inHand) this.characterImage.setScale(0.8);
     if (this.belongsTo === 2 && this.boardPosition < 45) this.characterImage.setFlipX(true);
-    if (this.isKO) this.characterImage.angle = 90;
+    if (this.isKO) this.characterImage.angle = 90; // TODO: replace with dead eyed head
 
     this.runeMetalImage = context.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.3).setName('runeMetal');
     if (!this.runeMetal) this.runeMetalImage.setVisible(false);
@@ -606,8 +607,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     gameController.hand.removeFromHand(this);
     gameController.board.units.push(this);
 
+    // Modify image
+    this.characterImage.setScale(1);
+    const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false);
+    this.characterImage.x = charImageX;
+    this.characterImage.y = charImageY;
     // Flip image if player is player 2
-    if (this.belongsTo === 2) (this.getByName('body') as Phaser.GameObjects.Image)?.setFlipX(true);
+    if (this.belongsTo === 2) this.characterImage.setFlipX(true);
     // Position hero on the board
     this.updatePosition(tile);
     // Update tile data
