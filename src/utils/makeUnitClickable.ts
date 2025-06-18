@@ -159,7 +159,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     // If hero is in hand and clicked tile is highlighted, spawn
     if (activeUnit.boardPosition > 44 && tile.isHighlighted) {
       if (isHero(activeUnit) && !tile.isOccupied()) activeUnit.spawn(tile);
-      if (isItem(activeUnit) && activeUnit.dealsDamage) gameController.aoeSpell(tile);
+      if (isItem(activeUnit) && activeUnit.dealsDamage) activeUnit.use(tile);
     }
 
     // AOE damaging spells can target empty tiles
