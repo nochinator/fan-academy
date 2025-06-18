@@ -154,11 +154,6 @@ export class GameController {
     this.context.turnNumber!++;
 
     sendTurnMessage(this.context.currentRoom, this.context.currentGame.currentState, this.context.opponentId, this.context.turnNumber!);
-
-    // Update game directly
-    this.context.currentGame.activePlayer = this.context.opponentId;
-    this.context.currentGame.currentState = [];
-    this.context.currentGame.previousTurn = [];
   }
 
   onHeroClicked(hero: Hero) {
@@ -209,6 +204,7 @@ export class GameController {
         unitsInHand: this.hand.exportHandData()
       }
     };
+
     const opponentState = this.context[opponent];
     // Add action to turn state
     if (!this.game.currentState) this.game.currentState = [];
