@@ -1,5 +1,5 @@
 import { ChallengePopup } from "../../classes/challengePopup";
-import { EFaction } from "../../enums/gameEnums";
+import { EChallengePopup, EFaction } from "../../enums/gameEnums";
 import { IUserStats } from "../../interfaces/userInterface";
 import { truncateText } from "../../utils/gameUtils";
 import LeaderboardScene from "../leaderboard.scene";
@@ -69,7 +69,12 @@ export function createLeaderboard(context: LeaderboardScene, data: {
 
     challengeIcon.on('pointerdown', () => {
       console.log('Clicked on challenge icon');
-      new ChallengePopup(context, player.username, player._id);
+      new ChallengePopup({
+        context,
+        username: player.username,
+        challengeType: EChallengePopup.SEND,
+        opponentId: player._id 
+      });
     });
 
     if (player._id === context.userId) challengeIcon.setVisible(false).disableInteractive();

@@ -2,6 +2,7 @@ import { Client, Room } from "colyseus.js";
 import { createGameList } from "../scenes/gameSceneUtils/gameList";
 import UIScene from "../scenes/ui.scene";
 import { IGameState } from "../interfaces/gameInterface";
+import { EFaction } from "../enums/gameEnums";
 
 export async function connectToGameLobby(client: Client, userId: string, context: UIScene): Promise<Room> {
   let lobby;
@@ -16,7 +17,8 @@ export async function connectToGameLobby(client: Client, userId: string, context
 
       // Update game and re-render game list. Remove the 'Searching...' game first if needed
       const isInArrayIndex = context.gameList!.findIndex(game => game._id === message.game._id);
-      if (isInArrayIndex !== -1) context.gameList?.splice(isInArrayIndex, 1); // REVIEW:
+      if (isInArrayIndex !== -1) context.gameList?.splice(isInArrayIndex, 1);
+
       context.gameList?.push(message.game);
 
       await createGameList(context);
@@ -83,5 +85,13 @@ export function sendDeletedGameMessage(lobby: Room, gameId: string, userId: stri
   lobby.send('gameDeletedMessage', {
     gameId,
     userId
+  });
+}
+
+export function sendChallengeAcceptedMessage(lobby: Room, gameId: string, userId: string, faction: EFaction): void {
+  lobby.send('challengeAcceptedMessage', {
+    gameId,
+    userId,
+    faction
   });
 }

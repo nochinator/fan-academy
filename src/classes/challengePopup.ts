@@ -1,6 +1,8 @@
-import { EFaction } from "../enums/gameEnums";
+import { EChallengePopup, EFaction } from "../enums/gameEnums";
+import { sendChallengeAcceptedMessage } from "../lib/colyseusLobbyRoom";
 import { newGameChallenge } from "../queries/gameQueries";
 import LeaderboardScene from "../scenes/leaderboard.scene";
+import UIScene from "../scenes/ui.scene";
 import { truncateText } from "../utils/gameUtils";
 
 const challengePopupCoordinates = {
@@ -18,7 +20,14 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
   popupText: Phaser.GameObjects.Text;
   cancelButtonText: Phaser.GameObjects.Text;
 
-  constructor(context: LeaderboardScene, username: string, opponentId: string) {
+  constructor(params: {
+    context: LeaderboardScene | UIScene,
+    opponentId: string,
+    challengeType: EChallengePopup,
+    username?: string,
+    gameId?: string
+  }) {
+    const { context, opponentId, challengeType, username, gameId } = params;
     super(context, challengePopupCoordinates.x, challengePopupCoordinates.y);
 
     // Used to block the user from clicking on some other part of the game
@@ -31,7 +40,8 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
     this.elvesButtonImage = context.add.image(-10, 60, EFaction.DARK_ELVES).setScale(0.4).setInteractive();
     this.cancelButtonImage = context.add.image(130, 60, 'popupButton').setTint(0x990000).setDisplaySize(110, 60).setInteractive();
 
-    this.popupText = context.add.text(0, -50, `Pick a faction to challenge ${truncateText(username, 20)}`, {
+    const popupString = challengeType === EChallengePopup.SEND ?  `Pick a faction to challenge ${truncateText(username!, 20)}` : 'Pick a faction to accept the challenge';
+    this.popupText = context.add.text(0, -50, popupString, {
       fontFamily: "proLight",
       fontSize: 40,
       color: '#ffffff',
@@ -49,21 +59,18 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    this.councilButtonImage.on('pointerdown', async () => {
+    const buttonCallback = async (faction: EFaction) => {
       this.setVisible(false);
-      console.log('Sent a challenge as the Council');
-      await newGameChallenge(context.userId, EFaction.COUNCIL, opponentId);
-    });
+      if (challengeType === EChallengePopup.SEND) await newGameChallenge(context.userId, faction, opponentId);
 
-    this.elvesButtonImage.on('pointerdown', async () => {
-      this.setVisible(false);
-      console.log('Sent a challenge as the Dark Elves');
-      await newGameChallenge(context.userId, EFaction.DARK_ELVES, opponentId);
-    });
+      if (challengeType === EChallengePopup.ACCEPT && context instanceof UIScene) sendChallengeAcceptedMessage(context.lobbyRoom!, gameId!, context.userId, faction);
+    };
 
-    this.cancelButtonImage.on('pointerdown', () => {
-      this.setVisible(false);
-    });
+    this.councilButtonImage.on('pointerdown', async () => await buttonCallback(EFaction.COUNCIL));
+
+    this.elvesButtonImage.on('pointerdown', async () => await buttonCallback(EFaction.DARK_ELVES));
+
+    this.cancelButtonImage.on('pointerdown', () => this.setVisible(false));
 
     this.add([
       this.blockingLayer,
@@ -75,7 +82,6 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
       this.cancelButtonText
     ]);
     this.setDepth(1002);
-    // this.setVisible(false);
 
     context.add.existing(this);
   }

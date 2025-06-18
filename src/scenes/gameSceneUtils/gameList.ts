@@ -1,4 +1,5 @@
-import { EFaction, EGameStatus } from "../../enums/gameEnums";
+import { ChallengePopup } from "../../classes/challengePopup";
+import { EChallengePopup, EFaction, EGameStatus } from "../../enums/gameEnums";
 import { IGame, IPlayerData } from "../../interfaces/gameInterface";
 import { createGame } from "../../lib/colyseusGameRoom";
 import { sendDeletedGameMessage } from "../../lib/colyseusLobbyRoom";
@@ -115,6 +116,16 @@ export async function createGameList(context: UIScene) {
 
           await accessGame(context, game);
         });
+      }
+
+      if (game.status === EGameStatus.CHALLENGE && opponent) {
+        gameListButtonImage.setInteractive();
+        gameListButtonImage.on('pointerdown', async () => new ChallengePopup({
+          context,
+          opponentId: opponent.userData._id,
+          challengeType: EChallengePopup.ACCEPT,
+          gameId: game._id
+        }));
       }
 
       gameListContainer.add([gameListButtonImage, playerFactionImage, opponentFactionImage, opponentNameText, opponentProfilePicture, closeButton]);

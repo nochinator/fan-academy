@@ -118,3 +118,8 @@ export enum ECardType {
   SPELL = 'Spell',
   CONSUMABLE = 'Consumable'
 }
+
+export enum EChallengePopup {
+  SEND = 'send',
+  ACCEPT = 'accept'
+}
