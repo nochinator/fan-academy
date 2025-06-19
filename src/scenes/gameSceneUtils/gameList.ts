@@ -226,13 +226,17 @@ export async function createGameList(context: UIScene) {
   const mask = new Phaser.Display.Masks.GeometryMask(context, maskGraphics);
 
   gameListContainer.setMask(mask);
-
-  const isHovered = false;
   const scrollSpeed = 1;
   let contentOffset = 0;
 
-  context.input.on("wheel", (_pointer: Phaser.Input.Pointer, _gameObjects: any, _deltaX: number, deltaY: number, _deltaZ: number ) => {
-    if (isHovered && contentHeight > visibleHeight) {
+  context.input.on("wheel", (pointer: Phaser.Input.Pointer, _gameObjects: any, _deltaX: number, deltaY: number, _deltaZ: number ) => {
+    const withinScrollArea =
+    pointer.x >= 19 &&
+    pointer.x <= 19 + visibleWidth &&
+    pointer.y >= 65 &&
+    pointer.y <= 65 + visibleHeight;
+
+    if (withinScrollArea && contentHeight > visibleHeight) {
       // Calculate the new offset
       contentOffset -= deltaY * scrollSpeed;
 
