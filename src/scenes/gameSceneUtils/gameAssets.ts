@@ -73,14 +73,14 @@ export function loadGameAssets(context: GameScene) {
 
   // TODO: a check should be made to see if both factions are needed
   councilArray.forEach(asset => {
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 9; i++) {
       context.load.image(`${asset}_${i}`, `/assets/images/factions/council/${asset}/${asset}_${i}.png`);
     }
     context.load.image(`${asset}CardPic`, `/assets/images/profilePics/${asset}_v1-hd.jpg`); // Unit picture for its unit card
   });
   darkElvesArray.forEach(asset => {
     if (asset !== EHeroes.PHANTOM) {
-      for (let i = 1; i <= 8; i++) {
+      for (let i = 1; i <= 9; i++) {
         context.load.image(`${asset}_${i}`, `/assets/images/factions/darkElves/${asset}/${asset}_${i}.png`);
       }
     } else {

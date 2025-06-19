@@ -489,8 +489,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     tile.setOccupied(false);
     tile.hero = this.exportData();
 
-    // TODO: Switch to KO'd image
-    this.characterImage.angle = 90; // REVIEW: p1 units are face down, P2 face up
+    this.updateCharacterImage();
   }
 
   getTile(): Tile {
@@ -743,6 +742,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   updateCharacterImage(): string {
     if (this.unitType === EHeroes.PHANTOM) return 'phantom_1';
+
+    if (this.isKO) return `${this.unitType}_9`;
 
     if (this.runeMetal && this.factionBuff && this.shiningHelm) return `${this.unitType}_8`;
     if (this.runeMetal && this.shiningHelm) return `${this.unitType}_7`;
