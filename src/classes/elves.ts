@@ -347,8 +347,7 @@ export class ManaVial extends Item {
 
   use(target: Hero): void {
     if (target.isKO) return;
-    target.getsHealed(1000);
-    target.increaseMaxHealth(50);
+    target.healAndIncreaseHealth(1000, 50);
 
     this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
     this.removeFromGame();

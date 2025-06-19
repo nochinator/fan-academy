@@ -428,9 +428,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     return totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
   }
 
-  getsHealed(healing: number): void {
+  getsHealed(healing: number, addText = true): number | undefined {
     if (healing <= 0) return;
-    if (this.isKO) this.getsRevived();
 
     let actualHealing: number;
 
@@ -446,20 +445,24 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
     // Show healing numbers
-    if (actualHealing > 0) new FloatingText(this.context, this.x, this.y - 50, actualHealing.toString(), true);
+    if (actualHealing > 0 && addText) new FloatingText(this.context, this.x, this.y - 50, actualHealing.toString(), true);
+
+    if (this.isKO) this.getsRevived();
 
     this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
     this.updateTileData();
+
+    return actualHealing;
   }
 
   private getsRevived(): void {
     this.reviveEvent = this.singleEvent(this.reviveAnim, ['reviveAnim_1', 'reviveAnim_2', 'reviveAnim_3'], 150);
     this.isKO = false;
     this.lastBreath = false;
-    this.characterImage.angle = 0;
+    this.characterImage.setTexture(this.updateCharacterImage());
   }
 
-  increaseMaxHealth(amount: number): void {
+  increaseMaxHealth(amount: number, addText = true): void {
     if (amount <= 0) return;
     if (this.isKO) this.getsRevived(); // for Soul Harvest
 
@@ -471,11 +474,20 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
     // Show healing numbers
-    new FloatingText(this.context, this.x, this.y - 50, amount.toString(), true);
+    if (addText) new FloatingText(this.context, this.x, this.y - 50, amount.toString(), true);
 
     this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
     this.updateTileData();
   }
+
+  healAndIncreaseHealth(healing: number, increase: number): void {
+    const actualHealing = this.getsHealed(healing, false);
+    this.increaseMaxHealth(increase, false);
+
+    // Show total number
+    const textFigure = actualHealing ? actualHealing + increase : increase;
+    new FloatingText(this.context, this.x, this.y - 50, textFigure.toString(), true);
+  };
 
   getsKnockedDown(): void {
     if (this.unitType === EHeroes.PHANTOM) {
@@ -489,7 +501,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     tile.setOccupied(false);
     tile.hero = this.exportData();
 
-    this.updateCharacterImage();
+    this.characterImage.setTexture(this.updateCharacterImage());
   }
 
   getTile(): Tile {
