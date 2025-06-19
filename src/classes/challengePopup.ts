@@ -70,8 +70,10 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
 
     this.elvesButtonImage.on('pointerdown', async () => await buttonCallback(EFaction.DARK_ELVES));
 
-    this.cancelButtonImage.on('pointerdown', () => this.setVisible(false));
-
+    this.cancelButtonImage.on('pointerdown', () => {
+      this.setVisible(false);
+      this.destroy();
+    });
     this.add([
       this.blockingLayer,
       this.backgroundImage,

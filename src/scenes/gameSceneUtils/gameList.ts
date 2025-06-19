@@ -118,14 +118,28 @@ export async function createGameList(context: UIScene) {
         });
       }
 
-      if (game.status === EGameStatus.CHALLENGE && opponent) {
+      if (game.status === EGameStatus.CHALLENGE && listChallengeReceivedArray.find(gameReceived => gameReceived._id === game._id )) {
         gameListButtonImage.setInteractive();
-        gameListButtonImage.on('pointerdown', async () => new ChallengePopup({
-          context,
-          opponentId: opponent.userData._id,
-          challengeType: EChallengePopup.ACCEPT,
-          gameId: game._id
-        }));
+        gameListButtonImage.on('pointerdown', async () => {
+          // Highlight the game in the UI
+          if (activeGameImage) activeGameImage.setTint(0xBBBBBB);
+          activeGameImage = gameListButtonImage;
+          activeGameImage.clearTint();
+
+          if (context.currentRoom) {
+            console.log('Leaving game: ', context.currentRoom.roomId);
+            await context.currentRoom.leave();
+            context.currentRoom = undefined;
+            context.scene.stop('GameScene');
+          }
+
+          new ChallengePopup({
+            context,
+            opponentId: opponent!.userData._id,
+            challengeType: EChallengePopup.ACCEPT,
+            gameId: game._id
+          });
+        });
       }
 
       gameListContainer.add([gameListButtonImage, playerFactionImage, opponentFactionImage, opponentNameText, opponentProfilePicture, closeButton]);
