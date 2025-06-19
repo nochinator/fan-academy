@@ -43,7 +43,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.boardPosition = data.boardPosition;
     this.row = tile.row;
     this.col = tile.col;
-    this.belongsTo = tile.col > 4 ? 2 : 1;
+    this.belongsTo = data.belongsTo;
     this.debuffLevel = data.debuffLevel;
 
     this.healthBar = new HealthBar(context, data, -38, -70);

@@ -1,9 +1,8 @@
-import { EActionType, EAttackType, ETiles } from "../enums/gameEnums";
-import { createElvesImpalerData, createElvesNecromancerData, createElvesPhantomData, createElvesPriestessData, createElvesVoidMonkData, createElvesWraithData } from "../gameData/elvesHeroData";
-import { createItemData } from "../gameData/itemData";
+import { EActionType, EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
+
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, turnIfBehind, getAOETiles, isOnBoard, roundToFive } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, getAOETiles, isOnBoard, roundToFive, turnIfBehind } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -38,8 +37,8 @@ export abstract class DarkElf extends Hero {
 }
 
 export class Impaler extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
-    super(context, createElvesImpalerData(data), tile);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
     const gameController = this.context.gameController!;
@@ -70,8 +69,8 @@ export class Impaler extends DarkElf {
 }
 
 export class VoidMonk extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
-    super(context, createElvesVoidMonkData(data), tile);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
   // TODO: add aoe to attack
   attack(target: Hero | Crystal): void {
@@ -146,8 +145,8 @@ export class VoidMonk extends DarkElf {
 }
 
 export class Necromancer extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
-    super(context, createElvesNecromancerData(data), tile);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -157,10 +156,10 @@ export class Necromancer extends DarkElf {
     if (target instanceof Hero && target.isKO) {
       const tile = target.getTile();
 
-      const phantom = new Phantom(this.context, {
+      const phantom = new Phantom(this.context, createElvesPhantomData({
         unitId: `${this.context.userId}_phantom_${++this.context.gameController!.phantomCounter}`,
         boardPosition: target.boardPosition
-      }, tile, true);
+      }), tile, true);
 
       target.removeFromBoard();
 
@@ -203,8 +202,8 @@ export class Necromancer extends DarkElf {
 }
 
 export class Priestess extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
-    super(context, createElvesPriestessData(data), tile);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -252,8 +251,8 @@ export class Priestess extends DarkElf {
 }
 
 export class Wraith extends DarkElf {
-  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
-    super(context, createElvesWraithData(data), tile);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
     turnIfBehind(this.context, this, target);
@@ -292,8 +291,8 @@ export class Wraith extends DarkElf {
 export class Phantom extends Hero {
   spawnAnim?: Phaser.GameObjects.Image;
 
-  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile, spawned = false) {
-    super(context, createElvesPhantomData(data), tile);
+  constructor(context: GameScene, data: IHero, tile?: Tile, spawned = false) {
+    super(context, data, tile);
 
     if (spawned && tile) {
       this.spawnAnim = context.add.image(0, -15, 'phantomSpawnAnim_1').setOrigin(0.5).setScale(0.9);
@@ -331,8 +330,8 @@ export class Phantom extends Hero {
 }
 
 export class SoulStone extends Item {
-  constructor(context: GameScene, data: Partial<IItem>) {
-    super(context, createItemData(data));
+  constructor(context: GameScene, data: IItem) {
+    super(context, data);
   }
 
   use(target: Hero): void {
@@ -342,8 +341,8 @@ export class SoulStone extends Item {
 }
 
 export class ManaVial extends Item {
-  constructor(context: GameScene, data: Partial<IItem>) {
-    super(context, createItemData(data));
+  constructor(context: GameScene, data: IItem) {
+    super(context, data);
   }
 
   use(target: Hero): void {
@@ -357,11 +356,8 @@ export class ManaVial extends Item {
 }
 
 export class SoulHarvest extends Item {
-  constructor(context: GameScene, data: Partial<IItem>) {
-    super(context, createItemData({
-      dealsDamage: true,
-      ...data
-    }));
+  constructor(context: GameScene, data: IItem) {
+    super(context, data);
   }
 
   use(targetTile: Tile): void {
@@ -409,4 +405,61 @@ export class SoulHarvest extends Item {
 
     this.removeFromGame();
   }
+}
+
+function createElvesPhantomData(data: Partial<IHero>): IHero {
+  // Cannot be equipped, buffed or healed, disappears if KO'd
+  return {
+    unitType: EHeroes.PHANTOM,
+    maxHealth: 100,
+    currentHealth: data.currentHealth ?? 100,
+    movement: 3,
+    attackRange: 1,
+    healingRange: 0,
+    attackType: EAttackType.MAGICAL,
+    power: 100,
+    basePower: 100,
+    physicalDamageResistance: 0,
+    basePhysicalDamageResistance: 0,
+    magicalDamageResistance: 0,
+    baseMagicalDamageResistance: 0,
+    canHeal: false,
+    ...createGenericElvesData(data)
+  };
+}
+
+function createGenericElvesData(data: Partial<IHero>): {
+  class: EClass,
+  faction: EFaction,
+  unitId: string,
+  boardPosition: number,
+  isKO: boolean,
+  factionBuff: boolean,
+  runeMetal: boolean,
+  shiningHelm: boolean,
+  superCharge: boolean,
+  belongsTo: number,
+  lastBreath: boolean,
+  powerModifier: number,
+  row: number,
+  col: number,
+  isDebuffed: boolean
+} {
+  return {
+    class: EClass.HERO,
+    faction: EFaction.DARK_ELVES,
+    unitId: data.unitId!,
+    boardPosition: data.boardPosition ?? 51,
+    isKO: data.isKO ?? false,
+    lastBreath: data.lastBreath ?? false,
+    factionBuff: data.factionBuff ?? false,
+    runeMetal: data.runeMetal ?? false,
+    shiningHelm: data.shiningHelm ?? false,
+    superCharge: data.superCharge ?? false,
+    belongsTo: data.belongsTo ?? 1,
+    powerModifier: data.powerModifier ?? 0,
+    row: data.row ?? 0,
+    col: data.col ?? 0,
+    isDebuffed: data.isDebuffed ?? false
+  };
 }

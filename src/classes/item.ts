@@ -1,5 +1,4 @@
 import { EClass, EFaction, EItems } from "../enums/gameEnums";
-import { createItemData } from "../gameData/itemData";
 import { IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
@@ -133,8 +132,8 @@ export abstract class Item extends Phaser.GameObjects.Container {
 }
 
 export class ShiningHelm extends Item {
-  constructor(context: GameScene, data: Partial<IItem>) {
-    super(context, createItemData(data));
+  constructor(context: GameScene, data: IItem) {
+    super(context, data);
   }
 
   use(target: Hero): void {
@@ -144,8 +143,8 @@ export class ShiningHelm extends Item {
 }
 
 export class RuneMetal extends Item {
-  constructor(context: GameScene, data: Partial<IItem>) {
-    super(context, createItemData(data));
+  constructor(context: GameScene, data: IItem) {
+    super(context, data);
   }
 
   use(target: Hero): void {
@@ -155,8 +154,8 @@ export class RuneMetal extends Item {
 }
 
 export class SuperCharge extends Item {
-  constructor(context: GameScene, data: Partial<IItem>) {
-    super(context, createItemData(data));
+  constructor(context: GameScene, data: IItem) {
+    super(context, data);
   }
 
   use(target: Hero): void {

@@ -1,9 +1,7 @@
-import { EActionType, EAttackType, ETiles } from "../enums/gameEnums";
-import { createCouncilArcherData, createCouncilClericData, createCouncilKnightData, createCouncilNinjaData, createCouncilWizardData } from "../gameData/councilHeroData";
-import { createItemData } from "../gameData/itemData";
+import { EActionType, EAttackType } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, turnIfBehind, getAOETiles, getGridDistance, isOnBoard } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, getAOETiles, getGridDistance, isOnBoard, turnIfBehind } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -32,8 +30,8 @@ export abstract class Human extends Hero {
 }
 
 export class Archer extends Human {
-  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
-    super(context, createCouncilArcherData(data), tile);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
     const distance = this.getDistanceToTarget(target);
@@ -65,8 +63,8 @@ export class Archer extends Human {
 }
 
 export class Knight extends Human {
-  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
-    super(context, createCouncilKnightData(data), tile);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
 
   async attack(target: Hero | Crystal): Promise<void> {
@@ -97,8 +95,8 @@ export class Knight extends Human {
 }
 
 export class Wizard extends Human {
-  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
-    super(context, createCouncilWizardData(data), tile);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -230,8 +228,8 @@ export class Wizard extends Human {
 }
 
 export class Ninja extends Human {
-  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
-    super(context, createCouncilNinjaData(data), tile);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -291,8 +289,8 @@ export class Ninja extends Human {
 }
 
 export class Cleric extends Human {
-  constructor(context: GameScene, data: Partial<IHero>, tile?: Tile) {
-    super(context, createCouncilClericData(data), tile);
+  constructor(context: GameScene, data: IHero, tile?: Tile) {
+    super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
@@ -331,8 +329,8 @@ export class Cleric extends Human {
 }
 
 export class DragonScale extends Item {
-  constructor(context: GameScene, data: Partial<IItem>) {
-    super(context, createItemData(data));
+  constructor(context: GameScene, data: IItem) {
+    super(context, data);
   }
 
   use(target: Hero): void {
@@ -342,8 +340,8 @@ export class DragonScale extends Item {
 }
 
 export class HealingPotion extends Item {
-  constructor(context: GameScene, data: Partial<IItem>) {
-    super(context, createItemData(data));
+  constructor(context: GameScene, data: IItem) {
+    super(context, data);
   }
 
   use(target: Hero): void {
@@ -357,12 +355,10 @@ export class HealingPotion extends Item {
 }
 
 export class Inferno extends Item {
-  constructor(context: GameScene, data: Partial<IItem>) {
-    super(context, createItemData({
-      dealsDamage: true,
-      ...data
-    }));
-  }
+  constructor(context: GameScene, data: IItem) {
+    super(context, data);
+    // dealsDamage: true,
+  };
 
   use(targetTile: Tile): void {
     // Damages enemy units and crystals, and removes enemy KO'd units

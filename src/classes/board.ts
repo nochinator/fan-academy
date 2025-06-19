@@ -1,5 +1,4 @@
 import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
-import { createCrystalData } from "../gameData/crystalData";
 import { Coordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, createNewHero, getGridDistance, isEnemySpawn } from "../utils/gameUtils";
@@ -34,8 +33,7 @@ export class Board {
       const newTile = new Tile(this.context, tile);
       if (newTile.hero) this.units.push(createNewHero(this.context, newTile.hero, newTile));
       if (newTile.crystal) {
-        const crystalData = createCrystalData(newTile.crystal);
-        this.crystals.push(new Crystal(this.context, crystalData, tile));
+        this.crystals.push(new Crystal(this.context, newTile.crystal, tile));
       }
       grid.push(newTile);
     });
