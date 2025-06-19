@@ -127,16 +127,16 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (this.belongsTo === 2 && this.boardPosition < 45) this.characterImage.setFlipX(true);
     if (this.isKO) this.characterImage.angle = 90; // TODO: replace with dead eyed head
 
-    this.runeMetalImage = context.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.3).setName('runeMetal');
+    this.runeMetalImage = context.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.4).setName('runeMetal');
     if (!this.runeMetal) this.runeMetalImage.setVisible(false);
 
-    this.shiningHelmImage = context.add.image(-28, 25, 'shiningHelm').setOrigin(0.5).setScale(0.3).setName('shiningHelm');
+    this.shiningHelmImage = context.add.image(-28, 25, 'shiningHelm').setOrigin(0.5).setScale(0.4).setName('shiningHelm');
     if (!this.shiningHelm) this.shiningHelmImage.setVisible(false);
 
     if (this.faction === EFaction.COUNCIL) {
-      this.factionBuffImage = context.add.image(5, 25, 'dragonScale').setOrigin(0.5).setScale(0.3).setName('dragonScale');
+      this.factionBuffImage = context.add.image(5, 25, 'dragonScale').setOrigin(0.5).setScale(0.4).setName('dragonScale');
     } else {
-      this.factionBuffImage = context.add.image(5, 25, 'soulStone').setOrigin(0.5).setScale(0.3).setName('soulStone');
+      this.factionBuffImage = context.add.image(5, 25, 'soulStone').setOrigin(0.5).setScale(0.4).setName('soulStone');
     } // Using else here removes a bunch of checks on factionBuff being possibly undefined
     if (!this.factionBuff) this.factionBuffImage.setVisible(false);
 
