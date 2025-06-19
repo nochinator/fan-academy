@@ -2,6 +2,7 @@ import { ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
+import { CrystalCard } from "./crystalCard";
 import { FloatingText } from "./floatingText";
 import { HealthBar } from "./healthBar";
 import { Tile } from "./tile";
@@ -30,6 +31,7 @@ export class Crystal extends Phaser.GameObjects.Container {
   debuffEventDouble: Phaser.Time.TimerEvent;
 
   healthBar: HealthBar;
+  unitCard: CrystalCard;
 
   constructor(context: GameScene, data: ICrystal, tile: ITile) {
     const { x, y } = context.centerPoints[data.boardPosition];
@@ -47,6 +49,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.debuffLevel = data.debuffLevel;
 
     this.healthBar = new HealthBar(context, data, -38, -70);
+    this.unitCard = new CrystalCard(context, data).setVisible(false);
 
     this.pedestalImage = context.add.image(0, 0, 'pedestal').setScale(0.8);
     const crystalTexture = data.currentHealth <= data.maxHealth / 2 ? 'crystalDamaged' : 'crystalFull';
@@ -92,7 +95,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
     addTween(this.attackReticle);
 
-    this.add([this.pedestalImage, this.crystalImage, this.singleCrystalDebuff, this.doubleCrystalDebuff, this.healthBar, this.attackReticle, this.blockedLOS]).setSize(90, 95).setInteractive().setDepth(this.boardPosition + 10); // REVIEW: not setting name
+    this.add([this.pedestalImage, this.crystalImage, this.singleCrystalDebuff, this.doubleCrystalDebuff, this.healthBar, this.attackReticle, this.blockedLOS, this.unitCard]).setSize(90, 95).setInteractive().setDepth(this.boardPosition + 10); // REVIEW: not setting name
 
     makeCrystalClickable(this, this.context);
 
@@ -167,6 +170,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     // Show damage numbers
     if (damageTaken > 0) new FloatingText(this.context, this.x, this.y - 50, damageTaken.toString());
 
+    this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
     this.updateTileData();
     if (this.currentHealth <= 0) this.removeFromGame(); // TODO: destruction animation
   }

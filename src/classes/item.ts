@@ -26,8 +26,7 @@ export abstract class Item extends Phaser.GameObjects.Container {
     super(context, x, y - 20); // REVIEW: -20 ?
     this.context = context;
 
-    this.unitCard = new ItemCard(context, data);
-    this.unitCard.setVisible(false);
+    this.unitCard = new ItemCard(context, data).setVisible(false);
 
     // Interface properties assignment
     this.unitId = data.unitId;

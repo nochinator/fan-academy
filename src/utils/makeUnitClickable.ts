@@ -168,20 +168,42 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
 }
 
 export function makeCrystalClickable(crystal: Crystal, context: GameScene): void {
-  crystal.on('pointerdown', () => {
+  crystal.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
     console.log('Crystal ->', crystal);
-    const attackReticle = crystal.attackReticle;
-    const activeUnit = context.activeUnit;
 
-    if (activeUnit) {
-      if (isHero(activeUnit) && attackReticle.visible) {
-        activeUnit.attack(crystal);
-        return;
-      }
-      if (isItem(activeUnit) && activeUnit?.dealsDamage) {
-        activeUnit.use(crystal.getTile());
-        return;
+    // Handling left click
+    if (pointer.button === 0) {
+      const attackReticle = crystal.attackReticle;
+      const activeUnit = context.activeUnit;
+
+      if (activeUnit) {
+        if (isHero(activeUnit) && attackReticle.visible) {
+          activeUnit.attack(crystal);
+          return;
+        }
+        if (isItem(activeUnit) && activeUnit?.dealsDamage) {
+          activeUnit.use(crystal.getTile());
+          return;
+        }
       }
     }
+
+    // Handling right click
+    if (pointer.button === 2) {
+      crystal.setDepth(1001);
+      crystal.unitCard.setVisible(true);
+    }
+  });
+
+  crystal.on('pointerover', (pointer: Phaser.Input.Pointer) => {
+    if (pointer.rightButtonDown()) {
+      crystal.setDepth(1001);
+      crystal.unitCard.setVisible(true);
+    }
+  });
+
+  crystal.on('pointerout', () => {
+    crystal.setDepth(crystal.boardPosition + 10);
+    crystal.unitCard.setVisible(false);
   });
 }

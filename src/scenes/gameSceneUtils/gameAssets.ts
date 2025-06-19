@@ -67,6 +67,9 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('crystalDebuff_3', '/assets/images/gameItems/animations/CrystalDebuff2_BgFlames01-hd.png');
   context.load.image('crystalDebuff_4', '/assets/images/gameItems/animations/CrystalDebuff2_BgFlames02-hd.png');
 
+  // Crystal card icon
+  context.load.image('crystalCardPic', '/assets/images/profilePics/crystal.jpg');
+
   // Loading units
   const councilArray = ['archer', 'cleric', 'knight', 'ninja', 'wizard'];
   const darkElvesArray = ['priestess', 'impaler', 'necromancer', 'phantom', 'voidmonk', 'wraith'];

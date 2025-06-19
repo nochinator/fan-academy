@@ -114,8 +114,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.unitCard = new HeroCard(context, {
       ...data,
       currentPower: this.getTotalPower()
-    });
-    this.unitCard.setVisible(false);
+    }).setVisible(false);
 
     this.healthBar = new HealthBar(context, data, -38, -75);
     if (this.boardPosition >= 45) this.healthBar.setVisible(false);
