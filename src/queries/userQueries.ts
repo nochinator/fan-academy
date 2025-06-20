@@ -99,15 +99,19 @@ export async function authCheck(): Promise<string | undefined> {
 /**
  * Used to populate the leaderboard
  */
-export async function getLeaderBoard(): Promise<{
-  _id: string,
-  username: string,
-  picture: string,
-  stats: IUserStats
-}[] | null> {
+export async function getLeaderBoard(page = 1): Promise<{
+  players: {
+    _id: string,
+    username: string,
+    picture: string,
+    stats: IUserStats,
+  }[],
+  totalPages: number,
+  currentPage: number
+} | null> {
   console.log('Fetching leaderboard data...');
 
-  const result = await fetch('http://localhost:3003/users/leaderboard', {
+  const result = await fetch(`http://localhost:3003/users/leaderboard?page=${encodeURIComponent(page)}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include'

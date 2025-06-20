@@ -1,5 +1,6 @@
+import { Leaderboard } from "../classes/leaderboard";
 import { getLeaderBoard } from "../queries/userQueries";
-import { createLeaderboard, loadLeaderboardUI } from "./leaderboardSceneUtils/leaderboardUI";
+import { loadLeaderboardUI } from "./leaderboardSceneUtils/leaderboardUI";
 
 export default class LeaderboardScene extends Phaser.Scene {
   userId!: string;
@@ -22,7 +23,7 @@ export default class LeaderboardScene extends Phaser.Scene {
 
     const leaderboardData = await getLeaderBoard();
 
-    if (leaderboardData) createLeaderboard(this, leaderboardData);
+    if (leaderboardData) new Leaderboard(this, leaderboardData);
 
     console.log('Leaderboard', leaderboardData);
   }
