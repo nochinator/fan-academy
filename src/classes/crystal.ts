@@ -172,6 +172,11 @@ export class Crystal extends Phaser.GameObjects.Container {
 
     this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
     this.updateTileData();
+
+    // Update player HP bar
+    if (this.belongsTo === 1) this.context.gameController?.gameUI.playerOneHpBar.setHealth();
+    if (this.belongsTo === 2) this.context.gameController?.gameUI.playerTwoHpBar.setHealth();
+
     if (this.currentHealth <= 0) this.removeFromGame(); // TODO: destruction animation
   }
 

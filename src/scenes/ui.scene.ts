@@ -35,7 +35,7 @@ export default class UIScene extends Phaser.Scene {
     this.gameList = await getGameList(this.userId);
 
     // UI background
-    this.add.image(0, 0, 'uiBackground').setOrigin(0, 0);
+    this.add.image(0, 0, 'uiBackground').setOrigin(0);
     // Add Home button
     new HomeButton(this);
     // Create the game list UI
