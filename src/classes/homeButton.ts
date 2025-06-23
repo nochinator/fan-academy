@@ -18,9 +18,10 @@ export class HomeButton extends Phaser.GameObjects.Container {
 
     this.add([this.button, this.buttonText]).setScale(0.8);
 
-    this.button.on('pointerdown', () => {
-      context.lobbyRoom?.leave();
-      context.currentRoom?.leave();
+    this.button.on('pointerdown', async() => {
+      await context.lobbyRoom?.leave();
+      await context.currentRoom?.leave();
+      context.currentRoom = undefined;
       context.scene.stop('GameScene');
       context.scene.start('MainMenuScene');
     });
