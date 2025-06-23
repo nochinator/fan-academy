@@ -29,8 +29,7 @@ export async function loadProfilePictures(context: UIScene): Promise<void> {
   );
 
   uniqueOponents.forEach( oponent => {
-
-git    context.load.image(oponent.username, oponent.picture);
+    context.load.image(oponent.username, oponent.picture);
   });
 
   const player = context.gameList[0].players.find(player => player.userData._id === context.userId);
