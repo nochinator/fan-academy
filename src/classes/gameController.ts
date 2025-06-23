@@ -42,8 +42,7 @@ export class GameController {
     context.player1 = this.lastTurnState.player1;
     context.player2 = this.lastTurnState.player2;
 
-    this.deck  = new Deck(context); // FIXME: sometimes door instantiates before deck somehow
-    this.context = context;
+    this.deck  = new Deck(context);
     this.hand = new Hand(context);
     this.actionPie = new ActionPie(context);
     this.turnButton = new TurnButton(context);

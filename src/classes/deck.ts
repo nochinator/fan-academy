@@ -7,7 +7,7 @@ export class Deck {
   deck: (IHero | IItem)[];
   constructor(context: GameScene) {
     this.context = context;
-    this.deck = getCurrentPlayer(context).factionData.unitsInDeck;
+    this.deck = [...getCurrentPlayer(context).factionData.unitsInDeck];
   }
 
   getDeckSize(): number {

@@ -63,7 +63,7 @@ export class Door extends Phaser.GameObjects.Container {
   }
 
   updateBannerText(): void {
-    const deckSize: number = this.context.gameController?.deck.getDeckSize() ?? 0; // REVIEW:
+    const deckSize: number = this.context.gameController?.deck.getDeckSize() ?? 0;
 
     this.bannerText.setText(deckSize.toString());
   }
