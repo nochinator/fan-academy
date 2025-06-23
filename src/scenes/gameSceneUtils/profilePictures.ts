@@ -32,6 +32,9 @@ export async function loadProfilePictures(context: UIScene): Promise<void> {
     context.load.image(oponent.username, oponent.picture);
   });
 
+  const player = context.gameList[0].players.find(player => player.userData._id === context.userId);
+  context.load.image(player!.userData.username, player!.userData.picture);
+
   return new Promise((resolve) => {
     context.load.once('complete', () => {
       resolve();
