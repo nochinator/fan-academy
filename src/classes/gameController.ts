@@ -36,7 +36,9 @@ export class GameController {
     this.game = context.currentGame!;
     this.lastTurnState =  context.currentGame.previousTurn[context.currentGame.previousTurn.length - 1]; // REVIEW:
     this.board = new Board(context, this.lastTurnState.boardState);
-    this.gameUI = new GameUI(context, this.board); // TODO: add depth to UI and board assets
+
+    const playerData = context.currentGame.players.map(player => { return player.userData;});
+    this.gameUI = new GameUI(context, this.board, playerData); // TODO: add depth to UI and board assets
     context.player1 = this.lastTurnState.player1;
     context.player2 = this.lastTurnState.player2;
 

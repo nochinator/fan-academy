@@ -103,7 +103,6 @@ export class Crystal extends Phaser.GameObjects.Container {
   }
 
   updateDebuffAnimation(newLevel: number): void {
-    console.log('debufflevel', this.debuffLevel);
     switch (newLevel) {
       case 0:
         this.singleCrystalDebuff.setVisible(false);
@@ -174,8 +173,8 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.updateTileData();
 
     // Update player HP bar
-    if (this.belongsTo === 1) this.context.gameController?.gameUI.playerOneHpBar.setHealth();
-    if (this.belongsTo === 2) this.context.gameController?.gameUI.playerTwoHpBar.setHealth();
+    if (this.belongsTo === 1) this.context.gameController?.gameUI.banner.playerOneHpBar.setHealth();
+    if (this.belongsTo === 2) this.context.gameController?.gameUI.banner.playerTwoHpBar.setHealth();
 
     if (this.currentHealth <= 0) this.removeFromGame(); // TODO: destruction animation
   }

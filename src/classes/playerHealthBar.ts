@@ -14,8 +14,8 @@ export class PlayerHealthBar extends Phaser.GameObjects.Container {
 
   fullWidth: number;
 
-  constructor(context: GameScene, board: Board, player: 1 | 2, x: number, y: number) {
-    super(context, x, y);
+  constructor(context: GameScene, board: Board, player: 1 | 2) {
+    super(context, 0, 0);
 
     this.context = context;
     this.board = board;
@@ -24,11 +24,11 @@ export class PlayerHealthBar extends Phaser.GameObjects.Container {
     const coordMap = {
       1: {
         x: 640,
-        y: 55
+        y: 65
       },
       2: {
         x: 930,
-        y: 55
+        y: 65
       }
     };
 
@@ -41,8 +41,6 @@ export class PlayerHealthBar extends Phaser.GameObjects.Container {
 
     // Group into container
     this.add([this.background, this.healthBar]);
-
-    context.add.existing(this);
   }
 
   // Updates health visually

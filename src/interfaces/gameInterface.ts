@@ -119,14 +119,16 @@ export interface IFaction {
 }
 
 /**
- * User data Interface
+ * User and player data Interface
  */
+export interface IUserData {
+  _id: string;
+  username: string; // from populate in the BE
+  picture: string; // from populate in the BE
+};
+
 export interface IPlayerData {
-  userData: {
-    _id: string;
-    username: string; // from populate in the BE
-    picture: string; // from populate in the BE
-  };
+  userData: IUserData
   faction: EFaction;
 }
 

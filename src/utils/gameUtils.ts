@@ -53,7 +53,6 @@ export function createNewItem(context: GameScene, itemData: IItem): Item {
     [EItems.SOUL_STONE]: () => new SoulStone(context, itemData)
   };
 
-  console.log('item type', itemData.itemType);
   const createItem = itemTypes[itemData.itemType];
   if (!createItem) console.error('Error creating item', itemData);
   return createItem();
