@@ -31,13 +31,13 @@ export class Banner extends Phaser.GameObjects.Container {
     this.playerOneHpBar = new PlayerHealthBar(context, board, 1);
     this.playerTwoHpBar = new PlayerHealthBar(context, board, 2);
 
-    this.playerOneName = context.add.text(645, 35, truncateText(playerData[0].username, 12), {
+    this.playerOneName = context.add.text(645, 35, truncateText(playerData[0].username, 14), {
       fontFamily: "proLight",
       color: '#ffffff',
       fontSize: 40
     });
 
-    this.playerTwoName = context.add.text(950, 35, truncateText(playerData[1].username, 12), {
+    this.playerTwoName = context.add.text(950, 35, truncateText(playerData[1].username, 14), {
       fontFamily: "proLight",
       color: '#ffffff',
       fontSize: 40

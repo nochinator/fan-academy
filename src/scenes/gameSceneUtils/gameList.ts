@@ -6,6 +6,7 @@ import { sendDeletedGameMessage } from "../../colyseus/colyseusLobbyRoom";
 import UIScene from "../ui.scene";
 import { accessGame } from "./gameMenuUI";
 import { loadProfilePictures } from "./profilePictures";
+import { truncateText } from "../../utils/gameUtils";
 
 export async function createGameList(context: UIScene) {
   if (!context.gameList) {
@@ -79,7 +80,7 @@ export async function createGameList(context: UIScene) {
       let opponentNameText;
 
       const setOpponentNameText = (name: string) => {
-        return context.add.text(200, lastListItemY + gameListButtonHeight / 2 - 33, name, {
+        return context.add.text(200, lastListItemY + gameListButtonHeight / 2 - 33, truncateText(name, 13), {
           fontSize: 50,
           fontFamily: "proLight"
         });
