@@ -33,7 +33,7 @@ export async function createGameList(context: UIScene) {
     }
   });
 
-  // Load oponents' profile pictures
+  // Load opponents' profile pictures
   await loadProfilePictures(context); // REVIEW: since we have the game list from Scene creation, we don't need to load this here
 
   // Setting spacing for the positioning of the items in the list

@@ -147,7 +147,7 @@ export class Wizard extends Human {
        *  An enemy unit gets points for:
        *    -being in the same direction of the attack
        *    -being in the general direction of the attack
-       *    -being in the direction of the oponent's side of the board
+       *    -being in the direction of the opponent's side of the board
        *    -being in an orthogonal direction (tie breaker)
        *    -having an adjacent enemy unit (the attack prioritizes number of target versus direction)
        *  */

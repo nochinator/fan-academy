@@ -9,27 +9,27 @@ export async function loadProfilePictures(context: UIScene): Promise<void> {
   }[] = [];
 
   context.gameList.forEach((game) => {
-    const oponent  = game.players.find(player => player.userData._id !== context.userId);
+    const opponent  = game.players.find(player => player.userData._id !== context.userId);
 
-    if (oponent) allPlayerObjects.push({
-      username: oponent.userData.username,
-      picture: oponent.userData.picture
+    if (opponent) allPlayerObjects.push({
+      username: opponent.userData.username,
+      picture: opponent.userData.picture
     });
   });
 
   // Remove duplicates
-  const uniqueOponents: {
+  const uniqueOpponents: {
     username: string,
     picture: string
   }[] = Array.from(
-    allPlayerObjects.reduce((map, oponent) => map.set(oponent.username, oponent), new Map<string, {
+    allPlayerObjects.reduce((map, opponent) => map.set(opponent.username, opponent), new Map<string, {
       username: string,
       picture: string
     }>()).values()
   );
 
-  uniqueOponents.forEach( oponent => {
-    context.load.image(oponent.username, oponent.picture);
+  uniqueOpponents.forEach( opponent => {
+    context.load.image(opponent.username, opponent.picture);
   });
 
   const player = context.gameList[0].players.find(player => player.userData._id === context.userId);
