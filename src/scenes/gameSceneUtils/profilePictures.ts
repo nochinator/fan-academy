@@ -1,7 +1,7 @@
 import UIScene from "../ui.scene";
 
 export async function loadProfilePictures(context: UIScene): Promise<void> {
-  if (!context.gameList) return;
+  if (!context.gameList?.length) return;
 
   const allPlayerObjects: {
     username: string,
@@ -29,7 +29,8 @@ export async function loadProfilePictures(context: UIScene): Promise<void> {
   );
 
   uniqueOponents.forEach( oponent => {
-    context.load.image(oponent.username, oponent.picture);
+
+git    context.load.image(oponent.username, oponent.picture);
   });
 
   const player = context.gameList[0].players.find(player => player.userData._id === context.userId);
