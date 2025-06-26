@@ -69,7 +69,12 @@ export default class MainMenuScene extends Phaser.Scene {
       y: 275,
       imageKey: 'mainMenuButton',
       text: 'Profile',
-      font: '70px proHeavy'
+      font: '70px proHeavy',
+      callback: () => {
+        if (this.currentSubScene) this.scene.stop(this.currentSubScene);
+        this.scene.launch('ProfileScene', { userId: this.userId });
+        this.currentSubScene = 'ProfileScene';
+      }
     });
 
     const leaderboardsButton = createMainMenuButton({

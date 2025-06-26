@@ -65,7 +65,7 @@ export async function createGameList(context: UIScene) {
 
       lastListItemY += ( index === 0 ? textListHeight : gameListButtonHeight) + gameListButtonSpacing;
 
-      const gameListButtonImage = context.add.image(0, lastListItemY, "gameListButton").setOrigin(0).setTint(0xBBBBBB);;
+      const gameListButtonImage = context.add.image(0, lastListItemY, "gameListButton").setOrigin(0).setTint(0xBBBBBB);
       const playerFactionIcon = player.faction ? {
         faction: player.faction,
         scale: 0.4
@@ -88,7 +88,7 @@ export async function createGameList(context: UIScene) {
 
       if (opponent) {
         opponentFactionImage = context.add.image(510, lastListItemY + gameListButtonHeight / 2, opponent.faction).setScale(0.4);
-        opponentProfilePicture = context.add.image(632, lastListItemY + gameListButtonHeight / 2, opponent.userData.username).setFlipX(true).setScale(0.4);
+        opponentProfilePicture = context.add.image(632, lastListItemY + gameListButtonHeight / 2, opponent.userData.username).setFlipX(true).setDisplaySize(256 * 0.4, 256 * 0.4);
         opponentNameText = setOpponentNameText(opponent.userData.username);
       } else {
         opponentFactionImage = context.add.image(510, lastListItemY + gameListButtonHeight / 2, 'unknownFaction');
