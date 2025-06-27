@@ -589,6 +589,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       const hero = gameController.board.units.find(unit => unit.unitId === targetTile.hero?.unitId);
       if (!hero) console.error('move() Found heroData on targetTile, but no Hero to remove', targetTile);
       hero?.removeFromBoard();
+      hero?.removeFromGame();
     }
 
     // Check if the unit is leaving or entering a special tile and apply any effects
