@@ -28,6 +28,7 @@ export class GameController {
   turnButton: TurnButton;
   turnPopup: TurnWarningPopup;
   lastTurnState: IGameState;
+  currentTurn: IGameState[];
 
   phantomCounter: number = 0; // REVIEW:
 
@@ -48,6 +49,8 @@ export class GameController {
     this.turnButton = new TurnButton(context);
     this.turnPopup = new TurnWarningPopup(context);
     this.door = new Door(context);
+
+    this.currentTurn = [];
   }
 
   async resetTurn() {
@@ -55,7 +58,7 @@ export class GameController {
   }
 
   async handleGameOver(): Promise<void> {
-    sendTurnMessage(this.context.currentRoom, this.context.currentGame.currentState, this.context.opponentId, ++this.context.turnNumber!, this.context.gameOver);
+    sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, ++this.context.turnNumber!, this.context.gameOver);
 
     this.context.activePlayer = undefined; // REVIEW:
 
@@ -87,7 +90,7 @@ export class GameController {
       }
     };
     const opponentState = this.context[opponent];
-    this.game.currentState.push({
+    this.currentTurn.push({
       player1: this.context.isPlayerOne ? playerState : opponentState!,
       player2: !this.context.isPlayerOne ? playerState : opponentState!,
       action: {
@@ -155,7 +158,7 @@ export class GameController {
     this.context.activePlayer = this.context.opponentId;
     this.context.turnNumber!++;
 
-    sendTurnMessage(this.context.currentRoom, this.context.currentGame.currentState, this.context.opponentId, this.context.turnNumber!);
+    sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!);
   }
 
   onHeroClicked(hero: Hero) {
@@ -203,14 +206,14 @@ export class GameController {
       ...this.context[player]!,
       factionData: {
         ...this.context[player]!.factionData,
-        unitsInHand: this.hand.exportHandData()
+        unitsInHand: this.hand.exportHandData(),
+        unitsInDeck: this.deck.getDeck()
       }
     };
 
     const opponentState = this.context[opponent];
-    // Add action to turn state
-    if (!this.game.currentState) this.game.currentState = [];
-    this.game.currentState.push({
+    // Add action to current turn state
+    this.currentTurn.push({
       player1: this.context.isPlayerOne ? playerState : opponentState!,
       player2: !this.context.isPlayerOne ? playerState : opponentState!,
       action: {

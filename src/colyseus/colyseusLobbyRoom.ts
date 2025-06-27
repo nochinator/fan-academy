@@ -40,6 +40,15 @@ export async function connectToGameLobby(client: Client, userId: string, context
       game.turnNumber = message.turnNumber;
 
       await createGameList(context);
+
+      if (message.gameId === context.currentRoom?.roomId) {
+        context.scene.get('GameScene').scene.restart({
+          userId: context.userId,
+          colyseusClient: context.colyseusClient,
+          currentGame: game,
+          currentRoom: context.currentRoom
+        });
+      }
     });
 
     lobby.onMessage('gameOverUpdate', async (message: {

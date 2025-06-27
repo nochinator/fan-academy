@@ -59,21 +59,21 @@ function subscribeToGameListeners(room: Room, context: UIScene): void {
   room.onMessage("turnPlayed", (message: ITurnSentMessage) => {
     console.log("Player sent turn:", message);
 
-    if (message.roomId === context.currentRoom?.roomId) {
-      const currentGame = context.gameList?.find(game => game._id === message.roomId);
-      if (!currentGame) throw new Error('turnPlayed() No game found in gameList');
+    // if (message.roomId === context.currentRoom?.roomId) {
+    //   const currentGame = context.gameList?.find(game => game._id === message.roomId);
+    //   if (!currentGame) throw new Error('turnPlayed() No game found in gameList');
 
-      currentGame.activePlayer = message.newActivePlayer;
-      currentGame.previousTurn = message.previousTurn;
-      currentGame.turnNumber = message.turnNumber;
+    //   currentGame.activePlayer = message.newActivePlayer;
+    //   currentGame.previousTurn = message.previousTurn;
+    //   currentGame.turnNumber = message.turnNumber;
 
-      context.scene.get('GameScene').scene.restart({
-        userId: context.userId,
-        colyseusClient: context.colyseusClient,
-        currentGame,
-        currentRoom: room
-      });
-    }
+    //   context.scene.get('GameScene').scene.restart({
+    //     userId: context.userId,
+    //     colyseusClient: context.colyseusClient,
+    //     currentGame,
+    //     currentRoom: room
+    //   });
+    // }
   });
 
   room.onMessage("lastTurnPlayed", (message: ILastTurnMessage) => {
