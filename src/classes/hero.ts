@@ -125,7 +125,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.characterImage = context.add.image(charImageX, charImageY, this.updateCharacterImage()).setOrigin(0.5).setName('body');
     if (inHand) this.characterImage.setScale(0.8);
     if (this.belongsTo === 2 && this.boardPosition < 45) this.characterImage.setFlipX(true);
-    if (this.isKO) this.characterImage.angle = 90; // TODO: replace with dead eyed head
 
     this.runeMetalImage = context.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.4).setName('runeMetal');
     if (!this.runeMetal) this.runeMetalImage.setVisible(false);
