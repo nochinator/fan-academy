@@ -75,14 +75,15 @@ export class GameController {
 
     this.hand.addToHand(drawnUnits);
 
-    // Add action to turn state // FIXME: there is already a function for adding actions, DRY
+    // Add action to turn state
     const { player, opponent } = getPlayersKey(this.context);
 
     const playerState: IPlayerState = {
       ...this.context[player]!,
       factionData: {
         ...this.context[player]!.factionData,
-        unitsInHand: this.hand.exportHandData()
+        unitsInHand: this.hand.exportHandData(),
+        unitsInDeck: this.deck.getDeck()
       }
     };
     const opponentState = this.context[opponent];
