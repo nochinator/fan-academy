@@ -56,7 +56,7 @@ export async function connectToGameLobby(client: Client, userId: string, context
       if (isInArrayIndex !== -1) context.gameList?.splice(isInArrayIndex, 1);
 
       await createGameList(context);
-      console.log('Finished game removed');
+      console.log('Finished game removed'); // FIXME: we don't delete finished games immediately
     });
 
     lobby.onMessage('gameDeletedUpdate', async (message: {
@@ -72,6 +72,26 @@ export async function connectToGameLobby(client: Client, userId: string, context
 
       await createGameList(context);
       console.log('Game removed from list');
+    });
+
+    lobby.onMessage('userDeletedUpdate', async (message: {
+      gameIds: string[],
+      userIds: string[]
+    }) => {
+      console.log('A user has been deleted, removing affected games from the game list');
+      if (!context.gameList) console.error('userDeletedUpdate - No context.gameList found');
+
+      // Remove game from the list and re-render it
+      message.gameIds.forEach(gameId => {
+        const isInArrayIndex = context.gameList!.findIndex(game => game._id === gameId);
+        if (isInArrayIndex !== -1) {
+          const game = context.gameList?.splice(isInArrayIndex, 1);
+          if (game?.length && context.currentRoom?.roomId === game[0]._id) context.scene.get('GameScene').scene.stop();
+        }
+      });
+
+      await createGameList(context);
+      console.log('Games removed from list');
     });
   } catch (error) {
     console.error('Error joining lobby ->', error);

@@ -1,7 +1,8 @@
-import { updateProfile } from "../queries/userQueries";
+import { deleteAccount, updateProfile } from "../queries/userQueries";
 import ProfileScene from "../scenes/profile.scene";
 import { imageKeywordFromFilename } from "../scenes/sceneUtils";
 import { isValidPassword } from "../utils/playerUtils";
+import { DeleteWarningPopup } from "./deletePopup";
 import { ProfilePicPopup } from "./profilePicPopup";
 
 export class Profile extends Phaser.GameObjects.Container {
@@ -20,6 +21,8 @@ export class Profile extends Phaser.GameObjects.Container {
   saveButtonText: Phaser.GameObjects.Text;
   deleteAccountButtonImage: Phaser.GameObjects.Image;
   deleteAccountButtonText: Phaser.GameObjects.Text;
+
+  deletePopup: Phaser.GameObjects.Container;
 
   profilePicture: Phaser.GameObjects.Image;
 
@@ -142,6 +145,9 @@ export class Profile extends Phaser.GameObjects.Container {
 
     this.loadUserData();
 
+    // Delete warning popup
+    this.deletePopup = new DeleteWarningPopup(context, this);
+
     // Delete account button
     this.deleteAccountButtonImage = this.context.add.image(1265, 700, 'saveButton').setTint(0x990000).setDisplaySize(230, 100).setInteractive();
     this.deleteAccountButtonText = this.context.add.text(1200, 655, 'DELETE ACCOUNT', {
@@ -157,7 +163,8 @@ export class Profile extends Phaser.GameObjects.Container {
 
     this.deleteAccountButtonImage.on('pointerdown', () => {
       console.log('Clicked on delete account');
-      // TODO: Add confirmation popup
+      this.toggleFormVisibility(false);
+      this.deletePopup.setVisible(true);
     });
 
     this.add([
@@ -262,19 +269,9 @@ export class Profile extends Phaser.GameObjects.Container {
   }
 
   async handleDelete(): Promise<void> {
-    // TODO:
-    // TODO:
-    // TODO:
-
-    /**
-     * Send query that:
-     *    sends email to the user (sorry to see you go)
-     *    deletes their email and password from the user (check if someone could log in like this)
-     *    randomizes their username
-     *    sends an email to players that had games or challenges with that player
-     *    adds a flag to the user so they don't appear in the leaderboard (maybe we can use the flag in case someone tries to log in)
-     *
-     */
+    const result = await deleteAccount();
+    console.log('RESULT', result);
+    if (result.success) this.context.scene.start('MainMenuScene');
   }
 
   toggleFormVisibility(visible: boolean) {

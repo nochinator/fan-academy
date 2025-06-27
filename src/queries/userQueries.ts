@@ -177,8 +177,6 @@ export async function updateProfile(payload: {
 
     const data = await response.json();
 
-    console.log('DATAAA', data);
-
     if (response.ok) {
       console.log('Profile updated! :)');
       return {
@@ -194,6 +192,38 @@ export async function updateProfile(payload: {
     }
   } catch (error) {
     console.error('Network error updating profile:', error);
+    return {
+      success: false,
+      error: 'Network error. Please try again.'
+    };
+  }
+}
+
+export async function deleteAccount() {
+  try {
+    const response = await fetch('http://localhost:3003/users/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include'
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log('Profile deleted :(');
+      return {
+        success: true,
+        result: data
+      };
+    } else {
+      console.log('Server responded with an error:', data.message || 'Unknown error');
+      return {
+        success: false,
+        error: data.message || 'Unknown error'
+      };
+    }
+  } catch (error) {
+    console.error('Network error while deleting account:', error);
     return {
       success: false,
       error: 'Network error. Please try again.'

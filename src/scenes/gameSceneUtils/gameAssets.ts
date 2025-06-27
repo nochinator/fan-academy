@@ -68,13 +68,12 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('crystalDebuff_4', '/assets/images/gameItems/animations/CrystalDebuff2_BgFlames02-hd.png');
 
   // Crystal card icon
-  context.load.image('crystalCardPic', '/assets/images/profilePics/crystal.jpg');
+  context.load.image('crystalCardPic', '/assets/images/profilePics/crystalIcon.jpg');
 
   // Loading units
   const councilArray = ['archer', 'cleric', 'knight', 'ninja', 'wizard'];
   const darkElvesArray = ['priestess', 'impaler', 'necromancer', 'phantom', 'voidmonk', 'wraith'];
 
-  // TODO: a check should be made to see if both factions are needed
   councilArray.forEach(asset => {
     for (let i = 1; i <= 9; i++) {
       context.load.image(`${asset}_${i}`, `/assets/images/factions/council/${asset}/${asset}_${i}.png`);
@@ -94,7 +93,7 @@ export function loadGameAssets(context: GameScene) {
 
   // Loading item card icons
   Object.entries(EItems).forEach(([key, value]) => {
-    context.load.image(`${value}CardPic`, `/assets/images/profilePics/${value}.jpg`);
+    context.load.image(`${value}CardPic`, `/assets/images/profilePics/${value}Icon.jpg`);
   });
 
   // Council

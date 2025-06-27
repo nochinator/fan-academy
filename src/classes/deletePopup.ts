@@ -25,11 +25,11 @@ export class DeleteWarningPopup extends Phaser.GameObjects.Container {
       .setInteractive();
 
     this.backgroundImage = context.add.image(0, 0, 'popupBackground').setDisplaySize(500, 300);
-    this.okButtonImage = context.add.image(-90, 60, 'popupButton').setTint(0x007BFF).setDisplaySize(110, 60).setInteractive();
-    this.cancelButtonImage = context.add.image(90, 60, 'popupButton').setTint(0x990000).setDisplaySize(110, 60).setInteractive();
+    this.okButtonImage = context.add.image(-90, 60, 'popupButton').setTint(0x990000).setDisplaySize(110, 60).setInteractive();
+    this.cancelButtonImage = context.add.image(90, 60, 'popupButton').setTint(0x007BFF).setDisplaySize(110, 60).setInteractive();
 
     // Warning text
-    this.popupText = context.add.text(0, -50, "You still have actions left. Send turn?", {
+    this.popupText = context.add.text(0, -50, "Delete account? All data will be lost", {
       fontFamily: "proLight",
       fontSize: 40,
       color: '#ffffff',
@@ -42,25 +42,26 @@ export class DeleteWarningPopup extends Phaser.GameObjects.Container {
     }).setOrigin(0.5);
 
     // OK button
-    this.okButtonText = context.add.text(-90, 60, "SEND", {
+    this.okButtonText = context.add.text(-90, 60, "DELETE", {
       fontFamily: "proLight",
       fontSize: 30,
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    this.cancelButtonText = context.add.text(90, 60, "BACK", {
+    this.cancelButtonText = context.add.text(90, 60, "CANCEL", {
       fontFamily: "proLight",
       fontSize: 30,
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    this.okButtonImage.on('pointerdown', () => {
+    this.okButtonImage.on('pointerdown', async () => {
       this.setVisible(false);
-      profile.handleDelete();
+      await profile.handleDelete();
     });
 
     this.cancelButtonImage.on('pointerdown', () => {
       this.setVisible(false);
+      profile.toggleFormVisibility(true);
     });
 
     this.add([

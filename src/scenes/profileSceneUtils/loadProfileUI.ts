@@ -6,6 +6,10 @@ export async function loadProfileUI(context: ProfileScene): Promise<void> {
 
   context.load.image('saveButton', '/assets/images/gameItems/ColorSwatch_Color-hd.png');
 
+  // Popup images
+  context.load.image('popupBackground', '/assets/images/gameItems/NextGameButton-hd.png');
+  context.load.image('popupButton', '/assets/images/gameItems/ColorSwatch_Color-hd.png');
+
   profilePicNames.forEach(name => {
     const keyword = name.slice(0, name.length - 4);
     context.load.image(keyword, `/assets/images/profilePics/${name}`);
