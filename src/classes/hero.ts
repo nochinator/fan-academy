@@ -409,8 +409,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     const totalPower = this.power + this.power * this.powerModifier / 100 * multiplier;
 
-    // this.updateTileData(); // REVIEW: Needed ?
-
     return totalPower;
   }
 
@@ -773,5 +771,18 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (this.runeMetal) return `${this.unitType}_2`;
 
     return `${this.unitType}_1`;
+  }
+
+  resetPowerModifier() {
+    this.powerModifier = 0;
+    if (this.isDebuffed) {
+      this.isDebuffed = false;
+      this.debuffImage.setVisible(false);
+      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
+    }
+    if (this.superCharge) {
+      this.superCharge = false;
+      this.superChargeAnim.setVisible(false);
+    }
   }
 }

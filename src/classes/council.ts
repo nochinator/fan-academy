@@ -44,16 +44,7 @@ export class Archer extends Human {
       target.getsDamaged(this.getTotalPower(), this.attackType);
     }
 
-    this.powerModifier = 0;
-    if (this.isDebuffed) {
-      this.isDebuffed = false;
-      this.debuffImage.setVisible(false);
-      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-    }
-    if (this.superCharge) {
-      this.superCharge = false;
-      this.superChargeAnim.setVisible(false);
-    }
+    this.resetPowerModifier();
 
     this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -76,16 +67,7 @@ export class Knight extends Human {
 
     if (target instanceof Hero) await gameController.pushEnemy(this, target);
 
-    this.powerModifier = 0;
-    if (this.isDebuffed) {
-      this.isDebuffed = false;
-      this.debuffImage.setVisible(false);
-      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-    }
-    if (this.superCharge) {
-      this.superCharge = false;
-      this.superChargeAnim.setVisible(false);
-    }
+    this.resetPowerModifier();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -117,16 +99,7 @@ export class Wizard extends Human {
     if (secondTarget) secondTarget.getsDamaged(this.getTotalPower(), this.attackType);
     if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower(), this.attackType);
 
-    this.powerModifier = 0;
-    if (this.isDebuffed) {
-      this.isDebuffed = false;
-      this.debuffImage.setVisible(false);
-      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-    }
-    if (this.superCharge) {
-      this.superCharge = false;
-      this.superChargeAnim.setVisible(false);
-    }
+    this.resetPowerModifier();
 
     gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -252,16 +225,7 @@ export class Ninja extends Human {
       target.getsDamaged(this.getTotalPower(), this.attackType);
     }
 
-    this.powerModifier = 0;
-    if (this.isDebuffed) {
-      this.isDebuffed = false;
-      this.debuffImage.setVisible(false);
-      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-    }
-    if (this.superCharge) {
-      this.superCharge = false;
-      this.superChargeAnim.setVisible(false);
-    }
+    this.resetPowerModifier();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -299,16 +263,7 @@ export class Cleric extends Human {
 
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
-    this.powerModifier = 0;
-    if (this.isDebuffed) {
-      this.isDebuffed = false;
-      this.debuffImage.setVisible(false);
-      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-    }
-    if (this.superCharge) {
-      this.superCharge = false;
-      this.superChargeAnim.setVisible(false);
-    }
+    this.resetPowerModifier();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -316,11 +271,15 @@ export class Cleric extends Human {
   heal(target: Hero): void {
     turnIfBehind(this.context, this, target);
 
+    const healingPower = this.getTotalPower();
+
     if (target.isKO) {
-      target.getsHealed(this.power * 2);
+      target.getsHealed(healingPower * 2);
     } else {
-      target.getsHealed(this.power * 3);
+      target.getsHealed(healingPower * 3);
     }
+
+    this.resetPowerModifier();
 
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };

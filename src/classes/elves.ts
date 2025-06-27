@@ -165,16 +165,7 @@ export class Necromancer extends DarkElf {
 
       tile.hero = phantom.exportData();
 
-      this.powerModifier = 0;
-      if (this.isDebuffed) {
-        this.isDebuffed = false;
-        this.debuffImage.setVisible(false);
-        this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-      }
-      if (this.superCharge) {
-        this.superCharge = false;
-        this.superChargeAnim.setVisible(false);
-      }
+      this.resetPowerModifier();
 
       gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
       gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
@@ -182,16 +173,7 @@ export class Necromancer extends DarkElf {
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
       if (damageDone) this.lifeSteal(damageDone);
 
-      this.powerModifier = 0;
-      if (this.isDebuffed) {
-        this.isDebuffed = false;
-        this.debuffImage.setVisible(false);
-        this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-      }
-      if (this.superCharge) {
-        this.superCharge = false;
-        this.superChargeAnim.setVisible(false);
-      }
+      this.resetPowerModifier();
 
       gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     }
@@ -238,11 +220,15 @@ export class Priestess extends DarkElf {
   heal(target: Hero): void {
     turnIfBehind(this.context, this, target);
 
+    const healingPower = this.getTotalPower();
+
     if (target.isKO) {
-      target.getsHealed(this.power / 2);
+      target.getsHealed(healingPower / 2);
     } else {
-      target.getsHealed(this.power * 2);
+      target.getsHealed(healingPower * 2);
     }
+
+    this.resetPowerModifier();
 
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
@@ -269,16 +255,7 @@ export class Wraith extends DarkElf {
     } else {
       target.getsDamaged(this.getTotalPower(), this.attackType);
 
-      this.powerModifier = 0;
-      if (this.isDebuffed) {
-        this.isDebuffed = false;
-        this.debuffImage.setVisible(false);
-        this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-      }
-      if (this.superCharge) {
-        this.superCharge = false;
-        this.superChargeAnim.setVisible(false);
-      }
+      this.resetPowerModifier();
     }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
