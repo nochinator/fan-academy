@@ -490,8 +490,16 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   getsKnockedDown(): void {
     if (this.unitType === EHeroes.PHANTOM) {
       this.removeFromBoard();
+      this.removeFromGame();
       return;
     }
+
+    this.superCharge = false;
+    this.superChargeAnim.setVisible(true);
+    this.isDebuffed = false;
+    this.debuffImage.setVisible(false);
+    this.powerModifier = 0;
+    this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
 
     this.currentHealth = 0;
     this.isKO = true;
