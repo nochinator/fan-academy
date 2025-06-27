@@ -80,9 +80,8 @@ export class Profile extends Phaser.GameObjects.Container {
     this.passwordConfirmInput = this.createInputField(600, 350, 'Confirm Password', true);
 
     // Error field
-    this.profileUpdateError = this.context.add.dom(600, 400).createFromHTML(`
-  <div id="profileError" class="proLightFont" style="color: red; font-size: 35px; margin-bottom: 10px; display: none;"></div>
-`);
+    this.profileUpdateError = this.context.add.dom(430, 380).createFromHTML(`
+  <div id="profileError" class="proLightFont" style="color: white; font-size: 30px; margin-bottom: 10px; display: none; max-width: 500px; background-color: #8e0000; padding: 10px"></div>`);
 
     /**
       *  PREFERENCES
@@ -216,8 +215,6 @@ export class Profile extends Phaser.GameObjects.Container {
   async handleSubmit() {
     this.profileUpdateError.setVisible(false);
 
-    console.log('thislogs');
-
     // const username = (this.context.usernameInput!.getChildByName('') as HTMLInputElement).value;
     const email = (this.emailInput!.getChildByName('') as HTMLInputElement).value;
     const password = (this.passwordInput!.getChildByName('') as HTMLInputElement).value;
@@ -230,14 +227,12 @@ export class Profile extends Phaser.GameObjects.Container {
         this.showFormError(this.profileUpdateError, 'Passwords do not match');
         return;
       };
-      console.log('thislogs');
 
       if (!isValidPassword(password)) {
         this.showFormError(this.profileUpdateError, 'Password must be at least 8 characters long and contain a letter and a number');
         return;
       };
     }
-    console.log('thislogs');
 
     const payload: {
       email?: string,
@@ -253,8 +248,6 @@ export class Profile extends Phaser.GameObjects.Container {
     if (enableChat !== this.context.userData?.preferences.chat) payload.chat = enableChat;
     if (this.context.userData?.picture !== this.previousPicture) payload.picture = this.context.userData!.picture;
 
-    console.log('profilePicsCheck', this.profilePicture.texture.key, this.context.userData!.picture);
-
     if (Object.keys(payload).length === 0) return;
 
     const result = await updateProfile(payload);
@@ -262,15 +255,16 @@ export class Profile extends Phaser.GameObjects.Container {
     if (result.success) {
       console.log('Profile updated');
       this.context.userData = result.user;
-      console.log('UUSER', this.context.userData);
     } else {
+      this.loadUserData();
+      const previousPicture = imageKeywordFromFilename(this.previousPicture!);
+      this.profilePicture.setTexture(previousPicture);
       this.showFormError(this.profileUpdateError, result.error); // Show server error to user
     }
   }
 
   async handleDelete(): Promise<void> {
     const result = await deleteAccount();
-    console.log('RESULT', result);
     if (result.success) this.context.scene.start('MainMenuScene');
   }
 
