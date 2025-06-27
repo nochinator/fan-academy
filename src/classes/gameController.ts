@@ -252,6 +252,7 @@ export class GameController {
       return;
     }
 
+    target.specialTileCheck(targetNewTile, targetTile);
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);
@@ -280,6 +281,7 @@ export class GameController {
       return;
     }
 
+    target.specialTileCheck(targetNewTile, targetTile);
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);
