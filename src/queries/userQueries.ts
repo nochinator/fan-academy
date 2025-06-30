@@ -2,7 +2,7 @@ import { IUserPreferences, IUserStats } from "../interfaces/userInterface";
 
 export async function loginQuery(username: string, password: string) {
   try {
-    const response = await fetch(`users/login`, {
+    const response = await fetch(`${import.meta.env.VITE_BE_URL}users/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -38,7 +38,7 @@ export async function loginQuery(username: string, password: string) {
 
 export async function signUpQuery(email: string, username: string, password: string) {
   try {
-    const response = await fetch(`users/signup`, {
+    const response = await fetch(`${import.meta.env.VITE_BE_URL}users/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
