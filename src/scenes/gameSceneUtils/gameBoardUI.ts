@@ -13,7 +13,7 @@ export function loadGameBoardUI(context: GameScene): void {
   context.load.image('actionPie', '/assets/images/gameItems/action_pie.png');
   context.load.image('actionCircle', '/assets/images/gameItems/action_circle.png');
 
-  context.load.image('turnButton', '/assets/ui/used/turn_button.png');
+  context.load.image('turnButton', '/assets/ui/turn_button.png');
 
   context.load.image('popupBackground', '/assets/images/gameItems/NextGameButton-hd.png');
   context.load.image('popupButton', '/assets/images/gameItems/ColorSwatch_Color-hd.png');

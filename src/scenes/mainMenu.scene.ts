@@ -23,7 +23,7 @@ export default class MainMenuScene extends Phaser.Scene {
     // TODO: add middleware check
 
     // images
-    const imagesPath = '/assets/ui/used/';
+    const imagesPath = '/assets/ui/';
     this.load.image('mainMenuBg', imagesPath + 'game_screen.png');
     this.load.image('mainMenuImage', imagesPath + 'main_menu_image.png');
     this.load.image('mainMenuImageLoggedIn', imagesPath + 'main_menu_logged.png');
