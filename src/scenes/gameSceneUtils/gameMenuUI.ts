@@ -4,15 +4,15 @@ import { joinGame } from "../../colyseus/colyseusGameRoom";
 import UIScene from "../ui.scene";
 
 export function loadGameMenuUI(context: UIScene) {
-  context.load.image('uiBackground', '/assets/ui/used/game_screen.png');
-  context.load.image('gameBackground', '/assets/ui/used/create_game.png');
-  context.load.image('gameListButton', '/assets/ui/used/game_list_premade.png');
-  context.load.image('newGameButton', '/assets/ui/used/new_game_btn.png');
-  context.load.image(EFaction.COUNCIL, '/assets/ui/used/council_emblem.png');
-  context.load.image(EFaction.DARK_ELVES, '/assets/ui/used/elves_emblem.png');
-  context.load.image('unknownFaction', '/assets/ui/used/unknown_faction.png');
+  context.load.image('uiBackground', '/assets/ui/game_screen.png');
+  context.load.image('gameBackground', '/assets/ui/create_game.png');
+  context.load.image('gameListButton', '/assets/ui/game_list_premade.png');
+  context.load.image('newGameButton', '/assets/ui/new_game_btn.png');
+  context.load.image(EFaction.COUNCIL, '/assets/ui/council_emblem.png');
+  context.load.image(EFaction.DARK_ELVES, '/assets/ui/elves_emblem.png');
+  context.load.image('unknownFaction', '/assets/ui/unknown_faction.png');
   context.load.image('unknownOpponent', '/assets/images/profilePics/unknownAvatar-hd.jpg');
-  context.load.image('closeButton', '/assets/ui/used/close_button.png');
+  context.load.image('closeButton', '/assets/ui/close_button.png');
 
   context.load.image('popupBackground', '/assets/images/gameItems/NextGameButton-hd.png');
   context.load.image('popupButton', '/assets/images/gameItems/ColorSwatch_Color-hd.png');

@@ -2,7 +2,7 @@ import ProfileScene from "../profile.scene";
 import { profilePicNames } from "./profilePicNames";
 
 export async function loadProfileUI(context: ProfileScene): Promise<void> {
-  context.load.image('gameBackground', '/assets/ui/used/create_game.png');
+  context.load.image('gameBackground', '/assets/ui/create_game.png');
 
   context.load.image('saveButton', '/assets/images/gameItems/ColorSwatch_Color-hd.png');
 
