@@ -92,7 +92,7 @@ export function loadGameAssets(context: GameScene) {
   });
 
   // Loading item card icons
-  Object.entries(EItems).forEach(([key, value]) => {
+  Object.entries(EItems).forEach(([_key, value]) => {
     context.load.image(`${value}CardPic`, `/assets/images/profilePics/${value}Icon.jpg`);
   });
 

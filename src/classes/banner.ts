@@ -1,5 +1,4 @@
-import { IGame, IUserData } from "../interfaces/gameInterface";
-import { IUser } from "../interfaces/userInterface";
+import { IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { truncateText } from "../utils/gameUtils";
 import { Board } from "./board";

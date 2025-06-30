@@ -49,8 +49,8 @@ export class Archer extends Human {
     this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(target: Hero): void {};
-  teleport(target: Hero): void {};
+  heal(_target: Hero): void {};
+  teleport(_target: Hero): void {};
 }
 
 export class Knight extends Human {
@@ -72,8 +72,8 @@ export class Knight extends Human {
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(target: Hero): void {};
-  teleport(target: Hero): void {};
+  heal(_target: Hero): void {};
+  teleport(_target: Hero): void {};
 }
 
 export class Wizard extends Human {
@@ -196,8 +196,8 @@ export class Wizard extends Human {
     }
   }
 
-  heal(target: Hero): void {};
-  teleport(target: Hero): void {};
+  heal(_target: Hero): void {};
+  teleport(_target: Hero): void {};
 }
 
 export class Ninja extends Human {
@@ -249,7 +249,7 @@ export class Ninja extends Human {
     gameController?.afterAction(EActionType.TELEPORT, this.boardPosition, target.boardPosition);
   };
 
-  heal(target: Hero): void {};
+  heal(_target: Hero): void {};
 }
 
 export class Cleric extends Human {
@@ -284,7 +284,7 @@ export class Cleric extends Human {
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
 
-  teleport(target: Hero): void {};
+  teleport(_target: Hero): void {};
 }
 
 export class DragonScale extends Item {

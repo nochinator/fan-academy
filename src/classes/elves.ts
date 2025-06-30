@@ -64,8 +64,8 @@ export class Impaler extends DarkElf {
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(target: Hero): void {};
-  teleport(target: Hero): void {};
+  heal(_target: Hero): void {};
+  teleport(_target: Hero): void {};
 }
 
 export class VoidMonk extends DarkElf {
@@ -129,7 +129,7 @@ export class VoidMonk extends DarkElf {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  getOffsetTiles(target: number, attackDirection: number): number[] {
+  getOffsetTiles(_target: number, attackDirection: number): number[] {
     // Direction can only be 1, 3, 5 or 7
     switch (attackDirection) {
       case 1: return [-1, 1, -9];
@@ -140,8 +140,8 @@ export class VoidMonk extends DarkElf {
     }
   }
 
-  heal(target: Hero): void {};
-  teleport(target: Hero): void {};
+  heal(_target: Hero): void {};
+  teleport(_target: Hero): void {};
 }
 
 export class Necromancer extends DarkElf {
@@ -179,8 +179,8 @@ export class Necromancer extends DarkElf {
     }
   }
 
-  heal(target: Hero): void {};
-  teleport(target: Hero): void {};
+  heal(_target: Hero): void {};
+  teleport(_target: Hero): void {};
 }
 
 export class Priestess extends DarkElf {
@@ -233,7 +233,7 @@ export class Priestess extends DarkElf {
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
 
-  teleport(target: Hero): void {};
+  teleport(_target: Hero): void {};
 }
 
 export class Wraith extends DarkElf {
@@ -261,8 +261,8 @@ export class Wraith extends DarkElf {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(target: Hero): void {};
-  teleport(target: Hero): void {};
+  heal(_target: Hero): void {};
+  teleport(_target: Hero): void {};
 }
 
 export class Phantom extends Hero {
@@ -301,8 +301,8 @@ export class Phantom extends Hero {
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(target: Hero): void {};
-  teleport(target: Hero): void {};
+  heal(_target: Hero): void {};
+  teleport(_target: Hero): void {};
   equipFactionBuff(): void {}
 }
 

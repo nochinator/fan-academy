@@ -57,13 +57,15 @@ export default class MainMenuScene extends Phaser.Scene {
       font: '50px proLight',
       color: '#873600'
     }).setOrigin(-0.4, -1.3);
-    const menuBottomContainer = this.add.container(bg.width - menuBottomImage.width - 14, bg.height - menuBottomImage.height - 14, [menuBottomImage, menuBottomText]);
+    // menuBottomContainer
+    this.add.container(bg.width - menuBottomImage.width - 14, bg.height - menuBottomImage.height - 14, [menuBottomImage, menuBottomText]);
 
     // main menu buttons
     const menuButtonHeight = this.textures.get('mainMenuButton').getSourceImage().height;
     const menuButtonX =  200;
 
-    const profileButton = createMainMenuButton({
+    // profileButton
+    createMainMenuButton({
       thisParam: this,
       x: menuButtonX,
       y: 275,
@@ -77,7 +79,8 @@ export default class MainMenuScene extends Phaser.Scene {
       }
     });
 
-    const leaderboardsButton = createMainMenuButton({
+    // leaderboardsButton
+    createMainMenuButton({
       thisParam: this,
       x: menuButtonX,
       y: menuButtonHeight + 299,
@@ -90,7 +93,9 @@ export default class MainMenuScene extends Phaser.Scene {
         this.currentSubScene = 'LeaderboardScene';
       }
     });
-    const aboutButton = createMainMenuButton({
+
+    // aboutButton
+    createMainMenuButton({
       thisParam: this,
       x: menuButtonX,
       y: menuButtonHeight * 2 + 323,
@@ -99,7 +104,8 @@ export default class MainMenuScene extends Phaser.Scene {
       font: '70px proHeavy'
     }); // TODO: add callbacks
 
-    const playButton = createMainMenuButton({
+    // playButton
+    createMainMenuButton({
       thisParam: this,
       x: 200,
       y: 140,
@@ -112,11 +118,6 @@ export default class MainMenuScene extends Phaser.Scene {
         this.currentSubScene = 'UIScene';
       }
     });
-
-    // this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-    //   // Log the mouse coordinates
-    //   console.log(`Mouse coordinates: x=${pointer.x}, y=${pointer.y}`);
-    // });
   }
 
   /*
