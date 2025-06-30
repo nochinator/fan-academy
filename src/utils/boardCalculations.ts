@@ -55,6 +55,5 @@ export function calculateAllCenterPoints(): Coordinates[] {
     y: 720
   });
 
-  console.log(centerPoints);
   return centerPoints;
 }

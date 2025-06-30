@@ -222,10 +222,6 @@ export function turnIfBehind(context: GameScene, attacker: Hero, target: Hero | 
   const isLookingRight = attacker.belongsTo === 1;
   const attackerImage = attacker.characterImage;
 
-  console.log('attacker belong to 1', attacker.belongsTo === 1);
-  console.log('isFlipped', attackerImage.flipX);
-  console.log(target.col, attacker.col);
-
   if (isLookingRight && target.col >= attacker.col) return;
   if (!isLookingRight && target.col <= attacker.col) return;
 
