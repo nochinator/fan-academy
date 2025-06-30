@@ -41,11 +41,10 @@ export default class MainMenuScene extends Phaser.Scene {
     this.userId = await authCheck();
 
     // Login and sign up forms. Only show if user is not authenticated
-    this.createSignUpAndLoginForms(this.userId);
+    // this.createSignUpAndLoginForms(this.userId);
 
     // Background image
     const bg = this.add.image(0, 0, 'mainMenuBg').setOrigin (0);
-    // main menu image
     // const menuIgm = isUserAuthenticated  this.add.image(0, 0, 'mainMenuImageLoggedIn').setOrigin (0) : this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
     const menuImg = this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
     menuImg.x = bg.width - menuImg.width - 14;
