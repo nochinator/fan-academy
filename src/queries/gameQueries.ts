@@ -3,7 +3,7 @@ import { IGame } from "../interfaces/gameInterface";
 
 export async function getGameList(userId: string): Promise<IGame[] | []> {
   console.log('Fetching game list...');
-  const url = `${import.meta.env.VITE_BE_IP}/games/playing?userId=${encodeURIComponent(userId)}`;
+  const url = `games/playing?userId=${encodeURIComponent(userId)}`;
   const result = await fetch(url, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
@@ -24,7 +24,7 @@ export async function getGameList(userId: string): Promise<IGame[] | []> {
 // Challenge a player to a game
 export async function newGameChallenge(userId: string, faction: EFaction, opponentId: string): Promise<any> {
   console.log('Sending challenge to player... ');
-  const url = `${import.meta.env.VITE_BE_IP}/games/newGame?userId=${encodeURIComponent(userId)}&faction=${encodeURIComponent(faction)}&opponentId=${encodeURIComponent(opponentId)}`;
+  const url = `games/newGame?userId=${encodeURIComponent(userId)}&faction=${encodeURIComponent(faction)}&opponentId=${encodeURIComponent(opponentId)}`;
   const result = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

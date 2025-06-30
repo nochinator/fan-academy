@@ -19,8 +19,6 @@ export default class MainMenuScene extends Phaser.Scene {
     // login form
     this.load.html('loginForm', '../src/html/loginForm.html'); // Paths are relative form the public folder
     this.load.html('signUpForm', '../src/html/signUpForm.html');
-    // TODO: play and profile need to be disabled until login. Leaderboard and about should be available. Coming back home should show the login form again
-    // TODO: add middleware check
 
     // images
     const imagesPath = '/assets/ui/';
