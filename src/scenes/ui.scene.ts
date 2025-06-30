@@ -18,7 +18,7 @@ export default class UIScene extends Phaser.Scene {
 
   constructor() {
     super({ key: 'UIScene' });
-    this.colyseusClient = new Client("ws://localhost:3003"); // TODO: env var
+    this.colyseusClient = new Client(`${import.meta.env.VITE_SOCKET}`);
   }
 
   async init(data: { userId: string, }) {

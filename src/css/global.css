@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'proLight';
-  src:local('/assets/fonts/BlambotFXProLightBB.ttf')
+  src:url('/assets/fonts/BlambotFXProLightBB.ttf')
 }
 
 @font-face {
   font-family: 'proHeavy';
-  src:local('/assets/fonts/BlambotFXProHeavyLowerCapsBB.ttf')
+  src:url('/assets/fonts/BlambotFXProHeavyLowerCapsBB.ttf')
 }
 
 body {
