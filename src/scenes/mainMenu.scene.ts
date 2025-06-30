@@ -183,6 +183,11 @@ export default class MainMenuScene extends Phaser.Scene {
         return;
       };
 
+      if(signUpUsernameInput.value.length > 20) {
+        showFormError(signUpError, 'Username must be 20 characters or shorter');
+        return;
+      }
+
       if (signUpEmailInput.value && signUpUsernameInput.value && signUpPasswordInput.value) {
         const result = await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
         if (result.success) {
