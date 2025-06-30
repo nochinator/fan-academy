@@ -49,4 +49,4 @@ This means:
 
 ### **Disclaimer for Third-Party Assets**
 
-This project includes proprietary assets from **Hero Academy**, which are the property of **Robot Entertainment**. These assets are used for educational and non-commercial purposes under the assumption of fair use for a fan project, and they are not hosted on GitHub. **This license applies only to the code in this repository and not to the assets.** All rights to the proprietary assets remain with their respective owners.
+This project includes proprietary assets from **Hero Academy**, which are the property of **Robot Entertainment**. These assets are used for educational and non-commercial purposes under the assumption of fair use for a fan project. **This license applies only to the code in this repository and not to the assets.** All rights to the proprietary assets remain with their respective owners.
