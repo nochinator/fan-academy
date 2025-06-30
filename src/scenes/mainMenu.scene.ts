@@ -17,8 +17,8 @@ export default class MainMenuScene extends Phaser.Scene {
 
   preload() {
     // login form
-    this.load.html('loginForm', '../src/html/loginForm.html'); // Paths are relative form the public folder
-    this.load.html('signUpForm', '../src/html/signUpForm.html');
+    this.load.html('loginForm', 'html/loginForm.html');
+    this.load.html('signUpForm', 'html/signUpForm.html');
 
     // images
     const imagesPath = '/assets/ui/';
@@ -128,101 +128,103 @@ export default class MainMenuScene extends Phaser.Scene {
     const signUpForm = this.add.dom(800, 400).createFromCache('signUpForm');
     signUpForm.setVisible(false);
 
-    this.time.delayedCall(100, () => {
     // Login form elements
-      const loginUsernameInput = loginForm.getChildByID('username') as HTMLInputElement;
-      const loginPasswordInput = loginForm.getChildByID('password') as HTMLInputElement;
-      const loginButton = loginForm.getChildByID('loginButton') as HTMLInputElement;
-      const linkToSignUp = loginForm.getChildByID('linkToSignUp') as HTMLInputElement;
-      const loginError = loginForm.getChildByID('loginError') as HTMLDivElement;
+    const loginUsernameInput = loginForm.getChildByID('username') as HTMLInputElement;
+    const loginPasswordInput = loginForm.getChildByID('password') as HTMLInputElement;
+    const loginButton = loginForm.getChildByID('loginButton') as HTMLInputElement;
+    const linkToSignUp = loginForm.getChildByID('linkToSignUp') as HTMLInputElement;
+    const loginError = loginForm.getChildByID('loginError') as HTMLDivElement;
 
-      // Sign up form elements
-      const signUpEmailInput = signUpForm.getChildByID('email') as HTMLInputElement;
-      const signUpUsernameInput = signUpForm.getChildByID('username') as HTMLInputElement;
-      const signUpPasswordInput = signUpForm.getChildByID('password') as HTMLInputElement;
-      const signUpPasswordConfirm = signUpForm.getChildByID('passwordConfirm') as HTMLInputElement;
-      const signUpButton = signUpForm.getChildByID('signUpButton') as HTMLInputElement;
-      const linkToLogin = signUpForm.getChildByID('linkToLogin') as HTMLInputElement;
-      const signUpError = signUpForm.getChildByID('signUpError') as HTMLDivElement;
+    // Sign up form elements
+    const signUpEmailInput = signUpForm.getChildByID('email') as HTMLInputElement;
+    const signUpUsernameInput = signUpForm.getChildByID('username') as HTMLInputElement;
+    const signUpPasswordInput = signUpForm.getChildByID('password') as HTMLInputElement;
+    const signUpPasswordConfirm = signUpForm.getChildByID('passwordConfirm') as HTMLInputElement;
+    const signUpButton = signUpForm.getChildByID('signUpButton') as HTMLInputElement;
+    const linkToLogin = signUpForm.getChildByID('linkToLogin') as HTMLInputElement;
+    const signUpError = signUpForm.getChildByID('signUpError') as HTMLDivElement;
 
-      const showFormError = (element: HTMLDivElement, message: string) => {
-        element.innerText = message;
-        element.style.display = 'block';
-      };
+    const showFormError = (element: HTMLDivElement, message: string) => {
+      element.innerText = message;
+      element.style.display = 'block';
+    };
 
-      const hideFormError = (element: HTMLDivElement) => {
-        element.innerText = '';
-        element.style.display = 'none';
-      };
+    const hideFormError = (element: HTMLDivElement) => {
+      element.innerText = '';
+      element.style.display = 'none';
+    };
 
-      loginButton.addEventListener('click', async () => {
-        if (loginUsernameInput.value && loginPasswordInput.value) {
-          const result = await loginQuery(loginUsernameInput.value, loginPasswordInput.value);
-          if (result.success) {
-            loginForm.setVisible(false);
-            this.userId = result.user._id;
-            console.log('UserId after login:', this.userId);
-          } else {
-            showFormError(loginError, result.error);
-          }
+    // Login button click
+    loginButton.addEventListener('click', async () => {
+      if (loginUsernameInput.value && loginPasswordInput.value) {
+        const result = await loginQuery(loginUsernameInput.value, loginPasswordInput.value);
+        if (result.success) {
+          loginForm.setVisible(false);
+          this.userId = result.user._id;
+          console.log('UserId after login:', this.userId);
+        }else {
+          showFormError(loginError, result.error); // Show server error to user
         }
-      });
-
-      signUpButton.addEventListener('click', async () => {
-        hideFormError(signUpError);
-
-        if (signUpPasswordInput.value !== signUpPasswordConfirm.value) {
-          showFormError(signUpError, 'Passwords do not match');
-          return;
-        };
-        if (!isValidPassword(signUpPasswordInput.value)) {
-          showFormError(signUpError, 'Password must be at least 8 characters long and contain a letter and a number');
-          return;
-        };
-
-        if(signUpUsernameInput.value.length > 20) {
-          showFormError(signUpError, 'Username must be 20 characters or shorter');
-          return;
-        }
-
-        if (signUpEmailInput.value && signUpUsernameInput.value && signUpPasswordInput.value) {
-          const result = await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
-          if (result.success) {
-            signUpForm.setVisible(false);
-            this.userId = result.user._id;
-            console.log('UserId after sign up:', this.userId);
-          } else {
-            showFormError(signUpError, result.error);
-          }
-        }
-      });
-
-      const addEnterKeyListener = (field: HTMLInputElement, button: HTMLInputElement ) => {
-        field.addEventListener('keydown', (event) => {
-          if (event.key === 'Enter') {
-            button.click();
-          }
-        });
-      };
-
-      [loginUsernameInput, loginPasswordInput].forEach(field => addEnterKeyListener(field, loginButton));
-      [signUpEmailInput, signUpUsernameInput, signUpPasswordInput, signUpPasswordConfirm].forEach(field => addEnterKeyListener(field, signUpButton));
-
-      linkToSignUp.addEventListener('click', () => {
-        loginForm.setVisible(false);
-        signUpForm.setVisible(true);
-      });
-
-      linkToLogin.addEventListener('click', () => {
-        signUpForm.setVisible(false);
-        loginForm.setVisible(true);
-      });
-
-      if (userId) {
-        loginForm.setVisible(false);
-        signUpForm.setVisible(false);
       }
     });
+
+    // Sign up button click
+    signUpButton.addEventListener('click', async () => {
+      hideFormError(signUpError);
+
+      if (signUpPasswordInput.value !== signUpPasswordConfirm.value) {
+        showFormError(signUpError, 'Passwords do not match');
+        return;
+      };
+      if (!isValidPassword(signUpPasswordInput.value)) {
+        showFormError(signUpError, 'Password must be at least 8 characters long and contain a letter and a number');
+        return;
+      };
+
+      if(signUpUsernameInput.value.length > 20) {
+        showFormError(signUpError, 'Username must be 20 characters or shorter');
+        return;
+      }
+
+      if (signUpEmailInput.value && signUpUsernameInput.value && signUpPasswordInput.value) {
+        const result = await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
+        if (result.success) {
+          signUpForm.setVisible(false);
+          this.userId = result.user._id;
+          console.log('UserId after sign up:', this.userId);
+        } else {
+          showFormError(signUpError, result.error); // Show server error to user
+        }
+      }
+    });
+
+    // Listeners for login in pressing Enter
+    const addEnterKeyListener = (field: HTMLInputElement, button: HTMLInputElement ) => {
+      field.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          button.click();
+        }
+      });
+    };
+    [loginUsernameInput, loginPasswordInput].forEach(field => addEnterKeyListener(field, loginButton));
+    [signUpEmailInput, signUpUsernameInput, signUpPasswordInput, signUpPasswordConfirm].forEach(field => addEnterKeyListener(field, signUpButton));
+
+    // Switch forms
+    linkToSignUp.addEventListener('click', () => {
+      loginForm.setVisible(false);
+      signUpForm.setVisible(true);
+    });
+
+    linkToLogin.addEventListener('click', () => {
+      signUpForm.setVisible(false);
+      loginForm.setVisible(true);
+    });
+
+    // If already logged in
+    if (userId) {
+      loginForm.setVisible(false);
+      signUpForm.setVisible(false);
+    }
 
     return {
       loginForm,
