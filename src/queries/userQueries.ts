@@ -79,7 +79,7 @@ export async function signUpQuery(email: string, username: string, password: str
  */
 export async function authCheck(): Promise<string | undefined> {
   console.log('Checking Authentication Status...');
-  const result = await fetch(`auth-check`, {
+  const result = await fetch(`${import.meta.env.VITE_BE_URL}auth-check`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include'
@@ -111,7 +111,7 @@ export async function getLeaderBoard(page = 1): Promise<{
 } | null> {
   console.log('Fetching leaderboard data...');
 
-  const result = await fetch(`users/leaderboard?page=${encodeURIComponent(page)}`, {
+  const result = await fetch(`${import.meta.env.VITE_BE_URL}users/leaderboard?page=${encodeURIComponent(page)}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include'
@@ -142,7 +142,7 @@ export async function getProfile(): Promise<{
 } | null> {
   console.log('Fetching profile data...');
 
-  const result = await fetch(`users/profile`, {
+  const result = await fetch(`${import.meta.env.VITE_BE_URL}users/profile`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include'
@@ -168,7 +168,7 @@ export async function updateProfile(payload: {
   chat?: boolean
 }) {
   try {
-    const response = await fetch(`users/update`, {
+    const response = await fetch(`${import.meta.env.VITE_BE_URL}users/update`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -201,7 +201,7 @@ export async function updateProfile(payload: {
 
 export async function deleteAccount() {
   try {
-    const response = await fetch(`users/delete`, {
+    const response = await fetch(`${import.meta.env.VITE_BE_URL}users/delete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include'
