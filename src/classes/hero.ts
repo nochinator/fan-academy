@@ -121,7 +121,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // Create the unit's image and images for its upgrades
     const inHand = isInHand(this.boardPosition);
-    const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, inHand);
+    const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, inHand, data.isKO);
     this.characterImage = context.add.image(charImageX, charImageY, this.updateCharacterImage()).setOrigin(0.5).setName('body');
     if (inHand) this.characterImage.setScale(0.8);
     if (this.belongsTo === 2 && this.boardPosition < 45) this.characterImage.setFlipX(true);
@@ -219,7 +219,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.physicalResistanceTileEvent = this.continuousEvent(this.physicalResistanceTileAnim, ['physicalResistanceAnim_1', 'physicalResistanceAnim_2', 'physicalResistanceAnim_3']);
 
-    this.superChargeAnim = context.add.image(0, -10, 'superChargeAnim_1').setOrigin(0.5).setScale(0.6);
+    this.superChargeAnim = context.add.image(0, -18, 'superChargeAnim_1').setOrigin(0.5).setScale(0.8);
     if (this.superCharge) {
       this.superChargeAnim.setVisible(true);
     } else {
@@ -381,12 +381,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.characterImage.setTint(0xff0000);
     this.scene.time.delayedCall(500, () => this.characterImage.clearTint());
 
-    console.log('damage', damage);
-
     // Calculate damage after applying resistances
     const totalDamage = roundToFive(this.getLifeLost(damage, attackType));
-
-    console.log('totalDamage', totalDamage);
 
     this.currentHealth -= totalDamage;
     if (this.currentHealth <= 0) this.getsKnockedDown();
@@ -460,6 +456,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.isKO = false;
     this.lastBreath = false;
     this.characterImage.setTexture(this.updateCharacterImage());
+    const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, false);
+    this.characterImage.x = charImageX;
+    this.characterImage.y = charImageY;
   }
 
   increaseMaxHealth(amount: number, addText = true): void {
@@ -497,7 +496,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     }
 
     this.superCharge = false;
-    this.superChargeAnim.setVisible(true);
+    this.superChargeAnim.setVisible(false);
     this.isDebuffed = false;
     this.debuffImage.setVisible(false);
     this.powerModifier = 0;
@@ -510,6 +509,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     tile.hero = this.exportData();
 
     this.characterImage.setTexture(this.updateCharacterImage());
+    const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, true);
+    this.characterImage.x = charImageX;
+    this.characterImage.y = charImageY;
   }
 
   getTile(): Tile {
@@ -629,7 +631,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // Modify image
     this.characterImage.setScale(1);
-    const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false);
+    const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, false);
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
     // Flip image if player is player 2

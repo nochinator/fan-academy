@@ -331,7 +331,7 @@ export function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHand: boolean): {
+export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHand: boolean, isKO: boolean): {
   charImageX: number,
   charImageY: number
 } {
@@ -350,6 +350,16 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
         charImageX: x,
         charImageY: y
       },
+      KO: {
+        1: {
+          charImageX: x,
+          charImageY: y
+        },
+        2: {
+          charImageX: x,
+          charImageY: y
+        }
+      },
       hand: {
         charImageX: x,
         charImageY: y - 15
@@ -364,6 +374,16 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
         charImageX: x,
         charImageY: y
       },
+      KO: {
+        1: {
+          charImageX: x,
+          charImageY: y
+        },
+        2: {
+          charImageX: x,
+          charImageY: y
+        }
+      },
       hand: {
         charImageX: x,
         charImageY: y - 15
@@ -372,11 +392,21 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
     [EHeroes.KNIGHT]: {
       1: {
         charImageX: x,
-        charImageY: y
+        charImageY: y - 5
       },
       2: {
         charImageX: x,
-        charImageY: y
+        charImageY: y - 5
+      },
+      KO: {
+        1: {
+          charImageX: x,
+          charImageY: y
+        },
+        2: {
+          charImageX: x,
+          charImageY: y
+        }
       },
       hand: {
         charImageX: x,
@@ -392,6 +422,16 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
         charImageX: x,
         charImageY: y
       },
+      KO: {
+        1: {
+          charImageX: x,
+          charImageY: y
+        },
+        2: {
+          charImageX: x,
+          charImageY: y
+        }
+      },
       hand: {
         charImageX: x,
         charImageY: y - 15
@@ -399,12 +439,22 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
     },
     [EHeroes.WIZARD]: {
       1: {
-        charImageX: x,
+        charImageX: x + 10,
         charImageY: y - 5
       },
       2: {
         charImageX: x - 10,
         charImageY: y - 5
+      },
+      KO: {
+        1: {
+          charImageX: x,
+          charImageY: y
+        },
+        2: {
+          charImageX: x,
+          charImageY: y
+        }
       },
       hand: {
         charImageX: x,
@@ -421,6 +471,16 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
         charImageX: x - 15,
         charImageY: y - 10
       },
+      KO: {
+        1: {
+          charImageX: x,
+          charImageY: y
+        },
+        2: {
+          charImageX: x,
+          charImageY: y
+        }
+      },
       hand: {
         charImageX: x,
         charImageY: y - 15
@@ -434,6 +494,16 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
       2: {
         charImageX: x - 15,
         charImageY: y - 5
+      },
+      KO: {
+        1: {
+          charImageX: x,
+          charImageY: y
+        },
+        2: {
+          charImageX: x,
+          charImageY: y
+        }
       },
       hand: {
         charImageX: x + 15,
@@ -449,6 +519,16 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
         charImageX: x + 20,
         charImageY: y - 10
       },
+      KO: {
+        1: {
+          charImageX: x,
+          charImageY: y
+        },
+        2: {
+          charImageX: x,
+          charImageY: y
+        }
+      },
       hand: {
         charImageX: x + 10,
         charImageY: y - 15
@@ -462,6 +542,16 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
       2: {
         charImageX: x,
         charImageY: y + 10
+      },
+      KO: {
+        1: {
+          charImageX: x,
+          charImageY: y
+        },
+        2: {
+          charImageX: x,
+          charImageY: y
+        }
       },
       hand: {
         charImageX: x,
@@ -477,6 +567,16 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
         charImageX: x,
         charImageY: y - 10
       },
+      KO: {
+        1: {
+          charImageX: x,
+          charImageY: y + 10
+        },
+        2: {
+          charImageX: x,
+          charImageY: y + 10
+        }
+      },
       hand: {
         charImageX: x + 5,
         charImageY: y - 15
@@ -491,6 +591,16 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
         charImageX: x,
         charImageY: y
       },
+      KO: {
+        1: {
+          charImageX: x,
+          charImageY: y
+        },
+        2: {
+          charImageX: x,
+          charImageY: y
+        }
+      },
       hand: {
         charImageX: x,
         charImageY: y - 15
@@ -498,7 +608,9 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
     }
   };
 
-  return inHand ? unitMap[unitType]['hand'] : unitMap[unitType][playerIndex];
+  if (inHand) return unitMap[unitType]['hand'];
+  if (isKO) return unitMap[unitType]['KO'][playerIndex];
+  return unitMap[unitType][playerIndex];
 }
 
 export function truncateText(text: string, maxLength: number) {
