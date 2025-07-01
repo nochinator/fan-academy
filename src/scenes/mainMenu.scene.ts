@@ -38,9 +38,6 @@ export default class MainMenuScene extends Phaser.Scene {
     // Auth check
     this.userId = await authCheck();
 
-    // Login and sign up forms. Only show if user is not authenticated
-    this.createSignUpAndLoginForms(this.userId);
-
     // Background image
     const bg = this.add.image(0, 0, 'mainMenuBg').setOrigin (0);
     // const menuIgm = isUserAuthenticated  this.add.image(0, 0, 'mainMenuImageLoggedIn').setOrigin (0) : this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
@@ -115,6 +112,9 @@ export default class MainMenuScene extends Phaser.Scene {
         this.currentSubScene = 'UIScene';
       }
     });
+
+    // Login and sign up forms. Only show if user is not authenticated
+    this.createSignUpAndLoginForms(this.userId);
   }
 
   /*
@@ -127,6 +127,9 @@ export default class MainMenuScene extends Phaser.Scene {
     const loginForm = this.add.dom(800, 400).createFromCache('loginForm');
     const signUpForm = this.add.dom(800, 400).createFromCache('signUpForm');
     signUpForm.setVisible(false);
+
+    // Used to block the user from clicking on some other part of the game
+    const blockingLayer = this.add.rectangle(0, 0, 2900, 2000, 0x000000, 0.001).setOrigin(0.5).setInteractive();
 
     // Login form elements
     const loginUsernameInput = loginForm.getChildByID('username') as HTMLInputElement;
@@ -160,6 +163,7 @@ export default class MainMenuScene extends Phaser.Scene {
         const result = await loginQuery(loginUsernameInput.value, loginPasswordInput.value);
         if (result.success) {
           loginForm.setVisible(false);
+          blockingLayer.setVisible(false);
           this.userId = result.user._id;
           console.log('UserId after login:', this.userId);
         }else {
@@ -190,6 +194,7 @@ export default class MainMenuScene extends Phaser.Scene {
         const result = await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
         if (result.success) {
           signUpForm.setVisible(false);
+          blockingLayer.setVisible(false);
           this.userId = result.user._id;
           console.log('UserId after sign up:', this.userId);
         } else {
@@ -224,6 +229,7 @@ export default class MainMenuScene extends Phaser.Scene {
     if (userId) {
       loginForm.setVisible(false);
       signUpForm.setVisible(false);
+      blockingLayer.setVisible(false);
     }
 
     return {

@@ -378,11 +378,15 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   getsDamaged(damage: number, attackType: EAttackType): number {
     // Flash the unit red
-    this.characterImage.setTint(0xff0000); // TODO: remove once I get floating dmg numbers working
-    this.scene.time.delayedCall(1000, () => this.characterImage.clearTint());
+    this.characterImage.setTint(0xff0000);
+    this.scene.time.delayedCall(500, () => this.characterImage.clearTint());
+
+    console.log('damage', damage);
 
     // Calculate damage after applying resistances
     const totalDamage = roundToFive(this.getLifeLost(damage, attackType));
+
+    console.log('totalDamage', totalDamage);
 
     this.currentHealth -= totalDamage;
     if (this.currentHealth <= 0) this.getsKnockedDown();

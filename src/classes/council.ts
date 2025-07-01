@@ -316,7 +316,6 @@ export class HealingPotion extends Item {
 export class Inferno extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
-    // dealsDamage: true,
   };
 
   use(targetTile: Tile): void {
