@@ -131,7 +131,6 @@ export class Crystal extends Phaser.GameObjects.Container {
   }
 
   getTile(): Tile {
-    console.log('BP', this.boardPosition);
     const tile = this.context?.gameController?.board.getTileFromBoardPosition(this.boardPosition);
     if (!tile) throw new Error('getTile() -> No tile found');
 
