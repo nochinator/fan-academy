@@ -161,9 +161,6 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
       if (isHero(activeUnit) && !tile.isOccupied()) activeUnit.spawn(tile);
       if (isItem(activeUnit) && activeUnit.dealsDamage) activeUnit.use(tile);
     }
-
-    // AOE damaging spells can target empty tiles
-    if (isItem(activeUnit) && activeUnit.dealsDamage) activeUnit.use(tile);
   });
 }
 
