@@ -196,7 +196,7 @@ export class Priestess extends DarkElf {
     if (damageDone) this.lifeSteal(damageDone);
 
     // Apply a 50% debuff to the target's next attack
-    if (target instanceof Hero && !target.isDebuffed) {
+    if (target instanceof Hero && !target.isDebuffed && !target.isKO) {
       target.modifyPower(-50);
       target.isDebuffed = true;
       target.debuffImage.setVisible(true);
