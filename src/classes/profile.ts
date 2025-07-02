@@ -13,6 +13,7 @@ export class Profile extends Phaser.GameObjects.Container {
   passwordInput: Phaser.GameObjects.DOMElement;
   passwordConfirmInput: Phaser.GameObjects.DOMElement;
   profileUpdateError: Phaser.GameObjects.DOMElement;
+  profileUpdateSuccess: Phaser.GameObjects.DOMElement;
 
   notificationsCheckBox: Phaser.GameObjects.DOMElement;
   chatCheckBox: Phaser.GameObjects.DOMElement;
@@ -69,9 +70,6 @@ export class Profile extends Phaser.GameObjects.Container {
     });
     this.profilePicturePopup = new ProfilePicPopup(this.context, this.profilePicture);
 
-    // Username input
-    // this.context.usernameInput = this.createInputField(600, 230, 'Username');
-
     // Email input
     this.emailInput = this.createInputField(600, 230, 'Email');
 
@@ -82,6 +80,10 @@ export class Profile extends Phaser.GameObjects.Container {
     // Error field
     this.profileUpdateError = this.context.add.dom(430, 380).createFromHTML(`
   <div id="profileError" class="proLightFont" style="color: white; font-size: 30px; margin-bottom: 10px; display: none; max-width: 500px; background-color: #8e0000; padding: 10px"></div>`);
+
+    // Successful update field
+    this.profileUpdateSuccess = this.context.add.dom(430, 380).createFromHTML(`
+  <div id="profileSuccess" class="proLightFont" style="color: white; font-size: 30px; margin-bottom: 10px; display: none; max-width: 500px; background-color: #14452f; padding: 10px"></div>`);
 
     /**
       *  PREFERENCES
@@ -171,6 +173,7 @@ export class Profile extends Phaser.GameObjects.Container {
       this.passwordInput,
       this.passwordConfirmInput,
       this.profileUpdateError,
+      this.profileUpdateSuccess,
       this.notificationsCheckBox,
       this.chatCheckBox,
       this.saveButtonImage,
@@ -214,6 +217,7 @@ export class Profile extends Phaser.GameObjects.Container {
 
   async handleSubmit() {
     this.profileUpdateError.setVisible(false);
+    this.profileUpdateSuccess.setVisible(false);
 
     // const username = (this.context.usernameInput!.getChildByName('') as HTMLInputElement).value;
     const email = (this.emailInput!.getChildByName('') as HTMLInputElement).value;
@@ -224,12 +228,12 @@ export class Profile extends Phaser.GameObjects.Container {
 
     if (password.trim() !== '') {
       if (password !== passwordConfirm) {
-        this.showFormError(this.profileUpdateError, 'Passwords do not match');
+        this.showForm(this.profileUpdateError, 'profileError', 'Passwords do not match');
         return;
       };
 
       if (!isValidPassword(password)) {
-        this.showFormError(this.profileUpdateError, 'Password must be at least 8 characters long and contain a letter and a number');
+        this.showForm(this.profileUpdateError, 'profileError', 'Password must be at least 8 characters long and contain a letter and a number');
         return;
       };
     }
@@ -254,12 +258,13 @@ export class Profile extends Phaser.GameObjects.Container {
 
     if (result.success) {
       console.log('Profile updated');
+      this.showForm(this.profileUpdateSuccess, 'profileSuccess', 'Profile successfully updated');
       this.context.userData = result.user;
     } else {
       this.loadUserData();
       const previousPicture = imageKeywordFromFilename(this.previousPicture!);
       this.profilePicture.setTexture(previousPicture);
-      this.showFormError(this.profileUpdateError, result.error); // Show server error to user
+      this.showForm(this.profileUpdateError, 'profileError', result.error); // Show server error to user
     }
   }
 
@@ -277,18 +282,18 @@ export class Profile extends Phaser.GameObjects.Container {
     this.profileUpdateError.setVisible(visible);
   }
 
-  showFormError(domElement: Phaser.GameObjects.DOMElement, message: string) {
+  showForm(domElement: Phaser.GameObjects.DOMElement, elementId: string, message: string) {
     domElement.setVisible(true);
 
-    const node = domElement.getChildByID?.('profileError') as HTMLDivElement | null;
+    const node = domElement.getChildByID?.(elementId) as HTMLDivElement | null;
     if (node) {
       node.innerText = message;
       node.style.display = 'block';
     }
   }
 
-  hideFormError(domElement: Phaser.GameObjects.DOMElement) {
-    const node = domElement.getChildByID?.('profileError') as HTMLDivElement | null;
+  hideForm(domElement: Phaser.GameObjects.DOMElement, elementId: string) {
+    const node = domElement.getChildByID?.(elementId) as HTMLDivElement | null;
     if (node) {
       node.innerText = '';
       node.style.display = 'none';
