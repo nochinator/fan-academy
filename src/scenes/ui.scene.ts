@@ -13,7 +13,7 @@ export default class UIScene extends Phaser.Scene {
   gameListContainer: Phaser.GameObjects.Container | undefined;
   gameList: IGame[] | undefined;
 
-  currentRoom: Room | undefined; // repeated
+  currentRoom: Room | undefined;
   gameScene: Phaser.Scene | undefined;
 
   constructor() {

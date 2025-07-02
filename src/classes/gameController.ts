@@ -39,7 +39,7 @@ export class GameController {
     this.board = new Board(context, this.lastTurnState.boardState);
 
     const playerData = context.currentGame.players.map(player => { return player.userData;});
-    this.gameUI = new GameUI(context, this.board, playerData); // TODO: add depth to UI and board assets
+    this.gameUI = new GameUI(context, this.board, playerData);
     context.player1 = this.lastTurnState.player1;
     context.player2 = this.lastTurnState.player2;
 

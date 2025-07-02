@@ -29,10 +29,12 @@ export async function loadProfilePictures(context: UIScene): Promise<void> {
   );
 
   uniqueOpponents.forEach( opponent => {
+    if (context.textures.exists(opponent.username)) context.textures.remove(opponent.username);
     context.load.image(opponent.username, opponent.picture);
   });
 
   const player = context.gameList[0].players.find(player => player.userData._id === context.userId);
+  if (context.textures.exists(player!.userData.username)) context.textures.remove(player!.userData.username);
   context.load.image(player!.userData.username, player!.userData.picture);
 
   return new Promise((resolve) => {
