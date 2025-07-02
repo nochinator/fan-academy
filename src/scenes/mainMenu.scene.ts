@@ -1,5 +1,5 @@
 import createMainMenuButton from "./mainMenuUtils/buttons";
-import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
+import { authCheck, loginQuery, sendLogout, signUpQuery } from "../queries/userQueries";
 import { isValidPassword } from "../utils/playerUtils";
 
 export default class MainMenuScene extends Phaser.Scene {
@@ -110,6 +110,21 @@ export default class MainMenuScene extends Phaser.Scene {
         if (this.currentSubScene) this.scene.stop(this.currentSubScene);
         this.scene.start('UIScene', { userId: this.userId });
         this.currentSubScene = 'UIScene';
+      }
+    });
+
+    // logoutButton
+    createMainMenuButton({
+      thisParam: this,
+      x: menuButtonX,
+      y: menuButtonHeight * 14 + 40,
+      imageKey: 'mainMenuButton',
+      text: 'Logout',
+      font: '70px proHeavy',
+      tint: '0x990000',
+      callback: async () => {
+        const result = await sendLogout();
+        if (result.success) this.scene.start('MainMenuScene');
       }
     });
 

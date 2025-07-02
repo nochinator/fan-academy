@@ -230,3 +230,35 @@ export async function deleteAccount() {
     };
   }
 }
+
+export async function sendLogout() {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BE_URL}users/logout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include'
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log('Logged out');
+      return {
+        success: true,
+        result: data
+      };
+    } else {
+      console.log('Server responded with an error:', data.message || 'Unknown error');
+      return {
+        success: false,
+        error: data.message || 'Unknown error'
+      };
+    }
+  } catch (error) {
+    console.error('Network error while logging out account:', error);
+    return {
+      success: false,
+      error: 'Network error. Please try again.'
+    };
+  }
+}
