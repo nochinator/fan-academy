@@ -71,18 +71,18 @@ export class Profile extends Phaser.GameObjects.Container {
     this.profilePicturePopup = new ProfilePicPopup(this.context, this.profilePicture);
 
     // Email input
-    this.emailInput = this.createInputField(600, 230, 'Email');
+    this.emailInput = this.createInputField(600, 230, 'email', 'Email');
 
     // Password input
-    this.passwordInput = this.createInputField(600, 290, 'New password', true);
-    this.passwordConfirmInput = this.createInputField(600, 350, 'Confirm Password', true);
+    this.passwordInput = this.createInputField(600, 290, 'New password', 'password');
+    this.passwordConfirmInput = this.createInputField(600, 350, 'Confirm Password', 'password');
 
     // Error field
-    this.profileUpdateError = this.context.add.dom(430, 380).createFromHTML(`
+    this.profileUpdateError = this.context.add.dom(450, 380).createFromHTML(`
   <div id="profileError" class="proLightFont" style="color: white; font-size: 30px; margin-bottom: 10px; display: none; max-width: 500px; background-color: #8e0000; padding: 10px"></div>`);
 
     // Successful update field
-    this.profileUpdateSuccess = this.context.add.dom(430, 380).createFromHTML(`
+    this.profileUpdateSuccess = this.context.add.dom(450, 380).createFromHTML(`
   <div id="profileSuccess" class="proLightFont" style="color: white; font-size: 30px; margin-bottom: 10px; display: none; max-width: 500px; background-color: #14452f; padding: 10px"></div>`);
 
     /**
@@ -187,10 +187,10 @@ export class Profile extends Phaser.GameObjects.Container {
     this.context.add.existing(this);
   }
 
-  createInputField(x: number, y: number, placeholder: string, isPassword = false, value = ''): Phaser.GameObjects.DOMElement {
+  createInputField(x: number, y: number, placeholder: string, type: string, value = ''): Phaser.GameObjects.DOMElement {
     const html = `
     <input
-      type="${isPassword ? 'password' : 'text'}"
+      type="${type}"
       placeholder="${placeholder}"
       value="${value}"
       style="font-size:25px; width: 300px; height: 30px; font-family: proLight"
@@ -209,7 +209,6 @@ export class Profile extends Phaser.GameObjects.Container {
   }
 
   loadUserData() {
-    // (this.context.usernameInput!.getChildByName('') as HTMLInputElement).value = this.context.userData!.username;
     (this.emailInput!.getChildByName('') as HTMLInputElement).value = this.context.userData!.email;
     (this.notificationsCheckBox!.getChildByName('') as HTMLInputElement).checked = this.context.userData!.preferences.emailNotifications;
     (this.chatCheckBox!.getChildByName('') as HTMLInputElement).checked = this.context.userData!.preferences.chat;
@@ -219,12 +218,18 @@ export class Profile extends Phaser.GameObjects.Container {
     this.profileUpdateError.setVisible(false);
     this.profileUpdateSuccess.setVisible(false);
 
-    // const username = (this.context.usernameInput!.getChildByName('') as HTMLInputElement).value;
     const email = (this.emailInput!.getChildByName('') as HTMLInputElement).value;
     const password = (this.passwordInput!.getChildByName('') as HTMLInputElement).value;
     const passwordConfirm = (this.passwordConfirmInput!.getChildByName('') as HTMLInputElement).value;
     const receiveNotifications = (this.notificationsCheckBox!.getChildByName('') as HTMLInputElement).checked;
     const enableChat = (this.chatCheckBox!.getChildByName('') as HTMLInputElement).checked;
+
+    const emailInputEl = this.emailInput.node.querySelector('input') as HTMLInputElement;
+
+    if (!emailInputEl.checkValidity()) {
+      this.showForm(this.profileUpdateError, 'profileError', 'Incorrect email format');
+      return;
+    }
 
     if (password.trim() !== '') {
       if (password !== passwordConfirm) {
