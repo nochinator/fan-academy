@@ -488,7 +488,7 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
     },
     [EHeroes.IMPALER]: {
       1: {
-        charImageX: x,
+        charImageX: x + 10,
         charImageY: y - 5
       },
       2: {

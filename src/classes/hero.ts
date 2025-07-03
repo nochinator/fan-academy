@@ -490,8 +490,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   getsKnockedDown(): void {
     if (this.unitType === EHeroes.PHANTOM) {
-      this.removeFromBoard();
-      this.removeFromGame();
+      this.removeFromGame(true);
       return;
     }
 
@@ -600,8 +599,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (targetTile.hero && targetTile.hero.isKO) {
       const hero = gameController.board.units.find(unit => unit.unitId === targetTile.hero?.unitId);
       if (!hero) console.error('move() Found heroData on targetTile, but no Hero to remove', targetTile);
-      hero?.removeFromBoard();
-      hero?.removeFromGame();
+      hero?.removeFromGame(true);
     }
 
     // Check if the unit is leaving or entering a special tile and apply any effects
@@ -623,7 +621,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (tile.hero && tile.hero.isKO) {
       const hero = gameController.board.units.find(unit => unit.unitId === tile.hero?.unitId);
       if (!hero) console.error('spawn() Found heroData on tile, but no Hero to remove', tile);
-      hero?.removeFromBoard();
+      hero?.removeFromGame(true);
     }
 
     gameController.hand.removeFromHand(this);

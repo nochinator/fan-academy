@@ -175,7 +175,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.belongsTo === 1) this.context.gameController?.gameUI.banner.playerOneHpBar.setHealth();
     if (this.belongsTo === 2) this.context.gameController?.gameUI.banner.playerTwoHpBar.setHealth();
 
-    if (this.currentHealth <= 0) this.removeFromGame(); // TODO: destruction animation
+    if (this.currentHealth <= 0) this.removeFromGame();
   }
 
   removeFromGame(): void {

@@ -330,7 +330,7 @@ export class Inferno extends Item {
 
       // Inferno removes KO'd enemy units
       if (hero.isKO){
-        hero.removeFromBoard();
+        hero.removeFromGame(true);
         return;
       }
 

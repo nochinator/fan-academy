@@ -7,8 +7,8 @@ import ProfileScene from './scenes/profile.scene';
 import PreloaderScene from './scenes/preloader.scene';
 
 const config = {
-  width: window.innerWidth - 710,
-  height: window.innerHeight - 120,
+  width: window.innerWidth,
+  height: window.innerHeight,
   backgroundColor: '#808080',
   type: Phaser.AUTO, // webgl is browser supports it, fallback to canvas
   scene: [PreloaderScene, MainMenuScene, UIScene, GameScene, LeaderboardScene, ProfileScene],
