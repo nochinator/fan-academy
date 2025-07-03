@@ -1,8 +1,6 @@
-import createMainMenuButton from "./mainMenuUtils/buttons";
 import { authCheck, loginQuery, sendLogout, signUpQuery } from "../queries/userQueries";
 import { isValidPassword } from "../utils/playerUtils";
-import { profilePicNames } from "./profileSceneUtils/profilePicNames";
-import { loadGameAssets } from "./mainMenuUtils/gameAssets";
+import createMainMenuButton from "./mainMenuUtils/buttons";
 
 export default class MainMenuScene extends Phaser.Scene {
   userId: string | undefined;
@@ -18,30 +16,7 @@ export default class MainMenuScene extends Phaser.Scene {
   }
 
   preload() {
-    // login form
-    this.load.html('loginForm', 'html/loginForm.html');
-    this.load.html('signUpForm', 'html/signUpForm.html');
 
-    // menu images
-    const imagesPath = '/assets/ui/';
-    this.load.image('mainMenuBg', imagesPath + 'game_screen.png');
-    this.load.image('mainMenuImage', imagesPath + 'main_menu_image.png');
-    this.load.image('mainMenuImageLoggedIn', imagesPath + 'main_menu_logged.png');
-    this.load.image('mainMenuBottom', imagesPath + 'main_menu_bottom.jpg');
-    this.load.image('playButton', imagesPath + 'play_button.png');
-    this.load.image('mainMenuButton', imagesPath + 'main_menu_button.png');
-
-    // profile pictures
-    profilePicNames.forEach(name => {
-      this.load.image(name, `/assets/images/profilePics/${name}.jpg`);
-    });
-
-    // fonts
-    this.load.font('proHeavy', '/assets/fonts/BlambotFXProHeavyLowerCapsBB.ttf', 'truetype');
-    this.load.font('proLight', '/assets/fonts/BlambotFXProLightBB.ttf', 'truetype');
-
-    // game assets
-    loadGameAssets(this);
   }
 
   async create() {
