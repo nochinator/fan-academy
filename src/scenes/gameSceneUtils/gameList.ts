@@ -1,12 +1,11 @@
 import { ChallengePopup } from "../../classes/challengePopup";
-import { EChallengePopup, EFaction, EGameStatus } from "../../enums/gameEnums";
-import { IGame, IPlayerData } from "../../interfaces/gameInterface";
 import { createGame } from "../../colyseus/colyseusGameRoom";
 import { sendDeletedGameMessage } from "../../colyseus/colyseusLobbyRoom";
+import { EChallengePopup, EFaction, EGameStatus } from "../../enums/gameEnums";
+import { IGame, IPlayerData } from "../../interfaces/gameInterface";
+import { truncateText } from "../../utils/gameUtils";
 import UIScene from "../ui.scene";
 import { accessGame } from "./gameMenuUI";
-import { loadProfilePictures } from "./profilePictures";
-import { truncateText } from "../../utils/gameUtils";
 
 export async function createGameList(context: UIScene) {
   if (!context.gameList) {
