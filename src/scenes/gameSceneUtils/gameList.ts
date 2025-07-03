@@ -34,7 +34,7 @@ export async function createGameList(context: UIScene) {
   });
 
   // Load opponents' profile pictures
-  await loadProfilePictures(context); // REVIEW: since we have the game list from Scene creation, we don't need to load this here
+  // await loadProfilePictures(context); // REVIEW: since we have the game list from Scene creation, we don't need to load this here
 
   // Setting spacing for the positioning of the items in the list
   const gameListButtonHeight = 142;
@@ -88,7 +88,7 @@ export async function createGameList(context: UIScene) {
 
       if (opponent) {
         opponentFactionImage = context.add.image(510, lastListItemY + gameListButtonHeight / 2, opponent.faction).setScale(0.4);
-        opponentProfilePicture = context.add.image(632, lastListItemY + gameListButtonHeight / 2, opponent.userData.username).setFlipX(true).setDisplaySize(256 * 0.4, 256 * 0.4);
+        opponentProfilePicture = context.add.image(632, lastListItemY + gameListButtonHeight / 2, opponent.userData.picture).setFlipX(true).setDisplaySize(256 * 0.4, 256 * 0.4);
         opponentNameText = setOpponentNameText(opponent.userData.username);
       } else {
         opponentFactionImage = context.add.image(510, lastListItemY + gameListButtonHeight / 2, 'unknownFaction');

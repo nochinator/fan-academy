@@ -1,14 +1,11 @@
 import ProfileScene from "../scenes/profile.scene";
 import { profilePicNames } from "../scenes/profileSceneUtils/profilePicNames";
-import { imageKeywordFromFilename } from "../scenes/sceneUtils";
 
 export class ProfilePicPopup extends Phaser.GameObjects.Container {
   constructor(context: ProfileScene, profilePicture: Phaser.GameObjects.Image) {
     super(context, 800, 400);
 
     const modal = new Phaser.GameObjects.Container(context, 0, 0); // Centered relative to the popup
-
-    // Scroll container (inside modal, top-left)
 
     // Used to block the user from clicking on some other part of the game
     const blockingLayer = context.add.rectangle(0, 0, 3000, 2000, 0x000000, 0.001).setOrigin(0.5).setInteractive();
@@ -18,12 +15,6 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
     const avatarSize = 256 * 0.4;
     const padding = 10;
     const avatarsPerRow = 4;
-
-    // Disable input outside modal
-    // context.input.enabled = false;
-
-    // Dark overlay
-    // const overlay = context.add.rectangle(400, 300, 800, 600, 0x000000, 0.5);
 
     // Background
     const backgroundRectangle = context.add.rectangle(0, 0, modalWidth, modalHeight, 0x222222, 1)
@@ -43,19 +34,16 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
       const x = col * (avatarSize + padding);
       const y = row * (avatarSize + padding);
 
-      const picName = imageKeywordFromFilename(key);
-      const img = context.add.image(x + 120, y - 160, picName)
+      const img = context.add.image(x + 120, y - 160, key)
         .setInteractive()
         .setDisplaySize(avatarSize, avatarSize)
         .setData('key', key);
 
       img.on('pointerdown', () => {
-        context.userData!.picture = `/assets/images/profilePics/${key}`;
-        console.log(picName, 'picname');
-        profilePicture!.setTexture(picName).setDisplaySize(256 * 0.5, 256 * 0.5);
+        context.userData!.picture = key;
+        profilePicture!.setTexture(key).setDisplaySize(256 * 0.5, 256 * 0.5);
         this.setVisible(false);
         context.profile?.toggleFormVisibility(true);
-        console.log('USERDATA', context.userData!);
       });
 
       thumbnails.push(img);

@@ -1,5 +1,4 @@
 import ProfileScene from "../profile.scene";
-import { profilePicNames } from "./profilePicNames";
 
 export async function loadProfileUI(context: ProfileScene): Promise<void> {
   context.load.image('gameBackground', '/assets/ui/create_game.png');
@@ -9,16 +8,4 @@ export async function loadProfileUI(context: ProfileScene): Promise<void> {
   // Popup images
   context.load.image('popupBackground', '/assets/images/gameItems/NextGameButton-hd.png');
   context.load.image('popupButton', '/assets/images/gameItems/ColorSwatch_Color-hd.png');
-
-  profilePicNames.forEach(name => {
-    const keyword = name.slice(0, name.length - 4);
-    context.load.image(keyword, `/assets/images/profilePics/${name}`);
-  });
-
-  return new Promise((resolve) => {
-    context.load.once('complete', () => {
-      resolve();
-    });
-    context.load.start(); // Start loading after setting up the event listener
-  });
 }

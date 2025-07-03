@@ -31,7 +31,6 @@ export default class ProfileScene extends Phaser.Scene {
   async create() {
     // User data query
     this.userData = await getProfile();
-    console.log('USERDATA', this.userData);
 
     this.profile = new Profile(this);
     // TODO: throw error if no user data

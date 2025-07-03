@@ -1,6 +1,5 @@
 import { deleteAccount, updateProfile } from "../queries/userQueries";
 import ProfileScene from "../scenes/profile.scene";
-import { imageKeywordFromFilename } from "../scenes/sceneUtils";
 import { isValidPassword } from "../utils/playerUtils";
 import { DeleteWarningPopup } from "./deletePopup";
 import { ProfilePicPopup } from "./profilePicPopup";
@@ -61,8 +60,7 @@ export class Profile extends Phaser.GameObjects.Container {
 
     // Display profile picture
     this.previousPicture = this.context.userData!.picture;
-    const keyword = imageKeywordFromFilename(this.context.userData!.picture);
-    this.profilePicture = this.context.add.image(580, 550, keyword).setDisplaySize(256 * 0.5, 256 * 0.5).setInteractive();
+    this.profilePicture = this.context.add.image(580, 550, this.context.userData!.picture).setDisplaySize(256 * 0.5, 256 * 0.5).setInteractive();
     this.profilePicture.on('pointerdown', () => {
       this.profilePicturePopup.setVisible(true);
       this.toggleFormVisibility(false);
@@ -267,8 +265,7 @@ export class Profile extends Phaser.GameObjects.Container {
       this.context.userData = result.user;
     } else {
       this.loadUserData();
-      const previousPicture = imageKeywordFromFilename(this.previousPicture!);
-      this.profilePicture.setTexture(previousPicture);
+      this.profilePicture.setTexture(this.previousPicture!);
       this.showForm(this.profileUpdateError, 'profileError', result.error); // Show server error to user
     }
   }

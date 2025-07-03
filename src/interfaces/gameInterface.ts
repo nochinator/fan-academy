@@ -128,7 +128,7 @@ export interface IUserData {
 };
 
 export interface IPlayerData {
-  userData: IUserData
+  userData: IUserData;
   faction: EFaction;
 }
 
