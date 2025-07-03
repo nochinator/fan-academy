@@ -62,7 +62,7 @@ export class HeroCard extends Phaser.GameObjects.Container {
     this.currentHpText = this.context.add.text(80, -60, `${data.currentHealth}/${data.maxHealth}`, {
       fontFamily: "proLight",
       fontSize: 35,
-      color: '#ffffff'
+      color: data.maxHealth > data.baseHealth ? '#00FF00' : '#ffffff'
     }).setOrigin(0.5);
     this.hpIconImage = context.add.image(-150, -60, 'hpIcon').setOrigin(0.5);
 

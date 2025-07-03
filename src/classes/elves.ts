@@ -388,6 +388,7 @@ function createElvesPhantomData(data: Partial<IHero>): IHero {
   // Cannot be equipped, buffed or healed, disappears if KO'd
   return {
     unitType: EHeroes.PHANTOM,
+    baseHealth: 100,
     maxHealth: 100,
     currentHealth: data.currentHealth ?? 100,
     movement: 3,
