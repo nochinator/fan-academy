@@ -1,7 +1,7 @@
 import { EHeroes, EItems } from "../../enums/gameEnums";
-import GameScene from "../game.scene";
+import MainMenuScene from "../mainMenu.scene";
 
-export function loadGameAssets(context: GameScene) {
+export function loadGameAssets(context: MainMenuScene) {
   // Load tiles
   context.load.image('spawnTile', '/assets/images/gameItems/DeployZone01-hd.png');
   context.load.image('helmetTile', '/assets/images/gameItems/PremiumTile_Resist-hd.png');

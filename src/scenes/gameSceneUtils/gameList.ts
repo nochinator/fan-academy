@@ -33,9 +33,6 @@ export async function createGameList(context: UIScene) {
     }
   });
 
-  // Load opponents' profile pictures
-  // await loadProfilePictures(context); // REVIEW: since we have the game list from Scene creation, we don't need to load this here
-
   // Setting spacing for the positioning of the items in the list
   const gameListButtonHeight = 142;
   const gameListButtonWidth = 700;

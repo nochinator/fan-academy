@@ -4,7 +4,6 @@ import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Coordinates, IGame, IGameOver, IPlayerData, IPlayerState } from "../interfaces/gameInterface";
 import { calculateAllCenterPoints } from "../utils/boardCalculations";
-import { loadGameAssets } from "./gameSceneUtils/gameAssets";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 
 export default class GameScene extends Phaser.Scene {
@@ -57,7 +56,6 @@ export default class GameScene extends Phaser.Scene {
 
   preload() {
     loadGameBoardUI(this);
-    loadGameAssets(this);
   }
 
   create() {
