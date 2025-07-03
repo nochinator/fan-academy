@@ -197,7 +197,7 @@ export class Priestess extends DarkElf {
 
     // Apply a 50% debuff to the target's next attack
     if (target instanceof Hero && !target.isDebuffed && !target.isKO) {
-      target.modifyPower(-50);
+      target.updatePowerModifier(-50);
       target.isDebuffed = true;
       target.debuffImage.setVisible(true);
       target.unitCard.updateCardPower(target.getTotalPower(), target.basePower, target.isDebuffed);
@@ -249,6 +249,7 @@ export class Wraith extends DarkElf {
       if (this.unitsConsumed < 3) {
         this.increaseMaxHealth(100);
         this.power += 50;
+        this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
         this.unitsConsumed++;
         this.updateTileData();
       }

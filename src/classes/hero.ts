@@ -399,7 +399,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     return totalDamage; // Return damage taken for lifesteal
   }
 
-  modifyPower(amount: number): void {
+  updatePowerModifier(amount: number): void {
     this.powerModifier += amount;
     this.updateTileData();
   }
