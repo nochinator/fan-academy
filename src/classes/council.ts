@@ -22,7 +22,7 @@ export abstract class Human extends Hero {
 
     this.increaseMaxHealth(this.maxHealth * 0.1);
 
-    this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
+    this.unitCard.updateCardHealth(this);
     this.updateTileData();
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);

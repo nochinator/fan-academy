@@ -41,7 +41,6 @@ export class Tile extends Phaser.GameObjects.Container {
     this.isHighlighted = this.baseRectangle.isFilled;
 
     // If tileType is not BASIC, add the visual representation
-    // TODO: clean the below snippet. Add tint based on player preferred color
     if (this.tileType !== ETiles.BASIC) {
       if (this.tileType === ETiles.CRYSTAL) {
         this.occupied = true;

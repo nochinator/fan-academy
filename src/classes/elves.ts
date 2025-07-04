@@ -19,7 +19,7 @@ export abstract class DarkElf extends Hero {
     this.characterImage.setTexture(this.updateCharacterImage());
     this.increaseMaxHealth(this.maxHealth * 0.1);
 
-    this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
+    this.unitCard.updateCardHealth(this);
     this.updateTileData();
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
@@ -50,16 +50,7 @@ export class Impaler extends DarkElf {
 
     if (target instanceof Hero) await gameController.pullEnemy(this, target);
 
-    this.powerModifier = 0;
-    if (this.isDebuffed) {
-      this.isDebuffed = false;
-      this.debuffImage.setVisible(false);
-      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-    }
-    if (this.superCharge) {
-      this.superCharge = false;
-      this.superChargeAnim.setVisible(false);
-    }
+    this.resetPowerModifier();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -115,16 +106,7 @@ export class VoidMonk extends DarkElf {
       splashedEnemies.forEach(enemy => enemy.getsDamaged(splashDamage, this.attackType));
     }
 
-    this.powerModifier = 0;
-    if (this.isDebuffed) {
-      this.isDebuffed = false;
-      this.debuffImage.setVisible(false);
-      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-    }
-    if (this.superCharge) {
-      this.superCharge = false;
-      this.superChargeAnim.setVisible(false);
-    }
+    this.resetPowerModifier();
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -200,19 +182,10 @@ export class Priestess extends DarkElf {
       target.updatePowerModifier(-50);
       target.isDebuffed = true;
       target.debuffImage.setVisible(true);
-      target.unitCard.updateCardPower(target.getTotalPower(), target.basePower, target.isDebuffed);
+      target.unitCard.updateCardPower(target);
     }
 
-    this.powerModifier = 0;
-    if (this.isDebuffed) {
-      this.isDebuffed = false;
-      this.debuffImage.setVisible(false);
-      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-    }
-    if (this.superCharge) {
-      this.superCharge = false;
-      this.superChargeAnim.setVisible(false);
-    }
+    this.resetPowerModifier();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -249,7 +222,7 @@ export class Wraith extends DarkElf {
       if (this.unitsConsumed < 3) {
         this.increaseMaxHealth(100);
         this.power += 50;
-        this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
+        this.unitCard.updateCardPower(this);
         this.unitsConsumed++;
         this.updateTileData();
       }
@@ -288,16 +261,7 @@ export class Phantom extends Hero {
 
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
-    this.powerModifier = 0;
-    if (this.isDebuffed) {
-      this.isDebuffed = false;
-      this.debuffImage.setVisible(false);
-      this.unitCard.updateCardPower(this.getTotalPower(), this.basePower, this.isDebuffed);
-    }
-    if (this.superCharge) {
-      this.superCharge = false;
-      this.superChargeAnim.setVisible(false);
-    }
+    this.resetPowerModifier();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }

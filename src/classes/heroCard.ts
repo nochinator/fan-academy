@@ -2,6 +2,7 @@ import { EAttackType, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { capitalize, getCardText } from "../utils/gameUtils";
+import { Hero } from "./hero";
 
 export class HeroCard extends Phaser.GameObjects.Container {
   cardBackgroundImage: Phaser.GameObjects.Image;
@@ -159,43 +160,38 @@ export class HeroCard extends Phaser.GameObjects.Container {
     return currentNumber > baseNumber ? '#00FF00' : currentNumber < baseNumber ? '#ff0000' : '#ffffff';
   }
 
-  updateCardPower(currentPower: number, basePower: number, isDebuffed: boolean): void {
-    this.powerText.setText(`${currentPower} ${this.attackType}`);
+  updateCardData(hero: Hero): void {
+    this.updateCardPower(hero);
+    this.updateCardPhysicalResistance(hero);
+    this.updateCardMagicalResistance(hero);
+    this.updateCardHealth(hero);
+  }
 
-    if (isDebuffed) {
+  updateCardPower(hero: Hero): void {
+    const totalPow = hero.getTotalPower();
+    this.powerText.setText(`${totalPow} ${this.attackType}`);
+
+    if (hero.isDebuffed) {
       this.powerText.setColor('#ff0000');
     } else {
-      this.powerText.setColor(this.getTextColor(currentPower, basePower));
+      this.powerText.setColor(this.getTextColor(totalPow, hero.basePower));
     }
   }
 
-  updateCardPhysicalResistance(newAmount: number): void {
-    this.physicalResistanceText.setText(`${newAmount} %`);
-    this.physicalResistanceText.setColor('#00FF00');
+  updateCardPhysicalResistance(hero: Hero): void {
+    this.physicalResistanceText.setText(`${hero.physicalDamageResistance} %`);
+    this.physicalResistanceText.setColor(this.getTextColor(hero.physicalDamageResistance, hero.basePhysicalDamageResistance));
   }
 
-  updateCardMagicalResistance(newAmount: number): void {
-    this.magicalResistanceText.setText(`${newAmount} %`);
-    this.magicalResistanceText.setColor('#00FF00');
+  updateCardMagicalResistance(hero: Hero): void {
+    this.magicalResistanceText.setText(`${hero.magicalDamageResistance} %`);
+    this.magicalResistanceText.setColor(this.getTextColor(hero.magicalDamageResistance, hero.baseMagicalDamageResistance));
   }
 
-  updateCardHealth(newHealth: number, maxHealth: number): void {
-    this.currentHpText.setText(`${newHealth}/${maxHealth}`);
-    this.setHealthTextColor(maxHealth);
-    this.setHealthBar(newHealth, maxHealth);
-  }
-
-  setHealthTextColor(maxHealth: number): void {
-    let baseHealth = 800;
-
-    if (this.unitType === EHeroes.KNIGHT) baseHealth = 1000;
-    if (this.unitType === EHeroes.WRAITH) baseHealth = 650;
-
-    if (maxHealth > baseHealth) {
-      this.currentHpText.setColor('#00FF00');
-    } else {
-      this.currentHpText.setColor('#ffffff');
-    }
+  updateCardHealth(hero: Hero ): void {
+    this.currentHpText.setText(`${hero.currentHealth}/${hero.maxHealth}`);
+    this.currentHpText.setColor(this.getTextColor(hero.maxHealth, hero.baseHealth));
+    this.setHealthBar(hero.currentHealth, hero.maxHealth);
   }
 
   setHealthBar(currentHealth: number, maxHealth: number) {
