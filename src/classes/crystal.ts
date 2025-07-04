@@ -154,7 +154,7 @@ export class Crystal extends Phaser.GameObjects.Container {
   }
 
   getsDamaged(damage: number): void {
-    const totalDamage = damage * (1 + this.debuffLevel * 0.5);
+    const totalDamage = damage + 300 * this.debuffLevel;
     const damageTaken = totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
     this.currentHealth -= damageTaken;
 
