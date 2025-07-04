@@ -60,9 +60,9 @@ export class GameController {
   async handleGameOver(): Promise<void> {
     sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, ++this.context.turnNumber!, this.context.gameOver);
 
-    this.context.activePlayer = undefined; // REVIEW:
+    this.context.activePlayer = undefined;
 
-    console.log(' GAME ENDS! THE WINNER IS', this.context.gameOver?.winner);
+    console.log('GAME ENDS! THE WINNER IS', this.context.gameOver?.winner);
   }
 
   getDeck() {

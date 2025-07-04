@@ -16,8 +16,8 @@ export enum EGameTermination {
 }
 
 export enum EWinConditions {
-  CRYSTAL = 'Crystals destroyed',
-  UNITS = 'Units defeated',
+  CRYSTAL = 'Crystal victory',
+  UNITS = 'Hero victory',
   TIME = 'Timeout',
   CONCEDED = 'Game conceded'
 };

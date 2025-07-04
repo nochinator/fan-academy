@@ -83,8 +83,6 @@ function subscribeToGameListeners(room: Room, context: UIScene): void {
       // TODO: add replay feature for opponent
       // Plus a 5 sec winning/losing animation before closing the game
     }
-
-    context.scene.get('GameScene').scene.stop();
   });
 }
 

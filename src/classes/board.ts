@@ -54,7 +54,6 @@ export class Board {
   }
 
   getBoardState(): ITile[] {
-    console.log('getBoardState()', this.tiles);
     return this.tiles.map(tile =>  tile.getTileData());
   }
 

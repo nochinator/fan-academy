@@ -21,6 +21,7 @@ export async function createGameList(context: UIScene) {
   const listSearchingArray: IGame[] = [];
   const listChallengeSentArray: IGame[] = [];
   const listChallengeReceivedArray: IGame[] = [];
+  const listFinishedArray: IGame[] = [];
 
   context.gameList.forEach((game: IGame )=> {
     if (game.status === EGameStatus.SEARCHING) listSearchingArray.push(game);
@@ -30,6 +31,7 @@ export async function createGameList(context: UIScene) {
       if (game.players[0].userData._id === context.userId) listChallengeSentArray.push(game);
       if (game.players[1].userData._id === context.userId) listChallengeReceivedArray.push(game);
     }
+    if (game.status === EGameStatus.FINISHED) listFinishedArray.push(game);
   });
 
   // Setting spacing for the positioning of the items in the list
@@ -42,7 +44,7 @@ export async function createGameList(context: UIScene) {
   let lastListItemY = 0;
 
   // Calculate content height for scrolling
-  const totalSections = (listPlayerTurnArray.length ? 1 : 0) + (listOpponentTurnArray.length ? 1 : 0) + (listSearchingArray.length ? 1 : 0) + (listChallengeSentArray.length ? 1 : 0) + (listChallengeReceivedArray.length ? 1 : 0);
+  const totalSections = (listPlayerTurnArray.length ? 1 : 0) + (listOpponentTurnArray.length ? 1 : 0) + (listSearchingArray.length ? 1 : 0) + (listChallengeSentArray.length ? 1 : 0) + (listChallengeReceivedArray.length ? 1 : 0) + (listFinishedArray.length ? 1 : 0);
   const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * context.gameList.length + ( textListHeight * totalSections + 200); // 200 = newGameButton + some padding to make sure the last item always displays fully
 
   // Creating a container for the game list and adding it to the context (scene)
@@ -224,6 +226,14 @@ export async function createGameList(context: UIScene) {
     gameListContainer.add(challengeSentText);
 
     createGameListItem(listChallengeSentArray);
+    lastListItemY += gameListButtonHeight + gameListButtonSpacing;
+  }
+
+  if (listFinishedArray.length) {
+    const finishedText = setHeaderText('Finished');
+    gameListContainer.add(finishedText);
+
+    createGameListItem(listFinishedArray);
     lastListItemY += gameListButtonHeight + gameListButtonSpacing;
   }
 
