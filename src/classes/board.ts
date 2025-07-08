@@ -251,7 +251,9 @@ export class Board {
         if (rangeType === ERange.MOVE && !tile.isOccupied()) {
           if (!isEnemySpawn(this.context, tile)) inRangeTiles.push(tile);
         }
-        if ((rangeType === ERange.ATTACK || rangeType === ERange.HEAL) && (tile.hero || tile.crystal)) inRangeTiles.push(tile);
+        if (rangeType === ERange.ATTACK || rangeType === ERange.HEAL) {
+          if (tile.crystal || tile.hero && tile.hero.unitId !== hero.unitId) inRangeTiles.push(tile);
+        }
       }
     });
 
