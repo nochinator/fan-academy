@@ -1,4 +1,4 @@
-import { authCheck, loginQuery, sendLogout, signUpQuery } from "../queries/userQueries";
+import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 import { isValidPassword } from "../utils/playerUtils";
 import createMainMenuButton from "./mainMenuUtils/buttons";
 
@@ -108,8 +108,10 @@ export default class MainMenuScene extends Phaser.Scene {
       font: '70px proHeavy',
       tint: '0x990000',
       callback: async () => {
-        const result = await sendLogout();
-        if (result.success) this.scene.start('MainMenuScene');
+        localStorage.removeItem('jwt');
+        this.userId = undefined;
+        if (this.currentSubScene) this.scene.stop(this.currentSubScene);
+        this.scene.restart();
       }
     });
 
@@ -164,7 +166,8 @@ export default class MainMenuScene extends Phaser.Scene {
         if (result.success) {
           loginForm.setVisible(false);
           blockingLayer.setVisible(false);
-          this.userId = result.user._id;
+          console.log('RESULT', result);
+          this.userId = result.userId;
           console.log('UserId after login:', this.userId);
         }else {
           showFormError(loginError, result.error); // Show server error to user
@@ -195,7 +198,7 @@ export default class MainMenuScene extends Phaser.Scene {
         if (result.success) {
           signUpForm.setVisible(false);
           blockingLayer.setVisible(false);
-          this.userId = result.user._id;
+          this.userId = result.userId;
           console.log('UserId after sign up:', this.userId);
         } else {
           showFormError(signUpError, result.error); // Show server error to user

@@ -30,16 +30,19 @@ export default class UIScene extends Phaser.Scene {
   }
 
   async create() {
+    // Connect to lobby and get the list of games
     this.lobbyRoom = await connectToGameLobby(this.colyseusClient, this.userId, this);
-
     this.gameList = await getGameList(this.userId);
 
     // UI background
     this.add.image(0, 0, 'uiBackground').setOrigin(0);
+
     // Add Home button
     new HomeButton(this);
+
     // Create the game list UI
     await createGameList(this);
+
     // Background game screen
     this.add.image(397, 15, 'gameBackground').setOrigin(0, 0).setScale(1.06, 1.2);
   }

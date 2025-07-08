@@ -4,11 +4,21 @@ import UIScene from "../scenes/ui.scene";
 import { IGameState } from "../interfaces/gameInterface";
 import { EFaction, EGameStatus } from "../enums/gameEnums";
 
-export async function connectToGameLobby(client: Client, userId: string, context: UIScene): Promise<Room> {
+export async function connectToGameLobby(client: Client, userId: string, context: UIScene): Promise<Room | undefined> {
   let lobby;
+  const token = localStorage.getItem("jwt");
+
+  if (!token) {
+    console.error('Error connecting to game lobby: missing token');
+    return undefined;
+  }
+
   try {
     console.log('Connecting to game lobby...');
-    lobby = await client.joinOrCreate('lobby', { userId });
+    lobby = await client.joinOrCreate('lobby', {
+      userId,
+      token
+    });
 
     lobby.onMessage('newGameListUpdate', async (message) => {
       console.log('A game has been added', message);
@@ -124,16 +134,20 @@ export async function connectToGameLobby(client: Client, userId: string, context
 };
 
 export function sendDeletedGameMessage(lobby: Room, gameId: string, userId: string): void {
+  const token = localStorage.getItem("jwt");
   lobby.send('gameDeletedMessage', {
     gameId,
-    userId
+    userId,
+    token
   });
 }
 
 export function sendChallengeAcceptedMessage(lobby: Room, gameId: string, userId: string, faction: EFaction): void {
+  const token = localStorage.getItem("jwt");
   lobby.send('challengeAcceptedMessage', {
     gameId,
     userId,
-    faction
+    faction,
+    token
   });
 }

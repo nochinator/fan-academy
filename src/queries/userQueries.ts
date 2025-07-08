@@ -2,23 +2,30 @@ import { IUserPreferences, IUserStats } from "../interfaces/userInterface";
 
 export async function loginQuery(username: string, password: string) {
   try {
+    const jwt = localStorage.getItem('jwt');
+
     const response = await fetch(`${import.meta.env.VITE_BE_URL}users/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwt}`
+      },
       body: JSON.stringify({
         username,
         password
-      }),
-      credentials: 'include'
+      })
     });
 
     const data = await response.json();
 
     if (response.ok) {
       console.log('Successful login! :)');
+
+      localStorage.setItem("jwt", data.token);
+
       return {
         success: true,
-        user: data.user
+        userId: data.userId
       };
     } else {
       console.error('Server responded with an error:', data.message || 'Unknown error');
@@ -38,24 +45,31 @@ export async function loginQuery(username: string, password: string) {
 
 export async function signUpQuery(email: string, username: string, password: string) {
   try {
+    const jwt = localStorage.getItem('jwt');
+
     const response = await fetch(`${import.meta.env.VITE_BE_URL}users/signup`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwt}`
+      },
       body: JSON.stringify({
         email,
         username,
         password
-      }),
-      credentials: 'include'
+      })
     });
 
     const data = await response.json();
 
     if (response.ok) {
       console.log('Successful sign up! :)');
+
+      localStorage.setItem("jwt", data.token);
+
       return {
         success: true,
-        user: data.user
+        userId: data.userId
       };
     } else {
       console.log('Server responded with an error:', data.message || 'Unknown error');
@@ -79,10 +93,14 @@ export async function signUpQuery(email: string, username: string, password: str
  */
 export async function authCheck(): Promise<string | undefined> {
   console.log('Checking Authentication Status...');
+  const jwt = localStorage.getItem('jwt');
+
   const result = await fetch(`${import.meta.env.VITE_BE_URL}auth-check`, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include'
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${jwt}`
+    }
   });
 
   if (result.status != 200) {
@@ -110,11 +128,14 @@ export async function getLeaderBoard(page = 1): Promise<{
   currentPage: number
 } | null> {
   console.log('Fetching leaderboard data...');
+  const jwt = localStorage.getItem('jwt');
 
   const result = await fetch(`${import.meta.env.VITE_BE_URL}users/leaderboard?page=${encodeURIComponent(page)}`, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include'
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${jwt}`
+    }
   });
 
   const data = await result.json();
@@ -141,11 +162,14 @@ export async function getProfile(): Promise<{
   stats: IUserStats
 } | null> {
   console.log('Fetching profile data...');
+  const jwt = localStorage.getItem('jwt');
 
   const result = await fetch(`${import.meta.env.VITE_BE_URL}users/profile`, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include'
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${jwt}`
+    }
   });
 
   const data = await result.json();
@@ -168,11 +192,15 @@ export async function updateProfile(payload: {
   chat?: boolean
 }) {
   try {
+    const jwt = localStorage.getItem('jwt');
+
     const response = await fetch(`${import.meta.env.VITE_BE_URL}users/update`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      credentials: 'include'
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwt}`
+      },
+      body: JSON.stringify(payload)
     });
 
     const data = await response.json();
@@ -201,16 +229,23 @@ export async function updateProfile(payload: {
 
 export async function deleteAccount() {
   try {
+    const jwt = localStorage.getItem('jwt');
+
     const response = await fetch(`${import.meta.env.VITE_BE_URL}users/delete`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include'
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwt}`
+      }
     });
 
     const data = await response.json();
 
     if (response.ok) {
       console.log('Profile deleted :(');
+
+      localStorage.removeItem("jwt");
+
       return {
         success: true,
         result: data
@@ -224,38 +259,6 @@ export async function deleteAccount() {
     }
   } catch (error) {
     console.error('Network error while deleting account:', error);
-    return {
-      success: false,
-      error: 'Network error. Please try again.'
-    };
-  }
-}
-
-export async function sendLogout() {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_BE_URL}users/logout`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include'
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      console.log('Logged out');
-      return {
-        success: true,
-        result: data
-      };
-    } else {
-      console.log('Server responded with an error:', data.message || 'Unknown error');
-      return {
-        success: false,
-        error: data.message || 'Unknown error'
-      };
-    }
-  } catch (error) {
-    console.error('Network error while logging out account:', error);
     return {
       success: false,
       error: 'Network error. Please try again.'

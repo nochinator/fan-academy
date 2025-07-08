@@ -5,16 +5,20 @@ import UIScene from "../scenes/ui.scene";
 
 export async function createGame(context: UIScene, faction: EFaction): Promise<void> {
   const { colyseusClient, userId } = context;
-  if (!colyseusClient || !userId || !faction) {
-    console.error('createGame error: missing one of client / userId / faction');
+  const token = localStorage.getItem("jwt");
+
+  if (!colyseusClient || !userId || !faction || !token) {
+    console.error('createGame error: missing one of client / userId / faction / token');
     return;
   }
+
   try {
     console.log('Checking for open games | creating a new game...');
 
     const room = await colyseusClient.create('game_room', {
       userId,
-      faction
+      faction,
+      token
     });
 
     subscribeToGameListeners(room, context);
@@ -28,9 +32,11 @@ export async function createGame(context: UIScene, faction: EFaction): Promise<v
 }
 
 export async function joinGame(client: Client, userId: string, roomId: string, context: UIScene): Promise<Room | undefined> {
-  if( !client || !userId || !roomId) {
-    console.error('joinGame, { client | userid | gameid } missing');
-    return undefined;
+  const token = localStorage.getItem("jwt");
+
+  if(!client || !userId || !roomId || !token) {
+    console.error('joinGame, { client | userid | gameid | token } missing');
+    // return undefined;
   }
 
   let room: Room;
@@ -38,7 +44,8 @@ export async function joinGame(client: Client, userId: string, roomId: string, c
   try {
     room = await client.joinOrCreate("game_room", {
       userId,
-      roomId
+      roomId,
+      token
     });
 
     console.log("Joined or created room:", room.roomId);
@@ -87,7 +94,8 @@ function subscribeToGameListeners(room: Room, context: UIScene): void {
 }
 
 export function sendTurnMessage(currentRoom: Room, currentTurn: IGameState[], newActivePlayer: string, turnNumber: number, gameOver?: IGameOver): void {
-  if (!currentRoom || !currentTurn || !newActivePlayer) {
+  const token = localStorage.getItem("jwt");
+  if (!currentRoom || !currentTurn || !newActivePlayer || !token) {
     console.error('Error sending turn, missing one or more params');
     return;
   }
@@ -97,7 +105,8 @@ export function sendTurnMessage(currentRoom: Room, currentTurn: IGameState[], ne
     currentTurn,
     newActivePlayer,
     gameOver,
-    turnNumber
+    turnNumber,
+    token
   });
 
   console.log("Turn message sent...");
