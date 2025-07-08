@@ -28,10 +28,10 @@ export async function loginQuery(username: string, password: string) {
         userId: data.userId
       };
     } else {
-      console.error('Server responded with an error:', data.message || 'Unknown error');
+      console.error('Server responded with an error:', data.error || 'Unknown error');
       return {
         success: false,
-        error: data.message || 'Unknown error'
+        error: data.error || 'Unknown error'
       };
     }
   } catch(error) {
@@ -72,10 +72,10 @@ export async function signUpQuery(email: string, username: string, password: str
         userId: data.userId
       };
     } else {
-      console.log('Server responded with an error:', data.message || 'Unknown error');
+      console.log('Server responded with an error:', data.error || 'Unknown error');
       return {
         success: false,
-        error: data.message || 'Unknown error'
+        error: data.error || 'Unknown error'
       };
     }
   } catch (error) {
@@ -212,10 +212,10 @@ export async function updateProfile(payload: {
         user: data
       };
     } else {
-      console.log('Server responded with an error:', data.message || 'Unknown error');
+      console.log('Server responded with an error:', data.error || 'Unknown error');
       return {
         success: false,
-        error: data.message || 'Unknown error'
+        error: data.error || 'Unknown error'
       };
     }
   } catch (error) {
@@ -251,10 +251,10 @@ export async function deleteAccount() {
         result: data
       };
     } else {
-      console.log('Server responded with an error:', data.message || 'Unknown error');
+      console.log('Server responded with an error:', data.error || 'Unknown error');
       return {
         success: false,
-        error: data.message || 'Unknown error'
+        error: data.error || 'Unknown error'
       };
     }
   } catch (error) {
