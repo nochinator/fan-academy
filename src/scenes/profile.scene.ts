@@ -1,7 +1,6 @@
 import { Profile } from "../classes/profile";
 import { IUserPreferences, IUserStats } from "../interfaces/userInterface";
 import { getProfile } from "../queries/userQueries";
-import { loadProfileUI } from "./profileSceneUtils/loadProfileUI";
 
 export default class ProfileScene extends Phaser.Scene {
   userId!: string;
@@ -25,7 +24,6 @@ export default class ProfileScene extends Phaser.Scene {
   }
 
   async preload() {
-    await loadProfileUI(this);
   }
 
   async create() {

@@ -24,8 +24,7 @@ export default class MainMenuScene extends Phaser.Scene {
     this.userId = await authCheck();
 
     // Background image
-    const bg = this.add.image(0, 0, 'mainMenuBg').setOrigin (0);
-    // const menuIgm = isUserAuthenticated  this.add.image(0, 0, 'mainMenuImageLoggedIn').setOrigin (0) : this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
+    const bg = this.add.image(0, 0, 'uiBackground').setOrigin (0);
     const menuImg = this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
     menuImg.x = bg.width - menuImg.width - 14;
     menuImg.y += 14;
@@ -166,7 +165,6 @@ export default class MainMenuScene extends Phaser.Scene {
         if (result.success) {
           loginForm.setVisible(false);
           blockingLayer.setVisible(false);
-          console.log('RESULT', result);
           this.userId = result.userId;
           console.log('UserId after login:', this.userId);
         }else {

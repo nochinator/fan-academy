@@ -1,3 +1,4 @@
+import { EFaction } from "../enums/gameEnums";
 import { loadGameAssets } from "./mainMenuUtils/gameAssets";
 import { profilePicNames } from "./profileSceneUtils/profilePicNames";
 
@@ -24,9 +25,8 @@ export default class PreloaderScene extends Phaser.Scene {
     this.load.html('signUpForm', 'html/signUpForm.html');
 
     // menu images
-    this.load.image('mainMenuBg', '/assets/ui/game_screen.png');
+    this.load.image('uiBackground', '/assets/ui/game_screen.png');
     this.load.image('mainMenuImage', '/assets/ui/main_menu_image.png');
-    this.load.image('mainMenuImageLoggedIn', '/assets/ui/main_menu_logged.png');
     this.load.image('mainMenuBottom', '/assets/ui/main_menu_bottom.jpg');
     this.load.image('playButton', '/assets/ui/play_button.png');
     this.load.image('mainMenuButton', '/assets/ui/main_menu_button.png');
@@ -39,6 +39,17 @@ export default class PreloaderScene extends Phaser.Scene {
     // fonts
     this.load.font('proHeavy', '/assets/fonts/BlambotFXProHeavyLowerCapsBB.ttf', 'truetype');
     this.load.font('proLight', '/assets/fonts/BlambotFXProLightBB.ttf', 'truetype');
+
+    // popups
+    this.load.image('popupBackground', '/assets/images/gameItems/turn_button.png');
+    this.load.image('popupButton', '/assets/images/gameItems/ColorSwatch_Color-hd.png');
+
+    // background images
+    this.load.image('gameBackground', '/assets/ui/create_game.png');
+
+    // faction emblems
+    this.load.image(EFaction.COUNCIL, '/assets/ui/council_emblem.png');
+    this.load.image(EFaction.DARK_ELVES, '/assets/ui/elves_emblem.png');
 
     // game assets
     loadGameAssets(this);

@@ -126,7 +126,7 @@ export class Profile extends Phaser.GameObjects.Container {
      */
 
     // Save changes button
-    this.saveButtonImage = this.context.add.image(895, 700, 'saveButton').setTint(0x3399ff).setDisplaySize(230, 100).setInteractive();
+    this.saveButtonImage = this.context.add.image(895, 700, 'popupButton').setTint(0x3399ff).setDisplaySize(230, 100).setInteractive();
     this.saveButtonText = this.context.add.text(830, 655, 'SAVE CHANGES', {
       fontFamily: "proHeavy",
       fontSize: 40,
@@ -148,7 +148,7 @@ export class Profile extends Phaser.GameObjects.Container {
     this.deletePopup = new DeleteWarningPopup(context, this);
 
     // Delete account button
-    this.deleteAccountButtonImage = this.context.add.image(1265, 700, 'saveButton').setTint(0x990000).setDisplaySize(230, 100).setInteractive();
+    this.deleteAccountButtonImage = this.context.add.image(1265, 700, 'popupButton').setTint(0x990000).setDisplaySize(230, 100).setInteractive();
     this.deleteAccountButtonText = this.context.add.text(1200, 655, 'DELETE ACCOUNT', {
       fontFamily: "proHeavy",
       fontSize: 40,
