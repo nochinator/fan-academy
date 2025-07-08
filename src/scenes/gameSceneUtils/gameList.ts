@@ -4,6 +4,7 @@ import { sendDeletedGameMessage } from "../../colyseus/colyseusLobbyRoom";
 import { EChallengePopup, EFaction, EGameStatus } from "../../enums/gameEnums";
 import { IGame, IPlayerData } from "../../interfaces/gameInterface";
 import { truncateText } from "../../utils/gameUtils";
+import { timeAgo } from "../../utils/timeAgo";
 import UIScene from "../ui.scene";
 import { accessGame } from "./gameMenuUI";
 
@@ -71,6 +72,13 @@ export async function createGameList(context: UIScene) {
         faction: 'unknownFaction',
         scale: 1.2
       };
+
+      const lastPlayedText = context.add.text(20, lastListItemY + 100, timeAgo(game.lastPlayedAt), {
+        fontFamily: "proLight",
+        fontSize: 38,
+        color: '#ffffff'
+      }).setOrigin(0);
+
       const playerFactionImage =  context.add.image(90, lastListItemY + gameListButtonHeight / 2, playerFactionIcon.faction).setScale(playerFactionIcon.scale);
 
       let opponentFactionImage;
@@ -141,7 +149,7 @@ export async function createGameList(context: UIScene) {
         });
       }
 
-      gameListContainer.add([gameListButtonImage, playerFactionImage, opponentFactionImage, opponentNameText, opponentProfilePicture, closeButton]);
+      gameListContainer.add([gameListButtonImage, playerFactionImage, opponentFactionImage, opponentNameText, opponentProfilePicture, closeButton, lastPlayedText]);
     });
   };
 
