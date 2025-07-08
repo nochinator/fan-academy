@@ -63,7 +63,6 @@ export class VoidMonk extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
-  // TODO: add aoe to attack
   attack(target: Hero | Crystal): void {
     turnIfBehind(this.context, this, target);
 
@@ -102,7 +101,7 @@ export class VoidMonk extends DarkElf {
     // Apply damage to targets
     target.getsDamaged(this.getTotalPower(), this.attackType);
     if (splashedEnemies.length) {
-      const splashDamage = this.getTotalPower() * 67.5 / 100;
+      const splashDamage = this.getTotalPower() * 0.66;
       splashedEnemies.forEach(enemy => enemy.getsDamaged(splashDamage, this.attackType));
     }
 

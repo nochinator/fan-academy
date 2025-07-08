@@ -96,8 +96,8 @@ export class Wizard extends Human {
 
     // Apply damage to targets
     target.getsDamaged(this.getTotalPower(), this.attackType);
-    if (secondTarget) secondTarget.getsDamaged(this.getTotalPower(), this.attackType);
-    if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower(), this.attackType);
+    if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
+    if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
 
     this.resetPowerModifier();
 
