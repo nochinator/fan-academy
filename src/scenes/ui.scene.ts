@@ -16,6 +16,10 @@ export default class UIScene extends Phaser.Scene {
   currentRoom: Room | undefined;
   gameScene: Phaser.Scene | undefined;
 
+  // Used to highlight the active game in the game list
+  activeGameImage: Phaser.GameObjects.Image | undefined;
+  activeGameImageId: string | undefined;
+
   constructor() {
     super({ key: 'UIScene' });
     this.colyseusClient = new Client(`${import.meta.env.VITE_SOCKET}`);

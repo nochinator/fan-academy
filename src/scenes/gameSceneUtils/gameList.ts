@@ -52,9 +52,6 @@ export async function createGameList(context: UIScene) {
   const gameListContainer = context.add.container(19, 65); // Setting a variable to save not having to write 'context' every time
   context.gameListContainer = gameListContainer;
 
-  // Set a variable to refer to the active game image -used to highlight the active game in the UI
-  let activeGameImage: Phaser.GameObjects.Image;
-
   // Function for adding elements to the container
   const createGameListItem = (gameListArray: IGame[]) => {
     gameListArray.forEach((game, index) => {
@@ -112,26 +109,29 @@ export async function createGameList(context: UIScene) {
         });
       }
 
-      // Make the game accessible -only for games already playing. // REVIEW: what about games already finished?
-      if (game.status === EGameStatus.PLAYING) {
-        gameListButtonImage.setInteractive();
-        gameListButtonImage.on('pointerdown', async () => {
-          // Highlight the game in the UI
-          if (activeGameImage) activeGameImage.setTint(0xBBBBBB);
-          activeGameImage = gameListButtonImage;
-          activeGameImage.clearTint();
+      // Highlight the current open game on the game list
+      const highlightGameButton = () => {
+        gameListButtonImage.clearTint();
+        if (context.activeGameImage) context.activeGameImage.setTint(0xBBBBBB);
+        context.activeGameImage = gameListButtonImage;
+        context.activeGameImageId = game._id;
+      };
 
+      // Make the game accessible -only for games already playing
+      if (game.status === EGameStatus.PLAYING || game.status === EGameStatus.FINISHED) {
+        gameListButtonImage.setInteractive();
+        if (context.activeGameImageId === game._id) highlightGameButton();
+        gameListButtonImage.on('pointerdown', async () => {
+          highlightGameButton();
           await accessGame(context, game);
         });
       }
 
       if (game.status === EGameStatus.CHALLENGE && listChallengeReceivedArray.find(gameReceived => gameReceived._id === game._id )) {
         gameListButtonImage.setInteractive();
+        if (context.activeGameImageId === game._id) highlightGameButton();
         gameListButtonImage.on('pointerdown', async () => {
-          // Highlight the game in the UI
-          if (activeGameImage) activeGameImage.setTint(0xBBBBBB);
-          activeGameImage = gameListButtonImage;
-          activeGameImage.clearTint();
+          highlightGameButton();
 
           if (context.currentRoom) {
             console.log('Leaving game: ', context.currentRoom.roomId);
