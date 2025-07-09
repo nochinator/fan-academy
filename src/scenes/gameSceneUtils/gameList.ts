@@ -271,7 +271,7 @@ export async function createGameList(context: UIScene) {
 
       // Define boundaries
       const maxOffset = 0; // The topmost position (no scrolling above the first item)
-      const minOffset = visibleHeight * 2 - contentHeight - 50; // The lowest allowed position. Needs to be double the visibleHeight to work properly. -50 for padding.
+      const minOffset = visibleHeight * 2 - contentHeight - 100; // The lowest allowed position. Needs to be double the visibleHeight to work properly. -50 for padding.
 
       // Clamp the scrolling within bounds
       contentOffset = Phaser.Math.Clamp(contentOffset, minOffset, maxOffset);
