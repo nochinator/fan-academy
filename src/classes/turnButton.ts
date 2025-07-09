@@ -5,8 +5,8 @@ export class TurnButton {
   context: GameScene;
   constructor(context: GameScene) {
     this.context = context;
-    const turnButton =  context.add.image(0, 0, 'turnButton').setOrigin(0.5).setPosition(1300, 725).setScale(1.1);
-    if (context.activePlayer === context.userId) turnButton.setInteractive();
+    const turnButton =  context.add.image(0, 0, 'turnButton').setOrigin(0.5).setPosition(1300, 725).setScale(1.1).setInteractive();
+    if (context.activePlayer !== context.userId) turnButton.setVisible(false);
 
     // Sending a turn
     turnButton.on('pointerdown', async () => {
