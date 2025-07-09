@@ -282,6 +282,7 @@ export class Profile extends Phaser.GameObjects.Container {
     this.notificationsCheckBox.setVisible(visible);
     this.chatCheckBox.setVisible(visible);
     this.profileUpdateError.setVisible(visible);
+    this.profileUpdateSuccess.setVisible(visible);
   }
 
   showForm(domElement: Phaser.GameObjects.DOMElement, elementId: string, message: string) {
