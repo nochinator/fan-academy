@@ -1,4 +1,3 @@
-import { EFaction } from "../../enums/gameEnums";
 import LeaderboardScene from "../leaderboard.scene";
 
 export function loadLeaderboardUI(context: LeaderboardScene): void {
