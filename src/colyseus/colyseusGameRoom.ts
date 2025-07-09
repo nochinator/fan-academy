@@ -1,6 +1,6 @@
 import { Client, Room } from "colyseus.js";
 import { EFaction } from "../enums/gameEnums";
-import { IGameOver, IGameState, ILastTurnMessage, ITurnSentMessage } from "../interfaces/gameInterface";
+import { IGameOver, IGameState } from "../interfaces/gameInterface";
 import UIScene from "../scenes/ui.scene";
 
 export async function createGame(context: UIScene, faction: EFaction): Promise<void> {
@@ -20,8 +20,6 @@ export async function createGame(context: UIScene, faction: EFaction): Promise<v
       faction,
       token
     });
-
-    subscribeToGameListeners(room, context);
 
     context.currentRoom = room;
 
@@ -56,41 +54,7 @@ export async function joinGame(client: Client, userId: string, roomId: string, c
     return undefined;
   }
 
-  subscribeToGameListeners(room, context);
-
   return room;
-}
-
-function subscribeToGameListeners(room: Room, context: UIScene): void {
-  // Listen for broadcasted messages, received only by opponent
-  room.onMessage("turnPlayed", (message: ITurnSentMessage) => {
-    console.log("Player sent turn:", message);
-
-    // if (message.roomId === context.currentRoom?.roomId) {
-    //   const currentGame = context.gameList?.find(game => game._id === message.roomId);
-    //   if (!currentGame) throw new Error('turnPlayed() No game found in gameList');
-
-    //   currentGame.activePlayer = message.newActivePlayer;
-    //   currentGame.previousTurn = message.previousTurn;
-    //   currentGame.turnNumber = message.turnNumber;
-
-    //   context.scene.get('GameScene').scene.restart({
-    //     userId: context.userId,
-    //     colyseusClient: context.colyseusClient,
-    //     currentGame,
-    //     currentRoom: room
-    //   });
-    // }
-  });
-
-  room.onMessage("lastTurnPlayed", (message: ILastTurnMessage) => {
-    console.log("Game over:", message);
-
-    if (message.roomId === context.currentRoom?.roomId) {
-      // TODO: add replay feature for opponent
-      // Plus a 5 sec winning/losing animation before closing the game
-    }
-  });
 }
 
 export function sendTurnMessage(currentRoom: Room, currentTurn: IGameState[], newActivePlayer: string, turnNumber: number, gameOver?: IGameOver): void {

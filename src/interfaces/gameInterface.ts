@@ -9,29 +9,6 @@ export interface IGameOver {
 }
 
 /**
- * Turn Sent interface
- */
-export interface ITurnSentMessage {
-  roomId: string;
-  previousTurn: IGameState[],
-  turnNumber: number,
-  newActivePlayer: string,
-  gameOver?: IGameOver
-}
-
-/**
- * Last Turn Recevied interface
- */
-export interface ILastTurnMessage {
-  roomId: string;
-  previousTurn: IGameState[],
-  finishedAt: Date,
-  winCondition: EWinConditions,
-  winner: string,
-  userIds: string[]
-}
-
-/**
  * Coordinates Interface
  */
 export type Coordinates = {
