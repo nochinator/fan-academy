@@ -31,6 +31,8 @@ export default class UIScene extends Phaser.Scene {
   preload() {}
 
   async create() {
+    this.add.image(0, 0, 'loadingScreen').setOrigin(0).setScale(2.8);
+
     // Connect to lobby and get the list of games
     this.lobbyRoom = await connectToGameLobby(this.colyseusClient, this.userId, this);
     this.gameList = await getGameList(this.userId);

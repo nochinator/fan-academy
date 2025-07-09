@@ -1,7 +1,7 @@
 # Fan Academy
 
 <p align="center">
-<img src="./readmeImage.png" alt="Fan Academy screenshot" width="600" height="auto">
+<img src="./readmeImage.webp" alt="Fan Academy screenshot" width="600" height="auto">
 </p>
 
 Fan Academy is a fan-made revival of the game **Hero Academy**, a turn-based tactics game developed by Robot Entertainment. This project aims to bring back the joy of the original game, offering a way for fans to rediscover it.

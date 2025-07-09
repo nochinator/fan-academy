@@ -26,6 +26,8 @@ export default class MainMenuScene extends Phaser.Scene {
     // Background image
     const bg = this.add.image(0, 0, 'uiBackground').setOrigin (0);
     const menuImg = this.add.image(0, 0, 'mainMenuImage').setOrigin (0);
+    // Background game screen (to be used when a sub scene is running to avoid flickering)
+    const backgroundGameScreen = this.add.image(397, 15, 'gameBackground').setOrigin(0, 0).setScale(1.06, 1.2).setVisible(false);
     menuImg.x = bg.width - menuImg.width - 14;
     menuImg.y += 14;
 
@@ -51,6 +53,8 @@ export default class MainMenuScene extends Phaser.Scene {
       text: 'Profile',
       font: '70px proHeavy',
       callback: () => {
+        backgroundGameScreen.setVisible(true);
+        menuImg.setVisible(false);
         if (this.currentSubScene) this.scene.stop(this.currentSubScene);
         this.scene.launch('ProfileScene', { userId: this.userId });
         this.currentSubScene = 'ProfileScene';
