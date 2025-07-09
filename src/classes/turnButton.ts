@@ -3,13 +3,14 @@ import GameScene from "../scenes/game.scene";
 
 export class TurnButton {
   context: GameScene;
+  buttonImage: Phaser.GameObjects.Image;
   constructor(context: GameScene) {
     this.context = context;
-    const turnButton =  context.add.image(0, 0, 'turnButton').setOrigin(0.5).setPosition(1300, 725).setScale(1.1).setInteractive();
-    if (context.activePlayer !== context.userId) turnButton.setVisible(false);
+    this.buttonImage =  context.add.image(1300, 725, 'turnButton').setOrigin(0.5).setScale(1.1).setInteractive();
+    if (context.activePlayer !== context.userId) this.buttonImage.setVisible(false);
 
     // Sending a turn
-    turnButton.on('pointerdown', async () => {
+    this.buttonImage.on('pointerdown', async () => {
       if (context.currentGame && context.activePlayer === context.userId) {
         console.log('Clicked on send turn');
 

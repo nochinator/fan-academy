@@ -4,6 +4,7 @@ import { newGameChallenge } from "../queries/gameQueries";
 import LeaderboardScene from "../scenes/leaderboard.scene";
 import UIScene from "../scenes/ui.scene";
 import { truncateText } from "../utils/gameUtils";
+import GameScene from "../scenes/game.scene";
 
 const challengePopupCoordinates = {
   x: 800,
@@ -21,7 +22,7 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
   cancelButtonText: Phaser.GameObjects.Text;
 
   constructor(params: {
-    context: LeaderboardScene | UIScene,
+    context: LeaderboardScene | UIScene | GameScene,
     opponentId: string,
     challengeType: EChallengePopup,
     username?: string,

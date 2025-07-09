@@ -1,6 +1,6 @@
-import GameScene from "../game.scene";
+import PreloaderScene from "../preloader.scene";
 
-export function loadGameBoardUI(context: GameScene): void {
+export function loadGameBoardUI(context: PreloaderScene): void {
   context.load.image('gameBoard', '/assets/images/maps/game_board.jpg');
 
   context.load.image('itemRack', '/assets/images/gameItems/item_rack.png');

@@ -1,6 +1,6 @@
 import { sendTurnMessage } from "../colyseus/colyseusGameRoom";
-import { EActionClass, EActionType, EHeroes, ETiles } from "../enums/gameEnums";
-import { IGame, IGameState, IPlayerState } from "../interfaces/gameInterface";
+import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles } from "../enums/gameEnums";
+import { IGame, IGameState, IPlayerState, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { forcedMoveAnimation, getActionClass, getNewPositionAfterForce } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
@@ -12,6 +12,7 @@ import { GameUI } from "./gameUI";
 import { Hand } from "./hand";
 import { Hero } from "./hero";
 import { Item } from "./item";
+import { RematchButton } from "./rematchButton";
 import { Tile } from "./tile";
 import { TurnButton } from "./turnButton";
 import { TurnWarningPopup } from "./turnPopup";
@@ -27,10 +28,13 @@ export class GameController {
   door: Door;
   turnButton: TurnButton;
   turnPopup: TurnWarningPopup;
+  rematchButton: RematchButton;
   lastTurnState: IGameState;
   currentTurn: IGameState[];
 
   phantomCounter: number = 0; // REVIEW:
+
+  playerData: IUserData[];
 
   constructor(context: GameScene) {
     this.context = context;
@@ -38,16 +42,27 @@ export class GameController {
     this.lastTurnState =  context.currentGame.previousTurn[context.currentGame.previousTurn.length - 1]; // REVIEW:
     this.board = new Board(context, this.lastTurnState.boardState);
 
-    const playerData = context.currentGame.players.map(player => { return player.userData;});
-    this.gameUI = new GameUI(context, this.board, playerData);
+    this.playerData = context.currentGame.players.map(player => { return player.userData;});
+    this.gameUI = new GameUI(context, this.board, this.playerData);
     context.player1 = this.lastTurnState.player1;
     context.player2 = this.lastTurnState.player2;
 
     this.deck  = new Deck(context);
     this.hand = new Hand(context);
     this.actionPie = new ActionPie(context);
+
     this.turnButton = new TurnButton(context);
     this.turnPopup = new TurnWarningPopup(context);
+
+    this.rematchButton = new RematchButton(context);
+    if (this.game.status === EGameStatus.FINISHED) {
+      this.rematchButton.setVisible(true);
+      this.turnButton.buttonImage.setVisible(false);
+    } else {
+      this.rematchButton.setVisible(false);
+      this.turnButton.buttonImage.setVisible(true);
+    }
+
     this.door = new Door(context);
 
     this.currentTurn = [];

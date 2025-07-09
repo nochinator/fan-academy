@@ -1,4 +1,5 @@
 import { EFaction } from "../enums/gameEnums";
+import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameAssets } from "./mainMenuUtils/gameAssets";
 import { profilePicNames } from "./profileSceneUtils/profilePicNames";
 
@@ -41,7 +42,7 @@ export default class PreloaderScene extends Phaser.Scene {
     this.load.font('proLight', '/assets/fonts/BlambotFXProLightBB.ttf', 'truetype');
 
     // popups
-    this.load.image('popupBackground', '/assets/images/gameItems/turn_button.png');
+    this.load.image('popupBackground', '/assets/images/gameItems/popup_button.png');
     this.load.image('popupButton', '/assets/images/gameItems/ColorSwatch_Color-hd.png');
 
     // background images
@@ -53,6 +54,16 @@ export default class PreloaderScene extends Phaser.Scene {
 
     // game assets
     loadGameAssets(this);
+
+    // game board ui
+    loadGameBoardUI(this);
+
+    // game ui
+    this.load.image('gameListButton', '/assets/ui/game_list_premade.png');
+    this.load.image('newGameButton', '/assets/ui/new_game_btn.png');
+    this.load.image('unknownFaction', '/assets/ui/unknown_faction.png');
+    this.load.image('unknownOpponent', '/assets/images/profilePics/unknownAvatar-hd.jpg');
+    this.load.image('closeButton', '/assets/ui/close_button.png');
   }
 
   create(): void {

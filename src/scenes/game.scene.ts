@@ -4,7 +4,6 @@ import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Coordinates, IGame, IGameOver, IPlayerData, IPlayerState } from "../interfaces/gameInterface";
 import { calculateAllCenterPoints } from "../utils/boardCalculations";
-import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 
 export default class GameScene extends Phaser.Scene {
   userId!: string;
@@ -54,9 +53,7 @@ export default class GameScene extends Phaser.Scene {
     this.currentTurnAction = this.turnNumber === 0 ? 3 : 1;
   }
 
-  preload() {
-    loadGameBoardUI(this);
-  }
+  preload() {}
 
   create() {
     this.input.mouse!.disableContextMenu();

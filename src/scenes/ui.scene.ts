@@ -1,10 +1,9 @@
 import { Client, Room } from "colyseus.js";
-import { loadGameMenuUI } from "./gameSceneUtils/gameMenuUI";
+import { HomeButton } from "../classes/homeButton";
 import { connectToGameLobby } from "../colyseus/colyseusLobbyRoom";
-import { createGameList } from "./gameSceneUtils/gameList";
 import { IGame } from "../interfaces/gameInterface";
 import { getGameList } from "../queries/gameQueries";
-import { HomeButton } from "../classes/homeButton";
+import { createGameList } from "./gameSceneUtils/gameList";
 
 export default class UIScene extends Phaser.Scene {
   colyseusClient: Client;
@@ -29,9 +28,7 @@ export default class UIScene extends Phaser.Scene {
     this.userId = data.userId;
   }
 
-  preload() {
-    loadGameMenuUI(this);
-  }
+  preload() {}
 
   async create() {
     // Connect to lobby and get the list of games
