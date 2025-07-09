@@ -3,10 +3,10 @@ import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { getGridDistance, isInHand, moveAnimation, positionHeroImage, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
-import { HeroCard } from "./heroCard";
 import { Crystal } from "./crystal";
 import { FloatingText } from "./floatingText";
 import { HealthBar } from "./healthBar";
+import { HeroCard } from "./heroCard";
 import { Item } from "./item";
 import { Tile } from "./tile";
 
@@ -232,6 +232,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.reviveAnim = context.add.image(0, -10, 'reviveAnim_1').setOrigin(0.5).setScale(0.7).setVisible(false);
 
+    // Set hitbox
+    const hitArea = new Phaser.Geom.Rectangle(-35, -50, 75, 85); // centered on (0,0)
     // Add all individual images to container
     this.add([
       this.debuffImage,
@@ -252,7 +254,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       ...this.smokeAnim ? [this.smokeAnim] : [],
       this.blockedLOS,
       this.unitCard
-    ]).setSize(50, 50).setInteractive().setName(this.unitId).setDepth(this.boardPosition + 10); // REVIEW: depth
+    ]).setInteractive(hitArea, Phaser.Geom.Rectangle.Contains).setName(this.unitId).setDepth(this.boardPosition + 10);
 
     // Hide if in deck
     if (this.boardPosition === 51) this.setVisible(false);

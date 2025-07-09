@@ -6,9 +6,10 @@ export function debugHitArea(context: GameScene, container: Phaser.GameObjects.C
 
   graphic.lineStyle(2, color, 1);
   graphic.strokeRect(
-    container.x - area.width / 2,
-    container.y - area.height / 2,
+    container.x + area.x,
+    container.y + area.y,
     area.width,
     area.height
   );
+  graphic.setDepth(9999);
 }
