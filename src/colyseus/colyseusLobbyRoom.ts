@@ -38,7 +38,8 @@ export async function connectToGameLobby(client: Client, userId: string, context
       gameId: string,
       previousTurn: IGameState[],
       newActivePlayer: string,
-      turnNumber: number
+      turnNumber: number,
+      lastPlayedAt: Date
     }) => {
       console.log('A game has been updated', message);
 
@@ -48,6 +49,7 @@ export async function connectToGameLobby(client: Client, userId: string, context
       game.previousTurn = message.previousTurn;
       game.activePlayer = message.newActivePlayer;
       game.turnNumber = message.turnNumber;
+      game.lastPlayedAt = message.lastPlayedAt;
 
       await createGameList(context);
 
@@ -77,6 +79,7 @@ export async function connectToGameLobby(client: Client, userId: string, context
       game.previousTurn = message.previousTurn;
       game.turnNumber = message.turnNumber;
       game.status = EGameStatus.FINISHED;
+      game.lastPlayedAt = message.lastPlayedAt;
 
       await createGameList(context);
 
