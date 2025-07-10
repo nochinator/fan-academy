@@ -1,7 +1,7 @@
 import { EActionType, EAttackType } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, getAOETiles, getGridDistance, isOnBoard, turnIfBehind } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -39,12 +39,21 @@ export class Archer extends Human {
     turnIfBehind(this.context, this, target);
 
     if (distance === 1) {
-      target.getsDamaged(this.getTotalPower(0.5), this.attackType);
+      // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
+      if (
+        target instanceof Hero &&
+        target.isKO &&
+        isEnemySpawn(this.context, target.getTile())
+      ) {
+        target.removeFromGame();
+      } else {
+        target.getsDamaged(this.getTotalPower(0.5), this.attackType);
+        this.resetPowerModifier();
+      }
     } else {
       target.getsDamaged(this.getTotalPower(), this.attackType);
+      this.resetPowerModifier();
     }
-
-    this.resetPowerModifier();
 
     this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -60,14 +69,22 @@ export class Knight extends Human {
 
   async attack(target: Hero | Crystal): Promise<void> {
     const gameController = this.context.gameController!;
-
     turnIfBehind(this.context, this, target);
 
-    target.getsDamaged(this.getTotalPower(), this.attackType);
+    // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile())
+    ) {
+      target.removeFromGame();
+    } else {
+      target.getsDamaged(this.getTotalPower(), this.attackType);
 
-    if (target instanceof Hero) await gameController.pushEnemy(this, target);
+      if (target instanceof Hero) await gameController.pushEnemy(this, target);
 
-    this.resetPowerModifier();
+      this.resetPowerModifier();
+    }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -82,24 +99,35 @@ export class Wizard extends Human {
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
-
     turnIfBehind(this.context, this, target);
 
-    // Get directions for finding out the next targets
-    const attackDirection = gameController.board.getAttackDirection(this.boardPosition, target.boardPosition);
-    const opponentDirection = this.context.isPlayerOne ? [2, 3, 4] : [6, 7, 8];
+    const distance = this.getDistanceToTarget(target);
 
-    // Get targets
-    const secondTarget = this.getNextTarget(target, attackDirection, opponentDirection, gameController.board, false);
-    let thirdTarget: Hero | Crystal | undefined;
-    if (secondTarget) thirdTarget = this.getNextTarget(secondTarget, attackDirection, opponentDirection, gameController.board, false, [target.boardPosition, secondTarget.boardPosition]);
+    // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
+    if (
+      distance === 1 &&
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile())
+    ) {
+      target.removeFromGame();
+    } else {
+      // Get directions for finding out the next targets
+      const attackDirection = gameController.board.getAttackDirection(this.boardPosition, target.boardPosition);
+      const opponentDirection = this.context.isPlayerOne ? [2, 3, 4] : [6, 7, 8];
 
-    // Apply damage to targets
-    target.getsDamaged(this.getTotalPower(), this.attackType);
-    if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
-    if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
+      // Get targets
+      const secondTarget = this.getNextTarget(target, attackDirection, opponentDirection, gameController.board, false);
+      let thirdTarget: Hero | Crystal | undefined;
+      if (secondTarget) thirdTarget = this.getNextTarget(secondTarget, attackDirection, opponentDirection, gameController.board, false, [target.boardPosition, secondTarget.boardPosition]);
 
-    this.resetPowerModifier();
+      // Apply damage to targets
+      target.getsDamaged(this.getTotalPower(), this.attackType);
+      if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
+      if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
+
+      this.resetPowerModifier();
+    }
 
     gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -206,26 +234,25 @@ export class Ninja extends Human {
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
-
     turnIfBehind(this.context, this, target);
 
-    const attackerTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
-    const targetTile = gameController.board.getTileFromBoardPosition(target.boardPosition);
-
-    if (!attackerTile || !targetTile) {
-      console.error('Archer attack() No attacker or target tile found');
-      return;
-    }
-
-    const distance = getGridDistance(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col );
+    const distance = this.getDistanceToTarget(target);
 
     if (distance === 1) {
-      target.getsDamaged(this.getTotalPower(2), this.attackType);
-    } else {
+      // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
+      if (
+        target instanceof Hero &&
+        target.isKO &&
+        isEnemySpawn(this.context, target.getTile())
+      ) {
+        target.removeFromGame();
+      } else {
+        target.getsDamaged(this.getTotalPower(2), this.attackType);
+        this.resetPowerModifier();
+      }} else {
       target.getsDamaged(this.getTotalPower(), this.attackType);
+      this.resetPowerModifier();
     }
-
-    this.resetPowerModifier();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }

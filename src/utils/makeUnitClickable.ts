@@ -4,7 +4,7 @@ import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
 import { EHeroes, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, isHero, isItem } from "./gameUtils";
+import { belongsToPlayer, isEnemySpawn, isHero, isItem } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
@@ -72,14 +72,27 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
     // CASE 3.1: Clicking an enemy unit
     if (isEnemy) {
+      const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
+
       if (isHero(activeUnit) && attackReticle?.visible) {
         activeUnit.attack(unit);
         return;
       }
 
+      // Stomp a KO'd units on a friendly spawn tile with a unit in hand
+      if (isHero(activeUnit) && unit.isKO && !isEnemySpawn(context, unitTile)) {
+        activeUnit.spawn(unit.getTile());
+        return;
+      }
+
+      // Stomp enemy phantoms on friendly spawn tiles
+      if (isHero(activeUnit) && unit.unitType === EHeroes.PHANTOM && !isEnemySpawn(context, unitTile)) {
+        activeUnit.spawn(unit.getTile());
+        return;
+      }
+
       // Stomp enemy KO'd units
       if (isHero(activeUnit) && unit.isKO) {
-        const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
         activeUnit.move(unitTile);
       }
 

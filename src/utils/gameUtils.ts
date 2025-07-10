@@ -5,7 +5,7 @@ import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
 import { EActionClass, EActionType, ECardType, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
-import { ICrystal, IHero, IItem, IPlayerState } from "../interfaces/gameInterface";
+import { ICrystal, IHero, IItem, IPlayerState, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
 export function isHero(hero: IHero | IItem): hero is Hero {
@@ -214,7 +214,7 @@ export function updateUnitsLeft(context: GameScene, hero: Hero): void {
   };
 }
 
-export function isEnemySpawn(context: GameScene, tile: Tile): boolean {
+export function isEnemySpawn(context: GameScene, tile: Tile | ITile): boolean {
   return tile.tileType === ETiles.SPAWN && (context.isPlayerOne ? tile.col > 5 : tile.col < 5);
 }
 

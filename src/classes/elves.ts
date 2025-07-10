@@ -2,7 +2,7 @@ import { EActionType, EAttackType, EClass, EFaction, EHeroes } from "../enums/ga
 
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, getAOETiles, isOnBoard, roundToFive, turnIfBehind } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -42,15 +42,29 @@ export class Impaler extends DarkElf {
   }
   async attack(target: Hero | Crystal): Promise<void> {
     const gameController = this.context.gameController!;
-
     turnIfBehind(this.context, this, target);
 
-    const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
-    if (damageDone) this.lifeSteal(damageDone);
+    const distance = this.getDistanceToTarget(target);
 
-    if (target instanceof Hero) await gameController.pullEnemy(this, target);
+    // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
+    if (
+      distance === 1 &&
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile())
+    ) {
+      target.removeFromGame();
+    } else {
+      const totalPower = this.getTotalPower();
 
-    this.resetPowerModifier();
+      const damageDone = target.getsDamaged(totalPower, this.attackType);
+
+      if (damageDone) this.lifeSteal(damageDone);
+
+      if (target instanceof Hero) await gameController.pullEnemy(this, target);
+
+      this.resetPowerModifier();
+    }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -66,46 +80,55 @@ export class VoidMonk extends DarkElf {
   attack(target: Hero | Crystal): void {
     turnIfBehind(this.context, this, target);
 
-    const board = this.context.gameController!.board;
+    // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile())
+    ) {
+      target.removeFromGame();
+    } else {
+      const board = this.context.gameController!.board;
 
-    // Get the direction of the attack and offset tiles
-    const attackDirection = board.getAttackDirection(this.boardPosition, target.boardPosition);
+      // Get the direction of the attack and offset tiles
+      const attackDirection = board.getAttackDirection(this.boardPosition, target.boardPosition);
 
-    const offsetTiles = this.getOffsetTiles(target.boardPosition, attackDirection);
+      const offsetTiles = this.getOffsetTiles(target.boardPosition, attackDirection);
 
-    if (!offsetTiles.length) throw new Error(`voidMonk attack() No offsetTiles: ${this.boardPosition}, ${target.boardPosition}`);
+      if (!offsetTiles.length) throw new Error(`voidMonk attack() No offsetTiles: ${this.boardPosition}, ${target.boardPosition}`);
 
-    // Get enemies in offset tiles, if any
-    const splashedEnemies: (Hero | Crystal)[] = [];
+      // Get enemies in offset tiles, if any
+      const splashedEnemies: (Hero | Crystal)[] = [];
 
-    for (const offset of offsetTiles) {
-      const tileBP = target.boardPosition + offset;
-      if (!isOnBoard(tileBP)) continue;
+      for (const offset of offsetTiles) {
+        const tileBP = target.boardPosition + offset;
+        if (!isOnBoard(tileBP)) continue;
 
-      const tile = board.getTileFromBoardPosition(tileBP);
-      if (!tile) throw new Error(`voidMonk attack() No tile found`);
+        const tile = board.getTileFromBoardPosition(tileBP);
+        if (!tile) throw new Error(`voidMonk attack() No tile found`);
 
-      if (!canBeAttacked(this.context, tile)) continue;
+        if (!canBeAttacked(this.context, tile)) continue;
 
-      if (tile.hero) {
-        const hero = board.units.find(unit => unit.unitId === tile.hero!.unitId);
-        if (hero) splashedEnemies.push(hero);
+        if (tile.hero) {
+          const hero = board.units.find(unit => unit.unitId === tile.hero!.unitId);
+          if (hero) splashedEnemies.push(hero);
+        }
+
+        if (tile.crystal) {
+          const crystal = board.crystals.find(c => c.boardPosition === tile.crystal!.boardPosition);
+          if (crystal) splashedEnemies.push(crystal);
+        }
+      };
+
+      // Apply damage to targets
+      target.getsDamaged(this.getTotalPower(), this.attackType);
+      if (splashedEnemies.length) {
+        const splashDamage = this.getTotalPower() * 0.66;
+        splashedEnemies.forEach(enemy => enemy.getsDamaged(splashDamage, this.attackType));
       }
 
-      if (tile.crystal) {
-        const crystal = board.crystals.find(c => c.boardPosition === tile.crystal!.boardPosition);
-        if (crystal) splashedEnemies.push(crystal);
-      }
-    };
-
-    // Apply damage to targets
-    target.getsDamaged(this.getTotalPower(), this.attackType);
-    if (splashedEnemies.length) {
-      const splashDamage = this.getTotalPower() * 0.66;
-      splashedEnemies.forEach(enemy => enemy.getsDamaged(splashDamage, this.attackType));
+      this.resetPowerModifier();
     }
-
-    this.resetPowerModifier();
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -139,7 +162,8 @@ export class Necromancer extends DarkElf {
 
       const phantom = new Phantom(this.context, createElvesPhantomData({
         unitId: `${this.context.userId}_phantom_${++this.context.gameController!.phantomCounter}`,
-        boardPosition: target.boardPosition
+        boardPosition: target.boardPosition,
+        belongsTo: this.belongsTo
       }), tile, true);
 
       target.removeFromGame(true);
@@ -170,21 +194,32 @@ export class Priestess extends DarkElf {
   }
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
-
     turnIfBehind(this.context, this, target);
 
-    const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
-    if (damageDone) this.lifeSteal(damageDone);
+    const distance = this.getDistanceToTarget(target);
 
-    // Apply a 50% debuff to the target's next attack
-    if (target instanceof Hero && !target.isDebuffed && !target.isKO) {
-      target.updatePowerModifier(-50);
-      target.isDebuffed = true;
-      target.debuffImage.setVisible(true);
-      target.unitCard.updateCardPower(target);
+    // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
+    if (
+      distance === 1 &&
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile())
+    ) {
+      target.removeFromGame();
+    } else {
+      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
+      if (damageDone) this.lifeSteal(damageDone);
+
+      // Apply a 50% debuff to the target's next attack
+      if (target instanceof Hero && !target.isDebuffed && !target.isKO) {
+        target.updatePowerModifier(-50);
+        target.isDebuffed = true;
+        target.debuffImage.setVisible(true);
+        target.unitCard.updateCardPower(target);
+      }
+
+      this.resetPowerModifier();
     }
-
-    this.resetPowerModifier();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -255,12 +290,20 @@ export class Phantom extends Hero {
 
   attack(target: Hero | Crystal): void {
     const gameController = this.context.gameController!;
-
     turnIfBehind(this.context, this, target);
 
-    target.getsDamaged(this.getTotalPower(), this.attackType);
+    // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile())
+    ) {
+      target.removeFromGame();
+    } else {
+      target.getsDamaged(this.getTotalPower(), this.attackType);
 
-    this.resetPowerModifier();
+      this.resetPowerModifier();
+    }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }

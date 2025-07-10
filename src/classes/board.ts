@@ -62,15 +62,22 @@ export class Board {
   }
 
   highlightSpawns(unitType: EHeroes) {
-    const spawns: Tile[] = [];
+    const spawns = new Set<Tile>();
 
     this.tiles.forEach(tile => {
       const enemySpawn = isEnemySpawn(this.context, tile);
-      if (tile.tileType === ETiles.SPAWN && !enemySpawn) spawns.push(tile);
-      if (tile.hero && tile.hero.isKO && unitType === EHeroes.WRAITH && !enemySpawn) spawns.push(tile);
+      /** We add:
+       *  -friendly spawn tiles (unless they are occupied by a live unit other than an enemy phantom)
+       *  -any tile with a KO'd unit if the unit spawning is a Wraith
+       */
+      if (tile.tileType === ETiles.SPAWN && !enemySpawn){
+        if (!tile.isOccupied()) spawns.add(tile);
+        if (tile.hero && tile.hero.unitType === EHeroes.PHANTOM) spawns.add(tile);
+      }
+      if (tile.hero && tile.hero.isKO && unitType === EHeroes.WRAITH) spawns.add(tile);
     });
 
-    this.highlightTiles(spawns);
+    this.highlightTiles([...spawns]);
   }
 
   highlightEnemyTargets(hero: Hero): void {
@@ -88,23 +95,18 @@ export class Board {
       }
 
       /**
-       * for each target, we gotta check the bp or coordinates in relation with the attacker. then if there is a friendly unit or crystal in between, LOS is blocked
-       *
-       *
-       */
-
-      /**
        * Show attack reticle if one of the below is true:
        *  -target is an enemy hero and it's not KO
        *  -target is an enemy crystal
-       *  -target is KO and active unit is a Necro
-       *  -target is KO and active unit is a Wraith that is not fully leveled (max 3 units consumed)
+       *  -target is KO and active unit is a Necro or a Wraith
+       *  -target is KO and standing on an enemy spawn, and hero is orthogonally adjacent
        */
       if (
         tile.isEnemy(userId) && target instanceof Hero && !target.isKO ||
         tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
-        hero.unitType === EHeroes.NECROMANCER  && target instanceof Hero && target.isKO ||
-        hero.unitType === EHeroes.WRAITH && hero.unitsConsumed < 3 && target instanceof Hero && target.isKO) {
+        (hero.unitType === EHeroes.NECROMANCER || hero.unitType === EHeroes.WRAITH)  && target instanceof Hero && target.isKO ||
+        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target)
+      ) {
         enemyLOSCheck.push(target);
       }
     });
@@ -419,10 +421,18 @@ export class Board {
     return result !== false;
   }
 
+  // Includes diagonally adjacent
   isAdjacent(hero: Hero, unitToCompare: Hero | Crystal): boolean {
     const row = Math.abs(hero.row - unitToCompare.row);
     const col = Math.abs(hero.col - unitToCompare.col);
 
     return col <= 1 && row <= 1 && !(row === 0 && col === 0);
+  }
+
+  isOrthogonalAdjacent(hero: Hero, unitToCompare: Hero | Crystal): boolean {
+    const row = Math.abs(hero.row - unitToCompare.row);
+    const col = Math.abs(hero.col - unitToCompare.col);
+
+    return row === 1 && col === 0 || row === 0 && col === 1;
   }
 }

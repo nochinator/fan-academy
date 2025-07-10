@@ -2,7 +2,7 @@ import { sendTurnMessage } from "../colyseus/colyseusGameRoom";
 import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles } from "../enums/gameEnums";
 import { IGame, IGameState, IPlayerState, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { forcedMoveAnimation, getActionClass, getNewPositionAfterForce } from "../utils/gameUtils";
+import { forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -153,7 +153,7 @@ export class GameController {
       }));
     }
 
-    this.addActionToState(EActionType.REMOVE_UNITS); // REVIEW: this step needs to happen every turn in order to update the tiles
+    this.addActionToState(EActionType.REMOVE_UNITS); // this step needs to happen every turn in order to update the tiles
   }
 
   hasActionsLeft(): boolean {
@@ -267,6 +267,10 @@ export class GameController {
     }
     if (targetNewTile?.isOccupied()) {
       console.error('pushEnemy() Destination tile is occupied');
+      return;
+    }
+    if (!isEnemySpawn(this.context, targetTile) && !target.isKO) {
+      console.error(`pushEnemy() Can't push a non-KO'd enemy onto a friendly spawn`);
       return;
     }
 
