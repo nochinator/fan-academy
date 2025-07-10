@@ -616,3 +616,11 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
 export function truncateText(text: string, maxLength: number) {
   return text.length > maxLength ? text.slice(0, maxLength - 3) + '...' : text;
 }
+
+// Used to remove any visible unit cards from a mobile long press action
+export function visibleUnitCardCheck(context: GameScene): void {
+  if (context.visibleUnitCard) {
+    context.visibleUnitCard.setDepth(context.visibleUnitCard.boardPosition + 10);
+    context.visibleUnitCard.unitCard.setVisible(false);
+  }
+}

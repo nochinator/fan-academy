@@ -4,16 +4,29 @@ import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
 import { EHeroes, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, isEnemySpawn, isHero, isItem } from "./gameUtils";
+import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   unit.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+    visibleUnitCardCheck(context);
+
+    // Set a timer for the a hold press on mobile
+    context.longPressStart = context.time.now;
+
     if (pointer.button === 0) handleOnUnitLeftClick(unit, context);
 
     if (pointer.button === 2) {
       unit.setDepth(1001);
       unit.unitCard.setVisible(true);
+    }
+  });
+
+  unit.on('pointerup', () => {
+    if (context.time.now - context.longPressStart > 500) {
+      unit.setDepth(1001);
+      unit.unitCard.setVisible(true);
+      context.visibleUnitCard = unit;
     }
   });
 
@@ -25,6 +38,9 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   });
 
   unit.on('pointerout', () => {
+    // Ignore if there was a long press. Used on mobile
+    if (context.visibleUnitCard) return;
+
     unit.setDepth(unit.boardPosition + 10);
     unit.unitCard.setVisible(false);
   });
@@ -32,6 +48,7 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
 function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
   console.log(`Unit in ${unit.boardPosition}`, unit);
+
   // Only the active player can click on tiles, and only if they still have actions available
   if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
 
@@ -158,6 +175,8 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
 export function makeTileClickable(tile: Tile, context: GameScene): void {
   tile.on('pointerdown', () => {
+    visibleUnitCardCheck(context);
+
     console.log('Clicked tile', tile.boardPosition, tile);
     // Only the active player can click on tiles, and only if they still have actions available
     if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
@@ -179,7 +198,10 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
 
 export function makeCrystalClickable(crystal: Crystal, context: GameScene): void {
   crystal.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-    console.log('Crystal ->', crystal);
+    visibleUnitCardCheck(context);
+
+    // Set a timer for the a hold press on mobile
+    context.longPressStart = context.time.now;
 
     // Handling left click
     if (pointer.button === 0) {
@@ -205,6 +227,14 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
     }
   });
 
+  crystal.on('pointerup', () => {
+    if (context.time.now - context.longPressStart > 500) {
+      crystal.setDepth(1001);
+      crystal.unitCard.setVisible(true);
+      context.visibleUnitCard = crystal;
+    }
+  });
+
   crystal.on('pointerover', (pointer: Phaser.Input.Pointer) => {
     if (pointer.rightButtonDown()) {
       crystal.setDepth(1001);
@@ -213,6 +243,9 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
   });
 
   crystal.on('pointerout', () => {
+    // Ignore if there was a long press. Used on mobile
+    if (context.visibleUnitCard) return;
+
     crystal.setDepth(crystal.boardPosition + 10);
     crystal.unitCard.setVisible(false);
   });

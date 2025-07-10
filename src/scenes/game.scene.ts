@@ -1,4 +1,5 @@
 import { Client, Room } from "colyseus.js";
+import { Crystal } from "../classes/crystal";
 import { GameController } from "../classes/gameController";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
@@ -27,6 +28,9 @@ export default class GameScene extends Phaser.Scene {
   player2: IPlayerState | undefined;
 
   gameOver: IGameOver | undefined;
+
+  longPressStart = 0;
+  visibleUnitCard: Hero | Item | Crystal | undefined;
 
   constructor() {
     super({ key: 'GameScene' });
