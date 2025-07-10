@@ -4,7 +4,7 @@ import { loadGameAssets } from "./mainMenuUtils/gameAssets";
 import { profilePicNames } from "./profileSceneUtils/profilePicNames";
 
 // CDN path
-export const CDN_PATH = 'https://cdn.jsdelivr.net/gh/Dan-DH/fa-assets@6af38e1';
+export const CDN_PATH = 'https://cdn.jsdelivr.net/gh/Dan-DH/fa-assets@3a9b192';
 
 // PreloaderScene.ts
 export default class PreloaderScene extends Phaser.Scene {
@@ -41,8 +41,8 @@ export default class PreloaderScene extends Phaser.Scene {
     });
 
     // fonts
-    this.load.font('proHeavy', `${CDN_PATH}/fonts/BlambotFXProHeavyLowerCapsBB.ttf', 'truetype`);
-    this.load.font('proLight', `${CDN_PATH}/fonts/BlambotFXProLightBB.ttf', 'truetype`);
+    this.load.font('proHeavy', '/fonts/BlambotFXProHeavyLowerCapsBB.woff', 'truetype');
+    this.load.font('proLight', '/fonts/BlambotFXProLightBB.woff', 'truetype');
 
     // popups
     this.load.image('popupBackground', `${CDN_PATH}/images/gameItems/popup_button.webp`);
