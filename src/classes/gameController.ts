@@ -54,14 +54,14 @@ export class GameController {
     this.turnButton = new TurnButton(context);
     this.turnPopup = new TurnWarningPopup(context);
 
-    this.rematchButton = new RematchButton(context);
+    this.rematchButton = new RematchButton(context).setVisible(false);
+
     if (this.game.status === EGameStatus.FINISHED) {
       this.rematchButton.setVisible(true);
       this.turnButton.buttonImage.setVisible(false);
-    } else {
-      this.rematchButton.setVisible(false);
-      this.turnButton.buttonImage.setVisible(true);
     }
+
+    if (context.activePlayer !== context.userId) this.turnButton.buttonImage.setVisible(false);
 
     this.door = new Door(context);
 
