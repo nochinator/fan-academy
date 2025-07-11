@@ -103,7 +103,9 @@ export async function createGameList(context: UIScene) {
       const closeButton = context.add.image(gameListButtonWidth - 30, lastListItemY, 'closeButton').setOrigin(0).setVisible(false);
       if (game.status === EGameStatus.SEARCHING || game.status === EGameStatus.CHALLENGE) {
         closeButton.setVisible(true).setInteractive();
-        closeButton.on('pointerdown', async () => {
+        closeButton.on('pointerup', async () => {
+          if (pointerMoved) return; // skip tap if user was swiping
+
           sendDeletedGameMessage(context.lobbyRoom!, game._id, context.userId);
           createGameList(context);
         });
@@ -121,7 +123,9 @@ export async function createGameList(context: UIScene) {
       if (game.status === EGameStatus.PLAYING || game.status === EGameStatus.FINISHED) {
         gameListButtonImage.setInteractive();
         if (context.activeGameImageId === game._id) highlightGameButton();
-        gameListButtonImage.on('pointerdown', async () => {
+        gameListButtonImage.on('pointerup', async () => {
+          if (pointerMoved) return; // skip tap if user was swiping
+
           highlightGameButton();
           await accessGame(context, game);
         });
@@ -130,7 +134,9 @@ export async function createGameList(context: UIScene) {
       if (game.status === EGameStatus.CHALLENGE && listChallengeReceivedArray.find(gameReceived => gameReceived._id === game._id )) {
         gameListButtonImage.setInteractive();
         if (context.activeGameImageId === game._id) highlightGameButton();
-        gameListButtonImage.on('pointerdown', async () => {
+        gameListButtonImage.on('pointerup', async () => {
+          if (pointerMoved) return; // skip tap if user was swiping
+
           highlightGameButton();
 
           if (context.currentRoom) {
@@ -257,15 +263,18 @@ export async function createGameList(context: UIScene) {
   gameListContainer.setMask(mask);
   const scrollSpeed = 1;
   let contentOffset = 0;
+  const withinScrollArea = (pointer: Phaser.Input.Pointer) => {
+    return (
+      pointer.x >= 19 &&
+      pointer.x <= 19 + visibleWidth &&
+      pointer.y >= 65 &&
+      pointer.y <= 65 + visibleHeight
+    );
+  };
 
+  // Scrolling on PC
   context.input.on("wheel", (pointer: Phaser.Input.Pointer, _gameObjects: any, _deltaX: number, deltaY: number, _deltaZ: number ) => {
-    const withinScrollArea =
-    pointer.x >= 19 &&
-    pointer.x <= 19 + visibleWidth &&
-    pointer.y >= 65 &&
-    pointer.y <= 65 + visibleHeight;
-
-    if (withinScrollArea && contentHeight > visibleHeight) {
+    if (withinScrollArea(pointer) && contentHeight > visibleHeight) {
       // Calculate the new offset
       contentOffset -= deltaY * scrollSpeed;
 
@@ -284,5 +293,53 @@ export async function createGameList(context: UIScene) {
         child.y = child.originalY + contentOffset;
       });
     }
+  });
+
+  // Setting scrolling on mobile
+  let isDragging = false;
+  let dragStartY = 0;
+  let dragStartOffset = 0;
+  let pointerMoved = false;
+
+  context.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+    if (withinScrollArea(pointer) && contentHeight > visibleHeight) {
+      isDragging = true;
+      dragStartY = pointer.y;
+      dragStartOffset = contentOffset;
+      pointerMoved = false;
+    } else {
+      isDragging = false;
+      dragStartY = 0;
+      dragStartOffset = 0;
+      pointerMoved = false;
+    }
+  });
+
+  context.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
+    if (!isDragging) return;
+
+    const deltaY = pointer.y - dragStartY;
+
+    if (Math.abs(deltaY) > 5) pointerMoved = true;
+
+    contentOffset = Phaser.Math.Clamp(
+      dragStartOffset + deltaY,
+      visibleHeight * 2 - contentHeight - 100,
+      0
+    );
+
+    gameListContainer.each((child: any) => {
+      if (child.originalY === undefined) {
+        child.originalY = child.y;
+      }
+      child.y = child.originalY + contentOffset;
+    });
+  });
+
+  context.input.on("gameobjectup", () => {
+    isDragging = false;
+    dragStartY = 0;
+    dragStartOffset = 0;
+    pointerMoved = false;
   });
 }
