@@ -108,15 +108,12 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
     // Enable touch-based scrolling
     let isDragging = false;
     let dragStartY = 0;
-    let dragStartOffset = 0;
     let pointerMoved = false;
-    const contentOffset = 0;
 
     context.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       if (!this.visible) return;
       isDragging = true;
       dragStartY = pointer.y;
-      dragStartOffset = contentOffset;
       pointerMoved = false;
     });
 
@@ -137,7 +134,6 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
     context.input.on("gameobjectup", () => {
       isDragging = false;
       dragStartY = 0;
-      dragStartOffset = 0;
       pointerMoved = false;
     });
 
