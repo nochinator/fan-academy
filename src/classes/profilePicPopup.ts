@@ -2,6 +2,7 @@ import ProfileScene from "../scenes/profile.scene";
 import { profilePicNames } from "../scenes/profileSceneUtils/profilePicNames";
 
 export class ProfilePicPopup extends Phaser.GameObjects.Container {
+  visibleFlag: boolean;
   constructor(context: ProfileScene, profilePicture: Phaser.GameObjects.Image) {
     super(context, 800, 400);
 
@@ -39,7 +40,9 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
         .setDisplaySize(avatarSize, avatarSize)
         .setData('key', key);
 
-      img.on('pointerdown', () => {
+      img.on('pointerup', () => {
+        if (pointerMoved || !this.visibleFlag) return; // skip tap if user was swiping
+
         context.userData!.picture = key;
         profilePicture!.setTexture(key).setDisplaySize(256 * 0.5, 256 * 0.5);
         this.setVisible(false);
@@ -76,6 +79,41 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
       scrollContainer.y = Phaser.Math.Clamp(scrollContainer.y, minY, 0);
     });
 
+    // Enable touch-based scrolling
+    let isDragging = false;
+    let dragStartY = 0;
+    let dragStartOffset = 0;
+    let pointerMoved = false;
+    const contentOffset = 0;
+
+    context.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      if (!this.visible) return;
+      isDragging = true;
+      dragStartY = pointer.y;
+      dragStartOffset = contentOffset;
+      pointerMoved = false;
+    });
+
+    context.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
+      if (!isDragging) return;
+
+      const deltaY = pointer.y - dragStartY;
+
+      if (Math.abs(deltaY) > 5) pointerMoved = true;
+
+      scrollContainer.y += deltaY * 0.7;
+      scrollContainer.y = Phaser.Math.Clamp(scrollContainer.y, minY, 0);
+
+      dragStartY = pointer.y; // Update for next frame
+    });
+
+    context.input.on("gameobjectup", () => {
+      isDragging = false;
+      dragStartY = 0;
+      dragStartOffset = 0;
+      pointerMoved = false;
+    });
+
     this.add([
       blockingLayer,
       modal
@@ -85,5 +123,6 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
     this.setVisible(false);
 
     context.add.existing(this);
+    this.visibleFlag = true;
   }
 }
