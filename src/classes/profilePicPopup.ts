@@ -4,7 +4,7 @@ import { profilePicNames } from "../scenes/profileSceneUtils/profilePicNames";
 export class ProfilePicPopup extends Phaser.GameObjects.Container {
   visibleFlag: boolean;
   constructor(context: ProfileScene, profilePicture: Phaser.GameObjects.Image) {
-    super(context, 800, 400);
+    super(context, 900, 400);
 
     const modal = new Phaser.GameObjects.Container(context, 0, 0); // Centered relative to the popup
 
@@ -18,8 +18,7 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
     const avatarsPerRow = 4;
 
     // Background
-    const backgroundRectangle = context.add.rectangle(0, 0, modalWidth, modalHeight, 0x222222, 1)
-      .setStrokeStyle(2, 0xffffff);
+    const backgroundRectangle = context.add.rectangle(0, 0, modalWidth, modalHeight, 0x222222, 1).setStrokeStyle(2, 0xffffff);
     modal.add(backgroundRectangle);
 
     // Scrollable area
@@ -27,6 +26,24 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
     modal.add(scrollContainer);
 
     const thumbnails: Phaser.GameObjects.Image[] = [];
+
+    const updateThumbnailInteractivity = () => {
+      const maskTop = -modalHeight / 2 + padding + 25; // Matches your maskShape Y
+      const maskBottom = maskTop + (modalHeight - 60);
+
+      thumbnails.forEach(img => {
+        const imgTop = img.y + scrollContainer.y;
+        const imgBottom = imgTop + img.displayHeight;
+
+        const isVisible = imgBottom > maskTop && imgTop < maskBottom;
+
+        if (isVisible) {
+          if (!img.input?.enabled) img.setInteractive(); // Prevent re-enabling every frame
+        } else {
+          img.disableInteractive();
+        }
+      });
+    };
 
     profilePicNames.forEach((key, index) => {
       const row = Math.floor(index / avatarsPerRow);
@@ -69,6 +86,14 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
     const contentHeight = totalRows * (avatarSize + padding);
     const minY = -contentHeight + modalHeight - 2 * padding - 100;
     scrollContainer.y = 0; // Make sure it's at top
+    updateThumbnailInteractivity();
+
+    const visibleArea = new Phaser.Geom.Rectangle(
+      scrollContainer.x,         // local X
+      scrollContainer.y + 25,    // adjust to match your mask's Y
+      modalWidth - 2 * padding,
+      modalHeight - 60
+    );
 
     // Enable wheel-based scrolling
     context.input.on('wheel', (_pointer: Phaser.Input.Pointer, _currentlyOver: any, _deltaX: number, deltaY: number, _deltaZ: number ) => {
@@ -77,6 +102,7 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
 
       scrollContainer.y -= deltaY * 1; // Adjust speed multiplier if needed
       scrollContainer.y = Phaser.Math.Clamp(scrollContainer.y, minY, 0);
+      updateThumbnailInteractivity();
     });
 
     // Enable touch-based scrolling
@@ -103,6 +129,7 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
 
       scrollContainer.y += deltaY * 0.7;
       scrollContainer.y = Phaser.Math.Clamp(scrollContainer.y, minY, 0);
+      updateThumbnailInteractivity();
 
       dragStartY = pointer.y; // Update for next frame
     });
