@@ -88,13 +88,6 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
     scrollContainer.y = 0; // Make sure it's at top
     updateThumbnailInteractivity();
 
-    const visibleArea = new Phaser.Geom.Rectangle(
-      scrollContainer.x,         // local X
-      scrollContainer.y + 25,    // adjust to match your mask's Y
-      modalWidth - 2 * padding,
-      modalHeight - 60
-    );
-
     // Enable wheel-based scrolling
     context.input.on('wheel', (_pointer: Phaser.Input.Pointer, _currentlyOver: any, _deltaX: number, deltaY: number, _deltaZ: number ) => {
       // Only scroll if the modal is visible
