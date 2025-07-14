@@ -12,12 +12,9 @@ export default class MainMenuScene extends Phaser.Scene {
     super({ key: 'MainMenuScene' });
   }
 
-  init() {
-  }
+  init() {}
 
-  preload() {
-
-  }
+  preload() {}
 
   async create() {
     // Auth check
@@ -83,8 +80,13 @@ export default class MainMenuScene extends Phaser.Scene {
       y: menuButtonHeight * 2 + 323,
       imageKey: 'mainMenuButton',
       text: 'About',
-      font: '70px proHeavy'
-    }); // TODO: add callbacks
+      font: '70px proHeavy',
+      callback: () => {
+        if (this.currentSubScene) this.scene.stop(this.currentSubScene);
+        this.scene.launch('AboutScene');
+        this.currentSubScene = 'AboutScene';
+      }
+    });
 
     // playButton
     createMainMenuButton({

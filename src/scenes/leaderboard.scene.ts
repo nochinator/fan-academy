@@ -9,7 +9,7 @@ export default class LeaderboardScene extends Phaser.Scene {
     super({ key: 'LeaderboardScene' });
   }
 
-  async init(data: { userId: string, }) {
+  init(data: { userId: string, }) {
     this.userId = data.userId;
   }
 

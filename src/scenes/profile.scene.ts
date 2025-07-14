@@ -19,12 +19,11 @@ export default class ProfileScene extends Phaser.Scene {
     super({ key: 'ProfileScene' });
   }
 
-  async init(data: { userId: string, }) {
+  init(data: { userId: string, }) {
     this.userId = data.userId;
   }
 
-  async preload() {
-  }
+  preload() {}
 
   async create() {
     // User data query

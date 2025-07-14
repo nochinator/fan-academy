@@ -1,0 +1,20 @@
+import AboutScene from "../about.scene";
+import { CDN_PATH } from "../preloader.scene";
+
+export function loadAboutUI(context: AboutScene): void {
+  context.load.image('archerAbout', `${CDN_PATH}/images/aboutImages/Archer_tile.webp`);
+  context.load.image('clericAbout', `${CDN_PATH}/images/aboutImages/Cleric_tile.webp`);
+  context.load.image('councilAbout', `${CDN_PATH}/images/aboutImages/Council_SplashScreen1.webp`);
+  context.load.image('elvesAbout', `${CDN_PATH}/images/aboutImages/DarkElves_SplashScreen.webp`);
+  context.load.image('impalerAbout', `${CDN_PATH}/images/aboutImages/Impaler_tile.webp`);
+  context.load.image('knightAbout', `${CDN_PATH}/images/aboutImages/Knight_tile.webp`);
+  context.load.image('necromancerAbout', `${CDN_PATH}/images/aboutImages/Necromancer_tile.webp`);
+  context.load.image('ninjaAbout', `${CDN_PATH}/images/aboutImages/Ninja_tile.webp`);
+  context.load.image('phantomAbout', `${CDN_PATH}/images/aboutImages/Phantom_tile.webp`);
+  context.load.image('priestessAbout', `${CDN_PATH}/images/aboutImages/Priestess_tile.webp`);
+  context.load.image('voidmonkAbout', `${CDN_PATH}/images/aboutImages/VoidMonk_tile.webp`);
+  context.load.image('wizardAbout', `${CDN_PATH}/images/aboutImages/Wizard_tile.webp`);
+  context.load.image('wraithAbout', `${CDN_PATH}/images/aboutImages/Wraith_tile.webp`);
+
+  context.load.image('arrowAbout', `${CDN_PATH}/images/aboutImages/AvatarArrow-hd.webp`);
+}
