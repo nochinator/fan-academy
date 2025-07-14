@@ -37,7 +37,7 @@ export default class AboutScene extends Phaser.Scene {
       );
     };
 
-    const contentHeight = getContainerHeight(this, container);
+    const contentHeight = getContainerHeight(container);
     const visibleHeight = bottomY;
 
     addHyperlinks(this, container, topY, bottomY, contentHeight);
@@ -57,19 +57,16 @@ export default class AboutScene extends Phaser.Scene {
     let isDragging = false;
     let dragStartY = 0;
     let dragStartOffset = 0;
-    let pointerMoved = false;
 
     this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       if (withinScrollArea(pointer) && contentHeight > visibleHeight) {
         isDragging = true;
         dragStartY = pointer.y;
         dragStartOffset = container.y;
-        pointerMoved = false;
       } else {
         isDragging = false;
         dragStartY = 0;
         dragStartOffset = 0;
-        pointerMoved = false;
       }
     });
 
@@ -79,8 +76,6 @@ export default class AboutScene extends Phaser.Scene {
       if (!isDragging) return;
 
       const deltaY = pointer.y - dragStartY;
-
-      if (Math.abs(deltaY) > 5) pointerMoved = true;
 
       const minY = topY + (visibleHeight - contentHeight);
       container.y = Phaser.Math.Clamp(
@@ -94,7 +89,6 @@ export default class AboutScene extends Phaser.Scene {
       isDragging = false;
       dragStartY = 0;
       dragStartOffset = 0;
-      pointerMoved = false;
     });
 
     // Back-to-top button

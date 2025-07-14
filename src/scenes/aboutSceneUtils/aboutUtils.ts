@@ -101,7 +101,7 @@ export function addTextContainer(context: Phaser.Scene): Phaser.GameObjects.Cont
   return aboutContainer;
 }
 
-export function getContainerHeight(context: Phaser.Scene, container: Phaser.GameObjects.Container): number {
+export function getContainerHeight(container: Phaser.GameObjects.Container): number {
   let maxY = 0;
   container.iterate((child: any) => {
     const bottom = child.y + (child.height ?? 0);
