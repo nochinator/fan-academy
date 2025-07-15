@@ -37,9 +37,9 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
       .setInteractive();
 
     this.backgroundImage = context.add.image(0, 0, 'popupBackground').setDisplaySize(500, 300);
-    this.councilButtonImage = context.add.image(-150, 60, EFaction.COUNCIL).setScale(0.4).setInteractive();
-    this.elvesButtonImage = context.add.image(-10, 60, EFaction.DARK_ELVES).setScale(0.4).setInteractive();
-    this.cancelButtonImage = context.add.image(130, 60, 'popupButton').setTint(0x990000).setDisplaySize(110, 60).setInteractive();
+    this.councilButtonImage = context.add.image(-150, 60, EFaction.COUNCIL).setScale(0.4).setInteractive({ useHandCursor: true });
+    this.elvesButtonImage = context.add.image(-10, 60, EFaction.DARK_ELVES).setScale(0.4).setInteractive({ useHandCursor: true });
+    this.cancelButtonImage = context.add.image(130, 60, 'popupButton').setTint(0x990000).setDisplaySize(110, 60).setInteractive({ useHandCursor: true });
 
     const popupString = challengeType === EChallengePopup.SEND ?  `Pick a faction to challenge ${truncateText(username!, 20)}` : 'Pick a faction to accept the challenge';
     this.popupText = context.add.text(0, -50, popupString, {

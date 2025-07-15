@@ -63,7 +63,11 @@ export abstract class Item extends Phaser.GameObjects.Container {
     // Set hitbox
     const hitArea = new Phaser.Geom.Rectangle(-35, -30, 75, 85); // centered on (0,0)
 
-    this.add([this.itemImage, this.unitCard]).setDepth(this.boardPosition + 10).setInteractive(hitArea, Phaser.Geom.Rectangle.Contains).setName(this.unitId);
+    this.add([this.itemImage, this.unitCard]).setDepth(this.boardPosition + 10).setInteractive({
+      hitArea,
+      hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+      useHandCursor: true
+    }).setName(this.unitId);
 
     context.add.existing(this);
   }

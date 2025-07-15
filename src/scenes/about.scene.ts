@@ -92,7 +92,7 @@ export default class AboutScene extends Phaser.Scene {
     });
 
     // Back-to-top button
-    const arrowButton = this.add.image(1350, 60, 'arrowAbout').setScale(2).setInteractive().setScrollFactor(0);
+    const arrowButton = this.add.image(1350, 60, 'arrowAbout').setScale(2).setInteractive({ useHandCursor: true }).setScrollFactor(0);
     arrowButton.on('pointerdown', () => {
       container.y = topY;
       const minY = topY + (visibleHeight - contentHeight);

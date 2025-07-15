@@ -29,7 +29,7 @@ export class Door extends Phaser.GameObjects.Container {
 
     this.add([this.doorClosed, this.doorOpen, this.doorBanner, this.bannerText]);
 
-    this.setSize(70, 100).setInteractive();
+    this.setSize(70, 100).setInteractive({ useHandCursor: true });
 
     this.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       if (pointer.button === 0 && context.activeUnit && isInHand(context.activeUnit.boardPosition)) {

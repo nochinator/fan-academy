@@ -70,7 +70,7 @@ export class Leaderboard extends Phaser.GameObjects.Container {
       const councilWins = context.add.text(750, 0, `${player.stats.councilWins}`, smallStyle);
       const elvesWins = context.add.text(950, 0, `${player.stats.elvesWins}`, smallStyle);
 
-      const challengeIcon = context.add.image(1030, 15, 'challengeIcon').setInteractive();
+      const challengeIcon = context.add.image(1030, 15, 'challengeIcon').setInteractive({ useHandCursor: true });
 
       challengeIcon.on('pointerdown', () => {
         console.log('Clicked on challenge icon');
@@ -103,7 +103,7 @@ export class Leaderboard extends Phaser.GameObjects.Container {
     const forwardButton = context.add.image(120, 0, 'curvedArrowButton').setFlipX(true).setScale(0.7).setVisible(page !== data.totalPages);
     const lastPageButton = context.add.image(180, 0, 'arrowButton').setScale(0.7).setVisible(page !== data.totalPages);
 
-    firstPageButton.setInteractive().on('pointerdown', async () => {
+    firstPageButton.setInteractive({ useHandCursor: true }).on('pointerdown', async () => {
       if (page > 1) {
         const leaderboardData = await getLeaderBoard(1);
         if (leaderboardData) {
@@ -113,7 +113,7 @@ export class Leaderboard extends Phaser.GameObjects.Container {
       }
     });
 
-    backButton.setInteractive().on('pointerdown', async () => {
+    backButton.setInteractive({ useHandCursor: true }).on('pointerdown', async () => {
       if (page > 1) {
         const leaderboardData = await getLeaderBoard(--page);
         if (leaderboardData) {
@@ -123,7 +123,7 @@ export class Leaderboard extends Phaser.GameObjects.Container {
       }
     });
 
-    forwardButton.setInteractive().on('pointerdown', async () => {
+    forwardButton.setInteractive({ useHandCursor: true }).on('pointerdown', async () => {
       const leaderboardData = await getLeaderBoard(++page);
       if (leaderboardData) {
         new Leaderboard(this.context, leaderboardData);
@@ -131,7 +131,7 @@ export class Leaderboard extends Phaser.GameObjects.Container {
       }
     });
 
-    lastPageButton.setInteractive().on('pointerdown', async () => {
+    lastPageButton.setInteractive({ useHandCursor: true }).on('pointerdown', async () => {
       if (page !== data.totalPages) {
         const leaderboardData = await getLeaderBoard(data.totalPages);
         if (leaderboardData) {

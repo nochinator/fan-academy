@@ -254,7 +254,11 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       ...this.smokeAnim ? [this.smokeAnim] : [],
       this.blockedLOS,
       this.unitCard
-    ]).setInteractive(hitArea, Phaser.Geom.Rectangle.Contains).setName(this.unitId).setDepth(this.boardPosition + 10);
+    ]).setInteractive({
+      hitArea,
+      hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+      useHandCursor: true
+    }).setName(this.unitId).setDepth(this.boardPosition + 10);
 
     // Hide if in deck
     if (this.boardPosition === 51) this.setVisible(false);

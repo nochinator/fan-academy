@@ -38,7 +38,7 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
         const isVisible = imgBottom > maskTop && imgTop < maskBottom;
 
         if (isVisible) {
-          if (!img.input?.enabled) img.setInteractive(); // Prevent re-enabling every frame
+          if (!img.input?.enabled) img.setInteractive({ useHandCursor: true }); // Prevent re-enabling every frame
         } else {
           img.disableInteractive();
         }
@@ -53,7 +53,7 @@ export class ProfilePicPopup extends Phaser.GameObjects.Container {
       const y = row * (avatarSize + padding);
 
       const img = context.add.image(x + 120, y - 160, key)
-        .setInteractive()
+        .setInteractive({ useHandCursor: true })
         .setDisplaySize(avatarSize, avatarSize)
         .setData('key', key);
 

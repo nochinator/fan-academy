@@ -102,7 +102,7 @@ export async function createGameList(context: UIScene) {
       // Add a 'close' button to games looking for players
       const closeButton = context.add.image(gameListButtonWidth - 30, lastListItemY, 'closeButton').setOrigin(0).setVisible(false);
       if (game.status === EGameStatus.SEARCHING || game.status === EGameStatus.CHALLENGE) {
-        closeButton.setVisible(true).setInteractive();
+        closeButton.setVisible(true).setInteractive({ useHandCursor: true });
         closeButton.on('pointerup', async () => {
           if (pointerMoved) return; // skip tap if user was swiping
 
@@ -121,7 +121,7 @@ export async function createGameList(context: UIScene) {
 
       // Make the game accessible -only for games already playing
       if (game.status === EGameStatus.PLAYING || game.status === EGameStatus.FINISHED) {
-        gameListButtonImage.setInteractive();
+        gameListButtonImage.setInteractive({ useHandCursor: true });
         if (context.activeGameImageId === game._id) highlightGameButton();
         gameListButtonImage.on('pointerup', async () => {
           if (pointerMoved) return; // skip tap if user was swiping
@@ -132,7 +132,7 @@ export async function createGameList(context: UIScene) {
       }
 
       if (game.status === EGameStatus.CHALLENGE && listChallengeReceivedArray.find(gameReceived => gameReceived._id === game._id )) {
-        gameListButtonImage.setInteractive();
+        gameListButtonImage.setInteractive({ useHandCursor: true });
         if (context.activeGameImageId === game._id) highlightGameButton();
         gameListButtonImage.on('pointerup', async () => {
           if (pointerMoved) return; // skip tap if user was swiping
@@ -165,8 +165,8 @@ export async function createGameList(context: UIScene) {
     fontFamily: "proHeavy"
   });
   const newGameButton = context.add.image(0, lastListItemY, 'newGameButton').setOrigin(0);
-  const councilEmblem = context.add.image(380, lastListItemY, EFaction.COUNCIL).setOrigin(0).setScale(0.5).setInteractive();
-  const elvesEmblem = context.add.image(530, lastListItemY, EFaction.DARK_ELVES).setOrigin(0).setScale(0.5).setInteractive();
+  const councilEmblem = context.add.image(380, lastListItemY, EFaction.COUNCIL).setOrigin(0).setScale(0.5).setInteractive({ useHandCursor: true });
+  const elvesEmblem = context.add.image(530, lastListItemY, EFaction.DARK_ELVES).setOrigin(0).setScale(0.5).setInteractive({ useHandCursor: true });
 
   // Creating a new game when clicking on the desired faction
   councilEmblem.on('pointerdown', async () => {
