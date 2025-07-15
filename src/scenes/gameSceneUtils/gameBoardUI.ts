@@ -17,4 +17,6 @@ export function loadGameBoardUI(context: PreloaderScene): void {
 
   context.load.image('playerBanner', `${CDN_PATH}/images/gameItems/player_banner.webp`);
   context.load.image('vsBanner', `${CDN_PATH}/images/gameItems/vs_banner.webp`);
+
+  context.load.image('replayButton', `${CDN_PATH}/ui/replay.webp`);
 }

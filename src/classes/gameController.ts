@@ -1,8 +1,9 @@
 import { sendTurnMessage } from "../colyseus/colyseusGameRoom";
 import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles } from "../enums/gameEnums";
-import { IGame, IGameState, IPlayerState, IUserData } from "../interfaces/gameInterface";
+import { IGame, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn } from "../utils/gameUtils";
+import { replayButton } from "../scenes/gameSceneUtils/replayButton";
+import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -31,15 +32,17 @@ export class GameController {
   rematchButton: RematchButton;
   lastTurnState: IGameState;
   currentTurn: IGameState[];
+  blockingLayer: Phaser.GameObjects.Rectangle;
+  replayButton: Phaser.GameObjects.Image;
 
-  phantomCounter: number = 0; // REVIEW:
+  phantomCounter: number = 0; // Used for the phantom ID. Shared by both players
 
   playerData: IUserData[];
 
   constructor(context: GameScene) {
     this.context = context;
     this.game = context.currentGame!;
-    this.lastTurnState =  context.currentGame.previousTurn[context.currentGame.previousTurn.length - 1]; // REVIEW:
+    this.lastTurnState =  context.currentGame.previousTurn[context.triggerReplay ? 0 : context.currentGame.previousTurn.length - 1];
     this.board = new Board(context, this.lastTurnState.boardState);
 
     this.playerData = context.currentGame.players.map(player => { return player.userData;});
@@ -65,12 +68,115 @@ export class GameController {
 
     this.door = new Door(context);
 
+    // Used to block the user from clicking on some other part of the game
+    this.blockingLayer = context.add.rectangle(910, 0, 1040, 1650, 0x000000, 0.001).setOrigin(0.5).setInteractive().setDepth(999).setVisible(this.context.triggerReplay);
+
+    // TODO: add replay button here, only visible if the replay is not running
+    this.replayButton = replayButton(context);
+
     this.currentTurn = [];
+  }
+
+  async replayTurn() {
+    // Fake the opponent's hand if needed
+    const opponentHand: (Hero | Item)[] = [];
+    if (this.context.activePlayer === this.context.userId) {
+      const opponentData = this.context.isPlayerOne ? this.lastTurnState.player2 : this.lastTurnState.player1;
+
+      opponentData?.factionData.unitsInHand.forEach(unit => {
+        if (isHero(unit)) opponentHand.push(createNewHero(this.context, unit).setVisible(false).setInteractive(false));
+        if (isItem(unit)) opponentHand.push(createNewItem(this.context, unit).setVisible(false).setInteractive(false));
+      });
+    }
+
+    for (let i = 1; i < this.context.currentGame.previousTurn.length; i++) {
+      const turn = this.context.currentGame.previousTurn[i];
+
+      console.log('[ACTION]:', turn);
+
+      const actionsToIgnore = [EActionType.DRAW, EActionType.PASS, EActionType.SHUFFLE];
+      const actionTaken = turn.action?.action;
+
+      if (!actionTaken || actionsToIgnore.includes(actionTaken)) continue;
+
+      await new Promise<void>(resolve => {
+        this.context.time.delayedCall(1000, async () => {
+          if (
+            actionTaken === EActionType.SPAWN ||
+            actionTaken === EActionType.MOVE
+          ) this.replaySpawnOrMove(turn.action!, opponentHand);
+
+          if (
+            actionTaken === EActionType.ATTACK ||
+            actionTaken === EActionType.HEAL ||
+            actionTaken === EActionType.TELEPORT
+          ) await this.replayAttackHealTeleport(turn.action!);
+
+          if (actionTaken === EActionType.USE) await this.replayUse(turn.action!, opponentHand);
+
+          if (actionTaken === EActionType.REMOVE_UNITS) await this.removeKOUnits();
+
+          resolve();
+        });
+      });
+    }
+
+    this.context.scene.restart({
+      userId: this.context.userId,
+      colyseusClient: this.context.colyseusClient,
+      currentGame: this.context.currentGame,
+      currentRoom: this.context.currentRoom,
+      triggerReplay: false
+    } );
+  }
+
+  replaySpawnOrMove(action: ITurnAction, opponentHand: (Hero | Item)[]): void {
+    const actionTaken = action.action;
+    const hand = opponentHand.length ? opponentHand : this.hand.hand;
+
+    const hero = actionTaken === EActionType.SPAWN ? hand.find(unit => unit.boardPosition === action.actorPosition) as Hero : this.board.units.find(unit => unit.boardPosition === action.actorPosition);
+
+    const tile = this.board.getTileFromBoardPosition(action.targetPosition!);
+
+    if (!hero || !tile) throw new Error('Missing hero or tile in spawn or move action');
+
+    if (actionTaken === EActionType.MOVE) hero.move(tile);
+    if (actionTaken === EActionType.SPAWN) hero.setVisible(true).spawn(tile);
+  };
+
+  async replayAttackHealTeleport(action: ITurnAction): Promise<void> {
+    const hero = this.board.units.find(unit => unit.boardPosition === action.actorPosition);
+    const target = this.board.crystals.find(crystal => crystal.boardPosition === action.targetPosition) ?? this.board.units.find(unit => unit.boardPosition === action.targetPosition);
+
+    if (!hero || !target) throw new Error('Missing hero or target in attack or heal action');
+
+    if (action.action === EActionType.ATTACK) hero.attack(target);
+    if (action.action === EActionType.HEAL) hero.heal(target as Hero);
+    if (action.action === EActionType.TELEPORT) hero.teleport(target as Hero);
+  };
+
+  async replayUse(action: ITurnAction, opponentHand: (Hero | Item)[]): Promise<void> {
+    const hand = opponentHand.length ? opponentHand : this.hand.hand;
+
+    const item = hand.find(item => item.boardPosition === action.actorPosition) as Item;
+    if (!item) throw new Error('Missing item in use action');
+
+    if (item.dealsDamage) {
+      const tile = this.board.getTileFromBoardPosition(action.targetPosition!);
+      if (!item) throw new Error('Missing tile in use action');
+      item.use(tile);
+    }
+
+    if (!item.dealsDamage) {
+      const hero = this.board.units.find(unit => unit.boardPosition === action.targetPosition);
+      if (!hero) throw new Error('Missing target in use action');
+      item.use(hero);
+    }
   }
 
   async resetTurn() {
     this.context.scene.restart();
-  }
+  };
 
   async handleGameOver(): Promise<void> {
     sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, ++this.context.turnNumber!, this.context.gameOver);
@@ -165,10 +271,14 @@ export class GameController {
   async endOfTurnActions(): Promise<void> {
     // If a unit was currently selected, de-select it
     if (this.context.activeUnit) deselectUnit(this.context);
+
     // Refresh actionPie, draw units and update door banner
     this.actionPie.resetActionPie();
     this.drawUnits();
     this.door.updateBannerText();
+
+    // Add the last action of the previous turn at index 0 of the actions array to serve as the base for the replay
+    this.currentTurn.unshift(this.lastTurnState);
 
     this.context.activePlayer = this.context.opponentId;
     this.context.turnNumber!++;
@@ -203,6 +313,9 @@ export class GameController {
   }
 
   afterAction(actionType: EActionType, activePosition: number, targetPosition?: number): void {
+    // Don't trigger pie animation during replays
+    if (this.context.triggerReplay) return;
+
     // Add action to current state
     this.addActionToState(actionType, activePosition, targetPosition);
 

@@ -53,7 +53,6 @@ export class Hand {
   removeFromHand(unitToRemove: IHero | IItem): void {
     const index = this.hand.findIndex(unit => unit.unitId === unitToRemove.unitId);
     if (index !== -1) this.hand.splice(index, 1);// can't use filter because creating a new array breaks the reference with factionData
-    console.log('HAND', this.hand);
   }
 
   exportHandData(): (IHero | IItem)[] {

@@ -24,7 +24,5 @@ export default class LeaderboardScene extends Phaser.Scene {
     const leaderboardData = await getLeaderBoard();
 
     if (leaderboardData) new Leaderboard(this, leaderboardData);
-
-    console.log('Leaderboard', leaderboardData);
   }
 }

@@ -4,7 +4,7 @@ import { loadGameAssets } from "./mainMenuUtils/gameAssets";
 import { profilePicNames } from "./profileSceneUtils/profilePicNames";
 
 // CDN path
-export const CDN_PATH = 'https://cdn.jsdelivr.net/gh/Dan-DH/fa-assets@0fd3c73';
+export const CDN_PATH = 'https://cdn.jsdelivr.net/gh/Dan-DH/fa-assets@1da8767';
 
 // PreloaderScene.ts
 export default class PreloaderScene extends Phaser.Scene {

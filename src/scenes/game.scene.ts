@@ -32,6 +32,8 @@ export default class GameScene extends Phaser.Scene {
   longPressStart = 0;
   visibleUnitCard: Hero | Item | Crystal | undefined;
 
+  triggerReplay = true;
+
   constructor() {
     super({ key: 'GameScene' });
     this.centerPoints = calculateAllCenterPoints();
@@ -42,6 +44,7 @@ export default class GameScene extends Phaser.Scene {
     colyseusClient: Client,
     currentGame: IGame,
     currentRoom: Room,
+    triggerReplay?: boolean
   }) {
     this.userId = data.userId;
     this.colyseusClient = data.colyseusClient;
@@ -50,6 +53,8 @@ export default class GameScene extends Phaser.Scene {
     this.currentRoom = data.currentRoom;
     const opponent = data.currentGame.players.find((p: IPlayerData) => data.userId !== p.userData._id);
     this.opponentId = opponent!.userData._id;
+
+    this.triggerReplay = data.triggerReplay ?? true;
 
     // Updating GameScene properties
     this.activePlayer =  this.currentGame.activePlayer.toString();
@@ -62,5 +67,6 @@ export default class GameScene extends Phaser.Scene {
   create() {
     this.input.mouse!.disableContextMenu();
     this.gameController = new GameController(this);
+    if (this.triggerReplay) this.gameController.replayTurn();
   }
 };
