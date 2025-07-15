@@ -19,30 +19,18 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
     if (pointer.button === 2) {
       unit.setDepth(1001);
       unit.unitCard.setVisible(true);
-    }
-  });
-
-  unit.on('pointerup', () => {
-    if (context.time.now - context.longPressStart > 500) {
-      unit.setDepth(1001);
-      unit.unitCard.setVisible(true);
       context.visibleUnitCard = unit;
     }
   });
 
-  unit.on('pointerover', (pointer: Phaser.Input.Pointer) => {
-    if (pointer.rightButtonDown()) {
+  unit.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+    if (pointer.button === 2) return;
+
+    if (context.longPressStart && context.time.now - context.longPressStart > 500) {
       unit.setDepth(1001);
       unit.unitCard.setVisible(true);
+      context.visibleUnitCard = unit;
     }
-  });
-
-  unit.on('pointerout', () => {
-    // Ignore if there was a long press. Used on mobile
-    if (context.visibleUnitCard) return;
-
-    unit.setDepth(unit.boardPosition + 10);
-    unit.unitCard.setVisible(false);
   });
 }
 
@@ -176,6 +164,8 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 export function makeTileClickable(tile: Tile, context: GameScene): void {
   tile.on('pointerdown', () => {
     visibleUnitCardCheck(context);
+    context.longPressStart = undefined;
+    console.log('tile', context.longPressStart);
 
     console.log('Clicked tile', tile.boardPosition, tile);
     // Only the active player can click on tiles, and only if they still have actions available
@@ -224,21 +214,15 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
     if (pointer.button === 2) {
       crystal.setDepth(1001);
       crystal.unitCard.setVisible(true);
-    }
-  });
-
-  crystal.on('pointerup', () => {
-    if (context.time.now - context.longPressStart > 500) {
-      crystal.setDepth(1001);
-      crystal.unitCard.setVisible(true);
       context.visibleUnitCard = crystal;
     }
   });
 
-  crystal.on('pointerover', (pointer: Phaser.Input.Pointer) => {
-    if (pointer.rightButtonDown()) {
+  crystal.on('pointerup', () => {
+    if (context.longPressStart && context.time.now - context.longPressStart > 500) {
       crystal.setDepth(1001);
       crystal.unitCard.setVisible(true);
+      context.visibleUnitCard = crystal;
     }
   });
 

@@ -29,7 +29,7 @@ export default class GameScene extends Phaser.Scene {
 
   gameOver: IGameOver | undefined;
 
-  longPressStart = 0;
+  longPressStart: number | undefined;
   visibleUnitCard: Hero | Item | Crystal | undefined;
 
   triggerReplay = true;
