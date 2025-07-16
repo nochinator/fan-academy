@@ -44,12 +44,10 @@ export async function createGameList(context: UIScene) {
   const visibleWidth = 400;
   let lastListItemY = 0;
 
-  // Calculate content height for scrolling
-  const totalSections = (listPlayerTurnArray.length ? 1 : 0) + (listOpponentTurnArray.length ? 1 : 0) + (listSearchingArray.length ? 1 : 0) + (listChallengeSentArray.length ? 1 : 0) + (listChallengeReceivedArray.length ? 1 : 0) + (listFinishedArray.length ? 1 : 0);
-  const contentHeight = (gameListButtonHeight + gameListButtonSpacing) * context.gameList.length + ( textListHeight * totalSections + 200); // 200 = newGameButton + some padding to make sure the last item always displays fully
-
   // Creating a container for the game list and adding it to the context (scene)
-  const gameListContainer = context.add.container(19, 65); // Setting a variable to save not having to write 'context' every time
+  const initialContainerX = 19;
+  const initialContainerY = 65;
+  const gameListContainer = context.add.container(initialContainerX, initialContainerY); // Setting a variable to save not having to write 'context' every time
   context.gameListContainer = gameListContainer;
 
   // Function for adding elements to the container
@@ -59,7 +57,7 @@ export async function createGameList(context: UIScene) {
       const opponent = game.players.find((p: IPlayerData) => context.userId !== p.userData._id);
       if (!player) return;
 
-      lastListItemY += ( index === 0 ? textListHeight : gameListButtonHeight) + gameListButtonSpacing;
+      lastListItemY += (index === 0 ? textListHeight : gameListButtonHeight) + gameListButtonSpacing;
 
       const gameListButtonImage = context.add.image(0, lastListItemY, "gameListButton").setOrigin(0).setTint(0xBBBBBB);
       const playerFactionIcon = player.faction ? {
@@ -194,7 +192,7 @@ export async function createGameList(context: UIScene) {
 
   gameListContainer.add([newGameButton, newGameText, councilEmblem, elvesEmblem]);
 
-  // Check the arrays one by one, adding the elements in order // FIXME: need to order them from longest time since it was your turn to shortest
+  // Check the arrays one by one, adding the elements in order
   const setHeaderText = (header: string) => {
     return context.add.text(30, lastListItemY, header, {
       fontSize: 50,
@@ -202,54 +200,21 @@ export async function createGameList(context: UIScene) {
     });
   };
 
-  // TODO: Turn all this if length into a function
-  if (listPlayerTurnArray.length) {
-    const playerTurnText = setHeaderText('Your turn');
-    gameListContainer.add(playerTurnText);
+  const addListItems = (arr: IGame[], headerText: string) =>{
+    if (!arr.length) return;
+    const header = setHeaderText(headerText);
+    gameListContainer.add(header);
 
-    createGameListItem(listPlayerTurnArray);
+    createGameListItem(arr);
     lastListItemY += gameListButtonHeight + gameListButtonSpacing;
-  }
+  };
 
-  if (listOpponentTurnArray.length) {
-    const opponentTurnText = setHeaderText("Opponent's turn");
-    gameListContainer.add(opponentTurnText);
-
-    createGameListItem(listOpponentTurnArray);
-    lastListItemY += gameListButtonHeight + gameListButtonSpacing;
-  }
-
-  if (listSearchingArray.length) {
-    const searchingText = setHeaderText('Searching for players');
-    gameListContainer.add(searchingText);
-
-    createGameListItem(listSearchingArray);
-    lastListItemY += gameListButtonHeight + gameListButtonSpacing;
-  }
-
-  if (listChallengeReceivedArray.length) {
-    const challengeReceivedText = setHeaderText('Challenges received');
-    gameListContainer.add(challengeReceivedText);
-
-    createGameListItem(listChallengeReceivedArray);
-    lastListItemY += gameListButtonHeight + gameListButtonSpacing;
-  }
-
-  if (listChallengeSentArray.length) {
-    const challengeSentText = setHeaderText('Challenges sent');
-    gameListContainer.add(challengeSentText);
-
-    createGameListItem(listChallengeSentArray);
-    lastListItemY += gameListButtonHeight + gameListButtonSpacing;
-  }
-
-  if (listFinishedArray.length) {
-    const finishedText = setHeaderText('Finished');
-    gameListContainer.add(finishedText);
-
-    createGameListItem(listFinishedArray);
-    lastListItemY += gameListButtonHeight + gameListButtonSpacing;
-  }
+  addListItems(listPlayerTurnArray, 'Your turn');
+  addListItems(listChallengeReceivedArray, 'Challenges received');
+  addListItems(listOpponentTurnArray, "Opponent's turn");
+  addListItems(listChallengeSentArray, 'Challenges sent');
+  addListItems(listSearchingArray, 'Searching for players');
+  addListItems(listFinishedArray, 'Finished');
 
   // Reduce the size of the container to make the images fit the UI
   gameListContainer.setScale(0.51);
@@ -261,37 +226,30 @@ export async function createGameList(context: UIScene) {
   const mask = new Phaser.Display.Masks.GeometryMask(context, maskGraphics);
 
   gameListContainer.setMask(mask);
-  const scrollSpeed = 1;
-  let contentOffset = 0;
   const withinScrollArea = (pointer: Phaser.Input.Pointer) => {
     return (
       pointer.x >= 19 &&
       pointer.x <= 19 + visibleWidth &&
-      pointer.y >= 65 &&
-      pointer.y <= 65 + visibleHeight
+      pointer.y >= initialContainerY &&
+      pointer.y <= initialContainerY + visibleHeight
     );
   };
 
-  // Scrolling on PC
+  // Define boundaries
+  let contentOffset = 0;
+  const maxOffset = 0;
+  const minOffset = Math.min(visibleHeight - lastListItemY * 0.51 - 10, 0);
+
+  // Scroll handler
   context.input.on("wheel", (pointer: Phaser.Input.Pointer, _gameObjects: any, _deltaX: number, deltaY: number, _deltaZ: number ) => {
-    if (withinScrollArea(pointer) && contentHeight > visibleHeight) {
-      // Calculate the new offset
-      contentOffset -= deltaY * scrollSpeed;
+    if (withinScrollArea(pointer) && lastListItemY > visibleHeight) {
+      contentOffset -= deltaY;
 
-      // Define boundaries
-      const maxOffset = 0; // The topmost position (no scrolling above the first item)
-      const minOffset = visibleHeight * 2 - contentHeight - 100; // The lowest allowed position. Needs to be double the visibleHeight to work properly. -50 for padding.
-
-      // Clamp the scrolling within bounds
+      // Clamp to valid scroll range
       contentOffset = Phaser.Math.Clamp(contentOffset, minOffset, maxOffset);
 
-      // Apply offset to each child
-      gameListContainer.each((child: any) => {
-        if (child.originalY === undefined) {
-          child.originalY = child.y; // Store original position once
-        }
-        child.y = child.originalY + contentOffset;
-      });
+      // Update container position
+      gameListContainer.y = initialContainerY + contentOffset;
     }
   });
 
@@ -302,7 +260,7 @@ export async function createGameList(context: UIScene) {
   let pointerMoved = false;
 
   context.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-    if (withinScrollArea(pointer) && contentHeight > visibleHeight) {
+    if (withinScrollArea(pointer) && lastListItemY > visibleHeight) {
       isDragging = true;
       dragStartY = pointer.y;
       dragStartOffset = contentOffset;
@@ -322,18 +280,8 @@ export async function createGameList(context: UIScene) {
 
     if (Math.abs(deltaY) > 5) pointerMoved = true;
 
-    contentOffset = Phaser.Math.Clamp(
-      dragStartOffset + deltaY,
-      visibleHeight * 2 - contentHeight - 100,
-      0
-    );
-
-    gameListContainer.each((child: any) => {
-      if (child.originalY === undefined) {
-        child.originalY = child.y;
-      }
-      child.y = child.originalY + contentOffset;
-    });
+    contentOffset = Phaser.Math.Clamp(dragStartOffset + deltaY, minOffset, 0);
+    gameListContainer.y = 65 + contentOffset;
   });
 
   context.input.on("gameobjectup", () => {
