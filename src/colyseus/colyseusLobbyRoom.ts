@@ -58,7 +58,8 @@ export async function connectToGameLobby(client: Client, userId: string, context
           userId: context.userId,
           colyseusClient: context.colyseusClient,
           currentGame: game,
-          currentRoom: context.currentRoom
+          currentRoom: context.currentRoom,
+          triggerReplay: message.newActivePlayer !== context.userId ? false : true
         });
       }
     });
