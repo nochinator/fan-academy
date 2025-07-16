@@ -344,7 +344,7 @@ export class GameController {
       player2: !this.context.isPlayerOne ? playerState : opponentState!,
       action: {
         actorPosition,
-        targetPosition: targetPosition ? targetPosition : actorPosition,
+        targetPosition: targetPosition ?? actorPosition,
         action,
         actionClass
       },

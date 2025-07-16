@@ -165,7 +165,6 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
   tile.on('pointerdown', () => {
     visibleUnitCardCheck(context);
     context.longPressStart = undefined;
-    console.log('tile', context.longPressStart);
 
     console.log('Clicked tile', tile.boardPosition, tile);
     // Only the active player can click on tiles, and only if they still have actions available
@@ -178,7 +177,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     // If unit is on the board and the tile clicked on is in range, move the unit
     if (activeUnit.boardPosition < 45 && tile.isHighlighted && isHero(activeUnit)) activeUnit.move(tile);
 
-    // If hero is in hand and clicked tile is highlighted, spawn
+    // If unit is in hand and clicked tile is highlighted, spawn. Otherwise, use item
     if (activeUnit.boardPosition > 44 && tile.isHighlighted) {
       if (isHero(activeUnit) && !tile.isOccupied()) activeUnit.spawn(tile);
       if (isItem(activeUnit) && activeUnit.dealsDamage) activeUnit.use(tile);
