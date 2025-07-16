@@ -246,10 +246,7 @@ export async function deleteAccount() {
 
       localStorage.removeItem("jwt");
 
-      return {
-        success: true,
-        result: data
-      };
+      return data;
     } else {
       console.log('Server responded with an error:', data.error || 'Unknown error');
       return {
