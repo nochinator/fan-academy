@@ -14,10 +14,10 @@ export class Door extends Phaser.GameObjects.Container {
     super(context, 450, 715);
     this.context = context;
 
-    // TODO: this should be a container, and swich between open and closed. On container 'hoover' -> show icons of remaining units and items in the deck
+    // TODO: On container 'hoover' -> show icons of remaining units and items in the deck
     this.doorClosed = context.add.image(50, -15, 'doorClosed').setScale(0.9);
 
-    this.doorOpen = context.add.image(55, -15, 'doorOpen').setVisible(false); // TODO: trigger 'refill' event at the end of the player's turn
+    this.doorOpen = context.add.image(55, -15, 'doorOpen').setVisible(false);
 
     this.doorBanner = context.add.image(0, 45, 'doorBanner');
     const deckSize: number = getCurrentPlayer(context).factionData.unitsInDeck.length ?? 99;
@@ -66,5 +66,15 @@ export class Door extends Phaser.GameObjects.Container {
     const deckSize: number = this.context.gameController?.deck.getDeckSize() ?? 0;
 
     this.bannerText.setText(deckSize.toString());
+  }
+
+  openDoor(): void {
+    this.doorOpen.setVisible(true);
+    this.doorClosed.setVisible(false);
+
+    this.scene.time.delayedCall(1000, () => {
+      this.doorOpen.setVisible(false);
+      this.doorClosed.setVisible(true);
+    });
   }
 }

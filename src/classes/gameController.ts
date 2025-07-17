@@ -189,6 +189,8 @@ export class GameController {
   }
 
   drawUnits() {
+    this.door.openDoor();
+
     const drawAmount = 6 - this.hand.getHandSize();
 
     if (this.deck.getDeckSize() === 0 || drawAmount === 0) return;
