@@ -1,10 +1,11 @@
-import { defineConfig } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
-import path from 'path';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   build: {
     rollupOptions: {
+      external: ['phaser'],
+      output: { globals: { phaser: 'Phaser' } },
       plugins: [
         visualizer({
           filename: 'dist/stats.html',
@@ -14,6 +15,5 @@ export default defineConfig({
         })
       ]
     }
-  },
-  resolve: { alias: { phaser: path.resolve(__dirname, 'node_modules/phaser/dist/phaser-arcade-physics.min.js') } }
+  }
 });
