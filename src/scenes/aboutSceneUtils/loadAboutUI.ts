@@ -17,4 +17,12 @@ export function loadAboutUI(context: AboutScene): void {
   context.load.image('wraithAbout', `${CDN_PATH}/images/aboutImages/Wraith_tile.webp`);
 
   context.load.image('arrowAbout', `${CDN_PATH}/images/aboutImages/AvatarArrow-hd.webp`);
+
+  context.load.image('aboutPlayButton', `${CDN_PATH}/images/aboutImages/play_button.webp`);
+  context.load.image('aboutProfileButton', `${CDN_PATH}/images/aboutImages/profile_button.webp`);
+  context.load.image('aboutLeaderboardButton', `${CDN_PATH}/images/aboutImages/leaderboard_button.webp`);
+
+  context.load.image('aboutPlayPage', `${CDN_PATH}/images/aboutImages/play_page.webp`);
+  context.load.image('aboutProfilePage', `${CDN_PATH}/images/aboutImages/profile_page.webp`);
+  context.load.image('aboutLeaderboardPage', `${CDN_PATH}/images/aboutImages/leaderboard_page.webp`);
 }

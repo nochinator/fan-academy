@@ -1,4 +1,4 @@
-import { addTextContainer, getContainerHeight, addHyperlinks, addFactionPictures } from "./aboutSceneUtils/aboutUtils";
+import { addTextContainer, getContainerHeight, addHyperlinks, addPictures } from "./aboutSceneUtils/aboutUtils";
 import { loadAboutUI } from "./aboutSceneUtils/loadAboutUI";
 
 export default class AboutScene extends Phaser.Scene {
@@ -18,7 +18,7 @@ export default class AboutScene extends Phaser.Scene {
 
     // Set the mask to make the text scrollable
     const leftX = 396;
-    const rightX = 1100;
+    const rightX = 2000;
     const topY = 20;
     const bottomY = 750;
     const maskGraphics = this.make.graphics();
@@ -42,7 +42,7 @@ export default class AboutScene extends Phaser.Scene {
 
     addHyperlinks(this, container, topY, bottomY, contentHeight);
 
-    addFactionPictures(this, container);
+    addPictures(this, container);
 
     // Scrolling on PC
     this.input.on("wheel", (pointer: Phaser.Input.Pointer, _gameObjects: any, _deltaX: number, deltaY: number, _deltaZ: number ) => {
@@ -71,8 +71,6 @@ export default class AboutScene extends Phaser.Scene {
     });
 
     this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
-      console.log('this logs', isDragging);
-
       if (!isDragging) return;
 
       const deltaY = pointer.y - dragStartY;
@@ -92,11 +90,13 @@ export default class AboutScene extends Phaser.Scene {
     });
 
     // Back-to-top button
-    const arrowButton = this.add.image(1350, 60, 'arrowAbout').setScale(2).setInteractive({ useHandCursor: true }).setScrollFactor(0);
+    const arrowButton = this.add.image(1350, 60, 'arrowAbout').setScale(2).setInteractive({ useHandCursor: true }).setScrollFactor(0).setDepth(999);
     arrowButton.on('pointerdown', () => {
       container.y = topY;
       const minY = topY + (visibleHeight - contentHeight);
       container.y = Phaser.Math.Clamp(container.y, minY, topY);
     });
+
+    this.add.existing(container);
   }
 }

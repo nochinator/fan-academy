@@ -42,61 +42,48 @@ export function addTextContainer(context: Phaser.Scene): Phaser.GameObjects.Cont
     fontSize: 50
   }));
 
-  aboutContainer.add(context.add.text(0, 1250, 'Play!', {
-    ...fontOptions,
-    fontSize: 50
-  }));
-  aboutContainer.add(context.add.text(0, 1310, playText, fontOptions));
+  aboutContainer.add(context.add.text(0, 2050, playText, fontOptions));
 
-  aboutContainer.add(context.add.text(0, 2490, 'Profile', {
-    ...fontOptions,
-    fontSize: 50
-  }));
-  aboutContainer.add(context.add.text(0, 2550, profileText, fontOptions));
+  aboutContainer.add(context.add.text(0, 4100, profileText, fontOptions));
 
-  aboutContainer.add(context.add.text(0, 3070, 'Leaderboard', {
-    ...fontOptions,
-    fontSize: 50
-  }));
-  aboutContainer.add(context.add.text(0, 3130, leaderboardText, fontOptions));
+  aboutContainer.add(context.add.text(0, 5000, leaderboardText, fontOptions));
 
-  aboutContainer.add(context.add.text(0, 3390, 'Game guide', {
+  aboutContainer.add(context.add.text(0, 5250, 'Game guide', {
     ...fontOptions,
-    fontSize: 50
+    fontSize: 60
   }));
-  aboutContainer.add(context.add.text(0, 3450, gameText, fontOptions));
 
-  aboutContainer.add(context.add.text(0, 3700, 'General mechanics', {
-    ...fontOptions,
-    fontSize: 50
-  }));
-  aboutContainer.add(context.add.text(0, 3760, mechanicsText, fontOptions));
+  aboutContainer.add(context.add.text(0, 5320, gameText, fontOptions));
 
-  aboutContainer.add(context.add.text(0, 6750, 'Factions', {
+  aboutContainer.add(context.add.text(0, 5570, 'General mechanics', {
     ...fontOptions,
     fontSize: 50
   }));
-  aboutContainer.add(context.add.image(450, 6980, 'councilAbout'));
-  aboutContainer.add(context.add.text(0, 7130, countilText, {
+  aboutContainer.add(context.add.text(0, 5630, mechanicsText, fontOptions));
+
+  aboutContainer.add(context.add.text(0, 8620, 'Factions', {
+    ...fontOptions,
+    fontSize: 50
+  }));
+  aboutContainer.add(context.add.image(450, 8850, 'councilAbout'));
+  aboutContainer.add(context.add.text(0, 9000, countilText, {
     ...fontOptions,
     wordWrap: {
       width: 700,
       useAdvancedWrap: true
     }
   }));
-  aboutContainer.add(context.add.text(0, 8320, councilItemsText, fontOptions));
+  aboutContainer.add(context.add.text(0, 10190, councilItemsText, fontOptions));
 
-  aboutContainer.add(context.add.image(450, 9040, 'elvesAbout'));
-  aboutContainer.add(context.add.text(0, 9200, elvesText, {
+  aboutContainer.add(context.add.image(450, 10910, 'elvesAbout'));
+  aboutContainer.add(context.add.text(0, 11070, elvesText, {
     ...fontOptions,
     wordWrap: {
       width: 750,
       useAdvancedWrap: true
     }
   }));
-  aboutContainer.add(context.add.text(0, 10910, elvesItemsText, fontOptions));
-
-  context.add.existing(aboutContainer);
+  aboutContainer.add(context.add.text(0, 12730, elvesItemsText, fontOptions));
 
   return aboutContainer;
 }
@@ -119,11 +106,11 @@ export function addHyperlinks(context: Phaser.Scene, container: Phaser.GameObjec
     },
     {
       title: 'Game guide',
-      y: 3390
+      y: 5240
     },
     {
       title: 'Factions',
-      y: 6750
+      y: 8610
     }
   ];
 
@@ -136,15 +123,15 @@ export function addHyperlinks(context: Phaser.Scene, container: Phaser.GameObjec
   const mainMenuElem = [
     {
       title: 'Play!',
-      y: 1250
+      y: 1210
     },
     {
       title: 'Profile',
-      y: 2540
+      y: 3200
     },
     {
       title: 'Leaderboard',
-      y: 3120
+      y: 4620
     }
   ];
 
@@ -176,18 +163,29 @@ export function addLink(context: Phaser.Scene, elem: {
   return link;
 }
 
-export function addFactionPictures(context: Phaser.Scene, container: Phaser.GameObjects.Container): void {
-  const pictureX = 840;
-  container.add(context.add.image(pictureX, 7200, 'knightAbout').setScale(1.5));
-  container.add(context.add.image(pictureX, 7430, 'archerAbout').setScale(1.5));
-  container.add(context.add.image(pictureX, 7630, 'wizardAbout').setScale(1.5));
-  container.add(context.add.image(pictureX, 7915, 'clericAbout').setScale(1.5));
-  container.add(context.add.image(pictureX, 8140, 'ninjaAbout').setScale(1.5));
+export function addPictures(context: Phaser.Scene, container: Phaser.GameObjects.Container): void {
+  // UI
+  container.add(context.add.image(87, 1280, 'aboutPlayButton').setScale(0.5));
+  container.add(context.add.image(490, 1690, 'aboutPlayPage').setScale(0.7));
 
-  container.add(context.add.image(pictureX, 9260, 'voidmonkAbout').setScale(1.5));
-  container.add(context.add.image(pictureX, 9530, 'impalerAbout').setScale(1.5));
-  container.add(context.add.image(pictureX, 9750, 'necromancerAbout').setScale(1.5));
-  container.add(context.add.image(pictureX, 10000, 'priestessAbout').setScale(1.5));
-  container.add(context.add.image(pictureX, 10300, 'wraithAbout').setScale(1.5));
-  container.add(context.add.image(pictureX, 10650, 'phantomAbout').setScale(1.5));
+  container.add(context.add.image(170, 3270, 'aboutProfileButton'));
+  container.add(context.add.image(490, 3700, 'aboutProfilePage'));
+
+  container.add(context.add.image(170, 4670, 'aboutLeaderboardButton'));
+  container.add(context.add.image(490, 4860, 'aboutLeaderboardPage'));
+
+  // Factions
+  const pictureX = 840;
+  container.add(context.add.image(pictureX, 9090, 'knightAbout').setScale(1.5));
+  container.add(context.add.image(pictureX, 9320, 'archerAbout').setScale(1.5));
+  container.add(context.add.image(pictureX, 9520, 'wizardAbout').setScale(1.5));
+  container.add(context.add.image(pictureX, 9805, 'clericAbout').setScale(1.5));
+  container.add(context.add.image(pictureX, 10030, 'ninjaAbout').setScale(1.5));
+
+  container.add(context.add.image(pictureX, 11150, 'voidmonkAbout').setScale(1.5));
+  container.add(context.add.image(pictureX, 11420, 'impalerAbout').setScale(1.5));
+  container.add(context.add.image(pictureX, 11640, 'necromancerAbout').setScale(1.5));
+  container.add(context.add.image(pictureX, 11890, 'priestessAbout').setScale(1.5));
+  container.add(context.add.image(pictureX, 12190, 'wraithAbout').setScale(1.5));
+  container.add(context.add.image(pictureX, 12540, 'phantomAbout').setScale(1.5));
 }
