@@ -16,7 +16,7 @@ export async function getGameList(userId: string): Promise<IGame[] | []> {
   const games = await result.json();
 
   if (result.status !== 200) {
-    console.log('Error fetching the game list...'); // TODO: throw errors
+    console.log('Error fetching the game list...');
     return [];
   }
 
@@ -34,14 +34,14 @@ export async function newGameChallenge(userId: string, faction: EFaction, oppone
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${jwt}` 
+      'Authorization': `Bearer ${jwt}`
     }
   });
 
   const data = await result.json();
 
   if (result.status !== 200) {
-    console.error('Error sending challenge...'); // TODO: throw errors
+    console.error('Error sending challenge...');
     return null;
   }
 

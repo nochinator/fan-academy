@@ -28,10 +28,10 @@ export async function loginQuery(username: string, password: string) {
         userId: data.userId
       };
     } else {
-      console.error('Server responded with an error:', data.error || 'Unknown error');
+      console.error('Server responded with an error:', data.message || 'Unknown error');
       return {
         success: false,
-        error: data.error || 'Unknown error'
+        error: data.message || 'Unknown error'
       };
     }
   } catch(error) {
@@ -72,10 +72,10 @@ export async function signUpQuery(email: string, username: string, password: str
         userId: data.userId
       };
     } else {
-      console.log('Server responded with an error:', data.error || 'Unknown error');
+      console.log('Server responded with an error:', data.message || 'Unknown error');
       return {
         success: false,
-        error: data.error || 'Unknown error'
+        error: data.message || 'Unknown error'
       };
     }
   } catch (error) {
@@ -141,7 +141,7 @@ export async function getLeaderBoard(page = 1): Promise<{
   const data = await result.json();
 
   if (result.status !== 200) {
-    console.error('Error getting leaderboard data...'); // TODO: throw errors
+    console.error('Error getting leaderboard data...');
     return null;
   }
 
@@ -175,7 +175,7 @@ export async function getProfile(): Promise<{
   const data = await result.json();
 
   if (result.status !== 200) {
-    console.error('Error getting profile data...'); // TODO: throw errors
+    console.error('Error getting profile data...');
     return null;
   }
 
@@ -212,10 +212,10 @@ export async function updateProfile(payload: {
         user: data
       };
     } else {
-      console.log('Server responded with an error:', data.error || 'Unknown error');
+      console.log('Server responded with an error:', data.message || 'Unknown error');
       return {
         success: false,
-        error: data.error || 'Unknown error'
+        error: data.message || 'Unknown error'
       };
     }
   } catch (error) {
@@ -248,10 +248,10 @@ export async function deleteAccount() {
 
       return data;
     } else {
-      console.log('Server responded with an error:', data.error || 'Unknown error');
+      console.log('Server responded with an error:', data.message || 'Unknown error');
       return {
         success: false,
-        error: data.error || 'Unknown error'
+        error: data.message || 'Unknown error'
       };
     }
   } catch (error) {
