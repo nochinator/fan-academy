@@ -35,6 +35,13 @@ export async function createGameList(context: UIScene) {
     if (game.status === EGameStatus.FINISHED) listFinishedArray.push(game);
   });
 
+  // Update the browser tab title if the player has games pending action
+  if (listPlayerTurnArray.length || listChallengeReceivedArray.length) {
+    document.title = `(${listPlayerTurnArray.length + listChallengeReceivedArray.length}) Fan Academy`;
+  } else {
+    document.title = 'Fan Academy';
+  }
+
   // Setting spacing for the positioning of the items in the list
   const gameListButtonHeight = 142;
   const gameListButtonWidth = 700;
