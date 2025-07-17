@@ -284,7 +284,7 @@ export async function createGameList(context: UIScene) {
     gameListContainer.y = 65 + contentOffset;
   });
 
-  context.input.on("gameobjectup", () => {
+  context.input.on("pointerup", () => {
     isDragging = false;
     dragStartY = 0;
     dragStartOffset = 0;
