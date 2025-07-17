@@ -235,7 +235,8 @@ export function turnIfBehind(context: GameScene, attacker: Hero, target: Hero | 
 
 export function getCardText(unit: EHeroes | EItems): {
   cardType: ECardType,
-  cardText: string
+  cardText: string,
+  cardName?: string
 } {
   const unitMap = {
     [EHeroes.ARCHER]: {
@@ -285,40 +286,49 @@ export function getCardText(unit: EHeroes | EItems): {
     },
 
     [EItems.SHINING_HELM]: {
+      cardName: 'Shining Helm',
       cardType: ECardType.EQUIPMENT,
       cardText: "Adds 20% magical defense, and 10% max health."
     },
     [EItems.SUPERCHARGE]: {
+      cardName: 'Scroll',
       cardType: ECardType.BUFF,
       cardText: "Multiplies an ally's attack power by 3 for one attack."
     },
     [EItems.RUNE_METAL]: {
+      cardName: 'Runemetal',
       cardType: ECardType.EQUIPMENT,
       cardText: "Permanently increases and ally's power by 50%."
     },
 
     [EItems.DRAGON_SCALE]: {
+      cardName: 'Dragonscale',
       cardType: ECardType.EQUIPMENT,
       cardText: "Adds 20% physical defense, and 10% max health."
     },
     [EItems.HEALING_POTION]: {
+      cardName: 'Healing Potion',
       cardType: ECardType.CONSUMABLE,
       cardText: "Heals and ally for 1000 HP, or revives an ally with 100 HP."
     },
     [EItems.INFERNO]: {
+      cardName: 'Inferno',
       cardType: ECardType.SPELL,
       cardText: "Damages all enemies in a 3x3 area and destroys knocked-out units."
     },
 
     [EItems.MANA_VIAL]: {
+      cardName: 'Mana Vial',
       cardType: ECardType.CONSUMABLE,
       cardText: "Heals an ally for 1000 HP and increases max health by 50 HP."
     },
     [EItems.SOUL_HARVEST]: {
+      cardName: 'Soul Harvest',
       cardType: ECardType.SPELL,
       cardText: "Drains health from enemies in a 3x3 area. Increases max health for all allies and revives knocked-out units."
     },
     [EItems.SOUL_STONE]: {
+      cardName: 'Soulstone',
       cardType: ECardType.EQUIPMENT,
       cardText: "Doubles the effect of a unit's life leech and increases max health by 50 HP"
     }

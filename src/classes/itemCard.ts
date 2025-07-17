@@ -22,9 +22,9 @@ export class ItemCard extends Phaser.GameObjects.Container {
     this.unitPictureImage = context.add.image(-130, -140, `${data.itemType}CardPic`).setOrigin(0.5).setScale(0.4);
     this.cardSeparatorImage = context.add.image(50, -100, 'cardSeparator').setOrigin(0.5).setScale(1.3);
 
-    const { cardText, cardType } = getCardText(data.itemType);
+    const { cardText, cardType, cardName } = getCardText(data.itemType);
 
-    this.cardNameText = this.context.add.text(55, -170, capitalize(data.itemType), {
+    this.cardNameText = this.context.add.text(55, -170, capitalize(cardName!), {
       fontFamily: "proLight",
       fontSize: 50,
       color: '#ffffff'
