@@ -40,7 +40,7 @@ You can send a challenge to a player from the leaderboard by clicking the sword 
 
 export const gameText = `If you are new to Hero Academy, here you will find resources to learn how to play. Fan Academy plays exactly the same than Hero Academy. And if it doesn't, please let me know.
 
-The information below is taken from a guide written by Hamlet on his defunct site, iam.yellingontheinternet.com, thanks to the magic on the Internet Archive. I have edited some parts for clarification.`;
+The information below is taken from a guide written by Hamlet on his defunct site, iam.yellingontheinternet.com, thanks to the magic of the Internet Archive. I have edited some parts for clarification.`;
 
 export const mechanicsText = `Basic:
 
@@ -54,14 +54,14 @@ export const mechanicsText = `Basic:
     	- use a unit special ability
     	- equip a unit with an upgrade
     	- use a one-time item
-    	- return a unit or item from your hand back into the bag to draw a random one next turn
+    	- return a unit or item from your hand back into the deck (the door icon) to draw a random one next turn
 
     • A unit that reaches 0 HP is knocked out, but can be revived by an ally. It vanishes from the board permanently if:
     	- any player moves a unit onto it (“stomps” it)
     	- destroys it with certain spells
     	- its owner takes a full turn without reviving it
 
-    • A player loses upon having all of his crystals destroyed, or by having all of the units in his deck stomped or knocked out (the game will end even if he has an item left that can revive a KO’d unit).
+    • A player loses upon having all of his crystals destroyed, or by having all of the units in his deck stomped or knocked out (the game will end even if he has an item left that can revive a KO'd unit).
 
     • Units are drawn in random order throughout the game, except that your starting hand always has at least 3 units.
 
@@ -69,12 +69,13 @@ Map features:
 
     • Crystals. There are two per faction, each one with 4500 hp. Destroy both of your opponent's crystals to win the game.
 
-    • Deploy square. Enemy units cannot move onto it, even to stomp. An enemy unit adjacent to a deploy square can attack a corpse that’s on the square (which destroys it), without moving onto it. A Necromancer or Inferno can also destroy a KO’d unit on a deploy square.
+    • Deploy square. Enemy units cannot move onto it, even to stomp. An enemy unit adjacent to a deploy square can attack a corpse that's on the square (which destroys it), without moving onto it. A Necromancer or Inferno can also destroy a KO'd unit on a deploy square.
 
     • Attack square (red sword). A unit on the square has +100 attack power, applied before all %-based bonuses.
 
     • Defense square (blue shield). A unit on the square has +20% physical resist.
-    Magic Defense square (dark blue helm). A unit on the square has +20% magical resist.
+
+    • Magic Defense square (dark blue helm). A unit on the square has +20% magical resist.
 
     • Assault square (purple gem). While a friendly unit is standing on this square, all attacks against enemy crystals do an extra 300 damage. Multiple assault bonuses stack. The bonus is reduced accordingly if the crystal takes AoE or chain damage. The bonus damage has no type and is not affected by any resist.
 
@@ -84,17 +85,17 @@ Advanced:
 
     • Range is counted orthogonally only, not diagonally (e.g. a unit one square diagonally from another is at range 2).
 
-    • Each unit has an attack power, and a damage type (physical or magical). • Ordinary attacks hit for damage equal to the unit’s attack power, but some multiply by certain percentage or add other bonuses. The attack power is what’s shown in the unit’s info window.
+    • Each unit has an attack power, and a damage type (physical or magical). • Ordinary attacks hit for damage equal to the unit's attack power, but some multiply by certain percentage or add other bonuses. The attack power is what's shown in the unit's info window.
 
     • Each target also has a physical and magical resist, which reduce incoming damage of the appropriate type by a fixed percentage.
 
-    • Ranged attacks (but not ranged friendly actions) require line of sight to the target. Enemy units and crystals block line of sight, but friendly ones do not. An attack to an immediately diagonal square can’t be blocked.
+    • Ranged attacks (but not ranged friendly actions) require line of sight to the target. Enemy units and crystals block line of sight, but friendly ones do not. An attack to an immediately diagonal square can't be blocked.
 
-    • A unit that can act on a corpse (healer reviving a friendly corpse, or Necromancer/Wraith destroying an enemy one) can’t choose to move and stomp the corpse instead. Clicking on the corpse causes the unit to act on it. However, if the unit does not have line of sight to the enemy corpse, it will move and stomp instead.
+    • A unit that can act on a corpse (healer reviving a friendly corpse, or Necromancer/Wraith destroying an enemy one) can't choose to move and stomp the corpse instead. Clicking on the corpse causes the unit to act on it. However, if the unit does not have line of sight to the enemy corpse, it will move and stomp instead.
 
-    • Knockbacks only occur if the target square is open, otherwise the unit simply doesn’t move. If a unit is KO’d by the knockback, it still moves. A unit can’t be knocked onto an enemy start tile, unless it’s also KO’d (in which case an enemy spawning there will stomp it).
+    • Knockbacks only occur if the target square is open, otherwise the unit simply doesn't move. If a unit is KO'd by the knockback, it still moves. A unit can't be knocked onto an enemy start tile, unless it's also KO'd (in which case an enemy spawning there will stomp it).
 
-    • A unit can wind up on an enemy deploy square if it’s KO’d onto it and then revived, or if it’s a Wraith that spawned from a corpse on that square. It will block the enemy from deploying units there so long as it remains.
+    • A unit can wind up on an enemy deploy square if it's KO'd onto it and then revived, or if it's a Wraith that spawned from a corpse on that square. It will block the enemy from deploying units there so long as it remains.
     • A corpse on its own deploy square will be stomped automatically if a friendly unit deploys there.
 
     • Units cannot target themselves with heals or other buffs.`;
@@ -140,9 +141,9 @@ export const councilItemsText = `Upgrades:
 Consumables:
 -Scroll (2): Targets one friendly. Unit has 300% attack power for one attack/heal.
 
--Inferno (2): Targets a 3×3 area. KO’d enemies are destroyed, and other enemies take 350 M.
+-Inferno (2): Targets a 3×3 area. KO'd enemies are destroyed, and other enemies take 350 M.
 
--Potion (2): Targets one friendly. Heals for 1000. In addition, can revive a KO’d unit for 100.
+-Potion (2): Targets one friendly. Heals for 1000. In addition, can revive a KO'd unit for 100.
 
 Faction passive: None`;
 
@@ -162,21 +163,21 @@ Move 2
 Necromancer (3):
 800 HP
 200 attack (M), range 3
-Can use 1 AP to turn any KO’d unit into a Phantom at range 3, including on an enemy start tile.
+Can use 1 AP to turn any KO'd unit into a Phantom at range 3, including on an enemy start tile.
 Move 2
 
 Priestess (3):
 800 HP
 200 attack (M), range 2
 Heals for 200% attack, revives for 50% attack, range 3
-An unit damaged by the Priestess has 50% attack power for its next attack/heal (doesn’t affect Barbed Crystals).
+An unit damaged by the Priestess has 50% attack power for its next attack/heal (doesn't affect Barbed Crystals).
 Move 2
 
 Wraith (1):
 800 HP
 250 attack (M), range 1.
-Can use 1 AP to consume a KO’d unit at range 1. Increases current and max HP by 100 and attack power by 50 (bonus can only be obtained 3 times per game although you can continue to consume).
-Can deploy onto any KO’d unit (stomping it) instead of a deploy tile, unless the KO’d unit is on an enemy deploy tile.
+Can use 1 AP to consume a KO'd unit at range 1. Increases current and max HP by 100 and attack power by 50 (bonus can only be obtained 3 times per game although you can continue to consume).
+Can deploy onto any KO'd unit (stomping it) instead of a deploy tile, unless the KO'd unit is on an enemy deploy tile.
 Move 3
 
 Phantom:
@@ -194,9 +195,9 @@ export const elvesItemsText = `Upgrades:
 Consumables:
 -Scroll (2): Targets one friendly. Unit has 300% attack power for one attack/heal.
 
--Soul Harvest (2): Targets a 3×3 area. Enemies take 100 M. All friendly units in play gain D/(N+3) current and max HP (reviving KO’d units in the process), where D is the total damage dealt to non-Crystal units by the spell, and N is the number of friendly units in play.
+-Soul Harvest (2): Targets a 3×3 area. Enemies take 100 M. All friendly units in play gain D/(N+3) current and max HP (reviving KO'd units in the process), where D is the total damage dealt to non-Crystal units by the spell, and N is the number of friendly units in play.
 
 -Mana Vial (2): Targets one friendly. Heals for 1000 and increases max HP by 50.
 
-Racial passive:
+Faction passive:
 Units are healed for 33% of any damage they deal to enemy units (not crystals).`;
