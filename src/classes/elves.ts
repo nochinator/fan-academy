@@ -290,7 +290,7 @@ export class Phantom extends Hero {
     if (spawned && tile) {
       this.spawnAnim = context.add.image(0, -15, 'phantomSpawnAnim_1').setOrigin(0.5).setScale(0.9);
 
-      this.specialTileCheck(tile);
+      this.specialTileCheck(tile.tileType);
       this.add([this.spawnAnim]);
       this.singleTween(this.spawnAnim, 200);
     }

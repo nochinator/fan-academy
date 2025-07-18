@@ -384,7 +384,7 @@ export class GameController {
       return;
     }
 
-    target.specialTileCheck(targetNewTile, targetTile);
+    target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);
@@ -413,7 +413,7 @@ export class GameController {
       return;
     }
 
-    target.specialTileCheck(targetNewTile, targetTile);
+    target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);
