@@ -47,6 +47,9 @@ export class Impaler extends DarkElf {
 
     const distance = this.getDistanceToTarget(target);
 
+    // Keep original position for replay purposes
+    const startingPosition = target.boardPosition;
+
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
       distance === 1 &&
@@ -67,7 +70,7 @@ export class Impaler extends DarkElf {
       this.resetPowerModifier();
     }
 
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, startingPosition);
   }
 
   heal(_target: Hero): void {};

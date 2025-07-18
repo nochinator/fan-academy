@@ -74,6 +74,9 @@ export class Knight extends Human {
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
+    // Keep original position for replay purposes
+    const startingPosition = target.boardPosition;
+
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
       target instanceof Hero &&
@@ -89,7 +92,7 @@ export class Knight extends Human {
       this.resetPowerModifier();
     }
 
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, startingPosition);
   }
 
   heal(_target: Hero): void {};
@@ -278,7 +281,7 @@ export class Ninja extends Human {
     this.updatePosition(unitDestination);
     unitDestination.hero = this.exportData();
 
-    gameController?.afterAction(EActionType.TELEPORT, this.boardPosition, target.boardPosition);
+    gameController?.afterAction(EActionType.TELEPORT, targetDestination.boardPosition, unitDestination.boardPosition);
   };
 
   heal(_target: Hero): void {};
