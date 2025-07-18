@@ -131,6 +131,7 @@ export default class MainMenuScene extends Phaser.Scene {
       callback: async () => {
         localStorage.removeItem('jwt');
         this.userId = undefined;
+        document.title = 'Fan Academy';
         if (this.currentSubScene) this.scene.stop(this.currentSubScene);
         this.scene.restart();
       }
