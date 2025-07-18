@@ -104,8 +104,8 @@ export class Board {
       if (
         tile.isEnemy(userId) && target instanceof Hero && !target.isKO ||
         tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
-        (hero.unitType === EHeroes.NECROMANCER || hero.unitType === EHeroes.WRAITH)  && target instanceof Hero && target.isKO ||
-        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target)
+        (hero.unitType === EHeroes.NECROMANCER || hero.unitType === EHeroes.WRAITH) && target instanceof Hero && target.isKO ||
+        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile())
       ) {
         enemyLOSCheck.push(target);
       }
