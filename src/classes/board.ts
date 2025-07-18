@@ -353,29 +353,28 @@ export class Board {
 
       const offsets = attackDirectionOffsetMap[atrtackDirection];
 
-      if (!offsets) return true; // REVIEW: seems to work
+      if (!offsets) return true;
 
       for (const offset of offsets) {
         const positionToCheck = attacker.boardPosition + offset; // should never be out of bounds
 
         if (positionToCheck === target.boardPosition) return true; // don't block self
+
         const tile = this.getTileFromBoardPosition(positionToCheck);
 
         if (
           tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
-          tile.hero && !belongsToPlayer(this.context, tile.hero)) {
-          return false;
-        }
+          tile.hero && !belongsToPlayer(this.context, tile.hero)
+        ) return false;
       }
     }
 
-    const coordKey = (row: number, col: number): string => `${row}, ${col}`;
-
+    // Get the coordinates of the two tiles that can block the target
     const tileOffsetMap: Record<string, [number, number][]> = {
       '1, 2': [[0, 1], [1, 1]],
-      '1, -2': [[0, -1], [1, -1]], // corrected
+      '1, -2': [[0, -1], [1, -1]],
 
-      '-1, 2': [[1, 0], [1, 1]],
+      '-1, 2': [[0, 1], [-1, 1]],
       '-1, -2': [[0, -1], [-1, -1]],
 
       '2, 1': [[1, 0], [1, 1]],
@@ -390,7 +389,7 @@ export class Board {
       col: target.col - attacker.col
     };
 
-    const tileCoordKey = coordKey(getOffset.row, getOffset.col);
+    const tileCoordKey = `${getOffset.row}, ${getOffset.col}`;
     const offsetsToCheck = tileOffsetMap[tileCoordKey];
 
     let result: boolean | undefined;
@@ -410,7 +409,8 @@ export class Board {
 
         if (
           tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
-        tile.hero && !belongsToPlayer(this.context, tile.hero) && !tile.hero.isKO) {
+          tile.hero && !belongsToPlayer(this.context, tile.hero) && !tile.hero.isKO
+        ) {
           result = false;
           break;
         }
