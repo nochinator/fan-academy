@@ -3,7 +3,7 @@ import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameAssets } from "./mainMenuUtils/gameAssets";
 import { profilePicNames } from "./profileSceneUtils/profilePicNames";
 
-export const CDN_PATH = 'https://cdn.jsdelivr.net/gh/Dan-DH/fa-assets@414940c';
+export const CDN_PATH = 'https://cdn.jsdelivr.net/gh/Dan-DH/fa-assets@c98ef1b';
 
 // PreloaderScene.ts
 export default class PreloaderScene extends Phaser.Scene {

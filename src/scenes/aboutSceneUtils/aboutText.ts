@@ -28,7 +28,7 @@ You can come back to the main menu by clicking on the "Home" button.`;
 
 export const profileText = `Here you can update your email, password, profile pics and communication preferences. No changes are saved until you click on the "Save changes" button.
 
--Email preferences: The game sends an email when is your turn to play, when a game ends and when you receive a challenge. If you don't wish to receive emails, leave the checkbox blank. Note: An email confirmation email was sent to you when you created the account. If you have not confirmed your email, you will not receive email notifications, even if the checkbox is ticked.
+-Email preferences: The game sends an email when it's your turn to play, when a game ends and when you receive a challenge. If you don't wish to receive emails, leave the checkbox blank. Note: An email confirmation email was sent to you when you created the account. If you have not confirmed your email, you will not receive email notifications, even if the checkbox is ticked.
 
 -Enable chat: Having this option checked allows people to message you in the in-game chat. Or it will, once I add an in-game chat to the game.
 
