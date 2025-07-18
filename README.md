@@ -10,7 +10,7 @@ This is not a reverse engineering of the game. The game logic has been written f
 
 ## What is Hero Academy?
 
-Hero Academy is a player-versus-player turn-based tactics game where players choose a team of heroes and use their units and items to defeat the opponent.Unfortunately, the game is currently dead, delisted from all stores and its online servers shut down. It is no longer possible for people who purchased the game to play it.
+Hero Academy is a player-versus-player turn-based tactics game where players choose a team of heroes and use their units and items to defeat the opponent. Unfortunately, the game is currently dead, delisted from all stores and its online servers shut down. It is no longer possible for people who purchased the game to play it.
 
 Learn more about the original game [here on its Wikipedia page](https://en.wikipedia.org/wiki/Hero_Academy).
 
