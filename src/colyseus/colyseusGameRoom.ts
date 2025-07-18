@@ -34,7 +34,7 @@ export async function joinGame(client: Client, userId: string, roomId: string, c
 
   if(!client || !userId || !roomId || !token) {
     console.error('joinGame, { client | userid | gameid | token } missing');
-    // return undefined;
+    return undefined;
   }
 
   let room: Room;
@@ -43,7 +43,8 @@ export async function joinGame(client: Client, userId: string, roomId: string, c
     room = await client.joinOrCreate("game_room", {
       userId,
       roomId,
-      token
+      token,
+      mongoId: roomId
     });
 
     console.log("Joined or created room:", room.roomId);
