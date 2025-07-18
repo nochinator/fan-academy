@@ -60,7 +60,7 @@ export function positionHeroImage(unitType: EHeroes, belongsToP1: boolean, inHan
     },
     [EHeroes.KNIGHT]: {
       1: {
-        charImageX: x,
+        charImageX: x + 5,
         charImageY: y - 5
       },
       2: {
