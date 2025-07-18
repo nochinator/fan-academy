@@ -1,6 +1,7 @@
-import PreloaderScene, { CDN_PATH } from "../preloader.scene";
+import GameScene from "../game.scene";
+import { CDN_PATH } from "../preloader.scene";
 
-export function loadGameBoardUI(context: PreloaderScene): void {
+export function loadGameBoardUI(context: GameScene): void {
   context.load.image('gameBoard', `${CDN_PATH}/images/maps/game_board.webp`);
 
   context.load.image('itemRack', `${CDN_PATH}/images/gameItems/item_rack.webp`);

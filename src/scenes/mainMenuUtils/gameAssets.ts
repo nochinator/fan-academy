@@ -1,7 +1,8 @@
 import { EHeroes, EItems } from "../../enums/gameEnums";
-import PreloaderScene, { CDN_PATH } from "../preloader.scene";
+import GameScene from "../game.scene";
+import { CDN_PATH } from "../preloader.scene";
 
-export function loadGameAssets(context: PreloaderScene) {
+export function loadGameAssets(context: GameScene) {
   // Load tiles
   context.load.image('spawnTile', `${CDN_PATH}/images/gameItems/DeployZone01-hd.webp`);
   context.load.image('helmetTile', `${CDN_PATH}/images/gameItems/PremiumTile_Resist-hd.webp`);

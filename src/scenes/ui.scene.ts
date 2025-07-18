@@ -4,6 +4,9 @@ import { connectToGameLobby } from "../colyseus/colyseusLobbyRoom";
 import { IGame } from "../interfaces/gameInterface";
 import { getGameList } from "../queries/gameQueries";
 import { createGameList } from "./gameSceneUtils/gameList";
+import { profilePicNames } from "./profileSceneUtils/profilePicNames";
+import { CDN_PATH } from "./preloader.scene";
+import { EFaction } from "../enums/gameEnums";
 
 export default class UIScene extends Phaser.Scene {
   colyseusClient: Client;
@@ -28,7 +31,23 @@ export default class UIScene extends Phaser.Scene {
     this.userId = data.userId;
   }
 
-  preload() {}
+  preload() {
+    // faction emblems
+    this.load.image(EFaction.COUNCIL, `${CDN_PATH}/ui/council_emblem.webp`);
+    this.load.image(EFaction.DARK_ELVES, `${CDN_PATH}/ui/elves_emblem.webp`);
+
+    // profile pictures
+    profilePicNames.forEach(name => {
+      this.load.image(name, `${CDN_PATH}/images/profilePics/${name}.webp`);
+    });
+
+    // UI
+    this.load.image('gameListButton', `${CDN_PATH}/ui/game_list_premade.webp`);
+    this.load.image('newGameButton', `${CDN_PATH}/ui/new_game_btn.webp`);
+    this.load.image('unknownFaction', `${CDN_PATH}/ui/unknown_faction.webp`);
+    this.load.image('unknownOpponent', `${CDN_PATH}/images/profilePics/unknownAvatar-hd.webp`);
+    this.load.image('closeButton', `${CDN_PATH}/ui/close_button.webp`);
+  }
 
   async create() {
     this.add.image(0, 0, 'loadingScreen').setOrigin(0).setScale(2.8);

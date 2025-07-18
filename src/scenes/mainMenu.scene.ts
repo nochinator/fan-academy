@@ -1,6 +1,7 @@
 import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 import { isValidPassword } from "../utils/playerUtils";
 import createMainMenuButton from "./mainMenuUtils/buttons";
+import { CDN_PATH } from "./preloader.scene";
 
 export default class MainMenuScene extends Phaser.Scene {
   userId: string | undefined;
@@ -14,7 +15,22 @@ export default class MainMenuScene extends Phaser.Scene {
 
   init() {}
 
-  preload() {}
+  preload() {
+    // login form
+    this.load.html('loginForm', 'html/loginForm.html');
+    this.load.html('signUpForm', 'html/signUpForm.html');
+
+    // menu images
+    this.load.image('uiBackground', `${CDN_PATH}/ui/game_screen.webp`);
+    this.load.image('mainMenuImage', `${CDN_PATH}/ui/main_menu_image.webp`);
+    this.load.image('mainMenuBottom', `${CDN_PATH}/ui/main_menu_bottom.webp`);
+    this.load.image('playButton', `${CDN_PATH}/ui/play_button.webp`);
+    this.load.image('mainMenuButton', `${CDN_PATH}/ui/main_menu_button.webp`);
+
+    // fonts
+    this.load.font('proHeavy', '/fonts/BlambotFXProHeavyLowerCapsBB.woff', 'truetype');
+    this.load.font('proLight', '/fonts/BlambotFXProLightBB.woff', 'truetype');
+  }
 
   async create() {
     // Auth check
