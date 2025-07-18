@@ -799,4 +799,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.superChargeAnim.setVisible(false);
     }
   }
+
+  flashAttacker(): void {
+    // Flash the unit blue to better identify which unit is attacking on a replay
+    this.characterImage.setTint(0x3399ff);
+    this.scene.time.delayedCall(500, () => this.characterImage.clearTint());
+  }
 }

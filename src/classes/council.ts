@@ -34,6 +34,8 @@ export class Archer extends Human {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
+    this.flashAttacker();
+
     const distance = this.getDistanceToTarget(target);
 
     turnIfBehind(this.context, this, target);
@@ -68,6 +70,7 @@ export class Knight extends Human {
   }
 
   async attack(target: Hero | Crystal): Promise<void> {
+    this.flashAttacker();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -98,6 +101,7 @@ export class Wizard extends Human {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
+    this.flashAttacker();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -233,6 +237,7 @@ export class Ninja extends Human {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
+    this.flashAttacker();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -284,6 +289,7 @@ export class Cleric extends Human {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
+    this.flashAttacker();
     const gameController = this.context.gameController!;
 
     turnIfBehind(this.context, this, target);

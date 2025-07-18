@@ -41,6 +41,7 @@ export class Impaler extends DarkElf {
     super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
+    this.flashAttacker();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -78,6 +79,7 @@ export class VoidMonk extends DarkElf {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
+    this.flashAttacker();
     turnIfBehind(this.context, this, target);
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
@@ -153,6 +155,7 @@ export class Necromancer extends DarkElf {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
+    this.flashAttacker();
     const gameController = this.context.gameController!;
 
     turnIfBehind(this.context, this, target);
@@ -193,6 +196,7 @@ export class Priestess extends DarkElf {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
+    this.flashAttacker();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -248,6 +252,7 @@ export class Wraith extends DarkElf {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
+    this.flashAttacker();
     turnIfBehind(this.context, this, target);
 
     if (target instanceof Hero && target.isKO) {
@@ -289,6 +294,7 @@ export class Phantom extends Hero {
   }
 
   attack(target: Hero | Crystal): void {
+    this.flashAttacker();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
