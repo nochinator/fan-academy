@@ -43,13 +43,18 @@ export async function connectToGameLobby(client: Client, userId: string, context
     }) => {
       console.log('A game has been updated');
 
-      const game = context.gameList?.find(game => game._id === message.gameId);
+      let game = undefined;
+      const isInArrayIndex = context.gameList!.findIndex(game => game._id === message.gameId);
+      if (isInArrayIndex !== -1) game = context.gameList?.splice(isInArrayIndex, 1)[0];
+
       if (!game) throw new Error('Colyseus lobby. No game found');
 
       game.previousTurn = message.previousTurn;
       game.activePlayer = message.newActivePlayer;
       game.turnNumber = message.turnNumber;
       game.lastPlayedAt = message.lastPlayedAt;
+
+      context.gameList?.push(game);
 
       await createGameList(context);
 
