@@ -219,7 +219,7 @@ export class Priestess extends DarkElf {
 
       // Apply a 50% debuff to the target's next attack
       if (target instanceof Hero && !target.isDebuffed && !target.isKO) {
-        target.updatePowerModifier(-50);
+        target.updatePowerModifier(-0.5);
         target.isDebuffed = true;
         target.debuffImage.setVisible(true);
         target.unitCard.updateCardPower(target);

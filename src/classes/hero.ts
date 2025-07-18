@@ -188,7 +188,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // Add special tile and character animations
     this.crystalDebuffTileAnim = context.add.image(0, 30, 'crystalDamageAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tile?.tileType === ETiles.CRYSTAL_DAMAGE) {
+    if (tile?.tileType === ETiles.CRYSTAL_DAMAGE && !this.isKO) {
       this.crystalDebuffTileAnim.setVisible(true);
     } else {
       this.crystalDebuffTileAnim.setVisible(false);
@@ -196,7 +196,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.crystalDebuffEvent = this.continuousEvent(this.crystalDebuffTileAnim, ['crystalDamageAnim_1', 'crystalDamageAnim_2', 'crystalDamageAnim_3']);
 
     this.powerTileAnim = context.add.image(0, 27, 'powerTileAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tile?.tileType === ETiles.POWER) {
+    if (tile?.tileType === ETiles.POWER && !this.isKO) {
       this.powerTileAnim.setVisible(true);
     } else {
       this.powerTileAnim.setVisible(false);
@@ -205,7 +205,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.powerTileEvent = this.continuousEvent(this.powerTileAnim, ['powerTileAnim_1', 'powerTileAnim_2', 'powerTileAnim_3']);
 
     this.magicalResistanceTileAnim = context.add.image(0, 30, 'magicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tile?.tileType === ETiles.MAGICAL_RESISTANCE) {
+    if (tile?.tileType === ETiles.MAGICAL_RESISTANCE && !this.isKO) {
       this.magicalResistanceTileAnim.setVisible(true);
     } else {
       this.magicalResistanceTileAnim.setVisible(false);
@@ -214,7 +214,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.magicalResistanceTileEvent = this.continuousEvent(this.magicalResistanceTileAnim, ['magicalResistanceAnim_1', 'magicalResistanceAnim_2', 'magicalResistanceAnim_3']);
 
     this.physicalResistanceTileAnim = context.add.image(0, 30, 'physicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tile?.tileType === ETiles.PHYSICAL_RESISTANCE) {
+    if (tile?.tileType === ETiles.PHYSICAL_RESISTANCE && !this.isKO) {
       this.physicalResistanceTileAnim.setVisible(true);
     } else {
       this.physicalResistanceTileAnim.setVisible(false);
@@ -418,7 +418,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     if (this.powerModifier === 0) return this.power * multiplier;
 
-    const totalPower = this.power + this.power * this.powerModifier / 100 * multiplier;
+    const totalPower = this.power * this.powerModifier * multiplier;
 
     return totalPower;
   }
@@ -507,13 +507,14 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.removeFromGame(true);
       return;
     }
+    console.log('KO logs');
 
     this.superCharge = false;
     this.superChargeAnim.setVisible(false);
     this.isDebuffed = false;
     this.debuffImage.setVisible(false);
     this.powerModifier = 0;
-    this.specialTileCheck(ETiles.BASIC);
+    this.removeSpecialTileOnKo();
 
     this.currentHealth = 0;
     this.isKO = true;
@@ -713,7 +714,11 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   equipSuperCharge(handPosition: number): void {
     this.superCharge = true;
-    this.powerModifier += 300;
+    console.log('before', this.powerModifier);
+    console.log('beforeTotal', this.getTotalPower());
+    this.powerModifier += 3;
+    console.log('after', this.powerModifier);
+    console.log('afterTotal', this.getTotalPower());
 
     this.unitCard.updateCardPower(this);
     this.updateTileData();
@@ -771,6 +776,29 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (targetTile === ETiles.PHYSICAL_RESISTANCE) {
       this.physicalDamageResistance += 20;
       this.physicalResistanceTileAnim.setVisible(true);
+    }
+
+    this.unitCard.updateCardData(this);
+  }
+
+  removeSpecialTileOnKo(): void {
+    const currentTile = this.getTile();
+    // If hero is leaving a special tile
+    if (currentTile.tileType === ETiles.CRYSTAL_DAMAGE) {
+      this.updateCrystals(false);
+      this.crystalDebuffTileAnim.setVisible(false);
+    }
+    if (currentTile.tileType === ETiles.POWER) {
+      this.power -= 100;
+      this.powerTileAnim.setVisible(false);
+    }
+    if (currentTile.tileType === ETiles.MAGICAL_RESISTANCE) {
+      this.magicalDamageResistance -= 20;
+      this.magicalResistanceTileAnim.setVisible(false);
+    }
+    if (currentTile.tileType === ETiles.PHYSICAL_RESISTANCE) {
+      this.physicalDamageResistance -= 20;
+      this.physicalResistanceTileAnim.setVisible(false);
     }
 
     this.unitCard.updateCardData(this);
