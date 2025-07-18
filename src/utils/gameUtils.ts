@@ -206,8 +206,6 @@ export function updateUnitsLeft(context: GameScene, hero: Hero): void {
 
   const unitsLeft = --affectedPlayer.factionData.unitsLeft;
 
-  console.log('unitsLeft', unitsLeft);
-
   if (unitsLeft === 0) context.gameOver = {
     winCondition: EWinConditions.UNITS,
     winner: otherPlayer.playerId

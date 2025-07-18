@@ -23,7 +23,7 @@ export async function createGame(context: UIScene, faction: EFaction): Promise<v
 
     context.currentRoom = room;
 
-    console.log("Created and joined room:", room.name);
+    console.log("Created and joined room:");
   } catch (error) {
     console.error("Failed to create or join room:", error);
   }
@@ -73,5 +73,5 @@ export function sendTurnMessage(currentRoom: Room, currentTurn: IGameState[], ne
     token
   });
 
-  console.log("Turn message sent...");
+  console.log("Turn message sent");
 }

@@ -19,8 +19,6 @@ export class TurnButton {
         }
 
         await this.handleSendingTurn();
-      } else {
-        console.log('Clicked on send turn but... not your turn');
       }
     });
   }

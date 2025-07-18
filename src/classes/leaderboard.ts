@@ -73,7 +73,6 @@ export class Leaderboard extends Phaser.GameObjects.Container {
       const challengeIcon = context.add.image(1030, 15, 'challengeIcon').setInteractive({ useHandCursor: true });
 
       challengeIcon.on('pointerdown', () => {
-        console.log('Clicked on challenge icon');
         new ChallengePopup({
           context,
           username: player.username,

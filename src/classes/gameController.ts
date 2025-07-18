@@ -92,8 +92,6 @@ export class GameController {
     for (let i = 1; i < this.context.currentGame.previousTurn.length; i++) {
       const turn = this.context.currentGame.previousTurn[i];
 
-      console.log('[ACTION]:', turn);
-
       const actionsToIgnore = [EActionType.DRAW, EActionType.PASS, EActionType.SHUFFLE];
       const actionTaken = turn.action?.action;
 
@@ -247,7 +245,6 @@ export class GameController {
             ease: 'Linear',
             onComplete: () => {
               hero.removeFromGame(true);
-              console.log('Unit removed from board!', hero);
               resolve();
             }
           });

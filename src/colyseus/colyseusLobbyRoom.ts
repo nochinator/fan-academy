@@ -21,7 +21,7 @@ export async function connectToGameLobby(client: Client, userId: string, context
     });
 
     lobby.onMessage('newGameListUpdate', async (message) => {
-      console.log('A game has been added', message);
+      console.log('A game has been added');
 
       if (!context.gameList) console.error('newGameListUpdate - No context.gameList found');
 
@@ -41,7 +41,7 @@ export async function connectToGameLobby(client: Client, userId: string, context
       turnNumber: number,
       lastPlayedAt: Date
     }) => {
-      console.log('A game has been updated', message);
+      console.log('A game has been updated');
 
       const game = context.gameList?.find(game => game._id === message.gameId);
       if (!game) throw new Error('Colyseus lobby. No game found');

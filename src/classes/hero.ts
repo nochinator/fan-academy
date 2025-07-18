@@ -351,7 +351,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
         image.setTexture(textures[frame]);
         frame++;
 
-        console.log('frame', frame, this.unitType);
         if (frame === textures.length) {
           image.setVisible(false);
           event.remove();
@@ -719,9 +718,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
-  private  updateCrystals(increase: boolean): void {
+  private updateCrystals(increase: boolean): void {
     this.context.gameController!.board.crystals.forEach(crystal => {
-      console.log('crystal', crystal.boardPosition, crystal.debuffLevel);
       if (crystal.belongsTo !== this.belongsTo) {
         let newLevel: number = 0;
 

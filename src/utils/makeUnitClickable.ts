@@ -166,7 +166,6 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     visibleUnitCardCheck(context);
     context.longPressStart = undefined;
 
-    console.log('Clicked tile', tile.boardPosition, tile);
     // Only the active player can click on tiles, and only if they still have actions available
     if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
 

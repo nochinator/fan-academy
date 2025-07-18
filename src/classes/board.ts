@@ -395,7 +395,6 @@ export class Board {
 
     let result: boolean | undefined;
 
-    console.log('offsetsToCheck', offsetsToCheck);
     if (offsetsToCheck && offsetsToCheck.length) {
       for (const offset of offsetsToCheck) {
         const tileRow = attacker.row + offset[0];

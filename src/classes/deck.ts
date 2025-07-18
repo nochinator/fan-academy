@@ -24,7 +24,6 @@ export class Deck {
 
   addToDeck(unit: IHero | IItem): (IHero | IItem)[] {
     this.deck.push(unit);
-    console.log('DECK', this.deck);
     return this.deck;
   }
 }
