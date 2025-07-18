@@ -414,6 +414,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   getTotalPower(multiplier = 1): number {
+    if (multiplier === 0) multiplier = 1;
+
     if (this.powerModifier === 0) return this.power * multiplier;
 
     const totalPower = this.power + this.power * this.powerModifier / 100 * multiplier;
@@ -695,7 +697,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   equipRunemetal(handPosition: number): void {
     this.runeMetal = true;
     this.runeMetalImage.setVisible(true);
-    this.power += this.power * 0.5;
+    this.power += this.basePower * 0.5;
 
     this.runeMetalImage.setVisible(true);
     this.characterImage.setTexture(this.updateCharacterImage());
