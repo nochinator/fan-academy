@@ -507,7 +507,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.removeFromGame(true);
       return;
     }
-    console.log('KO logs');
 
     this.superCharge = false;
     this.superChargeAnim.setVisible(false);
@@ -714,11 +713,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   equipSuperCharge(handPosition: number): void {
     this.superCharge = true;
-    console.log('before', this.powerModifier);
-    console.log('beforeTotal', this.getTotalPower());
     this.powerModifier += 3;
-    console.log('after', this.powerModifier);
-    console.log('afterTotal', this.getTotalPower());
 
     this.unitCard.updateCardPower(this);
     this.updateTileData();
