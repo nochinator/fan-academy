@@ -503,11 +503,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   };
 
   getsKnockedDown(): void {
-    if (this.unitType === EHeroes.PHANTOM) {
-      this.removeFromGame(true);
-      return;
-    }
-
     this.superCharge = false;
     this.superChargeAnim.setVisible(false);
     this.isDebuffed = false;
@@ -517,6 +512,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.currentHealth = 0;
     this.isKO = true;
+
     const tile = this.getTile();
     tile.setOccupied(false);
     tile.hero = this.exportData();
@@ -525,6 +521,15 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, true);
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
+
+    // Can't immediately destroy Phantoms to avoid bugs. Make them invisible and they will be collected automatically at the end of the turn
+    if (this.unitType === EHeroes.PHANTOM) {
+      this.isKO = true;
+      this.lastBreath = true;
+      this.setVisible(false);
+      tile.hero = undefined;
+      return;
+    }
   }
 
   getTile(): Tile {
