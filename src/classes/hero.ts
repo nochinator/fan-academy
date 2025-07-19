@@ -687,9 +687,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.shiningHelm = true;
     this.magicalDamageResistance += 20;
 
-    const factionBasedIncrease = this.faction === EFaction.DARK_ELVES ?  this.baseHealth : this.maxHealth;
-
-    this.increaseMaxHealth(factionBasedIncrease * 0.1);
+    this.increaseMaxHealth(this.baseHealth * 0.1);
 
     this.shiningHelmImage.setVisible(true);
     this.characterImage.setTexture(this.updateCharacterImage());

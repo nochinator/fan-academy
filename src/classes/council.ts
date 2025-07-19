@@ -20,7 +20,7 @@ export abstract class Human extends Hero {
 
     this.physicalDamageResistance += 20;
 
-    this.increaseMaxHealth(this.maxHealth * 0.1);
+    this.increaseMaxHealth(this.baseHealth * 0.1);
 
     this.unitCard.updateCardHealth(this);
     this.updateTileData();
