@@ -528,6 +528,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.lastBreath = true;
       this.setVisible(false);
       tile.hero = undefined;
+      this.removeInteractive();
       return;
     }
   }
