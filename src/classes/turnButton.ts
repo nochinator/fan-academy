@@ -30,7 +30,7 @@ export class TurnButton {
     // Remove KO'd units before end of turn actions to handle a possible game over
     await gameController.removeKOUnits();
 
-    if (this.context.gameOver) {
+    if (this.context.gameOver && !this.context.triggerReplay) {
       await gameController.handleGameOver();
     } else {
       gameController.endOfTurnActions();

@@ -350,7 +350,7 @@ export class GameController {
     });
 
     // Check if the game is over
-    if (this.context.gameOver) this.handleGameOver();
+    if (this.context.gameOver && !this.context.triggerReplay) this.handleGameOver();
   }
 
   async pushEnemy(attacker: Hero, target: Hero): Promise<void> {
