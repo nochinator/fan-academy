@@ -126,11 +126,18 @@ export class VoidMonk extends DarkElf {
       };
 
       // Apply damage to targets
-      target.getsDamaged(this.getTotalPower(), this.attackType);
+      let damageDone = 0;
+      const unitDamage = target.getsDamaged(this.getTotalPower(), this.attackType);
+      if (unitDamage) damageDone += unitDamage;
       if (splashedEnemies.length) {
         const splashDamage = this.getTotalPower() * 0.66;
-        splashedEnemies.forEach(enemy => enemy.getsDamaged(splashDamage, this.attackType));
+        splashedEnemies.forEach(enemy => {
+          const unitDamage = enemy.getsDamaged(splashDamage, this.attackType);
+          if (unitDamage) damageDone += unitDamage;
+        });
       }
+
+      if (damageDone) this.lifeSteal(damageDone);
 
       this.resetPowerModifier();
     }
@@ -269,7 +276,8 @@ export class Wraith extends DarkElf {
         this.updateTileData();
       }
     } else {
-      target.getsDamaged(this.getTotalPower(), this.attackType);
+      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
+      if (damageDone) this.lifeSteal(damageDone);
 
       this.resetPowerModifier();
     }
