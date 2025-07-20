@@ -1,5 +1,6 @@
 import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 import { isValidPassword } from "../utils/playerUtils";
+import { disclaimerText } from "./aboutSceneUtils/aboutText";
 import createMainMenuButton from "./mainMenuUtils/buttons";
 import { CDN_PATH } from "./preloader.scene";
 
@@ -53,15 +54,27 @@ export default class MainMenuScene extends Phaser.Scene {
     // menuBottomContainer
     this.add.container(bg.width - menuBottomImage.width - 14, bg.height - menuBottomImage.height - 14, [menuBottomImage, menuBottomText]);
 
+    // disclaimer text // FIXME: removed once beta is done
+    const diclaimerText = this.add.text(30, 730, 'This game is in beta state: Expect bugs and crashes. If you run into any issues, please let dadazbk know on Discord. Thanks!', {
+      fontFamily: "proLight",
+      fontSize: 35,
+      color: '#ffffff',
+      wordWrap: {
+        width: 350,
+        useAdvancedWrap: true
+      }
+    });
+
     // main menu buttons
     const menuButtonHeight = this.textures.get('mainMenuButton').getSourceImage().height;
     const menuButtonX =  200;
+    const menuButtonPadding = 20;
 
     // profileButton
     createMainMenuButton({
       thisParam: this,
       x: menuButtonX,
-      y: 275,
+      y: menuButtonHeight * 4 + menuButtonPadding,
       imageKey: 'mainMenuButton',
       text: 'Profile',
       font: '70px proHeavy',
@@ -78,7 +91,7 @@ export default class MainMenuScene extends Phaser.Scene {
     createMainMenuButton({
       thisParam: this,
       x: menuButtonX,
-      y: menuButtonHeight + 299,
+      y: menuButtonHeight * 6 - menuButtonPadding,
       imageKey: 'mainMenuButton',
       text: 'Leaderboard',
       font: '70px proHeavy',
@@ -93,7 +106,7 @@ export default class MainMenuScene extends Phaser.Scene {
     createMainMenuButton({
       thisParam: this,
       x: menuButtonX,
-      y: menuButtonHeight * 2 + 323,
+      y: menuButtonHeight * 7 + 5,
       imageKey: 'mainMenuButton',
       text: 'About',
       font: '70px proHeavy',
@@ -101,6 +114,19 @@ export default class MainMenuScene extends Phaser.Scene {
         if (this.currentSubScene) this.scene.stop(this.currentSubScene);
         this.scene.launch('AboutScene');
         this.currentSubScene = 'AboutScene';
+      }
+    });
+
+    // discordButton
+    createMainMenuButton({
+      thisParam: this,
+      x: menuButtonX,
+      y: menuButtonHeight * 8.5,
+      imageKey: 'mainMenuButton',
+      text: 'Discord',
+      font: '70px proHeavy',
+      callback: () => {
+        window.open('https://discord.gg/pkfwDvKyxX');
       }
     });
 
