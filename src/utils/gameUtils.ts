@@ -4,7 +4,7 @@ import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulSt
 import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EActionClass, EActionType, ECardType, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
+import { EActionClass, EActionType, ECardType, EClass, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, IHero, IItem, IPlayerState, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
@@ -191,24 +191,43 @@ export function canBeAttacked(context: GameScene, tile: Tile): boolean {
 }
 
 export function updateUnitsLeft(context: GameScene, hero: Hero): void {
-  let affectedPlayer: IPlayerState | undefined;
-  let otherPlayer: IPlayerState | undefined;
+  let attackingPlayer: IPlayerState | undefined;
+  let defendingPlayer: IPlayerState | undefined;
 
   if (hero.unitId.includes(context.player1!.playerId)) {
-    affectedPlayer = context.player1;
-    otherPlayer = context.player2;
+    attackingPlayer = context.player2;
+    defendingPlayer = context.player1;
   } else {
-    affectedPlayer = context.player2;
-    otherPlayer = context.player1;
+    attackingPlayer = context.player1;
+    defendingPlayer = context.player2;
   }
 
-  if (!affectedPlayer || !otherPlayer) throw new Error('updateUnitsLeft() No players found');
+  if (!attackingPlayer || !defendingPlayer) throw new Error('updateUnitsLeft() No player found');
 
-  const unitsLeft = --affectedPlayer.factionData.unitsLeft;
+  const unitsArray = context.gameController?.board.units;
+  if (!unitsArray) throw new Error('updateUnitsLeft() no units array found');
 
-  if (unitsLeft === 0) context.gameOver = {
+  const unitIndex = unitsArray.findIndex(unit => unit.unitId === hero.unitId);
+  if (unitIndex !== -1) unitsArray.splice(unitIndex, 1);
+
+  // Get remaining units of defending player. Populate gameOver flag if there are none left
+  const remainingBoardUnits = unitsArray.find(unit => unit.belongsTo === hero.belongsTo);
+
+  let remainingHandUnits;
+  const defendingPlayerIsActivePlayer = defendingPlayer.playerId === context.activePlayer;
+  if (defendingPlayerIsActivePlayer) {
+    remainingHandUnits = context.gameController?.hand.getHand().find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
+  } else {
+    remainingHandUnits = defendingPlayer.factionData.unitsInHand.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
+  }
+
+  const remainingDeckUnits = defendingPlayer.factionData.unitsInDeck.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
+
+  if (remainingBoardUnits || remainingHandUnits || remainingDeckUnits) return;
+
+  context.gameOver = {
     winCondition: EWinConditions.UNITS,
-    winner: otherPlayer.playerId
+    winner: attackingPlayer.playerId
   };
 }
 

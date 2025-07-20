@@ -119,7 +119,7 @@ export class Crystal extends Phaser.GameObjects.Container {
         break;
 
       default:
-        console.error('updateDebuffAnimation() level and case dont match');
+        console.error('updateDebuffAnimation() level and case dont match', newLevel);
         break;
     }
 

@@ -71,7 +71,6 @@ export class GameController {
     // Used to block the user from clicking on some other part of the game
     this.blockingLayer = context.add.rectangle(910, 0, 1040, 1650, 0x000000, 0.001).setOrigin(0.5).setInteractive().setDepth(999).setVisible(this.context.triggerReplay);
 
-    // TODO: add replay button here, only visible if the replay is not running
     this.replayButton = replayButton(context);
 
     this.currentTurn = [];
