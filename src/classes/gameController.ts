@@ -379,7 +379,7 @@ export class GameController {
       console.error('pushEnemy() Destination tile is occupied');
       return;
     }
-    if (isEnemySpawn(this.context, targetTile) && !target.isKO) {
+    if (targetNewTile.tileType == ETiles.SPAWN && !isEnemySpawn(this.context, targetNewTile) && !target.isKO) {
       console.error(`pushEnemy() Can't push a non-KO'd enemy onto a friendly spawn`);
       return;
     }
@@ -410,6 +410,10 @@ export class GameController {
     }
     if (targetNewTile?.isOccupied()) {
       console.error('pullEnemy() Destination tile is occupied');
+      return;
+    }
+    if (targetNewTile.tileType == ETiles.SPAWN && !isEnemySpawn(this.context, targetNewTile) && !target.isKO) {
+      console.error(`pushEnemy() Can't pull a non-KO'd enemy onto a friendly spawn`);
       return;
     }
 
