@@ -1,6 +1,5 @@
 import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 import { isValidPassword } from "../utils/playerUtils";
-import { disclaimerText } from "./aboutSceneUtils/aboutText";
 import createMainMenuButton from "./mainMenuUtils/buttons";
 import { CDN_PATH } from "./preloader.scene";
 
