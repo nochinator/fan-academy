@@ -379,7 +379,7 @@ export class GameController {
       console.error('pushEnemy() Destination tile is occupied');
       return;
     }
-    if (!isEnemySpawn(this.context, targetTile) && !target.isKO) {
+    if (isEnemySpawn(this.context, targetTile) && !target.isKO) {
       console.error(`pushEnemy() Can't push a non-KO'd enemy onto a friendly spawn`);
       return;
     }
