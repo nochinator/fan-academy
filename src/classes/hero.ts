@@ -732,7 +732,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   private updateCrystals(increase: boolean): void {
     this.context.gameController!.board.crystals.forEach(crystal => {
       if (crystal.belongsTo !== this.belongsTo) {
-        console.log('updateCrystals', crystal.boardPosition, crystal.debuffLevel);
         let newLevel: number = 0;
 
         if (increase) newLevel = crystal.debuffLevel + 1;
@@ -785,7 +784,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   removeSpecialTileOnKo(): void {
     const currentTile = this.getTile();
-    // If hero is leaving a special tile
+
     if (currentTile.tileType === ETiles.CRYSTAL_DAMAGE) {
       this.updateCrystals(false);
       this.crystalDebuffTileAnim.setVisible(false);
