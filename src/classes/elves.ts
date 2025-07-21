@@ -112,7 +112,7 @@ export class VoidMonk extends DarkElf {
         const tile = board.getTileFromBoardPosition(tileBP);
         if (!tile) throw new Error(`voidMonk attack() No tile found`);
 
-        if (!canBeAttacked(this.context, tile)) continue;
+        if (!canBeAttacked(this, tile)) continue;
 
         if (tile.hero) {
           const hero = board.units.find(unit => unit.unitId === tile.hero!.unitId);

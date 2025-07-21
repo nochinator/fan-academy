@@ -208,7 +208,7 @@ export class Wizard extends Human {
       if (isOnBoard(tilePosition)) {
         const tile = this.context.gameController!.board.getTileFromBoardPosition(tilePosition);
 
-        if (canBeAttacked(this.context, tile) &&
+        if (canBeAttacked(this, tile) &&
         !ignorePosition.includes(tile.boardPosition)) {
           adjacentTiles.push(tile);
         }}

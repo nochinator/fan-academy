@@ -183,10 +183,12 @@ export function getAOETiles(context: GameScene, targetTile: Tile): {
   };
 }
 
-export function canBeAttacked(context: GameScene, tile: Tile): boolean {
+export function canBeAttacked(attacker: Hero, tile: Tile): boolean {
   let result = false;
-  if (tile.hero && !belongsToPlayer(context, tile.hero)) result = true;
-  if (tile.crystal && !belongsToPlayer(context, tile.crystal)) result = true;
+
+  if (tile.hero && tile.hero.belongsTo !== attacker.belongsTo) result = true;
+  if (tile.crystal && tile.crystal.belongsTo !== attacker.belongsTo) result = true;
+
   return result;
 }
 
