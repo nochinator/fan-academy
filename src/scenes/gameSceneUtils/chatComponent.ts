@@ -22,7 +22,7 @@ export function renderChatMessage(chatMessage: IChatMessage): void {
 }
 
 export function createChatComponent(context: GameScene): void {
-  const chat = context.add.dom(633, 800).createFromCache('chatComponent').setOrigin(0.5) ;
+  const chat = context.add.dom(495, 800).createFromCache('chatComponent').setOrigin(0.5);
   const chatRoot = chat.node as HTMLElement;
   chatRoot.style.pointerEvents = 'auto';
 
@@ -36,8 +36,8 @@ export function createChatComponent(context: GameScene): void {
   const width = context.scale.width;
   const height = context.scale.height;
 
-  chatContainer.style.width = `${context.scale.width * 0.70}px`;
-  chatContainer.style.height = `${context.scale.height * 0.17}px`;
+  chatContainer.style.width = `${width * 0.705}px`;
+  chatContainer.style.height = `${height * 0.19}px`;
   chatContainer.style.backgroundColor = '#111';
   chatContainer.style.borderRadius = '8px';
   chatContainer.style.padding = '8px';
@@ -53,13 +53,14 @@ export function createChatComponent(context: GameScene): void {
   chatMessages.style.backgroundColor = '#222';
   chatMessages.style.color = '#fff';
   chatMessages.style.fontFamily = 'proLight';
-  chatMessages.style.fontSize = '35px';
-  chatMessages.style.padding = '6px';
+  chatMessages.style.fontSize = '30px';
+  chatMessages.style.padding = '8px';
   chatMessages.style.borderRadius = '4px';
-  chatMessages.style.maxHeight = `${context.scale.height * 0.25}px`;
+  chatMessages.style.maxHeight = `${height * 0.25}px`;
   chatMessages.style.touchAction = 'manipulation';
 
-  chatInput.style.width = '98%';
+  chatInput.style.width = '100%';
+  chatInput.style.height = '25px';
   chatInput.style.padding = '6px';
   chatInput.style.border = 'none';
   chatInput.style.borderRadius = '4px';
