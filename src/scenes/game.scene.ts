@@ -5,9 +5,9 @@ import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Coordinates, IGame, IGameOver, IPlayerData, IPlayerState } from "../interfaces/gameInterface";
 import { calculateAllCenterPoints } from "../utils/boardCalculations";
-import { loadGameAssets } from "./mainMenuUtils/gameAssets";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
-import { addChatComponent } from "./gameSceneUtils/chatComponent";
+import { loadGameAssets } from "./mainMenuUtils/gameAssets";
+import { createChatComponent } from "./gameSceneUtils/chatComponent";
 
 export default class GameScene extends Phaser.Scene {
   userId!: string;
@@ -75,7 +75,7 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.input.mouse!.disableContextMenu();
-    addChatComponent(this);
+    createChatComponent(this);
     this.gameController = new GameController(this);
     if (this.triggerReplay) this.gameController.replayTurn();
   }

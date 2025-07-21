@@ -155,6 +155,19 @@ export interface IGameState {
 }
 
 /**
+ * Chat message interface
+ */
+export interface IChatMessage {
+  username: string;
+  message: string;
+  createdAt: Date;
+}
+export interface IChat {
+  _id: string;
+  messages: IChatMessage[]
+}
+
+/**
  * Game Interface
  */
 export interface IGame {
@@ -169,4 +182,5 @@ export interface IGame {
   finishedAt: Date;
   lastPlayedAt: Date;
   activePlayer: string;
+  chatLogs: IChat;
 }

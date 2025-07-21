@@ -2,6 +2,7 @@ import { Client, Room } from "colyseus.js";
 import { EFaction } from "../enums/gameEnums";
 import { IGameOver, IGameState } from "../interfaces/gameInterface";
 import UIScene from "../scenes/ui.scene";
+import { renderChatMessage } from "../scenes/gameSceneUtils/chatComponent";
 
 export async function createGame(context: UIScene, faction: EFaction): Promise<void> {
   const { colyseusClient, userId } = context;
@@ -63,6 +64,8 @@ export async function joinGame(client: Client, userId: string, roomId: string, c
 function subscribeToListeners(room: Room): void {
   room.onMessage('chatMessageReceived', (message) => {
     console.log('Received chat message:', message);
+
+    renderChatMessage(message);
   });
 }
 
