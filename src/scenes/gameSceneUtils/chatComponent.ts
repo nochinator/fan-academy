@@ -23,7 +23,9 @@ export function renderChatMessage(chatMessage: IChatMessage): void {
 
 export function createChatComponent(context: GameScene): void {
   const chat = context.add.dom(633, 800).createFromCache('chatComponent').setOrigin(0.5) ;
-  // const chatRoot = chat.node as HTMLElement;
+  const chatRoot = chat.node as HTMLElement;
+  chatRoot.style.pointerEvents = 'auto';
+
   const chatContainer = chat.getChildByID('chatcomponent') as HTMLElement;
   const chatInput = chat.getChildByID('chatinput') as HTMLInputElement;
   const chatMessages = chat.getChildByID('chatmessages') as HTMLElement;
@@ -55,6 +57,7 @@ export function createChatComponent(context: GameScene): void {
   chatMessages.style.padding = '6px';
   chatMessages.style.borderRadius = '4px';
   chatMessages.style.maxHeight = `${context.scale.height * 0.25}px`;
+  chatMessages.style.touchAction = 'manipulation';
 
   chatInput.style.width = '98%';
   chatInput.style.padding = '6px';

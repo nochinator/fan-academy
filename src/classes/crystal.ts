@@ -1,6 +1,7 @@
 import { ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import { roundToFive } from "../utils/gameUtils";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
 import { CrystalCard } from "./crystalCard";
 import { FloatingText } from "./floatingText";
@@ -153,7 +154,7 @@ export class Crystal extends Phaser.GameObjects.Container {
   }
 
   getsDamaged(damage: number): void {
-    const totalDamage = damage + 300 * this.debuffLevel;
+    const totalDamage = roundToFive(damage + 300 * this.debuffLevel);
     const damageTaken = totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
     this.currentHealth -= damageTaken;
 

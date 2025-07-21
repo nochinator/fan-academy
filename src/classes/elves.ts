@@ -27,10 +27,10 @@ export abstract class DarkElf extends Hero {
 
   lifeSteal(damage: number): void {
     if (this.factionBuff) {
-      const roundedHealing = roundToFive(damage * 0.67);
+      const roundedHealing = roundToFive(damage * 0.666);
       this.getsHealed(roundedHealing);
     } else {
-      const roundedHealing = roundToFive(damage * 0.33);
+      const roundedHealing = roundToFive(damage * 0.333);
       this.getsHealed(roundedHealing);
     }
   }
@@ -130,7 +130,8 @@ export class VoidMonk extends DarkElf {
       const unitDamage = target.getsDamaged(this.getTotalPower(), this.attackType);
       if (unitDamage) damageDone += unitDamage;
       if (splashedEnemies.length) {
-        const splashDamage = this.getTotalPower() * 0.66;
+        const splashDamage = this.getTotalPower() * 0.666;
+        console.log(splashDamage);
         splashedEnemies.forEach(enemy => {
           const unitDamage = enemy.getsDamaged(splashDamage, this.attackType);
           if (unitDamage) damageDone += unitDamage;
