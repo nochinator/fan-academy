@@ -7,6 +7,7 @@ import { Coordinates, IGame, IGameOver, IPlayerData, IPlayerState } from "../int
 import { calculateAllCenterPoints } from "../utils/boardCalculations";
 import { loadGameAssets } from "./mainMenuUtils/gameAssets";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
+import { addChatComponent } from "./gameSceneUtils/chatComponent";
 
 export default class GameScene extends Phaser.Scene {
   userId!: string;
@@ -35,6 +36,8 @@ export default class GameScene extends Phaser.Scene {
   visibleUnitCard: Hero | Item | Crystal | undefined;
 
   triggerReplay = true;
+
+  chatComponent: Phaser.GameObjects.DOMElement | undefined;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -65,12 +68,14 @@ export default class GameScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.html('chatComponent', 'html/chat.html');
     loadGameAssets(this);
     loadGameBoardUI(this);
   }
 
   create() {
     this.input.mouse!.disableContextMenu();
+    addChatComponent(this);
     this.gameController = new GameController(this);
     if (this.triggerReplay) this.gameController.replayTurn();
   }

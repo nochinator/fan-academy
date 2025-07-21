@@ -22,6 +22,7 @@ export async function createGame(context: UIScene, faction: EFaction): Promise<v
     });
 
     context.currentRoom = room;
+    subscribeToListeners(room);
 
     console.log("Created and joined room:");
   } catch (error) {
@@ -50,12 +51,19 @@ export async function joinGame(client: Client, userId: string, roomId: string, c
     console.log("Joined or created room:", room.roomId);
 
     context.currentRoom = room;
+    subscribeToListeners(room);
   } catch (error) {
     console.error("Failed to join or create room", error);
     return undefined;
   }
 
   return room;
+}
+
+function subscribeToListeners(room: Room): void {
+  room.onMessage('chatMessageReceived', (message) => {
+    console.log('Received chat message:', message);
+  });
 }
 
 export function sendTurnMessage(currentRoom: Room, currentTurn: IGameState[], newActivePlayer: string, turnNumber: number, gameOver?: IGameOver): void {
@@ -75,4 +83,16 @@ export function sendTurnMessage(currentRoom: Room, currentTurn: IGameState[], ne
   });
 
   console.log("Turn message sent");
+}
+
+export function sendChatMessage(currentRoom: Room, message: string): void {
+  const token = localStorage.getItem("jwt");
+
+  currentRoom.send("chatMessage", {
+    _id: currentRoom.roomId,
+    message,
+    token
+  });
+
+  console.log("Chat message sent");
 }
