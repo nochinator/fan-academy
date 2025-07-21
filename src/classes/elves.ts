@@ -271,6 +271,7 @@ export class Wraith extends DarkElf {
       if (this.unitsConsumed < 3) {
         this.increaseMaxHealth(100);
         this.power += 50;
+        this.basePower += 50;
         this.unitCard.updateCardPower(this);
         this.unitsConsumed++;
         this.updateTileData();
