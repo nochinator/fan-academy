@@ -732,10 +732,11 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   private updateCrystals(increase: boolean): void {
     this.context.gameController!.board.crystals.forEach(crystal => {
       if (crystal.belongsTo !== this.belongsTo) {
+        console.log('updateCrystals', crystal.boardPosition, crystal.debuffLevel);
         let newLevel: number = 0;
 
         if (increase) newLevel = crystal.debuffLevel + 1;
-        if (!increase) newLevel = crystal.debuffLevel - 1;
+        if (!increase && crystal.debuffLevel !== 0) newLevel = crystal.debuffLevel - 1; // Safeguard to avoid it going negative until I figure out the bug
 
         crystal.updateDebuffAnimation(newLevel);
       }
