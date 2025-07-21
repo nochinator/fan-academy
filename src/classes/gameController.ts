@@ -3,7 +3,7 @@ import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles } from "../enum
 import { IGame, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
-import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem } from "../utils/gameUtils";
+import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -74,6 +74,9 @@ export class GameController {
     this.replayButton = replayButton(context);
 
     this.currentTurn = [];
+
+    // Add a generic gameobject pointer event to make it easier to hide a unit info card
+    context.input.on('gameobjectdown', () => visibleUnitCardCheck(context));
   }
 
   async replayTurn() {
@@ -350,7 +353,7 @@ export class GameController {
     });
 
     // Check if the game is over
-    if (this.context.gameOver && !this.context.triggerReplay) this.handleGameOver();
+    if (this.context.gameOver) this.handleGameOver();
   }
 
   async pushEnemy(attacker: Hero, target: Hero): Promise<void> {

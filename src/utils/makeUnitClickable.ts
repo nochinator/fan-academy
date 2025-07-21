@@ -1,3 +1,4 @@
+import { Types } from "phaser";
 import { Crystal } from "../classes/crystal";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
@@ -8,7 +9,7 @@ import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } f
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
-  unit.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+  unit.on('pointerdown', (pointer: Phaser.Input.Pointer, _x: number, _y: number, event: Types.Input.EventData) => {
     visibleUnitCardCheck(context);
 
     // Set a timer for the a hold press on mobile
@@ -20,6 +21,7 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
       unit.setDepth(1001);
       unit.unitCard.setVisible(true);
       context.visibleUnitCard = unit;
+      event.stopPropagation();
     }
   });
 

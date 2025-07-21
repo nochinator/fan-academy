@@ -9,7 +9,7 @@ export class GameUI {
 
   constructor(context: GameScene, board: Board, playerData: IUserData[]) {
     // Game map
-    const gameMap = context.add.image(0, 0, 'gameBoard').setOrigin(0);
+    const gameMap = context.add.image(0, 0, 'gameBoard').setOrigin(0).setInteractive();
     gameMap.x = 1434 - gameMap.width - 14;
     gameMap.y += 14;
 
