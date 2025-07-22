@@ -369,7 +369,9 @@ export class GameController {
     const newPosition = getNewPositionAfterForce(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col, true);
 
     // If the tile is beyond the boundaries of the map, ignore
-    if (newPosition.row > 4 || newPosition.col > 8) {
+    const isWrongRow = newPosition.row < 0 || newPosition.row > 4;
+    const isWrongCol = newPosition.col < 0 || newPosition.col > 8;
+    if (isWrongRow || isWrongCol) {
       console.error('pushEnemy() Cant push enemy out of the map');
       return;
     }
