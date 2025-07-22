@@ -17,7 +17,7 @@ export function renderChatMessage(chatMessage: IChatMessage): void {
 
   msgElement.innerHTML = `<span class="username">${username}</span>: <span class="message">${message}</span>`;
   const usernameSpan = msgElement.querySelector('.username') as HTMLElement;
-  const messageSpan = msgElement.querySelector('.message') as HTMLElement;
+  // const messageSpan = msgElement.querySelector('.message') as HTMLElement;
 
   usernameSpan.style.color = chatPlayers.player1 === chatMessage.username ? '#4fc3f7' : '#f44336';
   usernameSpan.style.fontWeight = 'bold';
