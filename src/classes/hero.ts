@@ -654,6 +654,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Flip image if player is player 2
     if (this.belongsTo === 2) this.characterImage.setFlipX(true);
 
+    // Update vertical positioning of the info card
+    this.unitCard.y = 0;
     // A Wraith can spawn on a special tile. Phantom spawning is handled within its class
     this.specialTileCheck(tile.tileType);
     // Position hero on the board
