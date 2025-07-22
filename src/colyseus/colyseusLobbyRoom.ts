@@ -137,7 +137,7 @@ export async function connectToGameLobby(client: Client, userId: string, context
     });
 
     lobby.onMessage('pong', () => {
-      console.log('Received lobby pong from server');
+      console.log('Received lobby pong from server', new Date());
     });
 
     lobby.onLeave((code: number, reason?: string) => {

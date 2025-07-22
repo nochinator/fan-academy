@@ -69,7 +69,7 @@ function subscribeToListeners(room: Room): void {
   });
 
   room.onMessage('pong', () => {
-    console.log('Received game pong from server');
+    console.log('Received game pong from server', new Date());
   });
 
   room?.onLeave((code: number, reason?: string) => {

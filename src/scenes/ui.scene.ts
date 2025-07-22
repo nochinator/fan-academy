@@ -53,6 +53,10 @@ export default class UIScene extends Phaser.Scene {
   }
 
   async create() {
+    setInterval(() => {
+      this.lobbyRoom?.send("ping");
+    }, 300000); // every 5 minutes
+
     createWarningComponent(this);
 
     this.add.image(0, 0, 'loadingScreen').setOrigin(0).setScale(2.8);
