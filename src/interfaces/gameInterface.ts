@@ -69,8 +69,6 @@ export interface IHero {
   healingRange: number;
   attackType: EAttackType;
   basePower: number;
-  power: number;
-  powerModifier: number;
   physicalDamageResistance: number;
   magicalDamageResistance: number;
   basePhysicalDamageResistance: number;
@@ -83,6 +81,7 @@ export interface IHero {
   canHeal: boolean;
   unitsConsumed?: number;
   isDebuffed: boolean;
+  attackTile: boolean;
 }
 
 /**

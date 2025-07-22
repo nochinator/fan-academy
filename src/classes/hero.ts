@@ -28,9 +28,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   attackRange: number;
   healingRange: number;
   attackType: EAttackType;
-  power: number;
   basePower: number;
-  powerModifier: number;
   physicalDamageResistance: number;
   basePhysicalDamageResistance: number;
   magicalDamageResistance: number;
@@ -39,6 +37,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   runeMetal: boolean;
   shiningHelm: boolean;
   superCharge: boolean;
+  attackTile: boolean;
   isActiveValue: boolean;
   belongsTo: number;
   canHeal: boolean;
@@ -97,9 +96,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.attackRange = data.attackRange;
     this.healingRange = data.healingRange;
     this.attackType = data.attackType;
-    this.power = data.power;
     this.basePower = data.basePower;
-    this.powerModifier = data.powerModifier;
     this.physicalDamageResistance = data.physicalDamageResistance;
     this.basePhysicalDamageResistance = data.basePhysicalDamageResistance;
     this.magicalDamageResistance = data.magicalDamageResistance;
@@ -108,6 +105,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.runeMetal = data.runeMetal;
     this.shiningHelm = data.shiningHelm;
     this.superCharge = data.superCharge;
+    this.attackTile = data.attackTile;
     this.isActiveValue = false;
     this.belongsTo = data.belongsTo ?? 1;
     this.canHeal = data.canHeal ?? false;
@@ -309,9 +307,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       attackRange: this.attackRange,
       healingRange: this.healingRange,
       attackType: this.attackType,
-      power: this.power,
       basePower: this.basePower,
-      powerModifier: this.powerModifier,
       physicalDamageResistance: this.physicalDamageResistance,
       basePhysicalDamageResistance: this.basePhysicalDamageResistance,
       magicalDamageResistance: this.magicalDamageResistance,
@@ -320,6 +316,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       runeMetal: this.runeMetal,
       shiningHelm: this.shiningHelm,
       superCharge: this.superCharge,
+      attackTile: this.attackTile,
       belongsTo: this.belongsTo,
       canHeal: this.canHeal,
       unitsConsumed: this.unitsConsumed,
@@ -408,17 +405,21 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     return totalDamage; // Return damage taken for lifesteal
   }
 
-  updatePowerModifier(amount: number): void {
-    this.powerModifier += amount;
-    this.updateTileData();
-  }
-
-  getTotalPower(multiplier = 1): number {
-    if (multiplier === 0) multiplier = 1;
+  getTotalPower(rangeModifier = 1): number {
+    /**
+     * Calculation order:
+     * - base attack power
+     * - range modifiers (archer, ninja)
+     * - assault tile bonus
+     * - any other multiplicative modifier (scroll, debuff, runemetal)
+     */
+    if (rangeModifier === 0) rangeModifier = 1;
     const runeMetalBuff = this.runeMetal ? 1.5 : 1;
+    const attackTileBuff = this.attackTile ? 100 : 0;
+    const superCharge = this.superCharge ? 3 : 1;
+    const priestessDebuff = this.isDebuffed ? 0.5 : 1;
 
-    if (this.powerModifier === 0) return this.power * multiplier * runeMetalBuff;
-    return  this.power * this.powerModifier * multiplier * runeMetalBuff;
+    return (this.basePower * rangeModifier + attackTileBuff) * superCharge * priestessDebuff * runeMetalBuff;
   }
 
   getLifeLost(damage: number, attackType: EAttackType) {
@@ -501,11 +502,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   };
 
   getsKnockedDown(): void {
-    this.superCharge = false;
-    this.superChargeAnim.setVisible(false);
-    this.isDebuffed = false;
-    this.debuffImage.setVisible(false);
-    this.powerModifier = 0;
+    this.removeAttackModifiers();
     this.removeSpecialTileOnKo();
 
     this.currentHealth = 0;
@@ -717,7 +714,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   equipSuperCharge(handPosition: number): void {
     this.superCharge = true;
-    this.powerModifier += 3;
 
     this.unitCard.updateCardPower(this);
     this.updateTileData();
@@ -747,7 +743,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.crystalDebuffTileAnim.setVisible(false);
     }
     if (currentTile === ETiles.POWER) {
-      this.power -= 100;
+      this.attackTile = false;
       this.powerTileAnim.setVisible(false);
     }
     if (currentTile === ETiles.MAGICAL_RESISTANCE) {
@@ -765,7 +761,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.crystalDebuffTileAnim.setVisible(true);
     }
     if (targetTile === ETiles.POWER) {
-      this.power += 100;
+      this.attackTile = true;
       this.powerTileAnim.setVisible(true);
     }
     if (targetTile === ETiles.MAGICAL_RESISTANCE) {
@@ -788,7 +784,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.crystalDebuffTileAnim.setVisible(false);
     }
     if (currentTile.tileType === ETiles.POWER) {
-      this.power -= 100;
+      this.attackTile = false;
       this.powerTileAnim.setVisible(false);
     }
     if (currentTile.tileType === ETiles.MAGICAL_RESISTANCE) {
@@ -819,8 +815,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     return `${this.unitType}_1`;
   }
 
-  resetPowerModifier() {
-    this.powerModifier = 0;
+  removeAttackModifiers() {
     if (this.isDebuffed) {
       this.isDebuffed = false;
       this.debuffImage.setVisible(false);
@@ -835,6 +830,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   flashAttacker(): void {
     // Flash the unit blue to better identify which unit is attacking on a replay
     this.characterImage.setTint(0x3399ff);
-    this.scene.time.delayedCall(500, () => this.characterImage.clearTint());
+    this.scene.time.delayedCall(800, () => this.characterImage.clearTint());
   }
 }

@@ -67,7 +67,7 @@ export class Impaler extends DarkElf {
 
       if (target instanceof Hero) await gameController.pullEnemy(this, target);
 
-      this.resetPowerModifier();
+      this.removeAttackModifiers();
     }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, startingPosition);
@@ -140,7 +140,7 @@ export class VoidMonk extends DarkElf {
 
       if (damageDone) this.lifeSteal(damageDone);
 
-      this.resetPowerModifier();
+      this.removeAttackModifiers();
     }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -184,7 +184,7 @@ export class Necromancer extends DarkElf {
 
       tile.hero = phantom.exportData();
 
-      this.resetPowerModifier();
+      this.removeAttackModifiers();
 
       gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
       gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
@@ -192,7 +192,7 @@ export class Necromancer extends DarkElf {
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
       if (damageDone) this.lifeSteal(damageDone);
 
-      this.resetPowerModifier();
+      this.removeAttackModifiers();
 
       gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     }
@@ -227,13 +227,12 @@ export class Priestess extends DarkElf {
 
       // Apply a 50% debuff to the target's next attack
       if (target instanceof Hero && !target.isDebuffed && !target.isKO) {
-        target.updatePowerModifier(-0.5);
         target.isDebuffed = true;
         target.debuffImage.setVisible(true);
         target.unitCard.updateCardPower(target);
       }
 
-      this.resetPowerModifier();
+      this.removeAttackModifiers();
     }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -250,7 +249,7 @@ export class Priestess extends DarkElf {
       target.getsHealed(healingPower * 2);
     }
 
-    this.resetPowerModifier();
+    this.removeAttackModifiers();
 
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
@@ -271,7 +270,6 @@ export class Wraith extends DarkElf {
 
       if (this.unitsConsumed < 3) {
         this.increaseMaxHealth(100);
-        this.power += 50;
         this.basePower += 50;
         this.unitCard.updateCardPower(this);
         this.unitsConsumed++;
@@ -281,7 +279,7 @@ export class Wraith extends DarkElf {
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
       if (damageDone) this.lifeSteal(damageDone);
 
-      this.resetPowerModifier();
+      this.removeAttackModifiers();
     }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -321,7 +319,7 @@ export class Phantom extends Hero {
     } else {
       target.getsDamaged(this.getTotalPower(), this.attackType);
 
-      this.resetPowerModifier();
+      this.removeAttackModifiers();
     }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -420,7 +418,6 @@ function createElvesPhantomData(data: Partial<IHero>): IHero {
     attackRange: 1,
     healingRange: 0,
     attackType: EAttackType.MAGICAL,
-    power: 100,
     basePower: 100,
     physicalDamageResistance: 0,
     basePhysicalDamageResistance: 0,
@@ -443,10 +440,10 @@ function createGenericElvesData(data: Partial<IHero>): {
   superCharge: boolean,
   belongsTo: number,
   lastBreath: boolean,
-  powerModifier: number,
   row: number,
   col: number,
-  isDebuffed: boolean
+  isDebuffed: boolean,
+  attackTile: boolean
 } {
   return {
     class: EClass.HERO,
@@ -460,9 +457,9 @@ function createGenericElvesData(data: Partial<IHero>): {
     shiningHelm: data.shiningHelm ?? false,
     superCharge: data.superCharge ?? false,
     belongsTo: data.belongsTo ?? 1,
-    powerModifier: data.powerModifier ?? 0,
     row: data.row ?? 0,
     col: data.col ?? 0,
-    isDebuffed: data.isDebuffed ?? false
+    isDebuffed: data.isDebuffed ?? false,
+    attackTile: data.attackTile ?? false
   };
 }

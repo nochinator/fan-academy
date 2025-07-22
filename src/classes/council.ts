@@ -50,11 +50,11 @@ export class Archer extends Human {
         target.removeFromGame();
       } else {
         target.getsDamaged(this.getTotalPower(0.5), this.attackType);
-        this.resetPowerModifier();
+        this.removeAttackModifiers();
       }
     } else {
       target.getsDamaged(this.getTotalPower(), this.attackType);
-      this.resetPowerModifier();
+      this.removeAttackModifiers();
     }
 
     this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -89,7 +89,7 @@ export class Knight extends Human {
 
       if (target instanceof Hero) await gameController.pushEnemy(this, target);
 
-      this.resetPowerModifier();
+      this.removeAttackModifiers();
     }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, startingPosition);
@@ -133,7 +133,7 @@ export class Wizard extends Human {
       if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
       if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
 
-      this.resetPowerModifier();
+      this.removeAttackModifiers();
     }
 
     gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -256,10 +256,10 @@ export class Ninja extends Human {
         target.removeFromGame();
       } else {
         target.getsDamaged(this.getTotalPower(2), this.attackType);
-        this.resetPowerModifier();
+        this.removeAttackModifiers();
       }} else {
       target.getsDamaged(this.getTotalPower(), this.attackType);
-      this.resetPowerModifier();
+      this.removeAttackModifiers();
     }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -301,7 +301,7 @@ export class Cleric extends Human {
 
     target.getsDamaged(this.getTotalPower(), this.attackType);
 
-    this.resetPowerModifier();
+    this.removeAttackModifiers();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -317,7 +317,7 @@ export class Cleric extends Human {
       target.getsHealed(healingPower * 3);
     }
 
-    this.resetPowerModifier();
+    this.removeAttackModifiers();
 
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
