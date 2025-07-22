@@ -165,7 +165,7 @@ export class Board {
 
     const friendlyUnitsOnBoard: Hero[] = [];
     this.units.forEach(unit => {
-      if (hero.belongsTo === unit.belongsTo) friendlyUnitsOnBoard.push(unit);
+      if (hero.belongsTo === unit.belongsTo && !unit.isKO) friendlyUnitsOnBoard.push(unit);
     });
 
     if (friendlyUnitsOnBoard.length <= 1) return;

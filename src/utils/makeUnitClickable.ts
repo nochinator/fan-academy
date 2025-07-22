@@ -3,7 +3,7 @@ import { Crystal } from "../classes/crystal";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EHeroes, ETiles } from "../enums/gameEnums";
+import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
@@ -49,6 +49,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
   const healReticle = isHero(unit) ? unit.getByName('healReticle') as Phaser.GameObjects.Image : undefined;
   const attackReticle = isHero(unit) ? unit.getByName('attackReticle') as Phaser.GameObjects.Image : undefined;
+  const allyReticle = isHero(unit) ? unit.getByName('allyReticle') as Phaser.GameObjects.Image : undefined;
 
   // CASE 1: No active unit
   if (!activeUnit && isFriendly) {
@@ -130,16 +131,22 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
           return;
         }
 
-        // Stomp friendly KO'd units, unless you are a Necromancer
-        if (unit.isKO && activeUnit.unitType !== EHeroes.NECROMANCER) {
-          const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
-          activeUnit.move(unitTile);
+        // Ninja can swap places with any friendly unit on the board
+        if (activeUnit.unitType === EHeroes.NINJA && allyReticle?.visible && !unit.isKO) {
+          activeUnit.teleport(unit);
           return;
         }
 
-        // Ninja can swap places with any friendly unit on the board
-        if (activeUnit.unitType === EHeroes.NINJA) {
-          activeUnit.teleport(unit);
+        // Stomp friendly KO'd units, unless you are a Necromancer
+        const tilesInRange = context.gameController!.board.getHeroTilesInRange(activeUnit, ERange.MOVE);
+        const withinStompingRange = tilesInRange.find(tile => tile.boardPosition === unit.boardPosition);
+        if (
+          unit.isKO &&
+          activeUnit.unitType !== EHeroes.NECROMANCER &&
+          withinStompingRange
+        ) {
+          const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
+          activeUnit.move(unitTile);
           return;
         }
       }
