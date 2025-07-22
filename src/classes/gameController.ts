@@ -40,6 +40,8 @@ export class GameController {
   playerData: IUserData[];
 
   constructor(context: GameScene) {
+    if (context.triggerReplay) context.chatComponent!.pointerEvents = 'none';
+
     this.context = context;
     this.game = context.currentGame!;
     this.lastTurnState =  context.currentGame.previousTurn[context.triggerReplay ? 0 : context.currentGame.previousTurn.length - 1];

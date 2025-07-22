@@ -1,3 +1,4 @@
+import { GameObjects } from "phaser";
 import { sendChatMessage } from "../../colyseus/colyseusGameRoom";
 import { IChatMessage } from "../../interfaces/gameInterface";
 import GameScene from "../game.scene";
@@ -21,7 +22,7 @@ export function renderChatMessage(chatMessage: IChatMessage): void {
   chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
 }
 
-export function createChatComponent(context: GameScene): void {
+export function createChatComponent(context: GameScene): GameObjects.DOMElement {
   const chat = context.add.dom(495, 800).createFromCache('chatComponent').setOrigin(0.5);
   const chatRoot = chat.node as HTMLElement;
   chatRoot.style.pointerEvents = 'auto';
@@ -29,8 +30,6 @@ export function createChatComponent(context: GameScene): void {
   const chatContainer = chat.getChildByID('chatcomponent') as HTMLElement;
   const chatInput = chat.getChildByID('chatinput') as HTMLInputElement;
   const chatMessages = chat.getChildByID('chatmessages') as HTMLElement;
-
-  if (!chatInput || !chatMessages) return;
 
   // Get canvas size
   const width = context.scale.width;
@@ -81,8 +80,9 @@ export function createChatComponent(context: GameScene): void {
 
   // Render the messages
   const messagesToRender = context.currentGame.chatLogs.messages;
-  if (!messagesToRender.length) return;
 
   messagesToRender.forEach((message) => renderChatMessage(message));
   chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  return chat;
 }
