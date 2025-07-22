@@ -33,7 +33,8 @@ export class HeroCard extends Phaser.GameObjects.Container {
   rangeText: Phaser.GameObjects.Text;
 
   constructor(context: GameScene, data: IHero & { currentPower: number }) {
-    super(context, 0, 0);
+    const cardY = data.boardPosition > 44 ? -200 : 0;
+    super(context, 0, cardY);
     this.context = context;
     this.attackType = data.attackType;
     this.unitType = data.unitType;

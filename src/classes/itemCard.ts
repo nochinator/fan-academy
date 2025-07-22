@@ -14,7 +14,8 @@ export class ItemCard extends Phaser.GameObjects.Container {
   cardNameText: Phaser.GameObjects.Text;
 
   constructor(context: GameScene, data: IItem) {
-    super(context, 0, 0);
+    const cardY = data.boardPosition > 44 ? -180 : 0;
+    super(context, 0, cardY);
     this.context = context;
 
     // Background, unit image, name and type, and separator
