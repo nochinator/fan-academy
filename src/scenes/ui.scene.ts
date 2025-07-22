@@ -1,12 +1,13 @@
 import { Client, Room } from "colyseus.js";
 import { HomeButton } from "../classes/homeButton";
 import { connectToGameLobby } from "../colyseus/colyseusLobbyRoom";
+import { EFaction } from "../enums/gameEnums";
 import { IGame } from "../interfaces/gameInterface";
 import { getGameList } from "../queries/gameQueries";
 import { createGameList } from "./gameSceneUtils/gameList";
-import { profilePicNames } from "./profileSceneUtils/profilePicNames";
 import { CDN_PATH } from "./preloader.scene";
-import { EFaction } from "../enums/gameEnums";
+import { profilePicNames } from "./profileSceneUtils/profilePicNames";
+import { createWarningComponent } from "./uiSceneUtils/disconnectWarning";
 
 export default class UIScene extends Phaser.Scene {
   colyseusClient: Client;
@@ -47,9 +48,13 @@ export default class UIScene extends Phaser.Scene {
     this.load.image('unknownFaction', `${CDN_PATH}/ui/unknown_faction.webp`);
     this.load.image('unknownOpponent', `${CDN_PATH}/images/profilePics/unknownAvatar-hd.webp`);
     this.load.image('closeButton', `${CDN_PATH}/ui/close_button.webp`);
+
+    this.load.html('disconnectWarning', 'html/disconnectWarning.html');
   }
 
   async create() {
+    createWarningComponent(this);
+
     this.add.image(0, 0, 'loadingScreen').setOrigin(0).setScale(2.8);
 
     // Connect to lobby and get the list of games
