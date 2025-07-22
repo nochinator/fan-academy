@@ -70,9 +70,19 @@ export class GameController {
 
     this.door = new Door(context);
 
-    // Used to block the user from clicking on some other part of the game
+    // Used to block the user from clicking on some other part of the game, instead, clicking skips replay
     this.blockingLayer = context.add.rectangle(910, 0, 1040, 1650, 0x000000, 0.001).setOrigin(0.5).setInteractive().setDepth(999).setVisible(this.context.triggerReplay);
 
+    this.blockingLayer = this.blockingLayer.on('pointerdown', () => {
+      context.scene.restart({
+        userId: context.userId,
+        colyseusClient: context.colyseusClient,
+        currentGame: context.currentGame,
+        currentRoom: context.currentRoom,
+        triggerReplay: false
+      });
+    });
+    
     this.replayButton = replayButton(context);
 
     this.currentTurn = [];
