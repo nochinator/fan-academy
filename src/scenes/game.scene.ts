@@ -74,9 +74,13 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    setInterval(() => {
-      this.currentRoom.send("ping");
-    }, 300000); // every 5 minutes
+    this.time.addEvent({
+      delay: 300000, // 5 minutes
+      callback: () => {
+        this.currentRoom.send("ping");
+      },
+      loop: true
+    });
 
     this.input.mouse!.disableContextMenu();
     this.chatComponent = createChatComponent(this);

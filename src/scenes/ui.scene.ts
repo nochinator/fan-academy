@@ -53,9 +53,13 @@ export default class UIScene extends Phaser.Scene {
   }
 
   async create() {
-    setInterval(() => {
-      this.lobbyRoom?.send("ping");
-    }, 300000); // every 5 minutes
+    this.time.addEvent({
+      delay: 300000, // 5 minutes
+      callback: () => {
+        this.lobbyRoom!.send("ping");
+      },
+      loop: true
+    });
 
     createWarningComponent(this);
 
