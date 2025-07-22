@@ -3,6 +3,11 @@ import { sendChatMessage } from "../../colyseus/colyseusGameRoom";
 import { IChatMessage } from "../../interfaces/gameInterface";
 import GameScene from "../game.scene";
 
+export const chatPlayers = {
+  player1: '',
+  player2: ''
+};
+
 export function renderChatMessage(chatMessage: IChatMessage): void {
   const chatMessagesDiv = document.getElementById('chatmessages');
   if (!chatMessagesDiv) return;
@@ -12,9 +17,9 @@ export function renderChatMessage(chatMessage: IChatMessage): void {
 
   msgElement.innerHTML = `<span class="username">${username}</span>: <span class="message">${message}</span>`;
   const usernameSpan = msgElement.querySelector('.username') as HTMLElement;
-  const messageSpan = msgElement.querySelector('.username') as HTMLElement;
+  const messageSpan = msgElement.querySelector('.message') as HTMLElement;
 
-  usernameSpan.style.color = '#f44336'; //#4fc3f7
+  usernameSpan.style.color = chatPlayers.player1 === chatMessage.username ? '#4fc3f7' : '#f44336';
   usernameSpan.style.fontWeight = 'bold';
 
   // msgElement.textContent = `${username}: ${message}`;
@@ -23,6 +28,10 @@ export function renderChatMessage(chatMessage: IChatMessage): void {
 }
 
 export function createChatComponent(context: GameScene): GameObjects.DOMElement {
+  // Set up player usernames to apply color to each message
+  chatPlayers.player1 = context.currentGame.players[0].userData.username;
+  chatPlayers.player2 = context.currentGame.players[1].userData.username;
+
   const chat = context.add.dom(495, 800).createFromCache('chatComponent').setOrigin(0.5);
   const chatRoot = chat.node as HTMLElement;
   chatRoot.style.pointerEvents = 'auto';
