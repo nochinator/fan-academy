@@ -47,7 +47,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.row = tile.row;
     this.col = tile.col;
     this.belongsTo = data.belongsTo;
-    this.debuffLevel = data.debuffLevel;
+    this.debuffLevel = data.debuffLevel < 0 ? 0 : data.debuffLevel; // safeguard for bug that keeps making debuff level negative. Remove when fixed
 
     this.healthBar = new HealthBar(context, data, -38, -70);
     this.unitCard = new CrystalCard(context, data).setVisible(false);
@@ -58,7 +58,7 @@ export class Crystal extends Phaser.GameObjects.Container {
 
     this.blockedLOS = context.add.image(0, -10, 'blockedLOS').setOrigin(0.5).setName('blockedLOS').setVisible(false);
 
-    const crystalColor = this.belongsTo === 1 ?  0x3399ff : 0x990000; // TODO: set this up to the players color
+    const crystalColor = this.belongsTo === 1 ?  0x3399ff : 0x990000;
     this.crystalImage.setTint(crystalColor);
 
     // Debuff images and animation
@@ -139,6 +139,11 @@ export class Crystal extends Phaser.GameObjects.Container {
 
   updateTileData(): void {
     const tile = this.getTile();
+
+    if (this.debuffLevel < 0) {
+      this.debuffLevel = 0;
+      this.updateDebuffAnimation(this.debuffLevel);
+    }
 
     tile.crystal = {
       belongsTo: this.belongsTo,
