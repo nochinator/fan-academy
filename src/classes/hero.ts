@@ -415,12 +415,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   getTotalPower(multiplier = 1): number {
     if (multiplier === 0) multiplier = 1;
+    const runeMetalBuff = this.runeMetal ? 1.5 : 1;
 
-    if (this.powerModifier === 0) return this.power * multiplier;
-
-    const totalPower = this.power * this.powerModifier * multiplier;
-
-    return totalPower;
+    if (this.powerModifier === 0) return this.power * multiplier * runeMetalBuff;
+    return  this.power * this.powerModifier * multiplier * runeMetalBuff;
   }
 
   getLifeLost(damage: number, attackType: EAttackType) {
@@ -707,7 +705,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   equipRunemetal(handPosition: number): void {
     this.runeMetal = true;
     this.runeMetalImage.setVisible(true);
-    this.power += this.basePower * 0.5;
 
     this.runeMetalImage.setVisible(true);
     this.characterImage.setTexture(this.updateCharacterImage());
