@@ -275,9 +275,11 @@ export class Ninja extends Human {
     this.singleTween(this.smokeAnim!, 500);
     target.singleTween(target.smokeAnim!, 500);
 
+    target.specialTileCheck(targetDestination.tileType, unitDestination.tileType);
     target.updatePosition(targetDestination);
     targetDestination.hero = target.exportData();
 
+    this.specialTileCheck(unitDestination.tileType, targetDestination.tileType);
     this.updatePosition(unitDestination);
     unitDestination.hero = this.exportData();
 

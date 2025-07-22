@@ -624,7 +624,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // Check if the unit is leaving or entering a special tile and apply any effects
     this.specialTileCheck(targetTile.tileType, startTile.tileType);
-
     this.updatePosition(targetTile);
     targetTile.hero = this.exportData();
     targetTile.setOccupied(true);
@@ -654,13 +653,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.characterImage.y = charImageY;
     // Flip image if player is player 2
     if (this.belongsTo === 2) this.characterImage.setFlipX(true);
+
+    // A Wraith can spawn on a special tile. Phantom spawning is handled within its class
+    this.specialTileCheck(tile.tileType);
     // Position hero on the board
     this.updatePosition(tile);
     // Update tile data
     this.updateTileData();
-
-    // A Wraith can spawn on a special tile. Phantom spawning is handled within its class
-    this.specialTileCheck(tile.tileType);
 
     this.healthBar.setVisible(true);
 

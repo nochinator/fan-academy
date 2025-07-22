@@ -68,12 +68,10 @@ function subscribeToListeners(room: Room): void {
     renderChatMessage(message);
   });
 
-  room.onMessage('pong', () => {
-    console.log('Received game pong from server', new Date());
-  });
+  room.onMessage('pong', () => {});
 
-  room?.onLeave((code: number, reason?: string) => {
-    console.log("Left room with code:", code, reason);
+  room?.onLeave((code: number) => {
+    console.log("Left room with code:", code);
   });
 }
 

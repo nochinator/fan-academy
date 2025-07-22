@@ -136,12 +136,10 @@ export async function connectToGameLobby(client: Client, userId: string, context
       console.log('Games removed from list');
     });
 
-    lobby.onMessage('pong', () => {
-      console.log('Received lobby pong from server', new Date());
-    });
+    lobby.onMessage('pong', () => {});
 
-    lobby.onLeave((code: number, reason?: string) => {
-      console.log("Left room with code:", code, reason);
+    lobby.onLeave((code: number) => {
+      console.log("Left room with code:", code);
       showDisconnectWarning();
     });
   } catch (error) {
