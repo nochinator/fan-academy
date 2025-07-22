@@ -134,6 +134,14 @@ export async function connectToGameLobby(client: Client, userId: string, context
       await createGameList(context);
       console.log('Games removed from list');
     });
+
+    lobby.onMessage('pong', () => {
+      console.log('Received lobby pong from server');
+    });
+
+    lobby.onLeave((code: number, reason?: string) => {
+      console.log("Left room with code:", code, reason);
+    });
   } catch (error) {
     console.error('Error joining lobby ->', error);
   }

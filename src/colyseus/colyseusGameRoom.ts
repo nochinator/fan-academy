@@ -67,6 +67,14 @@ function subscribeToListeners(room: Room): void {
 
     renderChatMessage(message);
   });
+
+  room.onMessage('pong', () => {
+    console.log('Received game pong from server');
+  });
+
+  room?.onLeave((code: number, reason?: string) => {
+    console.log("Left room with code:", code, reason);
+  });
 }
 
 export function sendTurnMessage(currentRoom: Room, currentTurn: IGameState[], newActivePlayer: string, turnNumber: number, gameOver?: IGameOver): void {
