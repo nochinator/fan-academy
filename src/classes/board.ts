@@ -343,16 +343,16 @@ export class Board {
     if (this.isAdjacent(attacker, target)) return true;
 
     if (attacker.row === target.row || attacker.col === target.col) {
-      const atrtackDirection = this.getAttackDirection(attacker.boardPosition, target.boardPosition);
+      const attackDirection = this.getAttackDirection(attacker.boardPosition, target.boardPosition);
 
       const attackDirectionOffsetMap: Record<string, number[]> = {
-        1: [-18, -9],
+        1: [-9, -18],
         3: [1, 2],
         5: [9, 18],
         7: [-1, -2]
       };
 
-      const offsets = attackDirectionOffsetMap[atrtackDirection];
+      const offsets = attackDirectionOffsetMap[attackDirection];
 
       if (!offsets) return true;
 
