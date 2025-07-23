@@ -434,6 +434,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     return totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
   }
 
+  getTotalHealing(baseHealing: number): number {
+    const runeMetalBuff = this.runeMetal ? 1.5 : 1;
+    const attackTileBuff = this.attackTile ? 100 : 0;
+
+    return (baseHealing + attackTileBuff) * runeMetalBuff;
+  }
+
   getsHealed(healing: number, addText = true): number | undefined {
     if (healing <= 0) return;
 
