@@ -183,10 +183,11 @@ export function getAOETiles(context: GameScene, targetTile: Tile): {
   };
 }
 
+// Used only by the voidmonk and wizard's splash attacks
 export function canBeAttacked(attacker: Hero, tile: Tile): boolean {
   let result = false;
 
-  if (tile.hero && tile.hero.belongsTo !== attacker.belongsTo) result = true;
+  if (tile.hero && tile.hero.belongsTo !== attacker.belongsTo && !tile.hero.isKO) result = true;
   if (tile.crystal && tile.crystal.belongsTo !== attacker.belongsTo) result = true;
 
   return result;
