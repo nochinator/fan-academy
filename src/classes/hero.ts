@@ -502,7 +502,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   };
 
   getsKnockedDown(): void {
-    this.removeAttackModifiers();
     this.removeSpecialTileOnKo();
 
     this.currentHealth = 0;
