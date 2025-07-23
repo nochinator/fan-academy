@@ -180,12 +180,6 @@ export class GameController {
     this.context.scene.restart();
   };
 
-  async handleGameOver(): Promise<void> {
-    sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, ++this.context.turnNumber!, this.context.gameOver);
-
-    console.log('GAME ENDS! THE WINNER IS', this.context.gameOver?.winner);
-  }
-
   getDeck() {
     return this.deck.getDeck();
   }
@@ -284,7 +278,11 @@ export class GameController {
     this.context.activePlayer = this.context.opponentId;
     this.context.turnNumber!++;
 
-    sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!);
+    sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.context.gameOver);
+
+    if (this.context.gameOver) console.log('GAME ENDS! THE WINNER IS', this.context.gameOver?.winner);
+
+    // TODO: victory / defeat screen
   }
 
   onHeroClicked(hero: Hero) {
@@ -353,9 +351,6 @@ export class GameController {
       },
       boardState: this.board.getBoardState()
     });
-
-    // Check if the game is over
-    if (this.context.gameOver) this.handleGameOver();
   }
 
   async pushEnemy(attacker: Hero, target: Hero): Promise<void> {

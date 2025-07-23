@@ -96,7 +96,6 @@ export async function connectToGameLobby(client: Client, userId: string, context
           colyseusClient: context.colyseusClient,
           currentGame: game,
           currentRoom: context.currentRoom
-          // TODO: add gameOver flag to trigger the image and the button swap?
         });
       }
     });
