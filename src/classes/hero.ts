@@ -822,15 +822,15 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   removeAttackModifiers() {
-    if (this.isDebuffed) {
-      this.isDebuffed = false;
-      this.debuffImage.setVisible(false);
-      this.unitCard.updateCardPower(this);
-    }
-    if (this.superCharge) {
-      this.superCharge = false;
-      this.superChargeAnim.setVisible(false);
-    }
+    this.isDebuffed = false;
+    this.debuffImage.setVisible(false);
+    this.superCharge = false;
+    this.superChargeAnim.setVisible(false);
+
+    this.unitCard.updateCardPower(this);
+
+    const tile = this.getTile();
+    tile.hero = this.exportData();
   }
 
   flashAttacker(): void {
