@@ -2,7 +2,7 @@ import { EActionType, EAttackType, EClass, EFaction, EHeroes } from "../enums/ga
 
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -175,7 +175,7 @@ export class Necromancer extends DarkElf {
       const tile = target.getTile();
 
       const phantom = new Phantom(this.context, createElvesPhantomData({
-        unitId: `${this.context.userId}_phantom_${++this.context.gameController!.phantomCounter}`,
+        unitId: `${this.context.userId}_phantom_${generateFourDigitId()}`,
         boardPosition: target.boardPosition,
         belongsTo: this.belongsTo
       }), tile, true);
