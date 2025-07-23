@@ -14,17 +14,17 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
     visibleUnitCardCheck(context);
 
-    // Set a timer for the a hold press on mobile
-    context.longPressStart = context.time.now;
-
-    if (pointer.button === 0) handleOnUnitLeftClick(unit, context);
-
     if (pointer.button === 2) {
       unit.setDepth(1001);
       unit.unitCard.setVisible(true);
       context.visibleUnitCard = unit;
       event.stopPropagation();
     }
+
+    // Set a timer for the a hold press on mobile
+    context.longPressStart = context.time.now;
+
+    if (pointer.button === 0) handleOnUnitLeftClick(unit, context);
   });
 
   unit.on('pointerup', (pointer: Phaser.Input.Pointer) => {
@@ -213,10 +213,18 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
 }
 
 export function makeCrystalClickable(crystal: Crystal, context: GameScene): void {
-  crystal.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+  crystal.on('pointerdown', (pointer: Phaser.Input.Pointer, _x: number, _Y: number, event: Types.Input.EventData) => {
     if (context.currentGame.status === EGameStatus.FINISHED) return;
 
     visibleUnitCardCheck(context);
+
+    // Handling right click
+    if (pointer.button === 2) {
+      crystal.setDepth(1001);
+      crystal.unitCard.setVisible(true);
+      context.visibleUnitCard = crystal;
+      event.stopPropagation();
+    }
 
     // Set a timer for the a hold press on mobile
     context.longPressStart = context.time.now;
@@ -236,13 +244,6 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
           return;
         }
       }
-    }
-
-    // Handling right click
-    if (pointer.button === 2) {
-      crystal.setDepth(1001);
-      crystal.unitCard.setVisible(true);
-      context.visibleUnitCard = crystal;
     }
   });
 
