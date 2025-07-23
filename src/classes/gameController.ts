@@ -383,7 +383,7 @@ export class GameController {
       console.error('pushEnemy() No destination tile found');
       return;
     }
-    if (targetNewTile?.isOccupied()) {
+    if (targetNewTile?.isOccupied() || targetNewTile.hero) {
       console.error('pushEnemy() Destination tile is occupied');
       return;
     }
@@ -416,7 +416,7 @@ export class GameController {
       console.error('pullEnemy() No destination tile found');
       return;
     }
-    if (targetNewTile?.isOccupied()) {
+    if (targetNewTile?.isOccupied() || targetNewTile.hero) {
       console.error('pullEnemy() Destination tile is occupied');
       return;
     }
