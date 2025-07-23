@@ -5,7 +5,7 @@ import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
 import { EGameStatus, EHeroes, EItems, ERange, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } from "./gameUtils";
+import { belongsToPlayer, isEnemySpawn, isHero, isInHand, isItem, visibleUnitCardCheck } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
@@ -92,7 +92,10 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
       }
 
       // Stomp enemy KO'd units
-      if (isHero(activeUnit) && unit.isKO && !isEnemySpawn(context, unitTile)) {
+      if (
+        isHero(activeUnit) &&
+        activeUnit.boardPosition < 45 &&
+        unit.isKO && !isEnemySpawn(context, unitTile)) {
         activeUnit.move(unitTile);
         return;
       }
@@ -149,16 +152,18 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
         }
 
         // Stomp friendly KO'd units, unless you are a Necromancer
-        const tilesInRange = context.gameController!.board.getHeroTilesInRange(activeUnit, ERange.MOVE);
-        const withinStompingRange = tilesInRange.find(tile => tile.boardPosition === unit.boardPosition);
-        if (
-          unit.isKO &&
+        if (activeUnit.boardPosition < 45) {
+          const tilesInRange = context.gameController!.board.getHeroTilesInRange(activeUnit, ERange.MOVE);
+          const withinStompingRange = tilesInRange.find(tile => tile.boardPosition === unit.boardPosition);
+          if (
+            unit.isKO &&
           activeUnit.unitType !== EHeroes.NECROMANCER &&
           withinStompingRange
-        ) {
-          const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
-          activeUnit.move(unitTile);
-          return;
+          ) {
+            const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
+            activeUnit.move(unitTile);
+            return;
+          }
         }
       }
 

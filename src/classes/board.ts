@@ -71,10 +71,10 @@ export class Board {
        *  -any tile with a KO'd unit if the unit spawning is a Wraith
        */
       if (tile.tileType === ETiles.SPAWN && !enemySpawn){
-        if (!tile.isOccupied()) spawns.add(tile);
-        if (tile.hero && tile.hero.unitType === EHeroes.PHANTOM) spawns.add(tile);
+        if (!tile.isOccupied() || tile.hero?.isKO) spawns.add(tile);
+        if (tile.hero?.unitType === EHeroes.PHANTOM) spawns.add(tile);
       }
-      if (tile.hero && tile.hero.isKO && unitType === EHeroes.WRAITH) spawns.add(tile);
+      if (tile.hero?.isKO && unitType === EHeroes.WRAITH) spawns.add(tile);
     });
 
     this.highlightTiles([...spawns]);
