@@ -3,13 +3,15 @@ import { Crystal } from "../classes/crystal";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EHeroes, EItems, ERange, ETiles } from "../enums/gameEnums";
+import { EGameStatus, EHeroes, EItems, ERange, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   unit.on('pointerdown', (pointer: Phaser.Input.Pointer, _x: number, _y: number, event: Types.Input.EventData) => {
+    if (context.currentGame.status === EGameStatus.FINISHED) return;
+
     visibleUnitCardCheck(context);
 
     // Set a timer for the a hold press on mobile
@@ -26,6 +28,8 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   });
 
   unit.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+    if (context.currentGame.status === EGameStatus.FINISHED) return;
+
     if (pointer.button === 2) return;
 
     if (context.longPressStart && context.time.now - context.longPressStart > 500) {
@@ -180,6 +184,8 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
 export function makeTileClickable(tile: Tile, context: GameScene): void {
   tile.on('pointerdown', () => {
+    if (context.currentGame.status === EGameStatus.FINISHED) return;
+
     visibleUnitCardCheck(context);
     context.longPressStart = undefined;
 
@@ -203,6 +209,8 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
 
 export function makeCrystalClickable(crystal: Crystal, context: GameScene): void {
   crystal.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+    if (context.currentGame.status === EGameStatus.FINISHED) return;
+
     visibleUnitCardCheck(context);
 
     // Set a timer for the a hold press on mobile
@@ -234,6 +242,8 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
   });
 
   crystal.on('pointerup', () => {
+    if (context.currentGame.status === EGameStatus.FINISHED) return;
+
     if (context.longPressStart && context.time.now - context.longPressStart > 500) {
       crystal.setDepth(1001);
       crystal.unitCard.setVisible(true);
