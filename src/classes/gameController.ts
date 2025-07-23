@@ -34,9 +34,6 @@ export class GameController {
   currentTurn: IGameState[];
   blockingLayer: Phaser.GameObjects.Rectangle;
   replayButton: Phaser.GameObjects.Image;
-
-  phantomCounter: number = 0; // Used for the phantom ID. Shared by both players
-
   playerData: IUserData[];
 
   constructor(context: GameScene) {
@@ -70,10 +67,10 @@ export class GameController {
 
     this.door = new Door(context);
 
-    // Used to block the user from clicking on some other part of the game, instead, clicking skips replay
+    // Used to block the user from clicking on some other part of the game during a replay. Clicking skips replay
     this.blockingLayer = context.add.rectangle(910, 0, 1040, 1650, 0x000000, 0.001).setOrigin(0.5).setInteractive().setDepth(999).setVisible(this.context.triggerReplay);
 
-    this.blockingLayer = this.blockingLayer.on('pointerdown', () => {
+    this.blockingLayer.on('pointerdown', () => {
       context.scene.restart({
         userId: context.userId,
         colyseusClient: context.colyseusClient,
@@ -82,7 +79,7 @@ export class GameController {
         triggerReplay: false
       });
     });
-    
+
     this.replayButton = replayButton(context);
 
     this.currentTurn = [];
@@ -190,12 +187,6 @@ export class GameController {
     this.context.scene.restart();
   };
 
-  async handleGameOver(): Promise<void> {
-    sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, ++this.context.turnNumber!, this.context.gameOver);
-
-    console.log('GAME ENDS! THE WINNER IS', this.context.gameOver?.winner);
-  }
-
   getDeck() {
     return this.deck.getDeck();
   }
@@ -294,7 +285,11 @@ export class GameController {
     this.context.activePlayer = this.context.opponentId;
     this.context.turnNumber!++;
 
-    sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!);
+    sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.context.gameOver);
+
+    if (this.context.gameOver) console.log('GAME ENDS! THE WINNER IS', this.context.gameOver?.winner);
+
+    // TODO: victory / defeat screen
   }
 
   onHeroClicked(hero: Hero) {
@@ -363,9 +358,6 @@ export class GameController {
       },
       boardState: this.board.getBoardState()
     });
-
-    // Check if the game is over
-    if (this.context.gameOver) this.handleGameOver();
   }
 
   async pushEnemy(attacker: Hero, target: Hero): Promise<void> {

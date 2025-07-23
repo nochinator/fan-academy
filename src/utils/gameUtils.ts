@@ -225,6 +225,8 @@ export function updateUnitsLeft(context: GameScene, hero: Hero): void {
 
   const remainingDeckUnits = defendingPlayer.factionData.unitsInDeck.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
 
+  if (remainingBoardUnits || remainingHandUnits || remainingDeckUnits) console.log('Still some more'); // FIXME:
+
   if (remainingBoardUnits || remainingHandUnits || remainingDeckUnits) return;
 
   context.gameOver = {
@@ -370,4 +372,8 @@ export function visibleUnitCardCheck(context: GameScene): void {
     context.visibleUnitCard.setDepth(context.visibleUnitCard.boardPosition + 10);
     context.visibleUnitCard.unitCard.setVisible(false);
   }
+}
+
+export function generateFourDigitId(): number {
+  return Math.floor(1000 + Math.random() * 9000);
 }
