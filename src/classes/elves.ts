@@ -22,6 +22,8 @@ export abstract class DarkElf extends Hero {
     this.unitCard.updateCardHealth(this);
     this.updateTileData();
 
+    this.context.sound.play('useHelm');
+
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
@@ -38,6 +40,7 @@ export abstract class DarkElf extends Hero {
 
 export class Impaler extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
+    data.heroKoSound = 'impalerDeath';
     super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
@@ -70,6 +73,14 @@ export class Impaler extends DarkElf {
       this.removeAttackModifiers();
     }
 
+    if (this.superCharge) {
+      this.context.sound.play('impalerAttackBig');
+    } else if (distance === 1) {
+      this.context.sound.play('impalerAttackMelee');
+    } else {
+      this.context.sound.play('impalerAttack');
+    }
+
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, startingPosition);
   }
 
@@ -79,6 +90,7 @@ export class Impaler extends DarkElf {
 
 export class VoidMonk extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
+    data.heroKoSound = 'voidMonkDeath';
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
@@ -143,6 +155,12 @@ export class VoidMonk extends DarkElf {
       this.removeAttackModifiers();
     }
 
+    if (this.superCharge) {
+      this.context.sound.play('voidMonkAttackBig');
+    } else {
+      this.context.sound.play('voidMonkAttack'); // TODO: multiple hit sounds with super attack
+    }
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -163,6 +181,7 @@ export class VoidMonk extends DarkElf {
 
 export class Necromancer extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
+    data.heroKoSound = 'priestessDeath'; // Yes it's reused
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
@@ -186,6 +205,8 @@ export class Necromancer extends DarkElf {
 
       this.removeAttackModifiers();
 
+      this.context.sound.play('phantomSpawn');
+
       gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
       gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
     } else {
@@ -193,6 +214,12 @@ export class Necromancer extends DarkElf {
       if (damageDone) this.lifeSteal(damageDone);
 
       this.removeAttackModifiers();
+
+      if (this.superCharge) {
+        this.context.sound.play('necroAttackBig');
+      } else {
+        this.context.sound.play('necroAttack');
+      }
 
       gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     }
@@ -204,6 +231,7 @@ export class Necromancer extends DarkElf {
 
 export class Priestess extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
+    data.heroKoSound = 'priestessDeath';
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
@@ -234,6 +262,11 @@ export class Priestess extends DarkElf {
 
       this.removeAttackModifiers();
     }
+    if (this.superCharge) {
+      this.context.sound.play('priestessAttackBig');
+    } else {
+      this.context.sound.play('priestessAttack');
+    }
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -249,6 +282,8 @@ export class Priestess extends DarkElf {
       target.getsHealed(healingAmount);
     }
 
+    this.context.sound.play('heal');
+
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
 
@@ -257,6 +292,7 @@ export class Priestess extends DarkElf {
 
 export class Wraith extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
+    data.heroKoSound = 'wraithDeath';
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
@@ -273,11 +309,17 @@ export class Wraith extends DarkElf {
         this.unitsConsumed++;
         this.updateTileData();
       }
+      this.context.sound.play('wraithConsume');
     } else {
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
       if (damageDone) this.lifeSteal(damageDone);
 
       this.removeAttackModifiers();
+    }
+    if (this.superCharge) {
+      this.context.sound.play('wraithAttackBig');
+    } else {
+      this.context.sound.play('wraithAttack');
     }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -291,6 +333,7 @@ export class Phantom extends Hero {
   spawnAnim?: Phaser.GameObjects.Image;
 
   constructor(context: GameScene, data: IHero, tile?: Tile, spawned = false) {
+    data.heroKoSound = 'phantomDeath';
     super(context, data, tile);
 
     if (spawned && tile) {
@@ -319,6 +362,7 @@ export class Phantom extends Hero {
 
       this.removeAttackModifiers();
     }
+    this.context.sound.play('phantomAttack');
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -335,6 +379,7 @@ export class SoulStone extends Item {
 
   use(target: Hero): void {
     target.equipFactionBuff(this.boardPosition);
+    this.context.sound.play('useHelm');
     this.removeFromGame();
   }
 }
@@ -349,6 +394,7 @@ export class ManaVial extends Item {
     target.healAndIncreaseHealth(1000, 50);
 
     this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
+    this.context.sound.play('usePotion');
     this.removeFromGame();
   }
 }
@@ -422,6 +468,7 @@ function createElvesPhantomData(data: Partial<IHero>): IHero {
     magicalDamageResistance: 0,
     baseMagicalDamageResistance: 0,
     canHeal: false,
+    heroKoSound: 'phanotomDeath',
     ...createGenericElvesData(data)
   };
 }

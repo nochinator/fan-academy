@@ -57,6 +57,10 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
   // CASE 1: No active unit
   if (!activeUnit && isFriendly) {
+
+    context.sound.play('selectHeroFromBoard');
+    context.thinkingMusic.play();
+
     if (isHero(unit) && unit.isKO) return; // Can't select KO'd units
 
     selectUnit(context, unit);
@@ -65,6 +69,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
   // CASE 2: Clicking the active unit deselects it, unless it's a healer
   if (isSameUnit) {
+    context.thinkingMusic.stop();
     if (isHero(activeUnit) && activeUnit.canHeal && healReticle?.visible && isHero(unit)) {
       activeUnit.heal(unit);
       return;
@@ -76,6 +81,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
   // CASE 3: There is already an active unit
   if (activeUnit && !isSameUnit) {
+
     // Unique case: Wraith can spawn on a KO'd unit
     if (isHero(unit) && unit.isKO && isHero(activeUnit) && activeUnit.unitType === EHeroes.WRAITH && activeUnit.boardPosition >= 45) {
       activeUnit.spawn(unit.getTile());
@@ -97,6 +103,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
         activeUnit.boardPosition < 45 &&
         unit.isKO && !isEnemySpawn(context, unitTile)) {
         activeUnit.move(unitTile);
+        context.sound.play('moveHero'); // so doesn't play in replay
         return;
       }
 
@@ -202,8 +209,14 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     if (!activeUnit || !gameController) return;
 
     // If unit is on the board and the tile clicked on is in range, move the unit
-    if (activeUnit.boardPosition < 45 && tile.isHighlighted && isHero(activeUnit)) activeUnit.move(tile);
+    if (activeUnit.boardPosition < 45 && tile.isHighlighted && isHero(activeUnit)) 
+    {
+      activeUnit.move(tile);
 
+       // This doesn't play in replay, footstep sound is in move()
+      context.sound.play('moveHero');
+      context.thinkingMusic.stop();
+    }
     // If unit is in hand and clicked tile is highlighted, spawn. Otherwise, use item
     if (activeUnit.boardPosition > 44 && tile.isHighlighted) {
       if (isHero(activeUnit) && !tile.isOccupied()) activeUnit.spawn(tile);
