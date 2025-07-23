@@ -3,11 +3,11 @@ import { Crystal } from "../classes/crystal";
 import { GameController } from "../classes/gameController";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
-import { Coordinates, IGame, IGameOver, IPlayerData, IPlayerState } from "../interfaces/gameInterface";
+import { Coordinates, IGame, IPlayerData, IPlayerState } from "../interfaces/gameInterface";
 import { calculateAllCenterPoints } from "../utils/boardCalculations";
+import { createChatComponent } from "./gameSceneUtils/chatComponent";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameAssets } from "./mainMenuUtils/gameAssets";
-import { createChatComponent } from "./gameSceneUtils/chatComponent";
 
 export default class GameScene extends Phaser.Scene {
   userId!: string;
@@ -29,8 +29,6 @@ export default class GameScene extends Phaser.Scene {
 
   player1: IPlayerState | undefined;
   player2: IPlayerState | undefined;
-
-  gameOver: IGameOver | undefined;
 
   longPressStart: number | undefined;
   visibleUnitCard: Hero | Item | Crystal | undefined;

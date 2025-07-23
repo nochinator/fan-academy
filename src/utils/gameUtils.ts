@@ -229,7 +229,7 @@ export function updateUnitsLeft(context: GameScene, hero: Hero): void {
 
   if (remainingBoardUnits || remainingHandUnits || remainingDeckUnits) return;
 
-  context.gameOver = {
+  context.gameController!.gameOver = {
     winCondition: EWinConditions.UNITS,
     winner: attackingPlayer.playerId
   };

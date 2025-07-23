@@ -1,6 +1,6 @@
 import { sendTurnMessage } from "../colyseus/colyseusGameRoom";
 import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles } from "../enums/gameEnums";
-import { IGame, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
+import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
 import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } from "../utils/gameUtils";
@@ -35,6 +35,8 @@ export class GameController {
   blockingLayer: Phaser.GameObjects.Rectangle;
   replayButton: Phaser.GameObjects.Image;
   playerData: IUserData[];
+
+  gameOver: IGameOver | undefined;
 
   constructor(context: GameScene) {
     if (context.triggerReplay) context.chatComponent!.pointerEvents = 'none';
@@ -135,7 +137,8 @@ export class GameController {
       colyseusClient: this.context.colyseusClient,
       currentGame: this.context.currentGame,
       currentRoom: this.context.currentRoom,
-      triggerReplay: false
+      triggerReplay: false,
+      gameOver: undefined
     } );
   }
 
@@ -285,9 +288,9 @@ export class GameController {
     this.context.activePlayer = this.context.opponentId;
     this.context.turnNumber!++;
 
-    sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.context.gameOver);
+    sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.gameOver);
 
-    if (this.context.gameOver) console.log('GAME ENDS! THE WINNER IS', this.context.gameOver?.winner);
+    if (this.gameOver) console.log('GAME ENDS! THE WINNER IS', this.gameOver?.winner);
 
     // TODO: victory / defeat screen
   }

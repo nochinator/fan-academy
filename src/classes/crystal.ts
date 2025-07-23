@@ -197,7 +197,7 @@ export class Crystal extends Phaser.GameObjects.Container {
 
     // Update the remaining crystal or set gameOver
     if (this.isLastCrystal) {
-      this.context.gameOver = {
+      this.context.gameController!.gameOver = {
         winCondition: EWinConditions.CRYSTAL,
         winner: this.context.activePlayer!
       };
