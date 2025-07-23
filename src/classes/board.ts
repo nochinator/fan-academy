@@ -184,6 +184,7 @@ export class Board {
       if (hero.isAlreadyEquipped(item)) return;
       if (item.canHeal && hero.isFullHP()) return;
       if (item.canHeal && item instanceof ManaVial && hero.isKO) return;
+      if (!item.canHeal && hero.isKO) return;
 
       tilesToHighlight.push(hero.getTile());
     });

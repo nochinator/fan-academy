@@ -3,7 +3,7 @@ import { Crystal } from "../classes/crystal";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
+import { EHeroes, EItems, ERange, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
@@ -155,7 +155,8 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
         if (unit.isAlreadyEquipped(activeUnit) || unit.unitType === EHeroes.PHANTOM) return;
 
         if (activeUnit.dealsDamage) activeUnit.use(unit.getTile());
-        if (!activeUnit.dealsDamage) activeUnit.use(unit);
+
+        if (!activeUnit.dealsDamage && (!unit.isKO || activeUnit.itemType === EItems.HEALING_POTION)) activeUnit.use(unit);
 
         return;
       }
