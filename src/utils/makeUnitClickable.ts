@@ -88,12 +88,19 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
       }
 
       // Stomp enemy KO'd units
-      if (isHero(activeUnit) && unit.isKO) {
+      if (isHero(activeUnit) && unit.isKO && !isEnemySpawn(context, unitTile)) {
         activeUnit.move(unitTile);
+        return;
       }
 
-      // Stomp a KO unit on a friendly spawn tile with a unit from hand
-      if (isHero(activeUnit) && activeUnit.boardPosition >= 45 && unit.isKO && !isEnemySpawn(context, unitTile)) {
+      // Stomp a KO unit or Phantom on a friendly spawn tile with a unit from hand
+      if (
+        isHero(activeUnit) &&
+        activeUnit.boardPosition >= 45 &&
+        (unit.isKO || unit.unitType === EHeroes.PHANTOM) &&
+        !isEnemySpawn(context, unitTile) &&
+        unitTile.isHighlighted // REVIEW:
+      ) {
         activeUnit.spawn(unit.getTile());
         return;
       }
