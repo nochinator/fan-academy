@@ -171,7 +171,8 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
     // Show damage numbers
-    if (damageTaken > 0) new FloatingText(this.context, this.x, this.y - 50, damageTaken.toString());
+    if (damageTaken > 0) new FloatingText(this.context, this.x, this.y - 50, damageTaken.toString());        
+
 
     this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
     this.updateTileData();
@@ -180,7 +181,13 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.belongsTo === 1) this.context.gameController?.gameUI.banner.playerOneHpBar.setHealth();
     if (this.belongsTo === 2) this.context.gameController?.gameUI.banner.playerTwoHpBar.setHealth();
 
-    if (this.currentHealth <= 0) this.removeFromGame();
+    if (this.currentHealth <= 0) {
+      this.removeFromGame();
+      this.context.sound.play('destroyCrystal');
+    } else {
+      const damageSounds = ['damageCrystal1', 'damageCrystal2']
+      this.context.sound.play(Phaser.Math.RND.pick(damageSounds));
+    }
   }
 
   removeFromGame(): void {

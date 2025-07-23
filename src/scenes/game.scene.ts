@@ -37,6 +37,8 @@ export default class GameScene extends Phaser.Scene {
 
   chatComponent: Phaser.GameObjects.DOMElement | undefined;
 
+  thinkingMusic!: Phaser.Sound.BaseSound;
+
   constructor() {
     super({ key: 'GameScene' });
     this.centerPoints = calculateAllCenterPoints();
@@ -79,6 +81,8 @@ export default class GameScene extends Phaser.Scene {
       },
       loop: true
     });
+
+    this.thinkingMusic = this.sound.add('thinkingMusic', { loop: true, volume: 0.5 });
 
     this.input.mouse!.disableContextMenu();
     this.chatComponent = createChatComponent(this);

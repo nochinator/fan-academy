@@ -144,6 +144,7 @@ export class ShiningHelm extends Item {
 
   use(target: Hero): void {
     target.equipShiningHelm(this.boardPosition);
+    this.context.sound.play('useHelm');
     this.removeFromGame();
   }
 }
@@ -155,6 +156,7 @@ export class RuneMetal extends Item {
 
   use(target: Hero): void {
     target.equipRunemetal(this.boardPosition);
+    this.context.sound.play('useShield');
     this.removeFromGame();
   }
 }

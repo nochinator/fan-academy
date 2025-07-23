@@ -29,12 +29,15 @@ export abstract class Human extends Hero {
     this.unitCard.updateCardPhysicalResistance(this);
     this.updateTileData();
 
+    this.context.sound.play('useShield');
+
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 }
 
 export class Archer extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
+    data.heroKoSound = 'archerDeath';
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
@@ -56,9 +59,15 @@ export class Archer extends Human {
         target.getsDamaged(this.getTotalPower(0.5), this.attackType);
         this.removeAttackModifiers();
       }
+      this.context.sound.play('archerAttackMelee');
     } else {
       target.getsDamaged(this.getTotalPower(), this.attackType);
       this.removeAttackModifiers();
+      if (this.superCharge) {
+        this.context.sound.play('archerAttackBig');
+      } else {
+        this.context.sound.play('archerAttack');
+      }
     }
 
     this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -70,6 +79,7 @@ export class Archer extends Human {
 
 export class Knight extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
+    data.heroKoSound = 'knightDeath';
     super(context, data, tile);
   }
 
@@ -81,8 +91,11 @@ export class Knight extends Human {
     // Keep original position for replay purposes
     const startingPosition = target.boardPosition;
 
+    const distance = this.getDistanceToTarget(target);
+
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
+      distance === 1 &&
       target instanceof Hero &&
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
@@ -92,6 +105,12 @@ export class Knight extends Human {
       target.getsDamaged(this.getTotalPower(), this.attackType);
 
       if (target instanceof Hero) await gameController.pushEnemy(this, target);
+      
+      if (this.superCharge) {
+        this.context.sound.play('knightAttackBig');
+      } else {
+        this.context.sound.play('knightAttack');
+      }
 
       this.removeAttackModifiers();
     }
@@ -105,6 +124,7 @@ export class Knight extends Human {
 
 export class Wizard extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
+    data.heroKoSound = 'wizardDeath';
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
@@ -136,6 +156,12 @@ export class Wizard extends Human {
       target.getsDamaged(this.getTotalPower(), this.attackType);
       if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
       if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
+
+      if (this.superCharge) {
+        this.context.sound.play('wizardAttackBig');
+      } else {
+        this.context.sound.play('wizardAttack');
+      }
 
       this.removeAttackModifiers();
     }
@@ -241,6 +267,7 @@ export class Wizard extends Human {
 
 export class Ninja extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
+    data.heroKoSound = 'ninjaDeath';
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
@@ -261,10 +288,22 @@ export class Ninja extends Human {
       } else {
         target.getsDamaged(this.getTotalPower(2), this.attackType);
         this.removeAttackModifiers();
+        if (this.superCharge) {
+          this.context.sound.play('ninjaAttackBig');
+        } else {
+          this.context.sound.play('ninjaAttack');
+        }
       }} else {
       target.getsDamaged(this.getTotalPower(), this.attackType);
       this.removeAttackModifiers();
+      if (this.superCharge) {
+        this.context.sound.play('ninjaAttackBig');
+      } else {
+        this.context.sound.play('ninjaAttackRanged');
+      }
     }
+
+
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -288,6 +327,8 @@ export class Ninja extends Human {
     unitDestination.hero = this.exportData();
 
     gameController?.afterAction(EActionType.TELEPORT, targetDestination.boardPosition, unitDestination.boardPosition);
+
+    this.context.sound.play('ninja');
   };
 
   heal(_target: Hero): void {};
@@ -295,6 +336,7 @@ export class Ninja extends Human {
 
 export class Cleric extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
+    data.heroKoSound = 'clericDeath';
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
@@ -303,7 +345,20 @@ export class Cleric extends Human {
 
     turnIfBehind(this.context, this, target);
 
-    target.getsDamaged(this.getTotalPower(), this.attackType);
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile())
+    ) {
+      target.removeFromGame();
+    } else {
+      target.getsDamaged(this.getTotalPower(), this.attackType);
+    }
+    if (this.superCharge) {
+      this.context.sound.play('clericAttackBig');
+    } else {
+      this.context.sound.play('clericAttack');
+    }
 
     this.removeAttackModifiers();
 
@@ -321,6 +376,13 @@ export class Cleric extends Human {
       target.getsHealed(healingAmount);
     }
 
+    this.context.sound.play('heal');
+    this.context.time.addEvent({
+      delay: 1000,
+      callback: () => {this.context.sound.play('healExtra')},
+      callbackScope: this
+    });
+
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
 
@@ -334,6 +396,7 @@ export class DragonScale extends Item {
 
   use(target: Hero): void {
     target.equipFactionBuff(this.boardPosition);
+    this.context.sound.play('useShield');
     this.removeFromGame();
   }
 }
@@ -351,6 +414,8 @@ export class HealingPotion extends Item {
     target.getsHealed(healingAmount);
 
     this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
+
+    this.context.sound.play('potion');
 
     this.removeFromGame();
   }
@@ -390,6 +455,8 @@ export class Inferno extends Item {
     });
 
     this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
+
+    this.context.sound.play('useInferno');
 
     this.removeFromGame();
   }

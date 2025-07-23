@@ -63,6 +63,7 @@ export interface IHero {
   maxHealth: number;
   currentHealth: number;
   isKO: boolean;
+  heroKoSound: string;
   lastBreath: boolean;
   movement: number;
   attackRange: number;

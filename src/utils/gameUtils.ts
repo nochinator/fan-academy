@@ -104,7 +104,7 @@ export async function moveAnimation(context: GameScene, hero: Hero, targetTile: 
         targets: hero,
         x: targetTile.x,
         y: targetTile.y,
-        duration: 300,
+        duration: 400,
         ease: 'Linear',
         onComplete: () => {
           context.input.enabled = true;
