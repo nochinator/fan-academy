@@ -226,8 +226,6 @@ export function updateUnitsLeft(context: GameScene, hero: Hero): void {
 
   const remainingDeckUnits = defendingPlayer.factionData.unitsInDeck.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
 
-  if (remainingBoardUnits || remainingHandUnits || remainingDeckUnits) console.log('Still some more'); // FIXME:
-
   if (remainingBoardUnits || remainingHandUnits || remainingDeckUnits) return;
 
   context.gameController!.gameOver = {

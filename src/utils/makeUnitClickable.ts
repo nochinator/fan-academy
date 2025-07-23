@@ -5,7 +5,7 @@ import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
 import { EGameStatus, EHeroes, EItems, ERange, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, isEnemySpawn, isHero, isInHand, isItem, visibleUnitCardCheck } from "./gameUtils";
+import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
@@ -106,7 +106,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
         activeUnit.boardPosition >= 45 &&
         (unit.isKO || unit.unitType === EHeroes.PHANTOM) &&
         !isEnemySpawn(context, unitTile) &&
-        unitTile.isHighlighted // REVIEW:
+        unitTile.isHighlighted
       ) {
         activeUnit.spawn(unit.getTile());
         return;

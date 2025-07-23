@@ -23,7 +23,7 @@ export abstract class Item extends Phaser.GameObjects.Container {
 
   constructor(context: GameScene, data: IItem) {
     const { x, y } = context.centerPoints[data.boardPosition];
-    super(context, x, y - 20); // REVIEW: -20 ?
+    super(context, x, y - 20);
     this.context = context;
 
     this.unitCard = new ItemCard(context, data).setVisible(false);
