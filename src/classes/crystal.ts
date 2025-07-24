@@ -163,8 +163,8 @@ export class Crystal extends Phaser.GameObjects.Container {
     const damageTaken = totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
     this.currentHealth -= damageTaken;
 
-    if (this.currentHealth <= this.maxHealth / 2) {
-      this.crystalImage.setTexture('crystalDamaged'); // FIXME: below 50%, this changes the texture every time the crystal is damaged
+    if (this.currentHealth <= this.maxHealth / 2 && this.currentHealth + totalDamage >= this.maxHealth / 2) {
+      this.crystalImage.setTexture('crystalDamaged');
     }
 
     // Update hp bar
