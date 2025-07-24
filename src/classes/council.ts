@@ -435,7 +435,7 @@ export class Inferno extends Item {
 
     this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
 
-    effectSequence(this.scene, 1000, ECouncilSounds.USE_FIREBOMB);
+    await effectSequence(this.scene, 800, ECouncilSounds.USE_FIREBOMB);
 
     enemyHeroTiles?.forEach(tile => {
       const hero = this.context.gameController?.board.units.find(unit => unit.boardPosition === tile.boardPosition);
