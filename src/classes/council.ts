@@ -394,7 +394,3 @@ export class Inferno extends Item {
     this.removeFromGame();
   }
 }
-
-function playUseAnimation(dragonScaleImg: Phaser.GameObjects.Image) {
-  throw new Error("Function not implemented.");
-}
