@@ -161,6 +161,13 @@ export function loadGameAssets(context: GameScene) {
 
   // general/universal game audio
   //context.load.audio('backgroundMusic', `${CDN_PATH}/audio/.mp3`);
+  context.load.audio('battleButton', `${CDN_PATH}/audio/UI_Front_End_Begin_Battle.mp3`);
+  context.load.audio('buttonPressGeneric', `${CDN_PATH}/audio/UI_Front_End_Select.mp3`);
+  context.load.audio('sendMove', `${CDN_PATH}/audio/Game_Submit_Round.mp3`);
+  context.load.audio('chatMessage', `${CDN_PATH}/audio/UI_Front_End_Tutorial_SlideThrough.mp3`);
+  context.load.audio('buttonFailed', `${CDN_PATH}/audio/Unit_Damage.mp3`);
+  context.load.audio('deleteGame', `${CDN_PATH}/audio/Game_Delete.mp3`);
+  context.load.audio('resign', `${CDN_PATH}/audio/Game_Resign.mp3`);
   context.load.audio('thinkingMusic', `${CDN_PATH}/audio/Game_Ponder_LP.mp3`);
   context.load.audio('selectHeroFromHand', `${CDN_PATH}/audio/Game_Pickup_CharacterTile_Generic.mp3`);
   context.load.audio('spawnHero', `${CDN_PATH}/audio/Game_Place_CharacterTile.mp3`);
@@ -170,11 +177,11 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('moveWalk', `${CDN_PATH}/audio/Character_Movement_Steps.mp3`);
   context.load.audio('stomp', `${CDN_PATH}/audio/KO_Player_Stomp.mp3`);
   context.load.audio('vanish', `${CDN_PATH}/audio/KO_Player_Vanish.mp3`);
-  context.load.audio('selectScroll', `${CDN_PATH}/audio/Game_Touch_Scroll.mp3`);
+  context.load.audio('selectsuperCharge', `${CDN_PATH}/audio/Game_Touch_Scroll.mp3`);
   context.load.audio('useScroll', `${CDN_PATH}/audio/Game_Use_Scroll.mp3`);
-  context.load.audio('selectSword', `${CDN_PATH}/audio/Touch_Sword.mp3`);
+  context.load.audio('selectruneMetal', `${CDN_PATH}/audio/Touch_Sword.mp3`);
   context.load.audio('useSword', `${CDN_PATH}/audio/Game_Equip_Sword.mp3`);
-  context.load.audio('selectShield', `${CDN_PATH}/audio/Touch_Shield.mp3`);
+  context.load.audio('selectdragonScale', `${CDN_PATH}/audio/Touch_Shield.mp3`);
   context.load.audio('useShield', `${CDN_PATH}/audio/Deploy_Shield.mp3`);
   context.load.audio('selectItemGeneric', `${CDN_PATH}/audio/Touch_Ring.mp3`);
   context.load.audio('useItemGeneric', `${CDN_PATH}/audio/Deploy_Ring.mp3`);
@@ -187,7 +194,8 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('landHelm', `${CDN_PATH}/audio/Tile_Resist_Magic.mp3`);
   context.load.audio('landCrystal', `${CDN_PATH}/audio/Game_Land_X.mp3`);
   context.load.audio('ko', `${CDN_PATH}/audio/KO_Slow_Mo_Punch.mp3`);
-  context.load.audio('door', `${CDN_PATH}/audio/UI_Door_KickOpenClose.mp3`);
+  context.load.audio('newItems', `${CDN_PATH}/audio/UI_Door_KickOpenClose.mp3`);
+  context.load.audio('returnItem', `${CDN_PATH}/audio/UI_Game_Chest_Tap.mp3`);
   context.load.audio('damageCrystal1', `${CDN_PATH}/audio/Game_Crystal_Damage_1.mp3`);
   context.load.audio('damageCrystal2', `${CDN_PATH}/audio/Game_Crystal_Damage_2.mp3`);
   context.load.audio('destroyCrystal', `${CDN_PATH}/audio/Game_Crystal_Destroy.mp3`);
@@ -199,7 +207,8 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('healExtra', `${CDN_PATH}/audio/Game_Heal.mp3`); // used on top of base heal sound sometimes
 
   // music
-  context.load.audio('title', `${CDN_PATH}/audio/Mx_Title_Theme_v4.mp3`);
+  context.load.audio('titleMusic', `${CDN_PATH}/audio/Mx_Title_Theme_v4.mp3`);
+  context.load.audio('backgroundMusic', `${CDN_PATH}/audio/Background_Music.mp3`);
 
   // council
   context.load.audio('archerAttack', `${CDN_PATH}/audio/Civ_Archer_Attack_Arrow.mp3`);

@@ -176,9 +176,10 @@ export class GameController {
 
     if (!hero || !target) throw new Error('Missing hero or target in attack or heal action');
 
-    if (action.action === EActionType.ATTACK) hero.attack(target);
-    if (action.action === EActionType.HEAL) hero.heal(target as Hero);
-    if (action.action === EActionType.TELEPORT) hero.teleport(target as Hero);
+    // VSCode says await has no effect on them, but it does work
+    if (action.action === EActionType.ATTACK) await hero.attack(target);
+    if (action.action === EActionType.HEAL) await hero.heal(target as Hero);
+    if (action.action === EActionType.TELEPORT) await hero.teleport(target as Hero);
   };
 
   async replayUse(action: ITurnAction, opponentHand: (Hero | Item)[]): Promise<void> {
@@ -215,6 +216,7 @@ export class GameController {
   }
 
   drawUnits() {
+    effectSequence(this.context, 0, EGameSounds.NEW_ITEMS);
     this.door.openDoor();
 
     const drawAmount = 6 - this.hand.getHandSize();
@@ -308,6 +310,7 @@ export class GameController {
     this.context.activePlayer = this.context.opponentId;
     this.context.turnNumber!++;
 
+    effectSequence(this.context, 0, EGameSounds.BATTLE_BUTTON); // TODO: add fail sound in send turn failed
     sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.gameOver);
 
     if (this.gameOver) console.log('GAME ENDS! THE WINNER IS', this.gameOver?.winner);

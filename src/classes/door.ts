@@ -1,6 +1,6 @@
-import { EActionType } from "../enums/gameEnums";
+import { EActionType, EGameSounds } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { isInHand } from "../utils/gameUtils";
+import { isInHand, effectSequence } from "../utils/gameUtils";
 import { getCurrentPlayer } from "../utils/playerUtils";
 
 export class Door extends Phaser.GameObjects.Container {
@@ -35,6 +35,8 @@ export class Door extends Phaser.GameObjects.Container {
       if (pointer.button === 0 && context.activeUnit && isInHand(context.activeUnit.boardPosition)) {
         const activePosition = context.activeUnit.boardPosition;
         context.activeUnit.shuffleInDeck();
+       effectSequence(this.scene, 0, EGameSounds.RETURN_ITEM);
+      
 
         this.updateBannerText();
 
@@ -72,7 +74,7 @@ export class Door extends Phaser.GameObjects.Container {
     this.doorOpen.setVisible(true);
     this.doorClosed.setVisible(false);
 
-    this.scene.time.delayedCall(1000, () => {
+    this.scene.time.delayedCall(1500, () => {
       this.doorOpen.setVisible(false);
       this.doorClosed.setVisible(true);
     });

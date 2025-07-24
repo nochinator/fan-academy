@@ -157,7 +157,6 @@ export class ShiningHelm extends Item {
 export class RuneMetal extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
-    this.selectSound = EGameSounds.SELECT_SWORD 
   }
 
   use(target: Hero): void {
@@ -170,7 +169,6 @@ export class RuneMetal extends Item {
 export class SuperCharge extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
-    this.selectSound = EGameSounds.SELECT_SCROLL
   }
 
   use(target: Hero): void {

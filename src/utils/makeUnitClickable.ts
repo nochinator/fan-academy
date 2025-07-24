@@ -62,7 +62,14 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
       if (isHero(unit)) {
         effectSequence(context, 0, EGameSounds.SELECT_HERO_FROM_HAND);
       } else {
-        effectSequence(context, 0, unit.selectSound);
+        let selectSound = 'selectItemGeneric'
+        const itemType = String(unit.itemType)
+        if (itemType === 'runeMetal' || itemType === 'superCharge' || itemType === 'dragonScale') {
+          selectSound = `select${unit.itemType}`
+        } else if (itemType === 'healingPotion' || itemType === 'manaVial') {
+          selectSound = `selectPotion`
+        }
+        effectSequence(context, 0, selectSound);
       }
       context.thinkingMusic.stop();
     } else {
@@ -209,7 +216,14 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
         if (isHero(unit)) {
           effectSequence(context, 0, EGameSounds.SELECT_HERO_FROM_HAND);
         } else {
-          effectSequence(context, 0, unit.selectSound);
+          let selectSound = 'selectItemGeneric'
+          const itemType = String(unit.itemType)
+          if (itemType === 'runeMetal' || itemType === 'superCharge' || itemType === 'dragonScale') {
+            selectSound = `select${unit.itemType}`
+          } else if (itemType === 'healingPotion' || itemType === 'manaVial') {
+            selectSound = `selectPotion`
+          }
+          effectSequence(context, 0, selectSound);
         }
         context.thinkingMusic.stop();
       } else {

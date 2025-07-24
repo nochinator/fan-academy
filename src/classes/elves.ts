@@ -141,9 +141,9 @@ export class VoidMonk extends DarkElf {
       };
 
       if (this.superCharge) {
-        await effectSequence(this.scene, 3000, EElfSounds.VOID_MONK_ATTACK_BIG);
+        await effectSequence(this.scene, 2500, EElfSounds.VOID_MONK_ATTACK_BIG);
       } else {
-        await effectSequence(this.scene, 1000, EElfSounds.VOID_MONK_ATTACK);
+        await effectSequence(this.scene, 650, EElfSounds.VOID_MONK_ATTACK);
       }
 
       // Apply damage to targets
@@ -214,7 +214,7 @@ export class Necromancer extends DarkElf {
       if (this.superCharge) {
         await effectSequence(this.scene, 1500, EElfSounds.NECRO_ATTACK_BIG);
       } else {
-        await effectSequence(this.scene, 1000, EElfSounds.NECRO_ATTACK);
+        await effectSequence(this.scene, 800, EElfSounds.NECRO_ATTACK);
       }
       
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
@@ -314,7 +314,8 @@ export class Wraith extends DarkElf {
       if (this.superCharge) {
         await effectSequence(this.scene, 4000, EElfSounds.WRAITH_ATTACK_BIG);
       } else {
-        await effectSequence(this.scene, 300, EElfSounds.WRAITH_ATTACK);
+        // NOTE: When animations are implemented there needs to be a slight delay before this
+        await effectSequence(this.scene, 350, EElfSounds.WRAITH_ATTACK);
       }
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
       if (damageDone) this.lifeSteal(damageDone);

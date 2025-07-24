@@ -56,7 +56,7 @@ export class Archer extends Human {
       ) {
         target.removeFromGame();
       } else {
-        await effectSequence(this.scene, 500, ECouncilSounds.ARCHER_ATTACK_MELEE);
+        await effectSequence(this.scene, 400, ECouncilSounds.ARCHER_ATTACK_MELEE);
         target.getsDamaged(this.getTotalPower(0.5), this.attackType);
         this.removeAttackModifiers();
       }
@@ -104,7 +104,7 @@ export class Knight extends Human {
       if (this.superCharge) {
         await effectSequence(this.scene, 750, ECouncilSounds.KNIGHT_ATTACK_BIG);
       } else {
-        await effectSequence(this.scene, 650, ECouncilSounds.KNIGHT_ATTACK);
+        await effectSequence(this.scene, 500, ECouncilSounds.KNIGHT_ATTACK);
         target.getsDamaged(this.getTotalPower(), this.attackType);
       }
 

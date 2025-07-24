@@ -1,7 +1,7 @@
-import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems, ETiles } from "../enums/gameEnums";
+import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems, ETiles, EGameSounds } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { equipAnimation, getGridDistance, isInHand, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
+import { effectSequence, equipAnimation, getGridDistance, isInHand, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
 import { positionHeroImage } from "../utils/heroImagePosition";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
@@ -396,8 +396,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.currentHealth -= totalDamage;
     if (this.currentHealth <= 0) this.getsKnockedDown();
     else if (playSound === true){
-      const damageSounds = ['hit1', 'hit2', 'hit3', 'hit4']
-      this.context.sound.play(Phaser.Math.RND.pick(damageSounds));
+      const damageSounds = [EGameSounds.HIT_1, EGameSounds.HIT_2, EGameSounds.HIT_3, EGameSounds.HIT_4]
+      effectSequence(this.scene, 0, Phaser.Math.RND.pick(damageSounds));
     }
 
     // Update hp bar
@@ -484,7 +484,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, false);
     this.specialTileCheck(this.getTile().tileType);
 
-    this.context.sound.play('reviveHero');
+    effectSequence(this.scene, 0, EGameSounds.REVIVE_HERO);
 
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
@@ -517,7 +517,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     new FloatingText(this.context, this.x, this.y - 50, textFigure.toString(), true);
   };
 
-  getsKnockedDown(): void {
+  async getsKnockedDown(): Promise<void> {
     this.removeSpecialTileOnKo();
 
     this.currentHealth = 0;
@@ -526,6 +526,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const tile = this.getTile();
     tile.setOccupied(false);
     tile.hero = this.exportData();
+
+    await effectSequence(this.context, 850, EGameSounds.KO)
+    const heroKoSound = `${this.unitType}Death`
+    await effectSequence(this.context, 150, heroKoSound)
 
     this.characterImage.setTexture(this.updateCharacterImage());
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, true);
@@ -541,13 +545,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.removeInteractive();
       return;
     }
-
-    this.context.sound.play('ko');
-    this.context.time.addEvent({
-      delay: 1000,
-      callback: () => {this.context.sound.play(this.heroKoSound)},
-      callbackScope: this
-    });
   }
 
   getTile(): Tile {
@@ -594,8 +591,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // Destroy container and children
     this.destroy(true);
-
-    this.context.sound.play('vanish');
   }
 
   removeFromBoard(): void {
@@ -610,6 +605,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // Update hero counter
     if (this.unitType !== EHeroes.PHANTOM) updateUnitsLeft(this.context, this);
+    effectSequence(this.context, 0, EGameSounds.VANISH)
   }
 
   getDistanceToTarget(target: Hero | Crystal): number {

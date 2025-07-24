@@ -131,7 +131,16 @@ export enum EPopups {
 }
 
 export enum EGameSounds {
+  BATTLE_BUTTON = 'battleButton',
+  BUTTON_PRESS_GENERIC = 'buttonPressGeneric',
+  SEND_MOVE = 'sendMove',
+  CHAT_MESSAGE = 'chatMessage',
+  BUTTON_FAILED = 'buttonFailed',
+  DELETE_GAME = 'deleteGame',
+  RESIGN = 'resign',
   THINKING_MUSIC = 'thinkingMusic',
+  BACKGROUND_MUSIC = 'backgroundMusic',
+  TITLE_MUSIC = 'titleMusic',
   SELECT_HERO_FROM_HAND = 'selectHeroFromHand',
   SPAWN_HERO = 'spawnHero',
   SELECT_HERO_FROM_BOARD = 'selectHeroFromBoard',
@@ -157,7 +166,8 @@ export enum EGameSounds {
   LAND_HELM = 'landHelm',
   LAND_CRYSTAL = 'landCrystal',
   KO = 'ko',
-  DOOR = 'door',
+  NEW_ITEMS = 'newItems',
+  RETURN_ITEM = 'returnItem',
   DAMAGE_CRYSTAL_1 = 'damageCrystal1',
   DAMAGE_CRYSTAL_2 = 'damageCrystal2',
   DESTROY_CRYSTAL = 'destroyCrystal',
