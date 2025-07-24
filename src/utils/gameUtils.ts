@@ -161,7 +161,8 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
   };
 }
 
-export function effectSequence(scene: Phaser.Scene, delay: number, sound?: string, Anim?: string): Promise<void> {
+// Add animation calls here when ready
+export function effectSequence(scene: Phaser.Scene, delay: number, sound?: string): Promise<void> {
   return new Promise(resolve => {
     if (sound) {
       scene.sound.play(sound);
