@@ -26,6 +26,7 @@ export abstract class Human extends Hero {
     this.increaseMaxHealth(this.baseHealth * 0.1);
 
     this.unitCard.updateCardHealth(this);
+    this.unitCard.updateCardPhysicalResistance(this);
     this.updateTileData();
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
