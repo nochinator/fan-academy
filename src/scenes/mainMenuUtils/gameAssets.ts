@@ -229,7 +229,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('wizardAttack', `${CDN_PATH}/audio/Civ_Wizard_Attack.mp3`);
   context.load.audio('wizardAttackBig', `${CDN_PATH}/audio/Civ_Human_Wizard_BigAttack.mp3`);
   context.load.audio('wizardDeath', `${CDN_PATH}/audio/Civ_Death_Wizard_Element.mp3`);
-  context.load.audio('selectFirebomb', `${CDN_PATH}/audio/Game_FireBomb_Grab_Tile.mp3`);
+  context.load.audio('selectinferno', `${CDN_PATH}/audio/Game_FireBomb_Grab_Tile.mp3`);
   context.load.audio('useFirebomb', `${CDN_PATH}/audio/Game_FireBomb_Activate.mp3`);
 
 
