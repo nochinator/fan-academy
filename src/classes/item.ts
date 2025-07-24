@@ -168,6 +168,7 @@ export class SuperCharge extends Item {
 
   use(target: Hero): void {
     target.equipSuperCharge(this.boardPosition);
+    this.context.sound.play('useScroll');
     this.removeFromGame();
   }
 }

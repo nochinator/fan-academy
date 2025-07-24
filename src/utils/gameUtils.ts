@@ -160,6 +160,12 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
   };
 }
 
+export function sceneDelay(scene: Phaser.Scene, ms: number): Promise<void> {
+  return new Promise(resolve => {
+      scene.time.delayedCall(ms, resolve);
+  });
+}
+
 export function getActionClass(action: EActionType): EActionClass {
   return [EActionType.PASS, EActionType.DRAW, EActionType.REMOVE_UNITS].includes(action) ? EActionClass.AUTO : EActionClass.USER;
 }

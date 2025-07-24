@@ -187,7 +187,8 @@ export class GameController {
   }
 
   async resetTurn() {
-    this.context.sound.play('resetTurn', {volume: 0.7});
+    this.context.sound.play('resetTurn', {volume: 0.5});
+    this.context.thinkingMusic.stop()
     this.context.scene.restart();
   };
 

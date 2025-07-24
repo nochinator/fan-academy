@@ -1,7 +1,7 @@
 import { EActionType, EAttackType } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind, sceneDelay } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -36,7 +36,7 @@ export class Archer extends Human {
     data.heroKoSound = 'archerDeath';
     super(context, data, tile);
   }
-  attack(target: Hero | Crystal): void {
+  async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
 
     const distance = this.getDistanceToTarget(target);
@@ -52,18 +52,23 @@ export class Archer extends Human {
       ) {
         target.removeFromGame();
       } else {
+        this.context.sound.play('archerAttackMelee');
+        await sceneDelay(this.scene, 500);
         target.getsDamaged(this.getTotalPower(0.5), this.attackType);
         this.removeAttackModifiers();
       }
-      this.context.sound.play('archerAttackMelee');
     } else {
-      target.getsDamaged(this.getTotalPower(), this.attackType);
-      this.removeAttackModifiers();
       if (this.superCharge) {
-        this.context.sound.play('archerAttackBig');
+        this.context.sound.play('archerAttack');
+        await sceneDelay(this.scene, 750);
       } else {
         this.context.sound.play('archerAttack');
+        await sceneDelay(this.scene, 650);
       }
+
+      target.getsDamaged(this.getTotalPower(), this.attackType);
+
+      this.removeAttackModifiers();
     }
 
     this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -98,15 +103,18 @@ export class Knight extends Human {
     ) {
       target.removeFromGame();
     } else {
+      if (this.superCharge) {
+        this.context.sound.play('knightAttackBig');
+        await sceneDelay(this.scene, 750);
+      } else {
+        this.context.sound.play('knightAttack');
+        await sceneDelay(this.scene, 750);
+        target.getsDamaged(this.getTotalPower(), this.attackType);
+      }
+
       target.getsDamaged(this.getTotalPower(), this.attackType);
 
       if (target instanceof Hero) await gameController.pushEnemy(this, target);
-      
-      if (this.superCharge) {
-        this.context.sound.play('knightAttackBig');
-      } else {
-        this.context.sound.play('knightAttack');
-      }
 
       this.removeAttackModifiers();
     }
@@ -123,7 +131,7 @@ export class Wizard extends Human {
     data.heroKoSound = 'wizardDeath';
     super(context, data, tile);
   }
-  attack(target: Hero | Crystal): void {
+  async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
@@ -148,16 +156,21 @@ export class Wizard extends Human {
       let thirdTarget: Hero | Crystal | undefined;
       if (secondTarget) thirdTarget = this.getNextTarget(secondTarget, attackDirection, opponentDirection, gameController.board, false, [target.boardPosition, secondTarget.boardPosition]);
 
-      // Apply damage to targets
-      target.getsDamaged(this.getTotalPower(), this.attackType);
-      if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
-      if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
+
 
       if (this.superCharge) {
         this.context.sound.play('wizardAttackBig');
       } else {
         this.context.sound.play('wizardAttack');
       }
+
+      // Apply damage to targets
+      await sceneDelay(this.scene, 750);
+      target.getsDamaged(this.getTotalPower(), this.attackType);
+      await sceneDelay(this.scene, 250);
+      if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
+      await sceneDelay(this.scene, 250);
+      if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
 
       this.removeAttackModifiers();
     }
@@ -266,7 +279,7 @@ export class Ninja extends Human {
     data.heroKoSound = 'ninjaDeath';
     super(context, data, tile);
   }
-  attack(target: Hero | Crystal): void {
+  async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
@@ -282,24 +295,27 @@ export class Ninja extends Human {
       ) {
         target.removeFromGame();
       } else {
-        target.getsDamaged(this.getTotalPower(2), this.attackType);
-        this.removeAttackModifiers();
         if (this.superCharge) {
           this.context.sound.play('ninjaAttackBig');
+          await sceneDelay(this.scene, 650);
         } else {
           this.context.sound.play('ninjaAttack');
+          await sceneDelay(this.scene, 500);
         }
-      }} else {
-      target.getsDamaged(this.getTotalPower(), this.attackType);
+        target.getsDamaged(this.getTotalPower(2), this.attackType);
+      }
       this.removeAttackModifiers();
+
+    } else {
       if (this.superCharge) {
         this.context.sound.play('ninjaAttackBig');
+        this.scene.time.delayedCall(650, () =>  target.getsDamaged(this.getTotalPower(), this.attackType));
       } else {
         this.context.sound.play('ninjaAttackRanged');
+        this.scene.time.delayedCall(650, () =>  target.getsDamaged(this.getTotalPower(), this.attackType));
       }
+      this.removeAttackModifiers();
     }
-
-
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -309,6 +325,8 @@ export class Ninja extends Human {
 
     const targetDestination = this.getTile();
     const unitDestination = target.getTile();
+
+    this.context.thinkingMusic.stop();
 
     // Smoke bomb animation
     this.singleTween(this.smokeAnim!, 500);
@@ -324,7 +342,7 @@ export class Ninja extends Human {
 
     gameController?.afterAction(EActionType.TELEPORT, targetDestination.boardPosition, unitDestination.boardPosition);
 
-    this.context.sound.play('ninja');
+    this.context.sound.play('ninjaSmoke');
   };
 
   heal(_target: Hero): void {};
@@ -335,7 +353,7 @@ export class Cleric extends Human {
     data.heroKoSound = 'clericDeath';
     super(context, data, tile);
   }
-  attack(target: Hero | Crystal): void {
+  async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
     const gameController = this.context.gameController!;
 
@@ -348,17 +366,19 @@ export class Cleric extends Human {
     ) {
       target.removeFromGame();
     } else {
-      target.getsDamaged(this.getTotalPower(), this.attackType);
-    }
-    if (this.superCharge) {
-      this.context.sound.play('clericAttackBig');
-    } else {
-      this.context.sound.play('clericAttack');
-    }
+      if (this.superCharge) {
+        this.context.sound.play('clericAttackBig');
+        await sceneDelay(this.scene, 750);
+      } else {
+        this.context.sound.play('clericAttack');
+        await sceneDelay(this.scene, 500);
+      }
+      target.getsDamaged(this.getTotalPower(), this.attackType)
 
-    this.removeAttackModifiers();
+      this.removeAttackModifiers();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    }
   }
 
   heal(target: Hero): void {
@@ -419,11 +439,14 @@ export class Inferno extends Item {
     super(context, data);
   };
 
-  use(targetTile: Tile): void {
+  async use(targetTile: Tile): Promise<void> {
     // Damages enemy units and crystals, and removes enemy KO'd units
     const damage = 350;
 
     const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, targetTile);
+    
+    this.context.sound.play('useInferno');
+    await sceneDelay(this.scene, 1000);
 
     enemyHeroTiles?.forEach(tile => {
       const hero = this.context.gameController?.board.units.find(unit => unit.boardPosition === tile.boardPosition);
@@ -449,7 +472,6 @@ export class Inferno extends Item {
 
     this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
 
-    this.context.sound.play('useInferno');
 
     this.removeFromGame();
   }
