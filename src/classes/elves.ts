@@ -54,8 +54,7 @@ export class Impaler extends DarkElf {
 
     const distance = this.getDistanceToTarget(target);
 
-    // Keep original position for replay purposes
-    const startingPosition = target.boardPosition;
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -82,8 +81,6 @@ export class Impaler extends DarkElf {
 
       this.removeAttackModifiers();
     }
-
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, startingPosition);
   }
 
   heal(_target: Hero): void {};
@@ -98,6 +95,8 @@ export class VoidMonk extends DarkElf {
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
     turnIfBehind(this.context, this, target);
+
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -164,7 +163,7 @@ export class VoidMonk extends DarkElf {
       this.removeAttackModifiers();
     }
 
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+
   }
 
   getOffsetTiles(_target: number, attackDirection: number): number[] {
@@ -189,9 +188,10 @@ export class Necromancer extends DarkElf {
   }
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
-    const gameController = this.context.gameController!;
 
     turnIfBehind(this.context, this, target);
+
+    this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     if (target instanceof Hero && target.isKO) {
       const tile = target.getTile();
@@ -208,8 +208,7 @@ export class Necromancer extends DarkElf {
 
       tile.hero = phantom.exportData();
 
-      gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
-      gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
+      this.context.gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
     } else {
       if (this.superCharge) {
         await effectSequence(this.scene, 1500, EElfSounds.NECRO_ATTACK_BIG);
@@ -222,7 +221,6 @@ export class Necromancer extends DarkElf {
 
       this.removeAttackModifiers();
 
-      gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     }
   }
 
@@ -237,10 +235,11 @@ export class Priestess extends DarkElf {
   }
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
-    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
+
+    this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -267,9 +266,6 @@ export class Priestess extends DarkElf {
 
       this.removeAttackModifiers();
     }
-
-
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(target: Hero): void {
@@ -299,6 +295,8 @@ export class Wraith extends DarkElf {
     this.flashAttacker();
     turnIfBehind(this.context, this, target);
 
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+
     if (target instanceof Hero && target.isKO) {
       await effectSequence(this.scene, 1500, EElfSounds.WRAITH_CONSUME);
       target.removeFromGame(true);
@@ -322,9 +320,6 @@ export class Wraith extends DarkElf {
 
       this.removeAttackModifiers();
     }
-
-
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(_target: Hero): void {};
@@ -349,8 +344,9 @@ export class Phantom extends Hero {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
-    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
+
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -367,8 +363,6 @@ export class Phantom extends Hero {
 
       this.removeAttackModifiers();
     }
-
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(_target: Hero): void {};
@@ -427,8 +421,9 @@ export class SoulHarvest extends Item {
     // Keep track of the cumulative damage done (not attack power used) to enemy heroes (not crystals)
     let totalDamageInflicted = 0;
 
-    effectSequence(this.scene, 0, EElfSounds.USE_HARVEST);
-    await effectSequence(this.scene, 1000);
+    gameController.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
+
+    await effectSequence(this.scene, 1000, EElfSounds.USE_HARVEST);
 
     enemyHeroTiles?.forEach(tile => {
       const hero = gameController.board.units.find(unit => unit.boardPosition === tile.boardPosition);
@@ -456,8 +451,6 @@ export class SoulHarvest extends Item {
 
     // Increase max health of all units, including KO'd ones, and revive them
     friendlyUnits.forEach(unit => unit.increaseMaxHealth(lifeIncreaseAmount));
-
-    gameController.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
 
     this.removeFromGame();
   }

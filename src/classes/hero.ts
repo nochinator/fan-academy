@@ -627,16 +627,18 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     const startTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
     if (!startTile) return;
+
+    gameController.afterAction(EActionType.MOVE, startTile.boardPosition, targetTile.boardPosition);
     
     // There is a second sound for moving that does not play in replay, see makeUnitClickable.ts
-    this.context.sound.play('moveWalk'); // TODO: Define which units can fly and walk and apply proper sound
+    effectSequence(this.scene, 0, EGameSounds.MOVE_WALK); // TODO: Define which units can fly and walk and apply proper sound
     await moveAnimation(this.context, this, targetTile);
 
     // Stomp KO'd units
     if (targetTile.hero && targetTile.hero.isKO) {
       const hero = gameController.board.units.find(unit => unit.unitId === targetTile.hero?.unitId);
       if (!hero) console.error('move() Found heroData on targetTile, but no Hero to remove', targetTile);
-      this.context.sound.play('stomp');
+      effectSequence(this.scene, 0, EGameSounds.STOMP);
       hero?.removeFromGame(true);
     }
 
@@ -646,8 +648,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     targetTile.hero = this.exportData();
     targetTile.setOccupied(true);
     startTile.removeHero();
-
-    gameController.afterAction(EActionType.MOVE, startTile.boardPosition, targetTile.boardPosition);
   }
 
   spawn(tile: Tile): void {
@@ -658,7 +658,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (tile.hero && (tile.hero.isKO || tile.isEnemy(this.context.userId) && tile.hero.unitType === EHeroes.PHANTOM)) {
       const hero = gameController.board.units.find(unit => unit.unitId === tile.hero?.unitId);
       if (!hero) console.error('spawn() Found heroData on tile, but no Hero to remove', tile);
-      this.context.sound.play('stomp');
+      effectSequence(this.scene, 0, EGameSounds.STOMP);
       hero?.removeFromGame(true);
     }
 
@@ -684,7 +684,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.healthBar.setVisible(true);
 
-    this.context.sound.play('spawnHero');
+    effectSequence(this.scene, 0, EGameSounds.SPAWN_HERO);
 
     gameController.afterAction(EActionType.SPAWN, startingPosition, tile.boardPosition);
   }
@@ -791,22 +791,22 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (targetTile === ETiles.CRYSTAL_DAMAGE) {
       this.updateCrystals(true);
       this.crystalDebuffTileAnim.setVisible(true);
-      this.context.sound.play('landCrystal');
+      effectSequence(this.scene, 0, EGameSounds.LAND_CRYSTAL);
     }
     if (targetTile === ETiles.POWER) {
       this.attackTile = true;
       this.powerTileAnim.setVisible(true);
-      this.context.sound.play('landSword');
+      effectSequence(this.scene, 0, EGameSounds.LAND_SWORD);
     }
     if (targetTile === ETiles.MAGICAL_RESISTANCE) {
       this.magicalDamageResistance += 20;
       this.magicalResistanceTileAnim.setVisible(true);
-      this.context.sound.play('landHelm');
+      effectSequence(this.scene, 0, EGameSounds.LAND_HELM);
     }
     if (targetTile === ETiles.PHYSICAL_RESISTANCE) {
       this.physicalDamageResistance += 20;
       this.physicalResistanceTileAnim.setVisible(true);
-      this.context.sound.play('landShield');
+      effectSequence(this.scene, 0, EGameSounds.LAND_SHIELD);
     }
 
     this.unitCard.updateCardData(this);

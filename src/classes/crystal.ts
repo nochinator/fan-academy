@@ -1,7 +1,7 @@
-import { ETiles, EWinConditions } from "../enums/gameEnums";
+import { EGameSounds, ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { roundToFive } from "../utils/gameUtils";
+import { roundToFive, effectSequence } from "../utils/gameUtils";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
 import { CrystalCard } from "./crystalCard";
 import { FloatingText } from "./floatingText";
@@ -183,10 +183,10 @@ export class Crystal extends Phaser.GameObjects.Container {
 
     if (this.currentHealth <= 0) {
       this.removeFromGame();
-      this.context.sound.play('destroyCrystal');
+      effectSequence(this.scene, 0, EGameSounds.DESTROY_CRYSTAL);
     } else {
-      const damageSounds = ['damageCrystal1', 'damageCrystal2']
-      this.context.sound.play(Phaser.Math.RND.pick(damageSounds));
+      const damageSounds = [EGameSounds.DAMAGE_CRYSTAL_1, EGameSounds.DAMAGE_CRYSTAL_2] 
+      effectSequence(this.scene, 0, Phaser.Math.RND.pick(damageSounds));
     }
   }
 

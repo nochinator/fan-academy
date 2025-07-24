@@ -99,6 +99,7 @@ export class GameController {
   addConcedeButton(context: GameScene): Phaser.GameObjects.Image {
     const button = context.add.image(1350, 70, 'concedeButton').setScale(0.9).setInteractive({ useHandCursor: true });
     button.on('pointerdown', ()=> {
+      effectSequence(this.context, 0, EGameSounds.BUTTON_PRESS_GENERIC);
       this.concedePopup.setVisible(true);
     });
     return button;

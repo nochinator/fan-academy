@@ -29,7 +29,7 @@ export abstract class Human extends Hero {
     this.unitCard.updateCardPhysicalResistance(this);
     this.updateTileData();
 
-    this.context.sound.play('useShield');
+    effectSequence(this.scene, 0, EGameSounds.USE_SHIELD);
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
@@ -47,6 +47,8 @@ export class Archer extends Human {
 
     turnIfBehind(this.context, this, target);
 
+    this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+
     if (distance === 1) {
       // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
       if (
@@ -56,7 +58,7 @@ export class Archer extends Human {
       ) {
         target.removeFromGame();
       } else {
-        await effectSequence(this.scene, 400, ECouncilSounds.ARCHER_ATTACK_MELEE);
+        await effectSequence(this.scene, 0, ECouncilSounds.ARCHER_ATTACK_MELEE);
         target.getsDamaged(this.getTotalPower(0.5), this.attackType);
         this.removeAttackModifiers();
       }
@@ -71,8 +73,6 @@ export class Archer extends Human {
 
       this.removeAttackModifiers();
     }
-
-    this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(_target: Hero): void {};
@@ -90,8 +90,7 @@ export class Knight extends Human {
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
-    // Keep original position for replay purposes
-    const startingPosition = target.boardPosition;
+    this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -114,8 +113,6 @@ export class Knight extends Human {
 
       this.removeAttackModifiers();
     }
-
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, startingPosition);
   }
 
   heal(_target: Hero): void {};
@@ -133,6 +130,8 @@ export class Wizard extends Human {
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
+
+    this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -169,8 +168,6 @@ export class Wizard extends Human {
 
       this.removeAttackModifiers();
     }
-
-    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   getNextTarget(target: Hero | Crystal, attackDirection: number, opponentDirection: number[], board: Board, isLastTarget: boolean, toIgnore?: number[]): Hero | Crystal | undefined {
@@ -276,10 +273,11 @@ export class Ninja extends Human {
   }
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
-    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
+
+    this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     if (distance === 1) {
       // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
@@ -309,8 +307,6 @@ export class Ninja extends Human {
       }
       this.removeAttackModifiers();
     }
-
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   teleport(target: Hero): void {
@@ -348,9 +344,10 @@ export class Cleric extends Human {
   }
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
-    const gameController = this.context.gameController!;
 
     turnIfBehind(this.context, this, target);
+
+    this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     if (
       target instanceof Hero &&
@@ -367,8 +364,6 @@ export class Cleric extends Human {
       target.getsDamaged(this.getTotalPower(), this.attackType)
 
       this.removeAttackModifiers();
-
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     }
   }
 
@@ -383,10 +378,10 @@ export class Cleric extends Human {
       target.getsHealed(healingAmount);
     }
 
+    this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
+
     effectSequence(this.scene, 1000, EGameSounds.HEAL);
     effectSequence(this.scene, 0, EGameSounds.HEAL_EXTRA);
-
-    this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
 
   teleport(_target: Hero): void {};
@@ -438,6 +433,8 @@ export class Inferno extends Item {
 
     const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, targetTile);
 
+    this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
+
     effectSequence(this.scene, 1000, ECouncilSounds.USE_FIREBOMB);
 
     enemyHeroTiles?.forEach(tile => {
@@ -461,9 +458,6 @@ export class Inferno extends Item {
         crystal.getsDamaged(damage);
       }
     });
-
-    this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
-
 
     this.removeFromGame();
   }
