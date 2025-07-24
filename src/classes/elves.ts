@@ -2,7 +2,7 @@ import { EActionType, EAttackType, EClass, EFaction, EHeroes } from "../enums/ga
 
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, equipAnimation, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -14,6 +14,9 @@ export abstract class DarkElf extends Hero {
   }
 
   equipFactionBuff(handPosition: number): void {
+    const soulStone = this.scene.add.image(this.x, this.y - 10, 'soulStone').setOrigin(0.5).setDepth(100);
+    equipAnimation(soulStone);
+
     this.factionBuff = true;
     this.factionBuffImage.setVisible(true);
     this.characterImage.setTexture(this.updateCharacterImage());
@@ -345,6 +348,9 @@ export class ManaVial extends Item {
   }
 
   use(target: Hero): void {
+    const potionImage = this.scene.add.image(target.x, target.y - 10, 'manaVial').setDepth(100);
+    equipAnimation(potionImage);
+
     if (target.isKO) return;
     target.healAndIncreaseHealth(1000, 50);
 

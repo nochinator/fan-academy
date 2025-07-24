@@ -1,7 +1,7 @@
 import { EActionType, EAttackType } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, equipAnimation, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -14,6 +14,9 @@ export abstract class Human extends Hero {
   }
 
   equipFactionBuff(handPosition: number): void {
+    const dragonScaleImg = this.scene.add.image(this.x + 10, this.y - 10, 'dragonScale').setOrigin(0.5).setDepth(100);
+    equipAnimation(dragonScaleImg);
+
     this.factionBuff = true;
     this.factionBuffImage.setVisible(true);
     this.characterImage.setTexture(this.updateCharacterImage());
@@ -340,6 +343,9 @@ export class HealingPotion extends Item {
   }
 
   use(target: Hero): void {
+    const potionImage = this.scene.add.image(target.x, target.y - 10, 'healingPotion').setDepth(100);
+    equipAnimation(potionImage);
+
     const healingAmount = target.isKO ? 100 : 1000;
     target.getsHealed(healingAmount);
 
@@ -386,4 +392,8 @@ export class Inferno extends Item {
 
     this.removeFromGame();
   }
+}
+
+function playUseAnimation(dragonScaleImg: Phaser.GameObjects.Image) {
+  throw new Error("Function not implemented.");
 }

@@ -1,3 +1,4 @@
+import { GameObjects } from "phaser";
 import { Archer, Cleric, DragonScale, HealingPotion, Inferno, Knight, Ninja, Wizard } from "../classes/council";
 import { Crystal } from "../classes/crystal";
 import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulStone, VoidMonk, Wraith } from "../classes/elves";
@@ -375,4 +376,16 @@ export function visibleUnitCardCheck(context: GameScene): void {
 
 export function generateFourDigitId(): number {
   return Math.floor(1000 + Math.random() * 9000);
+}
+
+export function equipAnimation(image: GameObjects.Image): void {
+  image.scene.tweens.add({
+    targets: image,
+    scale: 2,
+    alpha: 0,
+    duration: 1000,
+    onComplete: () => {
+      image.destroy();
+    }
+  });
 }

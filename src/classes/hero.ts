@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { getGridDistance, isInHand, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
+import { equipAnimation, getGridDistance, isInHand, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
 import { positionHeroImage } from "../utils/heroImagePosition";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
@@ -691,6 +691,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   equipShiningHelm(handPosition: number): void {
+    const helmImage = this.scene.add.image(this.x, this.y, 'shiningHelm').setDepth(100);
+    equipAnimation(helmImage);
+
     this.shiningHelm = true;
     this.magicalDamageResistance += 20;
 
@@ -706,6 +709,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   equipRunemetal(handPosition: number): void {
+    const helmImage = this.scene.add.image(this.x, this.y, 'runeMetal').setDepth(100);
+    equipAnimation(helmImage);
+
     this.runeMetal = true;
     this.runeMetalImage.setVisible(true);
 
