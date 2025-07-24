@@ -81,19 +81,21 @@ export async function connectToGameLobby(client: Client, userId: string, context
       const gameList = context.gameList;
       if (!gameList) console.error('gameOverUpdate - No context.gameList found');
 
-      const game = gameList?.find(game => game._id === message.gameId);
+      // The maximum number of finished games is 5. Sort by finishedAt and remove the oldest finished game if going above the cap
+      const unfinishedGames = gameList?.filter(game => game.status !== EGameStatus.FINISHED);
+      const finishedGames = gameList?.filter(game => game.status === EGameStatus.FINISHED);
+      finishedGames?.sort((a, b) => new Date(b.finishedAt).getTime() - new Date(a.finishedAt).getTime());
+      console.log('finished games', finishedGames);
+
+      if (finishedGames && finishedGames.length > 4) finishedGames.pop();
+
+      const game = unfinishedGames?.find(game => game._id === message.gameId);
       if (!game) throw new Error('Colyseus lobby. No game found');
 
       game.previousTurn = message.previousTurn;
       game.turnNumber = message.turnNumber;
       game.status = EGameStatus.FINISHED;
       game.lastPlayedAt = message.lastPlayedAt;
-
-      // The maximum number of finished games is 5. Sort by finishedAt and remove the oldest finished game if going above the cap
-      const unfinishedGames = gameList?.filter(game => game.status !== EGameStatus.FINISHED);
-      const finishedGames = gameList?.filter(game => game.status === EGameStatus.FINISHED);
-      finishedGames?.sort((a, b) => new Date(a.finishedAt).getTime() - new Date(b.finishedAt).getTime());
-      if (finishedGames && finishedGames.length > 5) finishedGames.shift();
 
       context.gameList = [...unfinishedGames ?? [], ...finishedGames ?? []];
 
