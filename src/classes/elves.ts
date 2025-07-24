@@ -245,10 +245,10 @@ export class Priestess extends DarkElf {
     turnIfBehind(this.context, this, target);
 
     if (target.isKO) {
-      const healingAmount = this.getTotalHealing(this.basePower / 2);
+      const healingAmount = this.getTotalHealing(this.basePower, 0.5);
       target.getsHealed(healingAmount);
     } else {
-      const healingAmount = this.getTotalHealing(this.basePower * 2);
+      const healingAmount = this.getTotalHealing(this.basePower, 2);
       target.getsHealed(healingAmount);
     }
 
