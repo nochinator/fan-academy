@@ -36,6 +36,7 @@ export enum EActionType {
   USE = 'use',
   SHUFFLE = 'shuffle',
   TELEPORT = 'teleport',
+  CONCEDE = 'concede',
 
   // Automated actions
   DRAW = 'draw',
@@ -122,4 +123,9 @@ export enum ECardType {
 export enum EChallengePopup {
   SEND = 'send',
   ACCEPT = 'accept'
+}
+
+export enum EPopups {
+  TURN = 'turn',
+  CONCEDE = 'concede'
 }

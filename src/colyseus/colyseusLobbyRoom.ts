@@ -1,8 +1,8 @@
 import { Client, Room } from "colyseus.js";
+import { EFaction, EGameStatus } from "../enums/gameEnums";
+import { IGameState } from "../interfaces/gameInterface";
 import { createGameList } from "../scenes/gameSceneUtils/gameList";
 import UIScene from "../scenes/ui.scene";
-import { IGameState } from "../interfaces/gameInterface";
-import { EFaction, EGameStatus } from "../enums/gameEnums";
 import { showDisconnectWarning } from "../scenes/uiSceneUtils/disconnectWarning";
 
 export async function connectToGameLobby(client: Client, userId: string, context: UIScene): Promise<Room | undefined> {
@@ -78,15 +78,24 @@ export async function connectToGameLobby(client: Client, userId: string, context
       lastPlayedAt: Date
     }) => {
       console.log('A game has ended, updating game list');
-      if (!context.gameList) console.error('gameOverUpdate - No context.gameList found');
+      const gameList = context.gameList;
+      if (!gameList) console.error('gameOverUpdate - No context.gameList found');
 
-      const game = context.gameList?.find(game => game._id === message.gameId);
+      const game = gameList?.find(game => game._id === message.gameId);
       if (!game) throw new Error('Colyseus lobby. No game found');
 
       game.previousTurn = message.previousTurn;
       game.turnNumber = message.turnNumber;
       game.status = EGameStatus.FINISHED;
       game.lastPlayedAt = message.lastPlayedAt;
+
+      // The maximum number of finished games is 5. Sort by finishedAt and remove the oldest finished game if going above the cap
+      const unfinishedGames = gameList?.filter(game => game.status !== EGameStatus.FINISHED);
+      const finishedGames = gameList?.filter(game => game.status === EGameStatus.FINISHED);
+      finishedGames?.sort((a, b) => new Date(a.finishedAt).getTime() - new Date(b.finishedAt).getTime());
+      if (finishedGames && finishedGames.length > 5) finishedGames.shift();
+
+      context.gameList = [...unfinishedGames ?? [], ...finishedGames ?? []];
 
       await createGameList(context);
 

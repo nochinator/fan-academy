@@ -48,6 +48,7 @@ export default class UIScene extends Phaser.Scene {
     this.load.image('unknownFaction', `${CDN_PATH}/ui/unknown_faction.webp`);
     this.load.image('unknownOpponent', `${CDN_PATH}/images/profilePics/unknownAvatar-hd.webp`);
     this.load.image('closeButton', `${CDN_PATH}/ui/close_button.webp`);
+    this.load.image('concedeButton', `${CDN_PATH}/ui/concede_button.webp`);
 
     this.load.html('disconnectWarning', 'html/disconnectWarning.html');
   }
