@@ -187,6 +187,10 @@ export class GameController {
   }
 
   async resetTurn() {
+    deselectUnit(this.context);
+    this.context.longPressStart = undefined;
+    this.context.visibleUnitCard = undefined;
+
     this.context.scene.restart();
   };
 
