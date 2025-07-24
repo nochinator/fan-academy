@@ -58,8 +58,13 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
   // CASE 1: No active unit
   if (!activeUnit && isFriendly) {
 
-    context.sound.play('selectHeroFromBoard');
-    context.thinkingMusic.play();
+    if (unit.boardPosition >= 45) {
+      context.sound.play('selectHeroFromHand');
+    } else {
+      context.sound.play('selectHeroFromBoard');
+      context.thinkingMusic.play();
+    }
+
 
     if (isHero(unit) && unit.isKO) return; // Can't select KO'd units
 
@@ -94,6 +99,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
       if (isHero(activeUnit) && attackReticle?.visible) {
         activeUnit.attack(unit);
+        context.thinkingMusic.stop()
         return;
       }
 
@@ -104,6 +110,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
         unit.isKO && !isEnemySpawn(context, unitTile)) {
         activeUnit.move(unitTile);
         context.sound.play('moveHero'); // so doesn't play in replay
+        context.thinkingMusic.stop()
         return;
       }
 
@@ -136,6 +143,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
       // Necromancer and Wraith can target friendly units if they are knocked down. NOTE: this check should always go before the stomping check
       if (isHero(activeUnit) && [EHeroes.NECROMANCER, EHeroes.WRAITH].includes(activeUnit.unitType) && unit.isKO && attackReticle?.visible) {
         activeUnit.attack(unit);
+        context.thinkingMusic.stop();
         return;
       }
 
@@ -149,12 +157,14 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
         if (activeUnit.canHeal && healReticle?.visible) {
           activeUnit.heal(unit);
+          context.thinkingMusic.stop();
           return;
         }
 
         // Ninja can swap places with any friendly unit on the board
         if (activeUnit.unitType === EHeroes.NINJA && allyReticle?.visible && !unit.isKO) {
           activeUnit.teleport(unit);
+          context.thinkingMusic.stop();
           return;
         }
 
@@ -169,6 +179,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
           ) {
             const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
             activeUnit.move(unitTile);
+            context.thinkingMusic.stop();
             return;
           }
         }

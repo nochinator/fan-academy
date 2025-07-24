@@ -210,16 +210,16 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('clericAttackBig', `${CDN_PATH}/audio/Civ_Human_Cleric_AttackBig.mp3`);
   context.load.audio('clericDeath', `${CDN_PATH}/audio/Civ_Death_Cleric_Element.mp3`);
   context.load.audio('knightAttack', `${CDN_PATH}/audio/Civ_Knight_Attack.mp3`);
-  context.load.audio('knightAttackBig', `${CDN_PATH}/audio/Civ_Cleric_Attack.mp3`);
+  context.load.audio('knightAttackBig', `${CDN_PATH}/audio/Civ_Human_Fighter_BigAttack.mp3`);
   context.load.audio('knightDeath', `${CDN_PATH}/audio/Civ_Death_Knight_Element.mp3`);
   context.load.audio('ninjaAttack', `${CDN_PATH}/audio/Civ_Human_Ninja_Attack_CloseRange.mp3`);
   context.load.audio('ninjaAttackBig', `${CDN_PATH}/audio/Civ_Human_Ninja_AttackBig.mp3`);
   context.load.audio('ninjaAttackRanged', `${CDN_PATH}/audio/Civ_Ninja_ThrowingStar_Attack.mp3`);
   context.load.audio('ninjaDeath', `${CDN_PATH}/audio/Civ_Death_Ninja_Element.mp3`);
   context.load.audio('ninjaSmoke', `${CDN_PATH}/audio/Civ_Ninja_Deploy_SmokeBomb.mp3`);
-  context.load.audio('wizardAttack', `${CDN_PATH}/audio/Civ_Death_Wizard_Element.mp3`);
+  context.load.audio('wizardAttack', `${CDN_PATH}/audio/Civ_Wizard_Attack.mp3`);
   context.load.audio('wizardAttackBig', `${CDN_PATH}/audio/Civ_Human_Wizard_BigAttack.mp3`);
-  context.load.audio('wizardDeath', `${CDN_PATH}/audio/Civ_Wizard_Attack.mp3`);
+  context.load.audio('wizardDeath', `${CDN_PATH}/audio/Civ_Death_Wizard_Element.mp3`);
   context.load.audio('selectFirebomb', `${CDN_PATH}/audio/Game_FireBomb_Grab_Tile.mp3`);
   context.load.audio('useInferno', `${CDN_PATH}/audio/Game_FireBomb_Activate.mp3`);
 
@@ -234,7 +234,6 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('necroAttack', `${CDN_PATH}/audio/DE-Necro_Attack.mp3`);
   context.load.audio('necroAttackBig', `${CDN_PATH}/audio/DE-Necro_AttackBig.mp3`);
   context.load.audio('phantomSpawn', `${CDN_PATH}/audio/DE-Phantom_Spawn.mp3`);
-  context.load.audio('phantomAttack', `${CDN_PATH}/audio/Civ_DarkElf_Attack_Spell_1.mp3`);
   context.load.audio('phantomDeath', `${CDN_PATH}/audio/DE-Phantom_Death.mp3`);
   context.load.audio('voidMonkAttack', `${CDN_PATH}/audio/DE-VoidMonk_Attack_Punch.mp3`);
   context.load.audio('voidMonkAttackBig', `${CDN_PATH}/audio/DE-VoidMonk_AttackBig.mp3`);
