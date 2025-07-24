@@ -8,6 +8,7 @@ import { calculateAllCenterPoints } from "../utils/boardCalculations";
 import { createChatComponent } from "./gameSceneUtils/chatComponent";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameAssets } from "./mainMenuUtils/gameAssets";
+import { EGameSounds } from "../enums/gameEnums";
 
 export default class GameScene extends Phaser.Scene {
   userId!: string;
@@ -82,7 +83,7 @@ export default class GameScene extends Phaser.Scene {
       loop: true
     });
 
-    this.thinkingMusic = this.sound.add('thinkingMusic', { loop: true, volume: 0.5 });
+    this.thinkingMusic = this.sound.add(EGameSounds.THINKING_MUSIC, { loop: true, volume: 0.5 });
 
     this.input.mouse!.disableContextMenu();
     this.chatComponent = createChatComponent(this);

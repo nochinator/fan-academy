@@ -1,4 +1,5 @@
-import { EClass, EFaction, EItems } from "../enums/gameEnums";
+import { EClass, EFaction, EGameSounds, EItems } from "../enums/gameEnums";
+import { effectSequence } from "../utils/gameUtils";
 import { IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
@@ -16,6 +17,7 @@ export abstract class Item extends Phaser.GameObjects.Container {
   canHeal: boolean;
   dealsDamage: boolean;
   itemImage: Phaser.GameObjects.Image;
+  selectSound: string;
 
   context: GameScene;
 
@@ -69,6 +71,8 @@ export abstract class Item extends Phaser.GameObjects.Container {
       useHandCursor: true
     }).setName(this.unitId);
 
+    this.selectSound = EGameSounds.SELECT_ITEM_GENERIC;
+
     context.add.existing(this);
   }
 
@@ -94,7 +98,8 @@ export abstract class Item extends Phaser.GameObjects.Container {
       boardPosition: this.boardPosition,
       belongsTo: this.belongsTo,
       canHeal: this.canHeal,
-      dealsDamage: this.dealsDamage
+      dealsDamage: this.dealsDamage,
+      selectSound: this.selectSound
     };
   }
 
@@ -144,7 +149,7 @@ export class ShiningHelm extends Item {
 
   use(target: Hero): void {
     target.equipShiningHelm(this.boardPosition);
-    this.context.sound.play('useHelm');
+    effectSequence(this.context, 0, EGameSounds.USE_ITEM_GENERIC);
     this.removeFromGame();
   }
 }
@@ -152,11 +157,12 @@ export class ShiningHelm extends Item {
 export class RuneMetal extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
+    this.selectSound = EGameSounds.SELECT_SWORD 
   }
 
   use(target: Hero): void {
     target.equipRunemetal(this.boardPosition);
-    this.context.sound.play('useShield');
+    effectSequence(this.context, 0, EGameSounds.USE_SHIELD);
     this.removeFromGame();
   }
 }
@@ -164,11 +170,12 @@ export class RuneMetal extends Item {
 export class SuperCharge extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
+    this.selectSound = EGameSounds.SELECT_SCROLL
   }
 
   use(target: Hero): void {
     target.equipSuperCharge(this.boardPosition);
-    this.context.sound.play('useScroll');
+    effectSequence(this.context, 0, EGameSounds.USE_SCROLL);
     this.removeFromGame();
   }
 }

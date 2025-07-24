@@ -1,8 +1,8 @@
-import { EActionType, EAttackType, EClass, EFaction, EHeroes } from "../enums/gameEnums";
+import { EActionType, EAttackType, EClass, EFaction, EHeroes, EElfSounds, EGameSounds } from "../enums/gameEnums";
 
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind, sceneDelay } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind, effectSequence } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -22,7 +22,7 @@ export abstract class DarkElf extends Hero {
     this.unitCard.updateCardHealth(this);
     this.updateTileData();
 
-    this.context.sound.play('useHelm');
+    effectSequence(this.scene, 0, EGameSounds.USE_ITEM_GENERIC);
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
@@ -40,7 +40,7 @@ export abstract class DarkElf extends Hero {
 
 export class Impaler extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
-    data.heroKoSound = 'impalerDeath';
+    data.heroKoSound = EElfSounds.IMPALER_DEATH;
     super(context, data, tile);
   }
 
@@ -61,19 +61,15 @@ export class Impaler extends DarkElf {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      this.context.sound.play('impalerAttack');
-      await sceneDelay(this.scene, 750);
+      await effectSequence(this.scene, 750, EElfSounds.IMPALER_ATTACK);
       target.removeFromGame();
     } else {
       if (this.superCharge) {
-        this.context.sound.play('impalerAttackBig');
-        await sceneDelay(this.scene, 1500);
+        await effectSequence(this.scene, 1500, EElfSounds.IMPALER_ATTACK_BIG);
       } else if (distance === 1) {
-        this.context.sound.play('impalerAttackMelee');
-        await sceneDelay(this.scene, 750);
+        await effectSequence(this.scene, 750, EElfSounds.IMPALER_ATTACK_MELEE);
       } else {
-        this.context.sound.play('impalerAttack');
-        await sceneDelay(this.scene, 750);
+        await effectSequence(this.scene, 750, EElfSounds.IMPALER_ATTACK);
       }
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
 
@@ -93,7 +89,7 @@ export class Impaler extends DarkElf {
 
 export class VoidMonk extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
-    data.heroKoSound = 'voidMonkDeath';
+    data.heroKoSound = EElfSounds.VOID_MONK_DEATH;
     super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
@@ -106,8 +102,7 @@ export class VoidMonk extends DarkElf {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      this.context.sound.play('voidMonkAttack'); 
-      await sceneDelay(this.scene, 1000);
+      await effectSequence(this.scene, 1000, EElfSounds.VOID_MONK_ATTACK);
       target.removeFromGame();
     } else {
       const board = this.context.gameController!.board;
@@ -143,11 +138,9 @@ export class VoidMonk extends DarkElf {
       };
 
       if (this.superCharge) {
-        this.context.sound.play('voidMonkAttackBig');
-        await sceneDelay(this.scene, 3000);
+        await effectSequence(this.scene, 3000, EElfSounds.VOID_MONK_ATTACK_BIG);
       } else {
-        this.context.sound.play('voidMonkAttack'); 
-        await sceneDelay(this.scene, 1000);
+        await effectSequence(this.scene, 1000, EElfSounds.VOID_MONK_ATTACK);
       }
 
       // Apply damage to targets
@@ -188,7 +181,7 @@ export class VoidMonk extends DarkElf {
 
 export class Necromancer extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
-    data.heroKoSound = 'priestessDeath'; // Yes it's reused
+    data.heroKoSound = EElfSounds.PRIESTESS_DEATH; // Yes it's reused
     super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
@@ -200,8 +193,7 @@ export class Necromancer extends DarkElf {
     if (target instanceof Hero && target.isKO) {
       const tile = target.getTile();
 
-      await sceneDelay(this.scene, 1500);
-      this.context.sound.play('phantomSpawn');
+      await effectSequence(this.scene, 1500, EElfSounds.PHANTOM_SPAWN);
 
       const phantom = new Phantom(this.context, createElvesPhantomData({
         unitId: `${this.context.userId}_phantom_${generateFourDigitId()}`,
@@ -217,11 +209,9 @@ export class Necromancer extends DarkElf {
       gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
     } else {
       if (this.superCharge) {
-        this.context.sound.play('necroAttackBig');
-        await sceneDelay(this.scene, 1500);
+        await effectSequence(this.scene, 1500, EElfSounds.NECRO_ATTACK_BIG);
       } else {
-        this.context.sound.play('necroAttack');
-        await sceneDelay(this.scene, 1000);
+        await effectSequence(this.scene, 1000, EElfSounds.NECRO_ATTACK);
       }
       
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
@@ -239,7 +229,7 @@ export class Necromancer extends DarkElf {
 
 export class Priestess extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
-    data.heroKoSound = 'priestessDeath';
+    data.heroKoSound = EElfSounds.PRIESTESS_DEATH;
     super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
@@ -256,12 +246,11 @@ export class Priestess extends DarkElf {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      this.context.sound.play('priestessAttack');
-      await sceneDelay(this.scene, 600);
+      await effectSequence(this.scene, 600, EElfSounds.PRIESTESS_ATTACK);
       target.removeFromGame();
     } else {
-      this.context.sound.play('priestessAttack'); // There is no big attack sound
-      await sceneDelay(this.scene, 600);
+      // There is no big attack sound
+      await effectSequence(this.scene, 600, EElfSounds.PRIESTESS_ATTACK);
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
 
       if (damageDone) this.lifeSteal(damageDone);
@@ -290,8 +279,7 @@ export class Priestess extends DarkElf {
       const healingAmount = this.getTotalHealing(this.basePower * 2);
       target.getsHealed(healingAmount);
     }
-
-    this.context.sound.play('heal');
+    effectSequence(this.scene, 0, EGameSounds.HEAL);
 
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
@@ -301,7 +289,7 @@ export class Priestess extends DarkElf {
 
 export class Wraith extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
-    data.heroKoSound = 'wraithDeath';
+    data.heroKoSound = EElfSounds.WRAITH_DEATH;
     super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
@@ -309,8 +297,7 @@ export class Wraith extends DarkElf {
     turnIfBehind(this.context, this, target);
 
     if (target instanceof Hero && target.isKO) {
-      this.context.sound.play('wraithConsume');
-      await sceneDelay(this.scene, 1500);
+      await effectSequence(this.scene, 1500, EElfSounds.WRAITH_CONSUME);
       target.removeFromGame(true);
 
       if (this.unitsConsumed < 3) {
@@ -322,11 +309,9 @@ export class Wraith extends DarkElf {
       }
     } else {
       if (this.superCharge) {
-        this.context.sound.play('wraithAttackBig');
-        await sceneDelay(this.scene, 4000);
+        await effectSequence(this.scene, 4000, EElfSounds.WRAITH_ATTACK_BIG);
       } else {
-        this.context.sound.play('wraithAttack');
-        await sceneDelay(this.scene, 300);
+        await effectSequence(this.scene, 300, EElfSounds.WRAITH_ATTACK);
       }
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
       if (damageDone) this.lifeSteal(damageDone);
@@ -346,7 +331,7 @@ export class Phantom extends Hero {
   spawnAnim?: Phaser.GameObjects.Image;
 
   constructor(context: GameScene, data: IHero, tile?: Tile, spawned = false) {
-    data.heroKoSound = 'phantomDeath';
+    data.heroKoSound = EElfSounds.PHANTOM_DEATH;
     super(context, data, tile);
 
     if (spawned && tile) {
@@ -369,12 +354,10 @@ export class Phantom extends Hero {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      this.context.sound.play('wraithAttack');
-      await sceneDelay(this.scene, 300);
+      await effectSequence(this.scene, 300, EElfSounds.WRAITH_ATTACK);
       target.removeFromGame();
     } else {
-      this.context.sound.play('wraithAttack');
-      await sceneDelay(this.scene, 300);
+      await effectSequence(this.scene, 300, EElfSounds.WRAITH_ATTACK);
 
       target.getsDamaged(this.getTotalPower(), this.attackType);
 
@@ -396,7 +379,7 @@ export class SoulStone extends Item {
 
   use(target: Hero): void {
     target.equipFactionBuff(this.boardPosition);
-    this.context.sound.play('useHelm');
+    effectSequence(this.scene, 0, EGameSounds.USE_ITEM_GENERIC);
     this.removeFromGame();
   }
 }
@@ -404,6 +387,7 @@ export class SoulStone extends Item {
 export class ManaVial extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
+    this.selectSound = EGameSounds.SELECT_POTION 
   }
 
   use(target: Hero): void {
@@ -411,17 +395,18 @@ export class ManaVial extends Item {
     target.healAndIncreaseHealth(1000, 50);
 
     this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
-    this.context.sound.play('usePotion');
+    effectSequence(this.scene, 0, EGameSounds.USE_POTION);
     this.removeFromGame();
   }
 }
 
 export class SoulHarvest extends Item {
   constructor(context: GameScene, data: IItem) {
+    // TODO: No unique sound?
     super(context, data);
   }
 
-  async use(targetTile: Tile): void {
+  async use(targetTile: Tile): Promise<void> {
     const gameController = this.context.gameController;
     if (!gameController) {
       console.error('SoulHarvest use() No gamecontroller');
@@ -435,8 +420,8 @@ export class SoulHarvest extends Item {
     // Keep track of the cumulative damage done (not attack power used) to enemy heroes (not crystals)
     let totalDamageInflicted = 0;
 
-    this.context.sound.play('useHarvest');
-    await sceneDelay(this.scene, 1000);
+    effectSequence(this.scene, 0, EElfSounds.USE_HARVEST);
+    await effectSequence(this.scene, 1000);
 
     enemyHeroTiles?.forEach(tile => {
       const hero = gameController.board.units.find(unit => unit.boardPosition === tile.boardPosition);
@@ -488,7 +473,7 @@ function createElvesPhantomData(data: Partial<IHero>): IHero {
     magicalDamageResistance: 0,
     baseMagicalDamageResistance: 0,
     canHeal: false,
-    heroKoSound: 'phanotomDeath',
+    heroKoSound: EElfSounds.PHANTOM_DEATH,
     ...createGenericElvesData(data)
   };
 }

@@ -176,8 +176,8 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('useSword', `${CDN_PATH}/audio/Game_Equip_Sword.mp3`);
   context.load.audio('selectShield', `${CDN_PATH}/audio/Touch_Shield.mp3`);
   context.load.audio('useShield', `${CDN_PATH}/audio/Deploy_Shield.mp3`);
-  context.load.audio('selectHelm', `${CDN_PATH}/audio/Touch_Ring.mp3`);
-  context.load.audio('useHelm', `${CDN_PATH}/audio/Deploy_Ring.mp3`);
+  context.load.audio('selectItemGeneric', `${CDN_PATH}/audio/Touch_Ring.mp3`);
+  context.load.audio('useItemGeneric', `${CDN_PATH}/audio/Deploy_Ring.mp3`);
   context.load.audio('selectPotion', `${CDN_PATH}/audio/Touch_Potion.mp3`);
   context.load.audio('usePotion', `${CDN_PATH}/audio/Deploy_Potion.mp3`);
   context.load.audio('resetTurn', `${CDN_PATH}/audio/Generic_Push_Button.mp3`);
@@ -206,7 +206,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('archerAttackBig', `${CDN_PATH}/audio/Civ_Human_Archer_BigAttack.mp3`);
   context.load.audio('archerAttackMelee', `${CDN_PATH}/audio/Civ_Human_Archer_Attack_CloseRange.mp3`);
   context.load.audio('archerDeath', `${CDN_PATH}/audio/Civ_Death_Archer_Element.mp3`);
-  context.load.audio('clericAttack', `${CDN_PATH}/audio/Civ_Cleric_Attack.mp3`);
+  context.load.audio('clericAttack', `${CDN_PATH}/audio/Civ_Human_Cleric_Attack_CloseRange.mp3`);
   context.load.audio('clericAttackBig', `${CDN_PATH}/audio/Civ_Human_Cleric_AttackBig.mp3`);
   context.load.audio('clericDeath', `${CDN_PATH}/audio/Civ_Death_Cleric_Element.mp3`);
   context.load.audio('knightAttack', `${CDN_PATH}/audio/Civ_Knight_Attack.mp3`);
@@ -221,7 +221,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('wizardAttackBig', `${CDN_PATH}/audio/Civ_Human_Wizard_BigAttack.mp3`);
   context.load.audio('wizardDeath', `${CDN_PATH}/audio/Civ_Death_Wizard_Element.mp3`);
   context.load.audio('selectFirebomb', `${CDN_PATH}/audio/Game_FireBomb_Grab_Tile.mp3`);
-  context.load.audio('useInferno', `${CDN_PATH}/audio/Game_FireBomb_Activate.mp3`);
+  context.load.audio('useFirebomb', `${CDN_PATH}/audio/Game_FireBomb_Activate.mp3`);
 
 
   // elves
