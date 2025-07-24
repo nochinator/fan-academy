@@ -1,11 +1,11 @@
 import { Types } from "phaser";
 import { Crystal } from "../classes/crystal";
 import { Hero } from "../classes/hero";
-import { Item } from "../classes/item";
+import { Item} from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EGameStatus, EHeroes, EItems, ERange, ETiles } from "../enums/gameEnums";
+import { EGameStatus, EHeroes, EItems, ERange, ETiles, EGameSounds } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } from "./gameUtils";
+import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck, effectSequence } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
@@ -59,12 +59,16 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
   if (!activeUnit && isFriendly) {
 
     if (unit.boardPosition >= 45) {
-      context.sound.play('selectHeroFromHand');
+      if (isHero(unit)) {
+        effectSequence(context, 0, EGameSounds.SELECT_HERO_FROM_HAND);
+      } else {
+        effectSequence(context, 0, unit.selectSound);
+      }
+      context.thinkingMusic.stop();
     } else {
-      context.sound.play('selectHeroFromBoard');
+      effectSequence(context, 0, EGameSounds.SELECT_HERO_FROM_BOARD);
       context.thinkingMusic.play();
     }
-
 
     if (isHero(unit) && unit.isKO) return; // Can't select KO'd units
 
@@ -109,7 +113,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
         activeUnit.boardPosition < 45 &&
         unit.isKO && !isEnemySpawn(context, unitTile)) {
         activeUnit.move(unitTile);
-        context.sound.play('moveHero'); // so doesn't play in replay
+        effectSequence(context, 0, EGameSounds.MOVE_HERO); // so doesn't play in replay
         context.thinkingMusic.stop()
         return;
       }
@@ -200,6 +204,19 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
     if (isFriendly) {
       if (isHero(unit) && unit.isKO) return;
       deselectUnit(context);
+
+      if (unit.boardPosition >= 45) {
+        if (isHero(unit)) {
+          effectSequence(context, 0, EGameSounds.SELECT_HERO_FROM_HAND);
+        } else {
+          effectSequence(context, 0, unit.selectSound);
+        }
+        context.thinkingMusic.stop();
+      } else {
+        effectSequence(context, 0, EGameSounds.SELECT_HERO_FROM_BOARD);
+        context.thinkingMusic.play();
+      }
+
       return selectUnit(context, unit);
     }
   }
@@ -225,7 +242,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
       activeUnit.move(tile);
 
        // This doesn't play in replay, footstep sound is in move()
-      context.sound.play('moveHero');
+      effectSequence(context, 0, EGameSounds.MOVE_HERO);
       context.thinkingMusic.stop();
     }
     // If unit is in hand and clicked tile is highlighted, spawn. Otherwise, use item

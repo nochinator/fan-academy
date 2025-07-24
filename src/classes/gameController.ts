@@ -1,9 +1,9 @@
 import { sendTurnMessage } from "../colyseus/colyseusGameRoom";
-import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles } from "../enums/gameEnums";
+import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles, EGameSounds } from "../enums/gameEnums";
 import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
-import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } from "../utils/gameUtils";
+import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, visibleUnitCardCheck, effectSequence } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -205,7 +205,7 @@ export class GameController {
     this.context.longPressStart = undefined;
     this.context.visibleUnitCard = undefined;
 
-    this.context.sound.play('resetTurn', {volume: 0.5});
+    effectSequence(this.context, 0, EGameSounds.RESET_TURN);
     this.context.thinkingMusic.stop()
     this.context.scene.restart();
   };

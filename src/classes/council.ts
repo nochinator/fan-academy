@@ -1,7 +1,7 @@
-import { EActionType, EAttackType } from "../enums/gameEnums";
+import { EActionType, EAttackType, ECouncilSounds, EGameSounds } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, equipAnimation, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind, sceneDelay } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, equipAnimation, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind, effectSequence } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -37,7 +37,7 @@ export abstract class Human extends Hero {
 
 export class Archer extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
-    data.heroKoSound = 'archerDeath';
+    data.heroKoSound = ECouncilSounds.ARCHER_DEATH;
     super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
@@ -56,18 +56,15 @@ export class Archer extends Human {
       ) {
         target.removeFromGame();
       } else {
-        this.context.sound.play('archerAttackMelee');
-        await sceneDelay(this.scene, 500);
+        await effectSequence(this.scene, 500, ECouncilSounds.ARCHER_ATTACK_MELEE);
         target.getsDamaged(this.getTotalPower(0.5), this.attackType);
         this.removeAttackModifiers();
       }
     } else {
       if (this.superCharge) {
-        this.context.sound.play('archerAttack');
-        await sceneDelay(this.scene, 750);
+        await effectSequence(this.scene, 750, ECouncilSounds.ARCHER_ATTACK_BIG);
       } else {
-        this.context.sound.play('archerAttack');
-        await sceneDelay(this.scene, 650);
+        await effectSequence(this.scene, 650, ECouncilSounds.ARCHER_ATTACK);
       }
 
       target.getsDamaged(this.getTotalPower(), this.attackType);
@@ -84,7 +81,7 @@ export class Archer extends Human {
 
 export class Knight extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
-    data.heroKoSound = 'knightDeath';
+    data.heroKoSound = ECouncilSounds.KNIGHT_DEATH;
     super(context, data, tile);
   }
 
@@ -108,11 +105,9 @@ export class Knight extends Human {
       target.removeFromGame();
     } else {
       if (this.superCharge) {
-        this.context.sound.play('knightAttackBig');
-        await sceneDelay(this.scene, 750);
+        await effectSequence(this.scene, 750, ECouncilSounds.KNIGHT_ATTACK_BIG);
       } else {
-        this.context.sound.play('knightAttack');
-        await sceneDelay(this.scene, 750);
+        await effectSequence(this.scene, 650, ECouncilSounds.KNIGHT_ATTACK);
         target.getsDamaged(this.getTotalPower(), this.attackType);
       }
 
@@ -132,7 +127,7 @@ export class Knight extends Human {
 
 export class Wizard extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
-    data.heroKoSound = 'wizardDeath';
+    data.heroKoSound = ECouncilSounds.WIZARD_DEATH;
     super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
@@ -163,17 +158,16 @@ export class Wizard extends Human {
 
 
       if (this.superCharge) {
-        this.context.sound.play('wizardAttackBig');
+        await effectSequence(this.scene, 750, ECouncilSounds.WIZARD_ATTACK_BIG);
       } else {
-        this.context.sound.play('wizardAttack');
+        await effectSequence(this.scene, 750, ECouncilSounds.WIZARD_ATTACK);
       }
 
       // Apply damage to targets
-      await sceneDelay(this.scene, 750);
       target.getsDamaged(this.getTotalPower(), this.attackType);
-      await sceneDelay(this.scene, 250);
+      await effectSequence(this.scene, 250);
       if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
-      await sceneDelay(this.scene, 250);
+      await effectSequence(this.scene, 250);
       if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
 
       this.removeAttackModifiers();
@@ -280,7 +274,7 @@ export class Wizard extends Human {
 
 export class Ninja extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
-    data.heroKoSound = 'ninjaDeath';
+    data.heroKoSound = ECouncilSounds.NINJA_DEATH;
     super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
@@ -300,11 +294,9 @@ export class Ninja extends Human {
         target.removeFromGame();
       } else {
         if (this.superCharge) {
-          this.context.sound.play('ninjaAttackBig');
-          await sceneDelay(this.scene, 650);
+          await effectSequence(this.scene, 650, ECouncilSounds.ARCHER_ATTACK_BIG);
         } else {
-          this.context.sound.play('ninjaAttack');
-          await sceneDelay(this.scene, 500);
+          await effectSequence(this.scene, 500, ECouncilSounds.NINJA_ATTACK);
         }
         target.getsDamaged(this.getTotalPower(2), this.attackType);
       }
@@ -312,11 +304,11 @@ export class Ninja extends Human {
 
     } else {
       if (this.superCharge) {
-        this.context.sound.play('ninjaAttackBig');
-        this.scene.time.delayedCall(650, () =>  target.getsDamaged(this.getTotalPower(), this.attackType));
+        await effectSequence(this.scene, 500, ECouncilSounds.NINJA_ATTACK_BIG);
+        target.getsDamaged(this.getTotalPower(), this.attackType);
       } else {
-        this.context.sound.play('ninjaAttackRanged');
-        this.scene.time.delayedCall(650, () =>  target.getsDamaged(this.getTotalPower(), this.attackType));
+        await effectSequence(this.scene, 500, ECouncilSounds.NINJA_ATTACK);
+        target.getsDamaged(this.getTotalPower(), this.attackType);
       }
       this.removeAttackModifiers();
     }
@@ -346,7 +338,7 @@ export class Ninja extends Human {
 
     gameController?.afterAction(EActionType.TELEPORT, targetDestination.boardPosition, unitDestination.boardPosition);
 
-    this.context.sound.play('ninjaSmoke');
+    effectSequence(this.scene, 500, ECouncilSounds.NINJA_SMOKE);
   };
 
   heal(_target: Hero): void {};
@@ -354,7 +346,7 @@ export class Ninja extends Human {
 
 export class Cleric extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
-    data.heroKoSound = 'clericDeath';
+    data.heroKoSound = ECouncilSounds.CLERIC_DEATH;
     super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
@@ -371,11 +363,9 @@ export class Cleric extends Human {
       target.removeFromGame();
     } else {
       if (this.superCharge) {
-        this.context.sound.play('clericAttackBig');
-        await sceneDelay(this.scene, 750);
+        await effectSequence(this.scene, 750, ECouncilSounds.CLERIC_ATTACK_BIG);
       } else {
-        this.context.sound.play('clericAttack');
-        await sceneDelay(this.scene, 500);
+        await effectSequence(this.scene, 300, ECouncilSounds.CLERIC_ATTACK);
       }
       target.getsDamaged(this.getTotalPower(), this.attackType)
 
@@ -396,12 +386,8 @@ export class Cleric extends Human {
       target.getsHealed(healingAmount);
     }
 
-    this.context.sound.play('heal');
-    this.context.time.addEvent({
-      delay: 1000,
-      callback: () => {this.context.sound.play('healExtra')},
-      callbackScope: this
-    });
+    effectSequence(this.scene, 1000, EGameSounds.HEAL);
+    effectSequence(this.scene, 0, EGameSounds.HEAL_EXTRA);
 
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
@@ -412,11 +398,12 @@ export class Cleric extends Human {
 export class DragonScale extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
+    this.selectSound = EGameSounds.SELECT_SHIELD
   }
 
   use(target: Hero): void {
     target.equipFactionBuff(this.boardPosition);
-    this.context.sound.play('useShield');
+    effectSequence(this.scene, 0, EGameSounds.USE_SHIELD);
     this.removeFromGame();
   }
 }
@@ -424,6 +411,7 @@ export class DragonScale extends Item {
 export class HealingPotion extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
+    this.selectSound = EGameSounds.SELECT_POTION
   }
 
   use(target: Hero): void {
@@ -435,7 +423,7 @@ export class HealingPotion extends Item {
 
     this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
 
-    this.context.sound.play('potion');
+    effectSequence(this.scene, 0, EGameSounds.USE_POTION);
 
     this.removeFromGame();
   }
@@ -444,6 +432,7 @@ export class HealingPotion extends Item {
 export class Inferno extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
+    this.selectSound = ECouncilSounds.SELECT_FIREBOMB 
   };
 
   async use(targetTile: Tile): Promise<void> {
@@ -451,9 +440,8 @@ export class Inferno extends Item {
     const damage = 350;
 
     const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, targetTile);
-    
-    this.context.sound.play('useInferno');
-    await sceneDelay(this.scene, 1000);
+
+    effectSequence(this.scene, 1000, ECouncilSounds.USE_FIREBOMB);
 
     enemyHeroTiles?.forEach(tile => {
       const hero = this.context.gameController?.board.units.find(unit => unit.boardPosition === tile.boardPosition);

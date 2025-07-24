@@ -161,9 +161,12 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
   };
 }
 
-export function sceneDelay(scene: Phaser.Scene, ms: number): Promise<void> {
+export function effectSequence(scene: Phaser.Scene, delay: number, sound?: string, Anim?: string): Promise<void> {
   return new Promise(resolve => {
-      scene.time.delayedCall(ms, resolve);
+    if (sound) {
+      scene.sound.play(sound);
+    }  
+      scene.time.delayedCall(delay, resolve);
   });
 }
 
