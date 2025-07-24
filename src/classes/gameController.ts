@@ -1,5 +1,5 @@
 import { sendTurnMessage } from "../colyseus/colyseusGameRoom";
-import { EActionClass, EActionType, EGameStatus, EHeroes, EPopups, ETiles } from "../enums/gameEnums";
+import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles } from "../enums/gameEnums";
 import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
