@@ -251,7 +251,7 @@ export class Board {
       const distance = getGridDistance(tile.row, tile.col, heroTile.row, heroTile.col);
 
       if (distance <= range) {
-        if (rangeType === ERange.MOVE && !tile.isOccupied()) {
+        if (rangeType === ERange.MOVE && (!tile.isOccupied() && !tile.hero)) {
           if (!isEnemySpawn(this.context, tile)) inRangeTiles.push(tile);
         }
         if (rangeType === ERange.ATTACK || rangeType === ERange.HEAL) {

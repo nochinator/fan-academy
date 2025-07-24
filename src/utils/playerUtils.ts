@@ -39,10 +39,10 @@ export function selectUnit(context: GameScene, unit: Hero | Item): void {
 }
 
 export function deselectUnit(context: GameScene): void {
-  context.activeUnit!.isActive = false;
+  if (!context.activeUnit) return;
+
+  context.activeUnit.isActive = false;
   context.activeUnit = undefined;
-  // Clear highlighted tiles, if any
   context.gameController?.board.clearHighlights();
-  // Clear reticles from units, if any
   context.gameController?.board.removeReticles();
 }

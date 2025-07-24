@@ -7,6 +7,7 @@ import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getN
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
+import { ConcedeWarningPopup } from "./concedePopup";
 import { Deck } from "./deck";
 import { Door } from "./door";
 import { GameUI } from "./gameUI";
@@ -37,6 +38,8 @@ export class GameController {
   playerData: IUserData[];
 
   gameOver: IGameOver | undefined;
+  concedeButton: Phaser.GameObjects.Image;
+  concedePopup: ConcedeWarningPopup;
 
   constructor(context: GameScene) {
     if (context.triggerReplay) context.chatComponent!.pointerEvents = 'none';
@@ -59,6 +62,9 @@ export class GameController {
     this.turnPopup = new TurnWarningPopup(context);
 
     this.rematchButton = new RematchButton(context).setVisible(false);
+
+    this.concedeButton = this.addConcedeButton(context);
+    this.concedePopup = new ConcedeWarningPopup(context);
 
     if (this.game.status === EGameStatus.FINISHED) {
       this.rematchButton.setVisible(true);
@@ -88,6 +94,14 @@ export class GameController {
 
     // Add a generic gameobject pointer event to make it easier to hide a unit info card
     context.input.on('gameobjectdown', () => visibleUnitCardCheck(context));
+  }
+
+  addConcedeButton(context: GameScene): Phaser.GameObjects.Image {
+    const button = context.add.image(1350, 70, 'concedeButton').setScale(0.9).setInteractive({ useHandCursor: true });
+    button.on('pointerdown', ()=> {
+      this.concedePopup.setVisible(true);
+    });
+    return button;
   }
 
   async replayTurn() {
@@ -189,6 +203,11 @@ export class GameController {
   async resetTurn() {
     effectSequence(this.context, 0, EGameSounds.RESET_TURN);
     this.context.thinkingMusic.stop()
+    
+    deselectUnit(this.context);
+    this.context.longPressStart = undefined;
+    this.context.visibleUnitCard = undefined;
+
     this.context.scene.restart();
   };
 

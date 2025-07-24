@@ -426,7 +426,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const superCharge = this.superCharge ? 3 : 1;
     const priestessDebuff = this.isDebuffed ? 0.5 : 1;
 
-    return (this.basePower * rangeModifier + attackTileBuff) * superCharge * priestessDebuff * runeMetalBuff;
+    return (this.basePower + attackTileBuff) * rangeModifier * superCharge * priestessDebuff * runeMetalBuff;
   }
 
   getLifeLost(damage: number, attackType: EAttackType) {

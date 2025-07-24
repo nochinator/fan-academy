@@ -1,4 +1,3 @@
-
 export const CDN_PATH = 'https://cdn.jsdelivr.net/gh/Dan-DH/fa-assets@69f4855';
 
 // PreloaderScene.ts

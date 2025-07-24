@@ -8,6 +8,10 @@
   src:url('/fonts/BlambotFXProHeavyLowerCapsBB.woff')
 }
 
+body {
+  background-color: #14181b;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

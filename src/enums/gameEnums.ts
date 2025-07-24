@@ -36,6 +36,7 @@ export enum EActionType {
   USE = 'use',
   SHUFFLE = 'shuffle',
   TELEPORT = 'teleport',
+  CONCEDE = 'concede',
 
   // Automated actions
   DRAW = 'draw',
@@ -124,6 +125,11 @@ export enum EChallengePopup {
   ACCEPT = 'accept'
 }
 
+export enum EPopups {
+  TURN = 'turn',
+  CONCEDE = 'concede'
+}
+
 export enum EGameSounds {
   THINKING_MUSIC = 'thinkingMusic',
   SELECT_HERO_FROM_HAND = 'selectHeroFromHand',
@@ -210,4 +216,3 @@ export enum EElfSounds {
   WRAITH_DEATH = 'wraithDeath',
   WRAITH_CONSUME = 'wraithConsume',
   USE_HARVEST = 'useHarvest',
-}
