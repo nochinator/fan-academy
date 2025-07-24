@@ -258,8 +258,6 @@ export class Board {
          * -Tile is occupied by a dead phantom awaiting collection
          */
         if (!isEnemySpawn(this.context, tile) && rangeType === ERange.MOVE) {
-          console.log('this logs');
-          console.log('tile');
           if (
             !tile.isOccupied() &&
             tile.hero?.unitType !== EHeroes.PHANTOM ||
