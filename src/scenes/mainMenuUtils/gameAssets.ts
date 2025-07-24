@@ -247,7 +247,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('phantomDeath', `${CDN_PATH}/audio/DE-Phantom_Death.mp3`);
   context.load.audio('voidMonkAttack', `${CDN_PATH}/audio/DE-VoidMonk_Attack_Punch.mp3`);
   context.load.audio('voidMonkAttackBig', `${CDN_PATH}/audio/DE-VoidMonk_AttackBig.mp3`);
-  context.load.audio('voidMonkDeath', `${CDN_PATH}/audio/DE-VoidMonk_Death.mp3`);
+  context.load.audio('voidmonkDeath', `${CDN_PATH}/audio/DE-VoidMonk_Death.mp3`);
   context.load.audio('wraithSpawn', `${CDN_PATH}/audio/DE-Wraith_Birth.mp3`);
   context.load.audio('wraithAttack', `${CDN_PATH}/audio/Civ_DarkElf_Attack_Spell_1.mp3`);
   context.load.audio('wraithAttackBig', `${CDN_PATH}/audio/DE-Wraith_BigAttack.mp3`);
