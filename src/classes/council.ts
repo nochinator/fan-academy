@@ -89,11 +89,8 @@ export class Knight extends Human {
     // Keep original position for replay purposes
     const startingPosition = target.boardPosition;
 
-    const distance = this.getDistanceToTarget(target);
-
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
-      distance === 1 &&
       target instanceof Hero &&
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
