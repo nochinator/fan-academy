@@ -221,7 +221,6 @@ export class Board {
   }
 
   getHeroTilesInRange(hero: Hero, rangeType: ERange): Tile[] {
-    const inRangeTiles: Tile[] = [];
     const heroTile = this.getTileFromBoardPosition(hero.boardPosition);
     let range: number;
 
@@ -247,20 +246,35 @@ export class Board {
       return [];
     }
 
+    const inRangeTiles = new Set<Tile>;
+
     this.tiles.forEach(tile => {
       const distance = getGridDistance(tile.row, tile.col, heroTile.row, heroTile.col);
 
       if (distance <= range) {
-        if (rangeType === ERange.MOVE && (!tile.isOccupied() && !tile.hero)) {
-          if (!isEnemySpawn(this.context, tile)) inRangeTiles.push(tile);
+        /**
+         * -Tile is in range
+         * -Tile is not occupied (unit or crystal)
+         * -Tile is occupied by a dead phantom awaiting collection
+         */
+        if (!isEnemySpawn(this.context, tile) && rangeType === ERange.MOVE) {
+          console.log('this logs');
+          console.log('tile');
+          if (
+            !tile.isOccupied() &&
+            tile.hero?.unitType !== EHeroes.PHANTOM ||
+            tile.hero?.unitType === EHeroes.PHANTOM &&
+            tile.hero?.currentHealth === 0
+          )  inRangeTiles.add(tile);
         }
+
         if (rangeType === ERange.ATTACK || rangeType === ERange.HEAL) {
-          if (tile.crystal || tile.hero && tile.hero.unitId !== hero.unitId) inRangeTiles.push(tile);
+          if (tile.crystal || tile.hero && tile.hero.unitId !== hero.unitId) inRangeTiles.add(tile);
         }
       }
     });
 
-    return inRangeTiles;
+    return [...inRangeTiles];
   }
 
   getAreaOfEffectTiles(tile: Tile): Tile[] {
