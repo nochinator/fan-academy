@@ -394,7 +394,7 @@ export class SoulHarvest extends Item {
     // Damages enemy units and crystals but doesn't remove KO'd enemy units
     const damage = 100;
 
-    const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, targetTile);
+    const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, this, targetTile);
 
     // Keep track of the cumulative damage done (not attack power used) to enemy heroes (not crystals)
     let totalDamageInflicted = 0;
@@ -412,9 +412,7 @@ export class SoulHarvest extends Item {
       const crystal = gameController.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('SoulHarvest use() crystal not found');
 
-      if (!belongsToPlayer(this.context, crystal)) {
-        crystal.getsDamaged(damage);
-      }
+      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage);
     });
 
     // Get total amount of friendly units in the map, including KO'd ones

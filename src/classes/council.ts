@@ -396,7 +396,7 @@ export class Inferno extends Item {
     // Damages enemy units and crystals, and removes enemy KO'd units
     const damage = 350;
 
-    const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, targetTile);
+    const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, this, targetTile);
 
     enemyHeroTiles?.forEach(tile => {
       const hero = this.context.gameController?.board.units.find(unit => unit.boardPosition === tile.boardPosition);
@@ -415,9 +415,7 @@ export class Inferno extends Item {
       const crystal = this.context.gameController?.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('Inferno use() crystal not found');
 
-      if (!belongsToPlayer(this.context, crystal)) {
-        crystal.getsDamaged(damage);
-      }
+      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage);
     });
 
     this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);

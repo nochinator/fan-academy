@@ -165,7 +165,7 @@ export function getActionClass(action: EActionType): EActionClass {
   return [EActionType.PASS, EActionType.DRAW, EActionType.REMOVE_UNITS].includes(action) ? EActionClass.AUTO : EActionClass.USER;
 }
 
-export function getAOETiles(context: GameScene, targetTile: Tile): {
+export function getAOETiles(context: GameScene, spell: Item,  targetTile: Tile): {
   enemyHeroTiles: Tile[],
   enemyCrystalTiles: Tile[]
 } {
@@ -174,9 +174,9 @@ export function getAOETiles(context: GameScene, targetTile: Tile): {
 
   const areOfEffect = board.getAreaOfEffectTiles(targetTile);
 
-  const enemyHeroTiles = areOfEffect?.filter(tile => tile.isEnemy(context.userId));
+  const enemyHeroTiles = areOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo !== spell.belongsTo);
 
-  const enemyCrystalTiles = areOfEffect?.filter(tile => tile.tileType === ETiles.CRYSTAL);
+  const enemyCrystalTiles = areOfEffect?.filter(tile => tile.tileType === ETiles.CRYSTAL && tile.crystal?.belongsTo !== spell.belongsTo);
 
   return {
     enemyHeroTiles,
