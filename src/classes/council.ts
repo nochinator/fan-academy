@@ -466,7 +466,6 @@ export class DragonScale extends Item {
   async use(target: Hero): Promise<void> {
     target.equipFactionBuff(this.boardPosition);
     this.removeFromGame();
-    this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
     await timeDelay(this.context, 1000)
   }
 }
