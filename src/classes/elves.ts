@@ -531,6 +531,10 @@ export class SoulHarvest extends Item {
       }
     });
 
+    if (enemyCrystalTiles.length === 0 && enemyHeroTiles.length === 0) {
+      await timeDelay(this.scene, 700);
+    }
+
     // Get total amount of friendly units in the map, including KO'd ones
     const friendlyUnits = gameController.board.units.filter(unit => unit.belongsTo === this.belongsTo);
 
@@ -543,7 +547,7 @@ export class SoulHarvest extends Item {
     this.removeFromGame();
 
     await Promise.all(replayWait);
-    await timeDelay(this.scene, 500);
+    await timeDelay(this.context, 500);
   }
 }
 

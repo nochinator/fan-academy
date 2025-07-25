@@ -534,6 +534,10 @@ export class Inferno extends Item {
       replayWait.push(currentReplayWait);
     });
 
+    if (enemyCrystalTiles.length === 0 && enemyHeroTiles.length === 0) {
+      await timeDelay(this.scene, 800);
+    }
+
     this.removeFromGame();
     this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
 
