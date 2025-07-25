@@ -378,10 +378,10 @@ export function generateFourDigitId(): number {
   return Math.floor(1000 + Math.random() * 9000);
 }
 
-export function equipAnimation(image: GameObjects.Image): void {
+export function useAnimation(image: GameObjects.Image, scale = 2): void {
   image.scene.tweens.add({
     targets: image,
-    scale: 2,
+    scale,
     alpha: 0,
     duration: 1000,
     onComplete: () => {

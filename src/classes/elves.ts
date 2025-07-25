@@ -2,7 +2,7 @@ import { EActionType, EAttackType, EClass, EFaction, EHeroes } from "../enums/ga
 
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, equipAnimation, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, useAnimation, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -15,7 +15,7 @@ export abstract class DarkElf extends Hero {
 
   equipFactionBuff(handPosition: number): void {
     const soulStone = this.scene.add.image(this.x, this.y - 10, 'soulStone').setOrigin(0.5).setDepth(100);
-    equipAnimation(soulStone);
+    useAnimation(soulStone);
 
     this.factionBuff = true;
     this.factionBuffImage.setVisible(true);
@@ -44,7 +44,7 @@ export class Impaler extends DarkElf {
     super(context, data, tile);
   }
   async attack(target: Hero | Crystal): Promise<void> {
-    this.flashAttacker();
+    this.flashActingUnit();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -87,7 +87,7 @@ export class VoidMonk extends DarkElf {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
-    this.flashAttacker();
+    this.flashActingUnit();
     turnIfBehind(this.context, this, target);
 
     const splashedEnemies: (Hero | Crystal)[] = [];
@@ -176,7 +176,7 @@ export class Necromancer extends DarkElf {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
-    this.flashAttacker();
+    this.flashActingUnit();
     const gameController = this.context.gameController!;
 
     turnIfBehind(this.context, this, target);
@@ -221,7 +221,7 @@ export class Priestess extends DarkElf {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
-    this.flashAttacker();
+    this.flashActingUnit();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -255,6 +255,7 @@ export class Priestess extends DarkElf {
   }
 
   heal(target: Hero): void {
+    this.flashActingUnit();
     turnIfBehind(this.context, this, target);
 
     if (target.isKO) {
@@ -276,7 +277,7 @@ export class Wraith extends DarkElf {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
-    this.flashAttacker();
+    this.flashActingUnit();
     turnIfBehind(this.context, this, target);
 
     if (target instanceof Hero && target.isKO) {
@@ -321,7 +322,7 @@ export class Phantom extends Hero {
   }
 
   attack(target: Hero | Crystal): void {
-    this.flashAttacker();
+    this.flashActingUnit();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -366,7 +367,7 @@ export class ManaVial extends Item {
 
   use(target: Hero): void {
     const potionImage = this.scene.add.image(target.x, target.y - 10, 'manaVial').setDepth(100);
-    equipAnimation(potionImage);
+    useAnimation(potionImage);
 
     if (target.isKO) return;
     target.healAndIncreaseHealth(1000, 50);
@@ -382,6 +383,9 @@ export class SoulHarvest extends Item {
   }
 
   use(targetTile: Tile): void {
+    const infernoImage = this.scene.add.image(targetTile.x, targetTile.y - 20, 'soulHarvestShockWave').setDepth(100);
+    useAnimation(infernoImage);
+
     const gameController = this.context.gameController;
     if (!gameController) {
       console.error('SoulHarvest use() No gamecontroller');
@@ -398,7 +402,7 @@ export class SoulHarvest extends Item {
     enemyHeroTiles?.forEach(tile => {
       const hero = gameController.board.units.find(unit => unit.boardPosition === tile.boardPosition);
 
-      if (!hero) throw new Error('Inferno use() hero not found');
+      if (!hero) throw new Error('SoulHarvest use() hero not found');
       if (hero.isKO) return;
 
       totalDamageInflicted += hero.getsDamaged(damage, EAttackType.MAGICAL);
@@ -406,7 +410,7 @@ export class SoulHarvest extends Item {
 
     enemyCrystalTiles.forEach(tile => {
       const crystal = gameController.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
-      if (!crystal) throw new Error('Inferno use() crystal not found');
+      if (!crystal) throw new Error('SoulHarvest use() crystal not found');
 
       if (!belongsToPlayer(this.context, crystal)) {
         crystal.getsDamaged(damage);

@@ -45,6 +45,9 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('infernoAnim_5', `${CDN_PATH}/images/gameItems/animations/Inferno_Fireball05-hd.webp`);
   context.load.image('infernoAnim_6', `${CDN_PATH}/images/gameItems/animations/Inferno_Fireball06-hd.webp`);
 
+  context.load.image('infernoShockWave', `${CDN_PATH}/images/factions/council/Inferno_Shockwave01-hd.webp`);
+  context.load.image('soulHarvestShockWave', `${CDN_PATH}/images/factions/darkElves/SoulHarvest_Shockwave01-hd.webp`);
+
   // Character animations
   context.load.image('smokeAnim_1', `${CDN_PATH}/images/gameItems/animations/NinjaSmoke_Puff01-hd.webp`);
   context.load.image('smokeAnim_2', `${CDN_PATH}/images/gameItems/animations/NinjaSmoke_Puff02-hd.webp`);

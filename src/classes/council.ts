@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EHeroes } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, equipAnimation, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, useAnimation, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -15,7 +15,7 @@ export abstract class Human extends Hero {
 
   equipFactionBuff(handPosition: number): void {
     const dragonScaleImg = this.scene.add.image(this.x + 10, this.y - 10, 'dragonScale').setOrigin(0.5).setDepth(100);
-    equipAnimation(dragonScaleImg);
+    useAnimation(dragonScaleImg);
 
     this.factionBuff = true;
     this.factionBuffImage.setVisible(true);
@@ -38,7 +38,7 @@ export class Archer extends Human {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
-    this.flashAttacker();
+    this.flashActingUnit();
 
     const distance = this.getDistanceToTarget(target);
 
@@ -76,7 +76,7 @@ export class Knight extends Human {
   }
 
   async attack(target: Hero | Crystal): Promise<void> {
-    this.flashAttacker();
+    this.flashActingUnit();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -112,7 +112,7 @@ export class Wizard extends Human {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
-    this.flashAttacker();
+    this.flashActingUnit();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -252,7 +252,7 @@ export class Ninja extends Human {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
-    this.flashAttacker();
+    this.flashActingUnit();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -308,7 +308,7 @@ export class Cleric extends Human {
     super(context, data, tile);
   }
   attack(target: Hero | Crystal): void {
-    this.flashAttacker();
+    this.flashActingUnit();
     const gameController = this.context.gameController!;
 
     turnIfBehind(this.context, this, target);
@@ -338,6 +338,7 @@ export class Cleric extends Human {
   }
 
   heal(target: Hero): void {
+    this.flashActingUnit();
     turnIfBehind(this.context, this, target);
 
     if (target.isKO) {
@@ -372,7 +373,7 @@ export class HealingPotion extends Item {
 
   use(target: Hero): void {
     const potionImage = this.scene.add.image(target.x, target.y - 10, 'healingPotion').setDepth(100);
-    equipAnimation(potionImage);
+    useAnimation(potionImage);
 
     const healingAmount = target.isKO ? 100 : 1000;
     target.getsHealed(healingAmount);
@@ -389,6 +390,9 @@ export class Inferno extends Item {
   };
 
   use(targetTile: Tile): void {
+    const infernoImage = this.scene.add.image(targetTile.x, targetTile.y, 'infernoShockWave').setDepth(100);
+    useAnimation(infernoImage, 3);
+
     // Damages enemy units and crystals, and removes enemy KO'd units
     const damage = 350;
 
