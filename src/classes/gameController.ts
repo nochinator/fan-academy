@@ -206,6 +206,7 @@ export class GameController {
       fontSize: 50,
       color: '#fffb00'
     });
+    effectSequence(this.context, EGameSounds.RETURN_ITEM);
     await textAnimation(testText, 1.3);
   }
 
