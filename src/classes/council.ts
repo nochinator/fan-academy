@@ -62,7 +62,7 @@ export class Archer extends Human {
       } else {
         effectSequence(this.scene, ECouncilSounds.ARCHER_ATTACK_MELEE);
         delay = 500;
-        [replayWait, ] = target.getsDamaged(this.getTotalPower(0.5), this.attackType);
+        [replayWait, ] = target.getsDamaged(this.getTotalPower(0.5), this.attackType, delay);
         this.removeAttackModifiers();
       }
     } else {
@@ -324,7 +324,7 @@ export class Ninja extends Human {
           effectSequence(this.scene, ECouncilSounds.NINJA_ATTACK);
           delay = 500;
         }
-        [replayWait, ] = target.getsDamaged(this.getTotalPower(2), this.attackType);
+        [replayWait, ] = target.getsDamaged(this.getTotalPower(2), this.attackType, delay);
       }
       this.removeAttackModifiers();
 
@@ -496,7 +496,7 @@ export class Inferno extends Item {
     effectSequence(this.scene, ECouncilSounds.USE_FIREBOMB);
 
     enemyHeroTiles?.forEach(tile => {
-      const hero = this.context.gameController?.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+      const hero = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
       if (!hero) throw new Error('Inferno use() hero not found');
 
       // Inferno removes KO'd enemy units
@@ -510,11 +510,11 @@ export class Inferno extends Item {
     });
 
     enemyCrystalTiles.forEach(tile => {
-      const crystal = this.context.gameController?.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
+      const crystal = this.context.gameController!.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('Inferno use() crystal not found');
 
       if (!belongsToPlayer(this.context, crystal)) {
-        [currentReplayWait, ] = crystal.getsDamaged(damage, null, 800);
+        [currentReplayWait, ] = crystal.getsDamaged(damage, EAttackType.MAGICAL, 800);
       }
       replayWait.push(currentReplayWait);
     });

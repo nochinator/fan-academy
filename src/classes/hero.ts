@@ -736,7 +736,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.unitCard.updateCardMagicalResistance(this);
     this.updateTileData();
 
-    this.context.gameController?.afterAction(EActionType.USE, handPosition, this.boardPosition);
+    this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
   equipRunemetal(handPosition: number): void {

@@ -237,7 +237,7 @@ export class Necromancer extends DarkElf {
 
       tile.hero = phantom.exportData();
 
-      this.context.gameController?.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
+      this.context.gameController!.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
     } else {
       if (this.superCharge) {
         effectSequence(this.scene, EElfSounds.NECRO_ATTACK_BIG);
@@ -482,7 +482,7 @@ export class SoulHarvest extends Item {
   }
 
   use(targetTile: Tile): void {
-    const gameController = this.context.gameController;
+    const gameController = this.context.gameController!;
     if (!gameController) {
       console.error('SoulHarvest use() No gamecontroller');
       return;
@@ -516,7 +516,7 @@ export class SoulHarvest extends Item {
       if (!crystal) throw new Error('Inferno use() crystal not found');
 
       if (!belongsToPlayer(this.context, crystal)) {
-        const [replayWaitLocal, ] = crystal.getsDamaged(damage, null, 700);
+        const [replayWaitLocal, ] = crystal.getsDamaged(damage, EAttackType.MAGICAL, 700);
         replayWait.push(replayWaitLocal)
       }
     });
