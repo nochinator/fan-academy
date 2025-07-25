@@ -552,15 +552,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
 
-    // Can't immediately destroy Phantoms to avoid bugs. Make them invisible and they will be collected automatically at the end of the turn
-    if (this.unitType === EHeroes.PHANTOM) {
-      this.isKO = true;
-      this.lastBreath = true;
-      this.setVisible(false);
-      tile.hero = undefined;
-      this.removeInteractive();
-    }
-
     await timeDelay(this.context, 250);
   }
 
