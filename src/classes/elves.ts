@@ -348,9 +348,8 @@ export class Wraith extends DarkElf {
 
     if (target instanceof Hero && target.isKO) {
       effectSequence(this.scene, EElfSounds.WRAITH_CONSUME);
-      replayWait = timeDelay(this.scene, 0);
+      replayWait = timeDelay(this.scene, 1500);
       target.removeFromGame(true, false);
-      await timeDelay(this.scene, 1500);
 
 
       if (this.unitsConsumed < 3) {
