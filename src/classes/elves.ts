@@ -254,8 +254,6 @@ export class Necromancer extends DarkElf {
       this.removeAttackModifiers();
 
       if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
-
-      this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     }
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
