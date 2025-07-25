@@ -510,17 +510,20 @@ export class SoulHarvest extends Item {
 
     effectSequence(this.scene, EElfSounds.USE_HARVEST);
 
+    let playSound = true
     enemyHeroTiles?.forEach(tile => {
       const hero = gameController.board.units.find(unit => unit.boardPosition === tile.boardPosition);
 
       if (!hero) throw new Error('SoulHarvest use() hero not found');
       if (hero.isKO) return;
 
-      const [replayWaitLocal, damageLocal] = hero.getsDamaged(damage, EAttackType.MAGICAL, 700);
+      const [replayWaitLocal, damageLocal] = hero.getsDamaged(damage, EAttackType.MAGICAL, 700, playSound);
       replayWait.push(replayWaitLocal);
       totalDamageInflicted += damageLocal;
+      playSound = false; // don't stack sound for loud volume (will stack ko sound)
     });
 
+    playSound = true
     enemyCrystalTiles.forEach(tile => {
       const crystal = gameController.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('SoulHarvest use() crystal not found');
@@ -528,6 +531,7 @@ export class SoulHarvest extends Item {
       if (!belongsToPlayer(this.context, crystal)) {
         const [replayWaitLocal, ] = crystal.getsDamaged(damage, EAttackType.MAGICAL, 700);
         replayWait.push(replayWaitLocal)
+        playSound = false; // don't stack sound for loud volume (will stack ko sound)
       }
     });
 

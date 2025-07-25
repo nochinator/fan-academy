@@ -511,6 +511,7 @@ export class Inferno extends Item {
 
     effectSequence(this.scene, ECouncilSounds.USE_FIREBOMB);
 
+    let playSound = true;
     enemyHeroTiles?.forEach(tile => {
       const hero = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
       if (!hero) throw new Error('Inferno use() hero not found');
@@ -521,17 +522,20 @@ export class Inferno extends Item {
         return;
       }
 
-      [currentReplayWait, ] = hero.getsDamaged(damage, EAttackType.MAGICAL, 800);
+      [currentReplayWait, ] = hero.getsDamaged(damage, EAttackType.MAGICAL, 800, playSound);
       replayWait.push(currentReplayWait);
+      playSound = false; // don't stack sound for loud volume (will stack ko sound)
     });
 
+    playSound = true
     enemyCrystalTiles.forEach(tile => {
       const crystal = this.context.gameController!.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('Inferno use() crystal not found');
 
-      if (!belongsToPlayer(this.context, crystal)) [currentReplayWait, ] = crystal.getsDamaged(damage, EAttackType.MAGICAL, 800);
+      if (!belongsToPlayer(this.context, crystal)) [currentReplayWait, ] = crystal.getsDamaged(damage, EAttackType.MAGICAL, 800, playSound);
       
       replayWait.push(currentReplayWait);
+      playSound = false; // don't stack sound for loud volume (will stack ko sound)
     });
 
     if (enemyCrystalTiles.length === 0 && enemyHeroTiles.length === 0) {

@@ -418,8 +418,11 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Show damage numbers
     if (totalDamage > 0) new FloatingText(this.context, this.x, this.y - 50, totalDamage.toString());
 
-    this.unitCard.updateCardHealth(this);
-    this.updateTileData();
+    // phantom won't exist any more
+    if (this.unitType != EHeroes.PHANTOM) {
+      this?.unitCard.updateCardHealth(this);
+      this.updateTileData();
+    }
 
     if (koWait) {
       await koWait;
@@ -546,10 +549,14 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const heroKoSound = `${this.unitType}Death`
     effectSequence(this.context, heroKoSound)
 
-    this.characterImage.setTexture(this.updateCharacterImage());
-    const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, true);
-    this.characterImage.x = charImageX;
-    this.characterImage.y = charImageY;
+    // phantom won't exist anymore
+    if (this.unitType != EHeroes.PHANTOM) {
+      this.characterImage.setTexture(this.updateCharacterImage());
+      const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, true);
+      this.characterImage.x = charImageX;
+      this.characterImage.y = charImageY;
+    }
+
 
     await timeDelay(this.context, 250);
   }
