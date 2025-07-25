@@ -112,7 +112,7 @@ export async function createGameList(context: UIScene) {
           if (pointerMoved) return; // skip tap if user was swiping
 
           sendDeletedGameMessage(context.lobbyRoom!, game._id, context.userId);
-          effectSequence(context, 0, EGameSounds.DELETE_GAME);
+          effectSequence(context, EGameSounds.DELETE_GAME);
           createGameList(context);
         });
       }
@@ -133,7 +133,7 @@ export async function createGameList(context: UIScene) {
           if (pointerMoved) return; // skip tap if user was swiping
 
           highlightGameButton();
-          effectSequence(context, 0, EGameSounds.BUTTON_PRESS_GENERIC);
+          effectSequence(context, EGameSounds.BUTTON_PRESS_GENERIC);
           await accessGame(context, game);
         });
       }
@@ -144,7 +144,7 @@ export async function createGameList(context: UIScene) {
         gameListButtonImage.on('pointerup', async () => {
           if (pointerMoved) return; // skip tap if user was swiping
 
-          effectSequence(context, 0, EGameSounds.DELETE_GAME);
+          effectSequence(context, EGameSounds.DELETE_GAME);
           highlightGameButton();
 
           if (context.currentRoom) {
@@ -180,7 +180,7 @@ export async function createGameList(context: UIScene) {
   councilEmblem.on('pointerdown', async () => {
     // Create the faction's deck and starting hand
     if (context.userId) {
-      effectSequence(context, 0, EGameSounds.BATTLE_BUTTON);
+      effectSequence(context, EGameSounds.BATTLE_BUTTON);
       await createGame(context, EFaction.COUNCIL);
       await context.currentRoom?.leave();
       context.currentRoom = undefined;
@@ -191,7 +191,7 @@ export async function createGameList(context: UIScene) {
   elvesEmblem.on('pointerdown', async () => {
     // Create the faction's deck and starting hand
     if (context.userId) {
-      effectSequence(context, 0, EGameSounds.BATTLE_BUTTON);
+      effectSequence(context, EGameSounds.BATTLE_BUTTON);
       await createGame(context, EFaction.DARK_ELVES);
       await context.currentRoom?.leave();
       context.currentRoom = undefined;

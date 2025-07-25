@@ -35,7 +35,7 @@ export class Door extends Phaser.GameObjects.Container {
       if (pointer.button === 0 && context.activeUnit && isInHand(context.activeUnit.boardPosition)) {
         const activePosition = context.activeUnit.boardPosition;
         context.activeUnit.shuffleInDeck();
-       effectSequence(this.scene, 0, EGameSounds.RETURN_ITEM);
+       effectSequence(this.scene, EGameSounds.RETURN_ITEM);
       
 
         this.updateBannerText();
