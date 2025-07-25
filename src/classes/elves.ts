@@ -87,7 +87,7 @@ export class Impaler extends DarkElf {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame(true, false);
     
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
@@ -181,7 +181,7 @@ export class VoidMonk extends DarkElf {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame(true, false);
 
     splashedEnemies.forEach(enemy => {
       if (enemy instanceof Hero && enemy.unitType == EHeroes.PHANTOM) enemy.removeFromGame();
@@ -255,7 +255,7 @@ export class Necromancer extends DarkElf {
 
       this.removeAttackModifiers();
 
-      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame(true, false);
     }
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
@@ -310,7 +310,7 @@ export class Priestess extends DarkElf {
 
       this.removeAttackModifiers();
 
-      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame(true, false);
     }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -377,7 +377,7 @@ export class Wraith extends DarkElf {
 
       this.removeAttackModifiers();
 
-      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame(true, false);
     }
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     
@@ -431,7 +431,7 @@ export class Phantom extends Hero {
 
       this.removeAttackModifiers();
 
-      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame(true, false);
     }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
