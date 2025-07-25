@@ -1,4 +1,4 @@
-import { EActionType, EAttackType, ECouncilSounds, EGameSounds } from "../enums/gameEnums";
+import { EActionType, EAttackType, EHeroes, ECouncilSounds, EGameSounds } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, canBeAttacked, equipAnimation, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind, effectSequence, timeDelay } from "../utils/gameUtils";
@@ -78,6 +78,8 @@ export class Archer extends Human {
 
       this.removeAttackModifiers();
     }
+
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
   
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
@@ -122,10 +124,12 @@ export class Knight extends Human {
 
       [replayWait, ] = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
-      if (target instanceof Hero) gameController.pushEnemy(this, target, delay);
+      if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target, delay);
 
       this.removeAttackModifiers();
     }
+
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     
@@ -180,6 +184,10 @@ export class Wizard extends Human {
       replayWait.push(currentReplayWait);
       if (secondTarget) [currentReplayWait, ] = secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType, 700); replayWait.push(currentReplayWait);
       if (thirdTarget) [currentReplayWait, ] = thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType, 750); replayWait.push(currentReplayWait);
+
+      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+      if (secondTarget && secondTarget instanceof Hero && secondTarget.unitType === EHeroes.PHANTOM) secondTarget.removeFromGame();
+      if (thirdTarget && thirdTarget instanceof Hero && thirdTarget.unitType === EHeroes.PHANTOM) thirdTarget.removeFromGame();
 
       this.removeAttackModifiers();
     }
@@ -332,6 +340,8 @@ export class Ninja extends Human {
       this.removeAttackModifiers();
     }
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
@@ -379,8 +389,10 @@ export class Cleric extends Human {
 
     let delay = 0;
     let replayWait: Promise<void>;
+    const distance = this.getDistanceToTarget(target);
 
     if (
+      distance === 1 &&
       target instanceof Hero &&
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
@@ -401,6 +413,8 @@ export class Cleric extends Human {
       this.removeAttackModifiers();
     }
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+    
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;

@@ -261,7 +261,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     }
     // If unit is in hand and clicked tile is highlighted, spawn. Otherwise, use item
     if (activeUnit.boardPosition > 44 && tile.isHighlighted) {
-      if (isHero(activeUnit) && !tile.isOccupied()) activeUnit.spawn(tile);
+      if (isHero(activeUnit))  activeUnit.spawn(tile);
       if (isItem(activeUnit) && activeUnit.dealsDamage) activeUnit.use(tile);
     }
   });

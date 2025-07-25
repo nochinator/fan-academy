@@ -539,7 +539,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.isKO = true;
 
     const tile = this.getTile();
-    tile.setOccupied(false);
     tile.hero = this.exportData();
 
     await timeDelay(this.context, delay);
@@ -575,7 +574,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   updateTileData(): void {
     const tile = this.getTile();
     tile.hero = this.exportData();
-    tile.setOccupied(!this.isKO);
   }
 
   shuffleInDeck(): void {
@@ -665,7 +663,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.specialTileCheck(targetTile.tileType, startTile.tileType);
     this.updatePosition(targetTile);
     targetTile.hero = this.exportData();
-    targetTile.setOccupied(true);
     startTile.removeHero();
 
     await timeDelay(this.context, 500);

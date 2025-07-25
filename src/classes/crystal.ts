@@ -202,7 +202,6 @@ export class Crystal extends Phaser.GameObjects.Container {
   removeFromGame(): void {
     const tile = this.getTile();
     tile.crystal = undefined;
-    tile.occupied = false;
     tile.obstacle = false;
     tile.tileType = ETiles.BASIC;
 

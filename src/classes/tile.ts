@@ -11,7 +11,6 @@ export class Tile extends Phaser.GameObjects.Container {
   y: number;
   boardPosition: number;
 
-  occupied: boolean;
   obstacle: boolean;
   hero: IHero | undefined;
   crystal: ICrystal | undefined;
@@ -29,7 +28,6 @@ export class Tile extends Phaser.GameObjects.Container {
     this.x = data.x;
     this.y = data.y;
     this.tileType = data.tileType;
-    this.occupied = data.occupied;
     this.obstacle = data.obstacle;
     this.hero = data.hero;
     this.crystal = data.crystal;
@@ -42,13 +40,9 @@ export class Tile extends Phaser.GameObjects.Container {
 
     // If tileType is not BASIC, add the visual representation
     if (this.tileType !== ETiles.BASIC) {
-      if (this.tileType === ETiles.CRYSTAL) {
-        this.occupied = true;
-      } else {
-        const tileIcon = context.add.image(0, 0, this.tileType);
-        if (this.col > 4) tileIcon.setFlipX(true);
-        this.add(tileIcon);
-      }
+      const tileIcon = context.add.image(0, 0, this.tileType);
+      if (this.col > 4) tileIcon.setFlipX(true);
+      this.add(tileIcon);
     }
 
     this.setSize(90, 90).setInteractive({ useHandCursor: true }).setDepth(2);
@@ -65,23 +59,13 @@ export class Tile extends Phaser.GameObjects.Container {
       y: this.y,
       tileType: this.tileType,
       boardPosition: this.boardPosition,
-      occupied: this.occupied,
       obstacle: this.obstacle,
       hero: this.hero,
       crystal: this.crystal
     };
   }
 
-  isOccupied() {
-    return this.occupied;
-  }
-
-  setOccupied(occupied: boolean) {
-    this.occupied = occupied;
-  }
-
   removeHero(): void {
-    this.occupied = false;
     this.hero = undefined;
   }
 

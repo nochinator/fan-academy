@@ -82,10 +82,12 @@ export class Impaler extends DarkElf {
       replayWait = replayWaitLocal
       if (damageDone !== undefined) this.lifeSteal(damageDone, delay);
 
-      if (target instanceof Hero) gameController.pullEnemy(this, target, delay);
+      if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pullEnemy(this, target, delay);
 
       this.removeAttackModifiers();
     }
+
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
@@ -106,6 +108,7 @@ export class VoidMonk extends DarkElf {
     turnIfBehind(this.context, this, target);
 
     let replayWait: Promise<void>[] = []
+    const splashedEnemies: (Hero | Crystal)[] = [];
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -125,9 +128,6 @@ export class VoidMonk extends DarkElf {
       const offsetTiles = this.getOffsetTiles(target.boardPosition, attackDirection);
 
       if (!offsetTiles.length) throw new Error(`voidMonk attack() No offsetTiles: ${this.boardPosition}, ${target.boardPosition}`);
-
-      // Get enemies in offset tiles, if any
-      const splashedEnemies: (Hero | Crystal)[] = [];
 
       for (const offset of offsetTiles) {
         const tileBP = target.boardPosition + offset;
@@ -180,6 +180,12 @@ export class VoidMonk extends DarkElf {
       this.removeAttackModifiers();
     }
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
+    splashedEnemies.forEach(enemy => {
+      if (enemy instanceof Hero && enemy.unitType == EHeroes.PHANTOM) enemy.removeFromGame();
+    });
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await Promise.all(replayWait);
@@ -222,7 +228,9 @@ export class Necromancer extends DarkElf {
       const phantom = new Phantom(this.context, createElvesPhantomData({
         unitId: `${this.context.userId}_phantom_${generateFourDigitId()}`,
         boardPosition: target.boardPosition,
-        belongsTo: this.belongsTo
+        belongsTo: this.belongsTo,
+        row: target.row,
+        col: target.col
       }), tile, true);
 
       target.removeFromGame(true, false);
@@ -245,6 +253,9 @@ export class Necromancer extends DarkElf {
 
       this.removeAttackModifiers();
 
+      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
+      this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     }
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
@@ -296,6 +307,8 @@ export class Priestess extends DarkElf {
       }
 
       this.removeAttackModifiers();
+
+      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -358,6 +371,8 @@ export class Wraith extends DarkElf {
       if (damageDone) this.lifeSteal(damageDone, delay);
 
       this.removeAttackModifiers();
+
+      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     }
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     
@@ -409,6 +424,8 @@ export class Phantom extends Hero {
       [replayWait, ] = target.getsDamaged(this.getTotalPower(), this.attackType, 200);
 
       this.removeAttackModifiers();
+
+      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);

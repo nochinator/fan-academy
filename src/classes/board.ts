@@ -71,7 +71,8 @@ export class Board {
        *  -any tile with a KO'd unit if the unit spawning is a Wraith
        */
       if (tile.tileType === ETiles.SPAWN && !enemySpawn){
-        if (!tile.isOccupied() || tile.hero?.isKO) spawns.add(tile);
+        if (!tile.hero) spawns.add(tile);
+        if (tile.hero?.isKO) spawns.add(tile);
         if (tile.hero?.unitType === EHeroes.PHANTOM) spawns.add(tile);
       }
       if (tile.hero?.isKO && unitType === EHeroes.WRAITH) spawns.add(tile);
@@ -252,19 +253,11 @@ export class Board {
       const distance = getGridDistance(tile.row, tile.col, heroTile.row, heroTile.col);
 
       if (distance <= range) {
-        /**
-         * -Tile is in range
-         * -Tile is not occupied (unit or crystal)
-         * -Tile is occupied by a dead phantom awaiting collection
-         */
-        if (!isEnemySpawn(this.context, tile) && rangeType === ERange.MOVE) {
-          if (
-            !tile.isOccupied() &&
-            tile.hero?.unitType !== EHeroes.PHANTOM ||
-            tile.hero?.unitType === EHeroes.PHANTOM &&
-            tile.hero?.currentHealth === 0
-          )  inRangeTiles.add(tile);
-        }
+        if (
+          rangeType === ERange.MOVE &&
+          !isEnemySpawn(this.context, tile) &&
+          (!tile.hero || tile.hero.isKO)
+        )  inRangeTiles.add(tile);
 
         if (rangeType === ERange.ATTACK || rangeType === ERange.HEAL) {
           if (tile.crystal || tile.hero && tile.hero.unitId !== hero.unitId) inRangeTiles.add(tile);
