@@ -542,7 +542,8 @@ export class SoulHarvest extends Item {
 
     this.removeFromGame();
 
-    await replayWait;
+    await Promise.all(replayWait);
+    await timeDelay(this.scene, 500);
   }
 }
 
