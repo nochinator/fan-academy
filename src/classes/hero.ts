@@ -391,7 +391,12 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const totalDamage = roundToFive(this.getLifeLost(damage, attackType));
 
     this.currentHealth -= totalDamage;
-    if (this.currentHealth <= 0) this.getsKnockedDown();
+
+    // Add a flag to remove the unit once the action is done
+    let removeUnit = false;
+    if (this.currentHealth <= 0) {
+      removeUnit = this.getsKnockedDown();
+    }
 
     // Update hp bar
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
@@ -508,14 +513,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     new FloatingText(this.context, this.x, this.y - 50, textFigure.toString(), true);
   };
 
-  getsKnockedDown(): void {
+  getsKnockedDown(): boolean {
     this.removeSpecialTileOnKo();
 
     this.currentHealth = 0;
     this.isKO = true;
 
     const tile = this.getTile();
-    tile.setOccupied(false);
     tile.hero = this.exportData();
 
     this.characterImage.setTexture(this.updateCharacterImage());
@@ -523,15 +527,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
 
-    // Can't immediately destroy Phantoms to avoid bugs. Make them invisible and they will be collected automatically at the end of the turn
-    if (this.unitType === EHeroes.PHANTOM) {
-      this.isKO = true;
-      this.lastBreath = true;
-      this.setVisible(false);
-      tile.hero = undefined;
-      this.removeInteractive();
-      return;
-    }
+    if (this.unitType === EHeroes.PHANTOM) return true;
+
+    return false;
   }
 
   getTile(): Tile {
@@ -544,7 +542,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   updateTileData(): void {
     const tile = this.getTile();
     tile.hero = this.exportData();
-    tile.setOccupied(!this.isKO);
   }
 
   shuffleInDeck(): void {
@@ -627,7 +624,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.specialTileCheck(targetTile.tileType, startTile.tileType);
     this.updatePosition(targetTile);
     targetTile.hero = this.exportData();
-    targetTile.setOccupied(true);
     startTile.removeHero();
 
     gameController.afterAction(EActionType.MOVE, startTile.boardPosition, targetTile.boardPosition);

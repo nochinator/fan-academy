@@ -1,4 +1,4 @@
-import { EActionType, EAttackType } from "../enums/gameEnums";
+import { EActionType, EAttackType, EHeroes } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, canBeAttacked, equipAnimation, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind } from "../utils/gameUtils";
@@ -61,6 +61,8 @@ export class Archer extends Human {
       this.removeAttackModifiers();
     }
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -91,10 +93,12 @@ export class Knight extends Human {
     } else {
       target.getsDamaged(this.getTotalPower(), this.attackType);
 
-      if (target instanceof Hero) await gameController.pushEnemy(this, target);
+      if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) await gameController.pushEnemy(this, target);
 
       this.removeAttackModifiers();
     }
+
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, startingPosition);
   }
@@ -136,6 +140,10 @@ export class Wizard extends Human {
       target.getsDamaged(this.getTotalPower(), this.attackType);
       if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
       if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
+
+      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+      if (secondTarget && secondTarget instanceof Hero && secondTarget.unitType === EHeroes.PHANTOM) secondTarget.removeFromGame();
+      if (thirdTarget && thirdTarget instanceof Hero && thirdTarget.unitType === EHeroes.PHANTOM) thirdTarget.removeFromGame();
 
       this.removeAttackModifiers();
     }
@@ -266,6 +274,8 @@ export class Ninja extends Human {
       this.removeAttackModifiers();
     }
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -303,9 +313,26 @@ export class Cleric extends Human {
 
     turnIfBehind(this.context, this, target);
 
-    target.getsDamaged(this.getTotalPower(), this.attackType);
+    const distance = this.getDistanceToTarget(target);
 
-    this.removeAttackModifiers();
+    if (distance === 1) {
+      // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
+      if (
+        target instanceof Hero &&
+        target.isKO &&
+        isEnemySpawn(this.context, target.getTile())
+      ) {
+        target.removeFromGame();
+      } else {
+        target.getsDamaged(this.getTotalPower(), this.attackType);
+        this.removeAttackModifiers();
+      }
+    } else {
+      target.getsDamaged(this.getTotalPower(), this.attackType);
+      this.removeAttackModifiers();
+    }
+
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
 
     gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }

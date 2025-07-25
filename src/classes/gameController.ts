@@ -404,7 +404,7 @@ export class GameController {
       console.error('pushEnemy() No destination tile found');
       return;
     }
-    if (targetNewTile?.isOccupied() || targetNewTile.hero) {
+    if (targetNewTile.crystal || targetNewTile.hero) {
       console.error('pushEnemy() Destination tile is occupied');
       return;
     }
@@ -418,7 +418,6 @@ export class GameController {
 
     target.updatePosition(targetNewTile);
     targetNewTile.hero = target.exportData();
-    targetNewTile.setOccupied(true);
     targetTile.removeHero();
   }
 
@@ -437,7 +436,7 @@ export class GameController {
       console.error('pullEnemy() No destination tile found');
       return;
     }
-    if (targetNewTile?.isOccupied() || targetNewTile.hero) {
+    if (targetNewTile.crystal || targetNewTile.hero) {
       console.error('pullEnemy() Destination tile is occupied');
       return;
     }
@@ -451,7 +450,6 @@ export class GameController {
 
     target.updatePosition(targetNewTile);
     targetNewTile.hero = target.exportData();
-    targetNewTile.setOccupied(true);
     targetTile.removeHero();
   }
 }
