@@ -186,8 +186,8 @@ export class Wizard extends Human {
       // Apply damage to targets
       [currentReplayWait, ] = target.getsDamaged(this.getTotalPower(), this.attackType, 650);
       replayWait.push(currentReplayWait);
-      if (secondTarget) [currentReplayWait, ] = secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType, 700); replayWait.push(currentReplayWait);
-      if (thirdTarget) [currentReplayWait, ] = thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType, 750); replayWait.push(currentReplayWait);
+      if (secondTarget) [currentReplayWait, ] = secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType, 750); replayWait.push(currentReplayWait);
+      if (thirdTarget) [currentReplayWait, ] = thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType, 850); replayWait.push(currentReplayWait);
 
       if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
       if (secondTarget && secondTarget instanceof Hero && secondTarget.unitType === EHeroes.PHANTOM) secondTarget.removeFromGame();
