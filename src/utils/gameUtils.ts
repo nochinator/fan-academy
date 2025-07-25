@@ -178,7 +178,7 @@ export function getActionClass(action: EActionType): EActionClass {
   return [EActionType.PASS, EActionType.DRAW, EActionType.REMOVE_UNITS].includes(action) ? EActionClass.AUTO : EActionClass.USER;
 }
 
-export function getAOETiles(context: GameScene, targetTile: Tile): {
+export function getAOETiles(context: GameScene, spell: Item,  targetTile: Tile): {
   enemyHeroTiles: Tile[],
   enemyCrystalTiles: Tile[]
 } {
@@ -187,9 +187,9 @@ export function getAOETiles(context: GameScene, targetTile: Tile): {
 
   const areOfEffect = board.getAreaOfEffectTiles(targetTile);
 
-  const enemyHeroTiles = areOfEffect?.filter(tile => tile.isEnemy(context.userId));
+  const enemyHeroTiles = areOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo !== spell.belongsTo);
 
-  const enemyCrystalTiles = areOfEffect?.filter(tile => tile.tileType === ETiles.CRYSTAL);
+  const enemyCrystalTiles = areOfEffect?.filter(tile => tile.tileType === ETiles.CRYSTAL && tile.crystal?.belongsTo !== spell.belongsTo);
 
   return {
     enemyHeroTiles,
@@ -391,14 +391,29 @@ export function generateFourDigitId(): number {
   return Math.floor(1000 + Math.random() * 9000);
 }
 
-export function equipAnimation(image: GameObjects.Image): void {
+export function useAnimation(image: GameObjects.Image, scale = 2): void {
   image.scene.tweens.add({
     targets: image,
-    scale: 2,
+    scale,
     alpha: 0,
     duration: 1000,
     onComplete: () => {
       image.destroy();
     }
+  });
+}
+
+export function textAnimation(text: GameObjects.Text, scale = 2): Promise<void> {
+  return new Promise((resolve) => {
+    text.scene.tweens.add({
+      targets: text,
+      scale,
+      alpha: 50,
+      duration: 1000,
+      onComplete: () => {
+        text.destroy();
+        resolve();
+      }
+    });
   });
 }

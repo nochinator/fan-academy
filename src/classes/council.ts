@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EHeroes, ECouncilSounds, EGameSounds } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, equipAnimation, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind, effectSequence, timeDelay } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, equipAnimation, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind, useAnimation, effectSequence, timeDelay } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -15,7 +15,7 @@ export abstract class Human extends Hero {
 
   equipFactionBuff(handPosition: number): void {
     const dragonScaleImg = this.scene.add.image(this.x + 10, this.y - 10, 'dragonScale').setOrigin(0.5).setDepth(100);
-    equipAnimation(dragonScaleImg);
+    useAnimation(dragonScaleImg);
 
     this.factionBuff = true;
     this.factionBuffImage.setVisible(true);
@@ -39,8 +39,9 @@ export class Archer extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
-   async attack(target: Hero | Crystal): Promise<void> {
-    this.flashAttacker();
+  
+  async attack(target: Hero | Crystal): Promise<void> {
+    this.flashActingUnit();
 
     const distance = this.getDistanceToTarget(target);
 
@@ -96,8 +97,9 @@ export class Knight extends Human {
     super(context, data, tile);
   }
 
-   async attack(target: Hero | Crystal): Promise<void> {
-    this.flashAttacker();
+  async attack(target: Hero | Crystal): Promise<void> {
+    this.flashActingUnit();
+
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -145,8 +147,10 @@ export class Wizard extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
-   async attack(target: Hero | Crystal): Promise<void> {
-    this.flashAttacker();
+
+  async attack(target: Hero | Crystal): Promise<void> {
+    this.flashActingUnit();
+
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -301,8 +305,10 @@ export class Ninja extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
-   async attack(target: Hero | Crystal): Promise<void> {
-    this.flashAttacker();
+
+  async attack(target: Hero | Crystal): Promise<void> {
+    this.flashActingUnit();
+
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
@@ -386,8 +392,9 @@ export class Cleric extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
-   async attack(target: Hero | Crystal): Promise<void> {
-    this.flashAttacker();
+
+  async attack(target: Hero | Crystal): Promise<void> {
+    this.flashActingUnit();
 
     turnIfBehind(this.context, this, target);
 
@@ -427,6 +434,8 @@ export class Cleric extends Human {
   }
 
   async heal(target: Hero): Promise<void> {
+    this.flashActingUnit();
+    
     turnIfBehind(this.context, this, target);
 
     if (target.isKO) {
@@ -469,7 +478,7 @@ export class HealingPotion extends Item {
 
   async use(target: Hero): Promise<void> {
     const potionImage = this.scene.add.image(target.x, target.y - 10, 'healingPotion').setDepth(100);
-    equipAnimation(potionImage);
+    useAnimation(potionImage);
 
     const healingAmount = target.isKO ? 100 : 1000;
     target.getsHealed(healingAmount);
@@ -489,11 +498,14 @@ export class Inferno extends Item {
     super(context, data);
   };
 
-   async use(targetTile: Tile): Promise<void> {
+  async use(targetTile: Tile): Promise<void> {
+    const infernoImage = this.scene.add.image(targetTile.x, targetTile.y, 'infernoShockWave').setDepth(100);
+    useAnimation(infernoImage, 3);
+
     // Damages enemy units and crystals, and removes enemy KO'd units
     const damage = 350;
 
-    const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, targetTile);
+    const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, this, targetTile);
 
     let replayWait: Promise<void>[] = [timeDelay(this.scene, 250)];
     let currentReplayWait: Promise<void>;
@@ -518,9 +530,8 @@ export class Inferno extends Item {
       const crystal = this.context.gameController!.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('Inferno use() crystal not found');
 
-      if (!belongsToPlayer(this.context, crystal)) {
-        [currentReplayWait, ] = crystal.getsDamaged(damage, EAttackType.MAGICAL, 800);
-      }
+      if (!belongsToPlayer(this.context, crystal)) [currentReplayWait, ] = crystal.getsDamaged(damage, EAttackType.MAGICAL, 800);
+      
       replayWait.push(currentReplayWait);
     });
 

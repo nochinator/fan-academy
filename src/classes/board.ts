@@ -75,7 +75,12 @@ export class Board {
         if (tile.hero?.isKO) spawns.add(tile);
         if (tile.hero?.unitType === EHeroes.PHANTOM) spawns.add(tile);
       }
-      if (tile.hero?.isKO && unitType === EHeroes.WRAITH) spawns.add(tile);
+      if (
+        unitType === EHeroes.WRAITH &&
+        tile.hero?.isKO &&
+        !isEnemySpawn(this.context, tile)
+      )
+        spawns.add(tile);
     });
 
     this.highlightTiles([...spawns]);

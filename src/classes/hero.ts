@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems, ETiles, EGameSounds } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { effectSequence, timeDelay, equipAnimation, getGridDistance, isInHand, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
+import { effectSequence, timeDelay, equipAnimation, getGridDistance, isInHand, useAnimation, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
 import { positionHeroImage } from "../utils/heroImagePosition";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
@@ -722,7 +722,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   equipShiningHelm(handPosition: number): void {
     const helmImage = this.scene.add.image(this.x, this.y, 'shiningHelm').setDepth(100);
-    equipAnimation(helmImage);
+    useAnimation(helmImage);
 
     this.shiningHelm = true;
     this.magicalDamageResistance += 20;
@@ -740,7 +740,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   equipRunemetal(handPosition: number): void {
     const helmImage = this.scene.add.image(this.x, this.y, 'runeMetal').setDepth(100);
-    equipAnimation(helmImage);
+    useAnimation(helmImage);
 
     this.runeMetal = true;
     this.runeMetalImage.setVisible(true);
@@ -873,8 +873,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     tile.hero = this.exportData();
   }
 
-  flashAttacker(): void {
-    // Flash the unit blue to better identify which unit is attacking on a replay
+  flashActingUnit(): void {
+    // Flash the unit blue to better identify which unit is attacking / healing on a replay
     this.characterImage.setTint(0x3399ff);
     this.scene.time.delayedCall(800, () => this.characterImage.clearTint());
   }

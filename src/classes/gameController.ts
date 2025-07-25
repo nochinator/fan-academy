@@ -3,7 +3,7 @@ import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles, EGameSounds } 
 import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
-import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, visibleUnitCardCheck, effectSequence, timeDelay } from "../utils/gameUtils";
+import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, textAnimation, visibleUnitCardCheck, effectSequence, timeDelay } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -122,7 +122,7 @@ export class GameController {
     for (let i = 1; i < this.context.currentGame.previousTurn.length; i++) {
       const turn = this.context.currentGame.previousTurn[i];
 
-      const actionsToIgnore = [EActionType.DRAW, EActionType.PASS, EActionType.SHUFFLE];
+      const actionsToIgnore = [EActionType.DRAW, EActionType.PASS];
       const actionTaken = turn.action?.action;
 
       if (!actionTaken || actionsToIgnore.includes(actionTaken)) continue;
@@ -137,6 +137,8 @@ export class GameController {
         actionTaken === EActionType.HEAL ||
         actionTaken === EActionType.TELEPORT
       ) await this.replayAttackHealTeleport(turn.action!);
+      
+      if (actionTaken === EActionType.SHUFFLE) await this.replayShuffle();
 
       if (actionTaken === EActionType.USE) await this.replayUse(turn.action!, opponentHand);
 
@@ -196,6 +198,15 @@ export class GameController {
       if (!hero) throw new Error('Missing target in use action');
       await item.use(hero);
     }
+  }
+
+  async replayShuffle(): Promise<void> {
+    const testText = this.context.add.text(600, 350, 'OPPONENT SWAPPED AN ITEM!', {
+      fontFamily: "proLight",
+      fontSize: 50,
+      color: '#fffb00'
+    });
+    await textAnimation(testText, 1.3);
   }
 
   async resetTurn() {
