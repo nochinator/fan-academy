@@ -589,7 +589,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.removeFromGame(false);
   }
 
-  removeFromGame(board = true): void {
+  removeFromGame(board = true, sound = true): void {
     // Remove animations
     this.scene.tweens.killTweensOf(this);
 
@@ -605,13 +605,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.superChargeEvent.remove(false);
     if (this.spawnEvent) this.spawnEvent?.remove(false);
 
-    if (board) this.removeFromBoard();
+    if (board) this.removeFromBoard(sound);
 
     // Destroy container and children
     this.destroy(true);
   }
 
-  removeFromBoard(): void {
+  removeFromBoard(sound: boolean): void {
     // Remove hero data from tile
     const tile = this.getTile();
     if (tile.tileType === ETiles.CRYSTAL_DAMAGE) this.updateCrystals(false);
@@ -623,7 +623,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // Update hero counter
     if (this.unitType !== EHeroes.PHANTOM) updateUnitsLeft(this.context, this);
-    effectSequence(this.context, EGameSounds.VANISH)
+
+    if (sound) effectSequence(this.context, EGameSounds.VANISH);
   }
 
   getDistanceToTarget(target: Hero | Crystal): number {

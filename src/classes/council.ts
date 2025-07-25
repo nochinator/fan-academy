@@ -71,7 +71,7 @@ export class Archer extends Human {
         delay = 750;
       } else {
         effectSequence(this.scene, ECouncilSounds.ARCHER_ATTACK);
-        delay = 750
+        delay = 650
       }
 
       [replayWait, ] = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
@@ -122,7 +122,7 @@ export class Knight extends Human {
 
       [replayWait, ] = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
-      if (target instanceof Hero) gameController.pushEnemy(this, target);
+      if (target instanceof Hero) gameController.pushEnemy(this, target, delay);
 
       this.removeAttackModifiers();
     }
@@ -176,10 +176,10 @@ export class Wizard extends Human {
       }
 
       // Apply damage to targets
-      [currentReplayWait, ] = target.getsDamaged(this.getTotalPower(), this.attackType, 750);
+      [currentReplayWait, ] = target.getsDamaged(this.getTotalPower(), this.attackType, 650);
       replayWait.push(currentReplayWait);
-      if (secondTarget) [currentReplayWait, ] = secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType, 875); replayWait.push(currentReplayWait);
-      if (thirdTarget) [currentReplayWait, ] = thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType, 1000); replayWait.push(currentReplayWait);
+      if (secondTarget) [currentReplayWait, ] = secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType, 700); replayWait.push(currentReplayWait);
+      if (thirdTarget) [currentReplayWait, ] = thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType, 750); replayWait.push(currentReplayWait);
 
       this.removeAttackModifiers();
     }
@@ -437,7 +437,6 @@ export class DragonScale extends Item {
 
   async use(target: Hero): Promise<void> {
     target.equipFactionBuff(this.boardPosition);
-    effectSequence(this.scene, EGameSounds.USE_SHIELD);
     this.removeFromGame();
     this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
     await timeDelay(this.context, 1000)

@@ -1,4 +1,3 @@
-import { time } from "console";
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EElfSounds, EGameSounds } from "../enums/gameEnums";
 
 import { IHero, IItem } from "../interfaces/gameInterface";
@@ -226,7 +225,7 @@ export class Necromancer extends DarkElf {
         belongsTo: this.belongsTo
       }), tile, true);
 
-      target.removeFromGame(true);
+      target.removeFromGame(true, false);
 
       tile.hero = phantom.exportData();
 
@@ -336,15 +335,14 @@ export class Wraith extends DarkElf {
 
     if (target instanceof Hero && target.isKO) {
       effectSequence(this.scene, EElfSounds.WRAITH_CONSUME);
-      replayWait = timeDelay(this.scene, 1500);
-      target.removeFromGame(true);
+      replayWait = timeDelay(this.scene, 0);
+      target.removeFromGame(true, false);
+      await timeDelay(this.scene, 1500);
 
       if (this.unitsConsumed < 3) {
-        this.increaseMaxHealth(100);
         this.basePower += 50;
-        this.unitCard.updateCardPower(this);
         this.unitsConsumed++;
-        this.updateTileData();
+        this.increaseMaxHealth(100);
       }
     } else {
       if (this.superCharge) {
@@ -353,20 +351,22 @@ export class Wraith extends DarkElf {
       } else {
         // NOTE: When animations are implemented there needs to be a slight delay before this
         effectSequence(this.scene, EElfSounds.WRAITH_ATTACK);
-        delay = 350
+        delay = 100
       }
       const [replayWaitLocal, damageDone] = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
       replayWait = replayWaitLocal;
       if (damageDone) this.lifeSteal(damageDone, delay);
 
       this.removeAttackModifiers();
-      
-
     }
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     
     await replayWait;
-    await timeDelay(this.scene, 500);
+    if (delay === 100) {
+      await timeDelay(this.scene, 1100);
+    } else {
+      await timeDelay(this.scene, 500);
+    }
   }
 
   heal(_target: Hero): void {};
@@ -401,12 +401,12 @@ export class Phantom extends Hero {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.WRAITH_ATTACK);
-      replayWait = timeDelay(this.scene, 250);
+      replayWait = timeDelay(this.scene, 200);
       target.removeFromGame();
     } else {
       effectSequence(this.scene, EElfSounds.WRAITH_ATTACK);
 
-      [replayWait, ] = target.getsDamaged(this.getTotalPower(), this.attackType, 250);
+      [replayWait, ] = target.getsDamaged(this.getTotalPower(), this.attackType, 200);
 
       this.removeAttackModifiers();
     }
@@ -414,7 +414,7 @@ export class Phantom extends Hero {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.scene, 500);
+    await timeDelay(this.scene, 1100);
   }
 
   heal(_target: Hero): void {};
@@ -429,10 +429,9 @@ export class SoulStone extends Item {
 
   async use(target: Hero): Promise<void> {
     target.equipFactionBuff(this.boardPosition);
-    effectSequence(this.scene, EGameSounds.USE_ITEM_GENERIC);
     this.removeFromGame();
     
-    await timeDelay(this.scene, 1000);
+    await timeDelay(this.context, 1000);
   }
 }
 

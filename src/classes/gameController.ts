@@ -106,6 +106,8 @@ export class GameController {
   }
 
   async replayTurn() {
+    await timeDelay(this.context, 1000);
+
     // Fake the opponent's hand if needed
     const opponentHand: (Hero | Item)[] = [];
     if (this.context.activePlayer === this.context.userId) {
@@ -381,7 +383,7 @@ export class GameController {
     });
   }
 
-  pushEnemy(attacker: Hero, target: Hero): void {
+  async pushEnemy(attacker: Hero, target: Hero, delay = 0): Promise<void> {
     const attackerTile = this.board.getTileFromBoardPosition(attacker.boardPosition);
     const targetTile = this.board.getTileFromBoardPosition(target.boardPosition);
     if (!attackerTile || !targetTile) {
@@ -413,8 +415,9 @@ export class GameController {
       return;
     }
 
+    await timeDelay(this.context, delay);
     target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
-    forcedMoveAnimation(this.context, target, targetNewTile);
+    await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);
     targetNewTile.hero = target.exportData();
@@ -445,9 +448,9 @@ export class GameController {
       console.error(`pushEnemy() Can't pull a non-KO'd enemy onto a friendly spawn`);
       return;
     }
-
-    target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
+    
     await timeDelay(this.context, delay);
+    target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);
