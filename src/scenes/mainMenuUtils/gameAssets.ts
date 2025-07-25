@@ -242,7 +242,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('impalerDeath', `${CDN_PATH}/audio/DE-Impaler_Death.mp3`);
   context.load.audio('necroAttack', `${CDN_PATH}/audio/DE-Necro_Attack.mp3`);
   context.load.audio('necroAttackBig', `${CDN_PATH}/audio/DE-Necro_AttackBig.mp3`);
-  context.load.audio('necromancerDeath', `${CDN_PATH}/audio/DE-DE-Heretic_Death.mp3`);
+  context.load.audio('necromancerDeath', `${CDN_PATH}/audio/DE-Heretic_Death.mp3`);
   context.load.audio('phantomSpawn', `${CDN_PATH}/audio/DE-Phantom_Spawn.mp3`);
   context.load.audio('phantomDeath', `${CDN_PATH}/audio/DE-Phantom_Death.mp3`);
   context.load.audio('voidMonkAttack', `${CDN_PATH}/audio/DE-VoidMonk_Attack_Punch.mp3`);

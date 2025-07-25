@@ -142,6 +142,8 @@ export abstract class Item extends Phaser.GameObjects.Container {
   abstract use(target: any): void;
 }
 
+// TODO: move item animations into effectSequence when it becomes able to handle it
+
 export class ShiningHelm extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
@@ -149,7 +151,7 @@ export class ShiningHelm extends Item {
 
   use(target: Hero): void {
     target.equipShiningHelm(this.boardPosition);
-    effectSequence(this.context, 0, EGameSounds.USE_ITEM_GENERIC);
+    effectSequence(this.context, EGameSounds.USE_ITEM_GENERIC);
     this.removeFromGame();
   }
 }
@@ -161,7 +163,7 @@ export class RuneMetal extends Item {
 
   use(target: Hero): void {
     target.equipRunemetal(this.boardPosition);
-    effectSequence(this.context, 0, EGameSounds.USE_SHIELD);
+    effectSequence(this.context, EGameSounds.USE_SHIELD);
     this.removeFromGame();
   }
 }
@@ -173,7 +175,7 @@ export class SuperCharge extends Item {
 
   use(target: Hero): void {
     target.equipSuperCharge(this.boardPosition);
-    effectSequence(this.context, 0, EGameSounds.USE_SCROLL);
+    effectSequence(this.context, EGameSounds.USE_SCROLL);
     this.removeFromGame();
   }
 }

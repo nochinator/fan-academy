@@ -1,7 +1,7 @@
 import { EGameSounds, ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { roundToFive, effectSequence } from "../utils/gameUtils";
+import { roundToFive, effectSequence, timeDelay } from "../utils/gameUtils";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
 import { CrystalCard } from "./crystalCard";
 import { FloatingText } from "./floatingText";
@@ -158,14 +158,21 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
   }
 
-  getsDamaged(damage: number): void {
+  //attackType included to match hero.getsDamaged to simplify calls
+  getsDamaged(damage: number, attackType: any, delay = 0): void {
     const totalDamage = roundToFive(damage + 300 * this.debuffLevel);
     const damageTaken = totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
     this.currentHealth -= damageTaken;
 
-    if (this.currentHealth <= this.maxHealth / 2) {
-      this.crystalImage.setTexture('crystalDamaged'); // FIXME: below 50%, this changes the texture every time the crystal is damaged
+    if (this.currentHealth <= this.maxHealth / 2 && this.currentHealth + totalDamage >= this.maxHealth / 2) {
+      this.crystalImage.setTexture('crystalDamaged');
     }
+
+    this.showDamage(damageTaken, delay);
+  }
+
+  async showDamage(damageTaken: number, delay: number){
+    await timeDelay(this.context, delay);
 
     // Update hp bar
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
@@ -182,11 +189,11 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.belongsTo === 2) this.context.gameController?.gameUI.banner.playerTwoHpBar.setHealth();
 
     if (this.currentHealth <= 0) {
+      effectSequence(this.scene, EGameSounds.DESTROY_CRYSTAL);
       this.removeFromGame();
-      effectSequence(this.scene, 0, EGameSounds.DESTROY_CRYSTAL);
     } else {
       const damageSounds = [EGameSounds.DAMAGE_CRYSTAL_1, EGameSounds.DAMAGE_CRYSTAL_2] 
-      effectSequence(this.scene, 0, Phaser.Math.RND.pick(damageSounds));
+      effectSequence(this.scene, Phaser.Math.RND.pick(damageSounds));
     }
   }
 

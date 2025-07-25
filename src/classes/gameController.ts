@@ -99,7 +99,7 @@ export class GameController {
   addConcedeButton(context: GameScene): Phaser.GameObjects.Image {
     const button = context.add.image(1350, 70, 'concedeButton').setScale(0.9).setInteractive({ useHandCursor: true });
     button.on('pointerdown', ()=> {
-      effectSequence(this.context, 0, EGameSounds.BUTTON_PRESS_GENERIC);
+      effectSequence(this.context, EGameSounds.BUTTON_PRESS_GENERIC);
       this.concedePopup.setVisible(true);
     });
     return button;
@@ -207,7 +207,7 @@ export class GameController {
     this.context.longPressStart = undefined;
     this.context.visibleUnitCard = undefined;
 
-    effectSequence(this.context, 0, EGameSounds.RESET_TURN);
+    effectSequence(this.context, EGameSounds.RESET_TURN);
     this.context.thinkingMusic.stop()
     this.context.scene.restart();
   };
@@ -217,7 +217,7 @@ export class GameController {
   }
 
   drawUnits() {
-    effectSequence(this.context, 0, EGameSounds.NEW_ITEMS);
+    effectSequence(this.context, EGameSounds.NEW_ITEMS);
     this.door.openDoor();
 
     const drawAmount = 6 - this.hand.getHandSize();
@@ -311,7 +311,7 @@ export class GameController {
     this.context.activePlayer = this.context.opponentId;
     this.context.turnNumber!++;
 
-    effectSequence(this.context, 0, EGameSounds.BATTLE_BUTTON); // TODO: add fail sound in send turn failed
+    effectSequence(this.context, EGameSounds.BATTLE_BUTTON); // TODO: add fail sound in send turn failed
     sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.gameOver);
 
     if (this.gameOver) console.log('GAME ENDS! THE WINNER IS', this.gameOver?.winner);
@@ -387,7 +387,7 @@ export class GameController {
     });
   }
 
-  async pushEnemy(attacker: Hero, target: Hero): Promise<void> {
+  pushEnemy(attacker: Hero, target: Hero): void {
     const attackerTile = this.board.getTileFromBoardPosition(attacker.boardPosition);
     const targetTile = this.board.getTileFromBoardPosition(target.boardPosition);
     if (!attackerTile || !targetTile) {
@@ -420,7 +420,7 @@ export class GameController {
     }
 
     target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
-    await forcedMoveAnimation(this.context, target, targetNewTile);
+    forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);
     targetNewTile.hero = target.exportData();
