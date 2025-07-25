@@ -487,7 +487,7 @@ export class SoulHarvest extends Item {
     super(context, data);
   }
 
-  use(targetTile: Tile): void {
+  async use(targetTile: Tile): Promise<void> {
     const infernoImage = this.scene.add.image(targetTile.x, targetTile.y - 20, 'soulHarvestShockWave').setDepth(100);
     useAnimation(infernoImage);
 
@@ -541,6 +541,8 @@ export class SoulHarvest extends Item {
     friendlyUnits.forEach(unit => unit.increaseMaxHealth(lifeIncreaseAmount));
 
     this.removeFromGame();
+
+    await replayWait;
   }
 }
 
