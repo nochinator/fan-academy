@@ -182,6 +182,6 @@ export class SuperCharge extends Item {
     effectSequence(this.context, EGameSounds.USE_SCROLL);
     this.removeFromGame();
 
-    await timeDelay(this.scene, 1000);
+    await timeDelay(this.context, 1000);
   }
 }

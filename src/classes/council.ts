@@ -535,7 +535,7 @@ export class Inferno extends Item {
     });
 
     if (enemyCrystalTiles.length === 0 && enemyHeroTiles.length === 0) {
-      await timeDelay(this.scene, 800);
+      await timeDelay(this.scene, 8000);
     }
 
     this.removeFromGame();

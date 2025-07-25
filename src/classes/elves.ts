@@ -532,7 +532,7 @@ export class SoulHarvest extends Item {
     });
 
     if (enemyCrystalTiles.length === 0 && enemyHeroTiles.length === 0) {
-      await timeDelay(this.scene, 700);
+      await timeDelay(this.scene, 1000);
     }
 
     // Get total amount of friendly units in the map, including KO'd ones
