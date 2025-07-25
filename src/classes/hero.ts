@@ -382,7 +382,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.setScale(1);
   }
 
-  getsDamaged(damage: number, attackType: EAttackType, delay = 0): number {
+  getsDamaged(damage: number, attackType: EAttackType, delay = 0, hitSound = true): [Promise<void>, number] {
     // Flash the unit red
     this.characterImage.setTint(0xff0000);
     this.scene.time.delayedCall(500, () => this.characterImage.clearTint());
@@ -393,19 +393,25 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.currentHealth -= totalDamage;
 
     // desyncs visuals to align with animations/sounds without forcing player to wait
-    this.showDamage(totalDamage, delay)
+    const replayWait = this.showDamage(totalDamage, delay, hitSound)
 
-    return totalDamage; // Return damage taken for lifesteal
+    return [replayWait, totalDamage]; // Lifesteal damage
   }
 
-  async showDamage(totalDamage: number, delay: number): Promise<void> {
+  async showDamage(totalDamage: number, delay: number, hitSound = true): Promise<void> {
+    let koWait = null;
     if (this.currentHealth <= 0) {
-      await this.getsKnockedDown(delay); // no delay applied in setting ko state, only visuals
+      // set ko state now, wait for attack delay, update visuals, slowmo later 
+      koWait = this.getsKnockedDown(delay); 
+      await timeDelay(this.context, delay);
     } else {
       await timeDelay(this.context, delay);
-      const damageSounds = [EGameSounds.HIT_1, EGameSounds.HIT_2, EGameSounds.HIT_3, EGameSounds.HIT_4]
-      effectSequence(this.scene, Phaser.Math.RND.pick(damageSounds));
+      if (hitSound) {
+        const damageSounds = [EGameSounds.HIT_1, EGameSounds.HIT_2, EGameSounds.HIT_3, EGameSounds.HIT_4]
+        effectSequence(this.scene, Phaser.Math.RND.pick(damageSounds));
+      }
     }
+
 
     // Update hp bar
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
@@ -415,6 +421,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.unitCard.updateCardHealth(this);
     this.updateTileData();
+
+    if (koWait) {
+      await koWait;
+    }
   }
 
   getTotalPower(rangeModifier = 1): number {
@@ -534,7 +544,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     await timeDelay(this.context, delay);
     effectSequence(this.context, EGameSounds.KO)
-    await timeDelay(this.context, 850);
+    await timeDelay(this.context, 950);
     const heroKoSound = `${this.unitType}Death`
     effectSequence(this.context, heroKoSound)
 
@@ -551,6 +561,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       tile.hero = undefined;
       this.removeInteractive();
     }
+
+    await timeDelay(this.context, 250);
   }
 
   getTile(): Tile {
@@ -654,9 +666,11 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     targetTile.hero = this.exportData();
     targetTile.setOccupied(true);
     startTile.removeHero();
+
+    await timeDelay(this.context, 500);
   }
 
-  spawn(tile: Tile): void {
+  async spawn(tile: Tile): Promise<void> {
     const startingPosition = this.boardPosition;
     const gameController = this.context.gameController!;
 
@@ -693,6 +707,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     effectSequence(this.scene, EGameSounds.SPAWN_HERO);
 
     gameController.afterAction(EActionType.SPAWN, startingPosition, tile.boardPosition);
+
+    await timeDelay(this.scene, 500)
   }
 
   abstract attack(target: Hero | Crystal): void;

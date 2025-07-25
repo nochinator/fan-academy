@@ -1,5 +1,5 @@
 import { EClass, EFaction, EGameSounds, EItems } from "../enums/gameEnums";
-import { effectSequence } from "../utils/gameUtils";
+import { effectSequence, timeDelay } from "../utils/gameUtils";
 import { IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
@@ -142,17 +142,19 @@ export abstract class Item extends Phaser.GameObjects.Container {
   abstract use(target: any): void;
 }
 
-// TODO: move item animations into effectSequence when it becomes able to handle it
+// TODO: move item animations into effectSequence when adding all animations
 
 export class ShiningHelm extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
   }
 
-  use(target: Hero): void {
+  async use(target: Hero): Promise<void> {
     target.equipShiningHelm(this.boardPosition);
     effectSequence(this.context, EGameSounds.USE_ITEM_GENERIC);
     this.removeFromGame();
+
+    await timeDelay(this.context, 1000);
   }
 }
 
@@ -161,10 +163,12 @@ export class RuneMetal extends Item {
     super(context, data);
   }
 
-  use(target: Hero): void {
+  async use(target: Hero): Promise<void> {
     target.equipRunemetal(this.boardPosition);
     effectSequence(this.context, EGameSounds.USE_SHIELD);
     this.removeFromGame();
+
+    await timeDelay(this.context, 1000);
   }
 }
 
@@ -173,9 +177,11 @@ export class SuperCharge extends Item {
     super(context, data);
   }
 
-  use(target: Hero): void {
+  async use(target: Hero): Promise<void> {
     target.equipSuperCharge(this.boardPosition);
     effectSequence(this.context, EGameSounds.USE_SCROLL);
     this.removeFromGame();
+
+    await timeDelay(this.scene, 1000);
   }
 }

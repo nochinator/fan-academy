@@ -170,8 +170,7 @@ export function effectSequence(scene: Phaser.Scene, sound: string): void {
 
 export function timeDelay(scene: Phaser.Scene, delay: number): Promise<void> {
   return new Promise(resolve => {
-    console.log(delay);
-      scene.time.delayedCall(delay, resolve);
+    scene.time.delayedCall(delay, resolve);
   });
 }
 

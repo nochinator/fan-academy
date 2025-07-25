@@ -3,7 +3,7 @@ import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles, EGameSounds } 
 import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
-import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, visibleUnitCardCheck, effectSequence } from "../utils/gameUtils";
+import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, visibleUnitCardCheck, effectSequence, timeDelay } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -125,26 +125,20 @@ export class GameController {
 
       if (!actionTaken || actionsToIgnore.includes(actionTaken)) continue;
 
-      await new Promise<void>(resolve => {
-        this.context.time.delayedCall(800, async () => {
-          if (
-            actionTaken === EActionType.SPAWN ||
-            actionTaken === EActionType.MOVE
-          ) this.replaySpawnOrMove(turn.action!, opponentHand);
+      if (
+        actionTaken === EActionType.SPAWN ||
+        actionTaken === EActionType.MOVE
+      ) await this.replaySpawnOrMove(turn.action!, opponentHand);
 
-          if (
-            actionTaken === EActionType.ATTACK ||
-            actionTaken === EActionType.HEAL ||
-            actionTaken === EActionType.TELEPORT
-          ) await this.replayAttackHealTeleport(turn.action!);
+      if (
+        actionTaken === EActionType.ATTACK ||
+        actionTaken === EActionType.HEAL ||
+        actionTaken === EActionType.TELEPORT
+      ) await this.replayAttackHealTeleport(turn.action!);
 
-          if (actionTaken === EActionType.USE) await this.replayUse(turn.action!, opponentHand);
+      if (actionTaken === EActionType.USE) await this.replayUse(turn.action!, opponentHand);
 
-          if (actionTaken === EActionType.REMOVE_UNITS) await this.removeKOUnits();
-
-          resolve();
-        });
-      });
+      if (actionTaken === EActionType.REMOVE_UNITS) await this.removeKOUnits();
     }
 
     this.context.scene.restart({
@@ -157,7 +151,7 @@ export class GameController {
     } );
   }
 
-  replaySpawnOrMove(action: ITurnAction, opponentHand: (Hero | Item)[]): void {
+  async replaySpawnOrMove(action: ITurnAction, opponentHand: (Hero | Item)[]): Promise<void> {
     const actionTaken = action.action;
     const hand = opponentHand.length ? opponentHand : this.hand.hand;
 
@@ -167,8 +161,8 @@ export class GameController {
 
     if (!hero || !tile) throw new Error('Missing hero or tile in spawn or move action');
 
-    if (actionTaken === EActionType.MOVE) hero.move(tile);
-    if (actionTaken === EActionType.SPAWN) hero.setVisible(true).spawn(tile);
+    if (actionTaken === EActionType.MOVE) await hero.move(tile);
+    if (actionTaken === EActionType.SPAWN) await hero.setVisible(true).spawn(tile);
   };
 
   async replayAttackHealTeleport(action: ITurnAction): Promise<void> {
@@ -192,13 +186,13 @@ export class GameController {
     if (item.dealsDamage) {
       const tile = this.board.getTileFromBoardPosition(action.targetPosition!);
       if (!item) throw new Error('Missing tile in use action');
-      item.use(tile);
+      await item.use(tile);
     }
 
     if (!item.dealsDamage) {
       const hero = this.board.units.find(unit => unit.boardPosition === action.targetPosition);
       if (!hero) throw new Error('Missing target in use action');
-      item.use(hero);
+      await item.use(hero);
     }
   }
 
@@ -428,7 +422,7 @@ export class GameController {
     targetTile.removeHero();
   }
 
-  async pullEnemy(attacker: Hero, target: Hero): Promise<void> {
+  async pullEnemy(attacker: Hero, target: Hero, delay = 0): Promise<void> {
     const attackerTile = this.board.getTileFromBoardPosition(attacker.boardPosition);
     const targetTile = this.board.getTileFromBoardPosition(target.boardPosition);
     if (!attackerTile || !targetTile) {
@@ -453,6 +447,7 @@ export class GameController {
     }
 
     target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
+    await timeDelay(this.context, delay);
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);

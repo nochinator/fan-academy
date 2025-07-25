@@ -158,8 +158,8 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
   }
 
-  //attackType included to match hero.getsDamaged to simplify calls
-  getsDamaged(damage: number, attackType: any, delay = 0): void {
+  //attackType and hitSound included to match hero.getsDamaged to simplify calls
+  getsDamaged(damage: number, attackType: any, delay = 0, hitSound = true): [Promise<void>, number] {
     const totalDamage = roundToFive(damage + 300 * this.debuffLevel);
     const damageTaken = totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
     this.currentHealth -= damageTaken;
@@ -168,7 +168,9 @@ export class Crystal extends Phaser.GameObjects.Container {
       this.crystalImage.setTexture('crystalDamaged');
     }
 
-    this.showDamage(damageTaken, delay);
+    const replayDelay = this.showDamage(damageTaken, delay);
+
+    return [replayDelay, 0]
   }
 
   async showDamage(damageTaken: number, delay: number){

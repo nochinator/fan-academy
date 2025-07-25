@@ -1,8 +1,9 @@
+import { time } from "console";
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EElfSounds, EGameSounds } from "../enums/gameEnums";
 
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, equipAnimation, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind, effectSequence } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, equipAnimation, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind, effectSequence, timeDelay } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -30,7 +31,8 @@ export abstract class DarkElf extends Hero {
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
-  lifeSteal(damage: number): void {
+  async lifeSteal(damage: number, delay = 0): Promise<void> {
+    await timeDelay(this.context, delay);
     if (this.factionBuff) {
       const roundedHealing = roundToFive(damage * 0.666);
       this.getsHealed(roundedHealing);
@@ -46,16 +48,15 @@ export class Impaler extends DarkElf {
     super(context, data, tile);
   }
 
-  attack(target: Hero | Crystal): void {
+  async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target); // Ensure turnIfBehind is imported/defined
 
     const distance = this.getDistanceToTarget(target);
 
-
     let delay = 0;
-
+    let replayWait: Promise<void>;
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -64,7 +65,8 @@ export class Impaler extends DarkElf {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      effectSequence(this.scene, EElfSounds.IMPALER_ATTACK);
+      effectSequence(this.scene, EElfSounds.IMPALER_ATTACK_MELEE);
+      replayWait = timeDelay(this.scene, 750)
       target.removeFromGame();
     } else {
       if (this.superCharge) {
@@ -72,21 +74,24 @@ export class Impaler extends DarkElf {
         delay = 1500;
       } else if (distance === 1) {
         effectSequence(this.scene, EElfSounds.IMPALER_ATTACK_MELEE);
-        delay = 750;
+        delay = 700;
       } else {
         effectSequence(this.scene, EElfSounds.IMPALER_ATTACK);
-        delay = 750;
+        delay = 650;
       }
-      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
+      const [replayWaitLocal, damageDone] = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
+      replayWait = replayWaitLocal
+      if (damageDone !== undefined) this.lifeSteal(damageDone, delay);
 
-      if (damageDone !== undefined) this.lifeSteal(damageDone);
-
-      if (target instanceof Hero) gameController.pullEnemy(this, target);
+      if (target instanceof Hero) gameController.pullEnemy(this, target, delay);
 
       this.removeAttackModifiers();
     }
     
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+
+    await replayWait;
+    await timeDelay(this.scene, 500);
   }
 
   heal(_target: Hero): void {};
@@ -97,9 +102,11 @@ export class VoidMonk extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
-   attack(target: Hero | Crystal): void {
+   async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
     turnIfBehind(this.context, this, target);
+
+    let replayWait: Promise<void>[] = []
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -108,6 +115,7 @@ export class VoidMonk extends DarkElf {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.VOID_MONK_ATTACK);
+      replayWait.push(timeDelay(this.scene, 650));
       target.removeFromGame();
     } else {
       const board = this.context.gameController!.board;
@@ -155,23 +163,28 @@ export class VoidMonk extends DarkElf {
 
       // Apply damage to targets
       let damageDone = 0
-      const unitDamage = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
+      const [currentReplayWait, unitDamage] = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
+      replayWait.push(currentReplayWait);
       if (unitDamage) damageDone += unitDamage;
       if (splashedEnemies.length) {
         const splashDamage = this.getTotalPower() * 0.666;
         console.log(splashDamage);
         splashedEnemies.forEach(enemy => {
-          const unitDamage = enemy.getsDamaged(splashDamage, this.attackType, delay);
+          const [currentReplayWait, unitDamage] = enemy.getsDamaged(splashDamage, this.attackType, delay, false);
+          replayWait.push(currentReplayWait)
           if (unitDamage) damageDone += unitDamage;
         });
       }
 
-      if (damageDone) this.lifeSteal(damageDone);
+      if (damageDone) this.lifeSteal(damageDone, delay);
 
       this.removeAttackModifiers();
     }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+
+    await Promise.all(replayWait);
+    await timeDelay(this.scene, 500);
   }
 
   getOffsetTiles(_target: number, attackDirection: number): number[] {
@@ -193,17 +206,19 @@ export class Necromancer extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
-   attack(target: Hero | Crystal): void {
+   async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
 
     turnIfBehind(this.context, this, target);
 
     let delay = 0;
+    let replayWait: Promise<void>;
 
     if (target instanceof Hero && target.isKO) {
       const tile = target.getTile();
 
       effectSequence(this.scene, EElfSounds.PHANTOM_SPAWN);
+      replayWait = timeDelay(this.scene, 1500);
 
       const phantom = new Phantom(this.context, createElvesPhantomData({
         unitId: `${this.context.userId}_phantom_${generateFourDigitId()}`,
@@ -225,13 +240,17 @@ export class Necromancer extends DarkElf {
         delay = 800
       }
       
-      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
-      if (damageDone) this.lifeSteal(damageDone);
+      const [replayWaitLocal, damageDone] = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
+      replayWait = replayWaitLocal;
+      if (damageDone) this.lifeSteal(damageDone, delay);
 
       this.removeAttackModifiers();
 
     }
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+
+    await replayWait;
+    await timeDelay(this.scene, 500);
   }
 
   heal(_target: Hero): void {};
@@ -242,13 +261,14 @@ export class Priestess extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
-  attack(target: Hero | Crystal): void {
+  async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
 
     let delay = 0;
+    let replayWait: Promise<void>;
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -258,16 +278,16 @@ export class Priestess extends DarkElf {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.PRIESTESS_ATTACK);
-      delay = 600
+      replayWait = timeDelay(this.scene, 600);
       target.removeFromGame();
     } else {
       // There is no big attack sound
       effectSequence(this.scene, EElfSounds.PRIESTESS_ATTACK);
       delay = 600
 
-      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
-
-      if (damageDone) this.lifeSteal(damageDone);
+      const [replayWaitLocal, damageDone] = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
+      replayWait = replayWaitLocal;
+      if (damageDone) this.lifeSteal(damageDone, delay);
 
       // Apply a 50% debuff to the target's next attack
       if (target instanceof Hero && !target.isDebuffed && !target.isKO) {
@@ -280,6 +300,9 @@ export class Priestess extends DarkElf {
     }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+
+    await replayWait;
+    await timeDelay(this.scene, 500);
   }
 
   heal(target: Hero): void {
@@ -304,15 +327,16 @@ export class Wraith extends DarkElf {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
-  attack(target: Hero | Crystal): void {
+  async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
     turnIfBehind(this.context, this, target);
 
     let delay = 0;
+    let replayWait: Promise<void>;
 
     if (target instanceof Hero && target.isKO) {
       effectSequence(this.scene, EElfSounds.WRAITH_CONSUME);
-      delay = 1500
+      replayWait = timeDelay(this.scene, 1500);
       target.removeFromGame(true);
 
       if (this.unitsConsumed < 3) {
@@ -331,14 +355,18 @@ export class Wraith extends DarkElf {
         effectSequence(this.scene, EElfSounds.WRAITH_ATTACK);
         delay = 350
       }
-      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
-      if (damageDone) this.lifeSteal(damageDone);
+      const [replayWaitLocal, damageDone] = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
+      replayWait = replayWaitLocal;
+      if (damageDone) this.lifeSteal(damageDone, delay);
 
       this.removeAttackModifiers();
       
 
     }
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    
+    await replayWait;
+    await timeDelay(this.scene, 500);
   }
 
   heal(_target: Hero): void {};
@@ -360,11 +388,11 @@ export class Phantom extends Hero {
     }
   }
 
-  attack(target: Hero | Crystal): void {
+  async attack(target: Hero | Crystal): Promise<void> {
     this.flashAttacker();
     turnIfBehind(this.context, this, target);
 
-    let delay = 0
+    let replayWait: Promise<void>;
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -373,17 +401,20 @@ export class Phantom extends Hero {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.WRAITH_ATTACK);
+      replayWait = timeDelay(this.scene, 250);
       target.removeFromGame();
     } else {
       effectSequence(this.scene, EElfSounds.WRAITH_ATTACK);
-      delay = 250
 
-      target.getsDamaged(this.getTotalPower(), this.attackType, delay);
+      [replayWait, ] = target.getsDamaged(this.getTotalPower(), this.attackType, 250);
 
       this.removeAttackModifiers();
     }
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+
+    await replayWait;
+    await timeDelay(this.scene, 500);
   }
 
   heal(_target: Hero): void {};
@@ -396,10 +427,12 @@ export class SoulStone extends Item {
     super(context, data);
   }
 
-  use(target: Hero): void {
+  async use(target: Hero): Promise<void> {
     target.equipFactionBuff(this.boardPosition);
     effectSequence(this.scene, EGameSounds.USE_ITEM_GENERIC);
     this.removeFromGame();
+    
+    await timeDelay(this.scene, 1000);
   }
 }
 
@@ -409,7 +442,7 @@ export class ManaVial extends Item {
     this.selectSound = EGameSounds.SELECT_POTION 
   }
 
-  use(target: Hero): void {
+  async use(target: Hero): Promise<void> {
     const potionImage = this.scene.add.image(target.x, target.y - 10, 'manaVial').setDepth(100);
     equipAnimation(potionImage);
 
@@ -421,6 +454,8 @@ export class ManaVial extends Item {
     this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
     
     this.removeFromGame();
+
+    await timeDelay(this.scene, 1000);
   }
 }
 
@@ -443,6 +478,7 @@ export class SoulHarvest extends Item {
 
     // Keep track of the cumulative damage done (not attack power used) to enemy heroes (not crystals)
     let totalDamageInflicted = 0;
+    let replayWait: Promise<void>[] = [];
 
     gameController.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
 
@@ -454,7 +490,9 @@ export class SoulHarvest extends Item {
       if (!hero) throw new Error('Inferno use() hero not found');
       if (hero.isKO) return;
 
-      totalDamageInflicted += hero.getsDamaged(damage, EAttackType.MAGICAL, 700);
+      const [replayWaitLocal, damageLocal] = hero.getsDamaged(damage, EAttackType.MAGICAL, 700);
+      replayWait.push(replayWaitLocal);
+      totalDamageInflicted += damageLocal;
     });
 
     enemyCrystalTiles.forEach(tile => {
@@ -462,7 +500,8 @@ export class SoulHarvest extends Item {
       if (!crystal) throw new Error('Inferno use() crystal not found');
 
       if (!belongsToPlayer(this.context, crystal)) {
-        crystal.getsDamaged(damage, null, 700);
+        const [replayWaitLocal, ] = crystal.getsDamaged(damage, null, 700);
+        replayWait.push(replayWaitLocal)
       }
     });
 
