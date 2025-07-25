@@ -352,6 +352,7 @@ export class Wraith extends DarkElf {
       target.removeFromGame(true, false);
       await timeDelay(this.scene, 1500);
 
+
       if (this.unitsConsumed < 3) {
         this.basePower += 50;
         this.unitsConsumed++;

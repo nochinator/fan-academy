@@ -412,7 +412,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       }
     }
 
-
     // Update hp bar
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
