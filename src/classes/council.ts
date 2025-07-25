@@ -58,7 +58,7 @@ export class Archer extends Human {
         isEnemySpawn(this.context, target.getTile())
       ) {
         effectSequence(this.scene, ECouncilSounds.ARCHER_ATTACK_MELEE);
-        replayWait = timeDelay(this.scene, 500);
+        replayWait = timeDelay(this.context, 500);
         target.removeFromGame();
       } else {
         effectSequence(this.scene, ECouncilSounds.ARCHER_ATTACK_MELEE);
@@ -85,7 +85,7 @@ export class Archer extends Human {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.scene, 500);
+    await timeDelay(this.context, 500);
   }
 
   heal(_target: Hero): void {};
@@ -114,7 +114,7 @@ export class Knight extends Human {
     ) {
       target.removeFromGame();
       effectSequence(this.scene, ECouncilSounds.KNIGHT_ATTACK);
-      replayWait = timeDelay(this.scene, 500);
+      replayWait = timeDelay(this.context, 500);
     } else {
       if (this.superCharge) {
         effectSequence(this.scene, ECouncilSounds.KNIGHT_ATTACK_BIG);
@@ -136,7 +136,7 @@ export class Knight extends Human {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
     
     await replayWait;
-    await timeDelay(this.scene, 500);
+    await timeDelay(this.context, 500);
   }
 
   heal(_target: Hero): void {};
@@ -202,7 +202,7 @@ export class Wizard extends Human {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await Promise.all(replayWait);
-    await timeDelay(this.scene, 500);
+    await timeDelay(this.context, 500);
   }
 
   getNextTarget(target: Hero | Crystal, attackDirection: number, opponentDirection: number[], board: Board, isLastTarget: boolean, toIgnore?: number[]): Hero | Crystal | undefined {
@@ -324,7 +324,7 @@ export class Ninja extends Human {
         isEnemySpawn(this.context, target.getTile())
       ) {
         effectSequence(this.scene, ECouncilSounds.NINJA_ATTACK);
-        replayWait = timeDelay(this.scene, 500);
+        replayWait = timeDelay(this.context, 500);
         target.removeFromGame();
       } else {
         if (this.superCharge) {
@@ -355,7 +355,7 @@ export class Ninja extends Human {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.scene, 500);
+    await timeDelay(this.context, 500);
   }
 
   async teleport(target: Hero): Promise<void> {
@@ -382,7 +382,7 @@ export class Ninja extends Human {
 
     effectSequence(this.scene, ECouncilSounds.NINJA_SMOKE);
 
-    await timeDelay(this.scene, 750);
+    await timeDelay(this.context, 750);
   };
 
   heal(_target: Hero): void {};
@@ -409,7 +409,7 @@ export class Cleric extends Human {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, ECouncilSounds.CLERIC_ATTACK);
-      replayWait = timeDelay(this.scene, 300)
+      replayWait = timeDelay(this.context, 300)
       target.removeFromGame();
     } else {
       if (this.superCharge) {
@@ -430,7 +430,7 @@ export class Cleric extends Human {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.scene, 500);
+    await timeDelay(this.context, 500);
   }
 
   async heal(target: Hero): Promise<void> {
@@ -449,10 +449,10 @@ export class Cleric extends Human {
     this.context.gameController!.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
 
     effectSequence(this.scene, EGameSounds.HEAL);
-    await timeDelay(this.scene, 750);
+    await timeDelay(this.context, 750);
     effectSequence(this.scene, EGameSounds.HEAL_EXTRA);
 
-    await timeDelay(this.scene, 750)
+    await timeDelay(this.context, 750)
   };
 
   teleport(_target: Hero): void {};
@@ -506,7 +506,7 @@ export class Inferno extends Item {
 
     const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, this, targetTile);
 
-    let replayWait: Promise<void>[] = [timeDelay(this.scene, 250)];
+    let replayWait: Promise<void>[] = [timeDelay(this.context, 250)];
     let currentReplayWait: Promise<void>;
 
     effectSequence(this.scene, ECouncilSounds.USE_FIREBOMB);
@@ -539,13 +539,13 @@ export class Inferno extends Item {
     });
 
     if (enemyCrystalTiles.length === 0 && enemyHeroTiles.length === 0) {
-      await timeDelay(this.scene, 8000);
+      await timeDelay(this.context, 8000);
     }
 
     this.removeFromGame();
     this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
 
     await Promise.all(replayWait);
-    await timeDelay(this.scene, 250);
+    await timeDelay(this.context, 250);
   }
 }

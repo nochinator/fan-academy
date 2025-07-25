@@ -168,12 +168,12 @@ export class Crystal extends Phaser.GameObjects.Container {
       this.crystalImage.setTexture('crystalDamaged');
     }
 
-    const replayDelay = this.showDamage(damageTaken, delay);
+    const replayDelay = this.showDamage(damageTaken, delay, hitSound);
 
     return [replayDelay, 0]
   }
 
-  async showDamage(damageTaken: number, delay: number){
+  async showDamage(damageTaken: number, delay: number, hitSound: boolean){
     await timeDelay(this.context, delay);
 
     // Update hp bar
@@ -190,13 +190,16 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.belongsTo === 1) this.context.gameController?.gameUI.banner.playerOneHpBar.setHealth();
     if (this.belongsTo === 2) this.context.gameController?.gameUI.banner.playerTwoHpBar.setHealth();
 
-    if (this.currentHealth <= 0) {
-      effectSequence(this.scene, EGameSounds.DESTROY_CRYSTAL);
-      this.removeFromGame();
-    } else {
-      const damageSounds = [EGameSounds.DAMAGE_CRYSTAL_1, EGameSounds.DAMAGE_CRYSTAL_2] 
-      effectSequence(this.scene, Phaser.Math.RND.pick(damageSounds));
+    if (hitSound) {
+      if (this.currentHealth <= 0) {
+        effectSequence(this.scene, EGameSounds.DESTROY_CRYSTAL);
+        this.removeFromGame();
+      } else {
+        const damageSounds = [EGameSounds.DAMAGE_CRYSTAL_1, EGameSounds.DAMAGE_CRYSTAL_2] 
+        effectSequence(this.scene, Phaser.Math.RND.pick(damageSounds));
+      }
     }
+
   }
 
   removeFromGame(): void {

@@ -65,7 +65,7 @@ export class Impaler extends DarkElf {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.IMPALER_ATTACK_MELEE);
-      replayWait = timeDelay(this.scene, 750)
+      replayWait = timeDelay(this.context, 750)
       target.removeFromGame();
     } else {
       if (this.superCharge) {
@@ -92,7 +92,7 @@ export class Impaler extends DarkElf {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.scene, 500);
+    await timeDelay(this.context, 500);
   }
 
   heal(_target: Hero): void {};
@@ -118,7 +118,7 @@ export class VoidMonk extends DarkElf {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.VOID_MONK_ATTACK);
-      replayWait.push(timeDelay(this.scene, 650));
+      replayWait.push(timeDelay(this.context, 650));
       target.removeFromGame();
     } else {
       const board = this.context.gameController!.board;
@@ -190,7 +190,7 @@ export class VoidMonk extends DarkElf {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await Promise.all(replayWait);
-    await timeDelay(this.scene, 500);
+    await timeDelay(this.context, 500);
   }
 
   getOffsetTiles(_target: number, attackDirection: number): number[] {
@@ -225,7 +225,7 @@ export class Necromancer extends DarkElf {
       const tile = target.getTile();
 
       effectSequence(this.scene, EElfSounds.PHANTOM_SPAWN);
-      replayWait = timeDelay(this.scene, 1500);
+      replayWait = timeDelay(this.context, 1500);
 
       const phantom = new Phantom(this.context, createElvesPhantomData({
         unitId: `${this.context.userId}_phantom_${generateFourDigitId()}`,
@@ -260,7 +260,7 @@ export class Necromancer extends DarkElf {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.scene, 500);
+    await timeDelay(this.context, 500);
   }
 
   heal(_target: Hero): void {};
@@ -290,7 +290,7 @@ export class Priestess extends DarkElf {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.PRIESTESS_ATTACK);
-      replayWait = timeDelay(this.scene, 600);
+      replayWait = timeDelay(this.context, 600);
       target.removeFromGame();
     } else {
       // There is no big attack sound
@@ -316,7 +316,7 @@ export class Priestess extends DarkElf {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.scene, 500);
+    await timeDelay(this.context, 500);
   }
 
   heal(target: Hero): void {
@@ -353,7 +353,7 @@ export class Wraith extends DarkElf {
 
     if (target instanceof Hero && target.isKO) {
       effectSequence(this.scene, EElfSounds.WRAITH_CONSUME);
-      replayWait = timeDelay(this.scene, 1500);
+      replayWait = timeDelay(this.context, 1500);
       target.removeFromGame(true, false);
 
 
@@ -383,9 +383,9 @@ export class Wraith extends DarkElf {
     
     await replayWait;
     if (delay === 100) {
-      await timeDelay(this.scene, 1100);
+      await timeDelay(this.context, 1100);
     } else {
-      await timeDelay(this.scene, 500);
+      await timeDelay(this.context, 500);
     }
   }
 
@@ -422,7 +422,7 @@ export class Phantom extends Hero {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.WRAITH_ATTACK);
-      replayWait = timeDelay(this.scene, 200);
+      replayWait = timeDelay(this.context, 200);
       target.removeFromGame();
     } else {
       effectSequence(this.scene, EElfSounds.WRAITH_ATTACK);
@@ -437,7 +437,7 @@ export class Phantom extends Hero {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.scene, 1100);
+    await timeDelay(this.context, 1100);
   }
 
   heal(_target: Hero): void {};
@@ -477,7 +477,7 @@ export class ManaVial extends Item {
     
     this.removeFromGame();
 
-    await timeDelay(this.scene, 1000);
+    await timeDelay(this.context, 1000);
   }
 }
 
@@ -536,7 +536,7 @@ export class SoulHarvest extends Item {
     });
 
     if (enemyCrystalTiles.length === 0 && enemyHeroTiles.length === 0) {
-      await timeDelay(this.scene, 1000);
+      await timeDelay(this.context, 1000);
     }
 
     // Get total amount of friendly units in the map, including KO'd ones
