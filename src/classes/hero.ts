@@ -392,11 +392,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.currentHealth -= totalDamage;
 
-    // Add a flag to remove the unit once the action is done
-    let removeUnit = false;
-    if (this.currentHealth <= 0) {
-      removeUnit = this.getsKnockedDown();
-    }
+    if (this.currentHealth <= 0) this.getsKnockedDown();
 
     // Update hp bar
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
@@ -513,7 +509,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     new FloatingText(this.context, this.x, this.y - 50, textFigure.toString(), true);
   };
 
-  getsKnockedDown(): boolean {
+  getsKnockedDown(): void {
     this.removeSpecialTileOnKo();
 
     this.currentHealth = 0;
@@ -526,10 +522,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, true);
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
-
-    if (this.unitType === EHeroes.PHANTOM) return true;
-
-    return false;
   }
 
   getTile(): Tile {
