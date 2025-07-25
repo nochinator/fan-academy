@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EHeroes } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, canBeAttacked, useAnimation, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind } from "../utils/gameUtils";
+import { belongsToPlayer, canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind, useAnimation } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
