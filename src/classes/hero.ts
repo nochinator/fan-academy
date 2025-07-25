@@ -422,6 +422,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (this.unitType != EHeroes.PHANTOM) {
       this?.unitCard.updateCardHealth(this);
       this.updateTileData();
+    } else {
+      this.removeFromGame(true, false);
     }
 
     if (koWait) {
@@ -617,9 +619,11 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (index !== -1) { this.context.gameController!.board.units.splice(index, 1); }
 
     // Update hero counter
-    if (this.unitType !== EHeroes.PHANTOM) updateUnitsLeft(this.context, this);
+    if (this.unitType !== EHeroes.PHANTOM) {
+      updateUnitsLeft(this.context, this);
 
-    if (sound) effectSequence(this.context, EGameSounds.VANISH);
+      if (sound) effectSequence(this.context, EGameSounds.VANISH);
+    }
   }
 
   getDistanceToTarget(target: Hero | Crystal): number {
