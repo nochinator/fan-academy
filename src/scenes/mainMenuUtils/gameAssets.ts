@@ -235,7 +235,7 @@ export function loadGameAssets(context: GameScene) {
 
   // elves
   context.load.audio('priestessAttack', `${CDN_PATH}/audio/DE-Heretic_Attack_Curse.mp3`);
-  context.load.audio('priestessDeath', `${CDN_PATH}/audio/DE-Heretic_Death.mp3`);
+  context.load.audio('priestessDeath', `${CDN_PATH}/audio/DE-Heretic_Death.mp3`); // correct
   context.load.audio('impalerAttack', `${CDN_PATH}/audio/DE-Impaler_Attack_Throw_Spear.mp3`);
   context.load.audio('impalerAttackBig', `${CDN_PATH}/audio/DE-Impaler_BigAttack.mp3`);
   context.load.audio('impalerAttackMelee', `${CDN_PATH}/audio/DE-Impaler_Melee_Attack.mp3`);
