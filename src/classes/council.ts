@@ -532,7 +532,7 @@ export class Inferno extends Item {
       const crystal = this.context.gameController!.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('Inferno use() crystal not found');
 
-      if (!belongsToPlayer(this.context, crystal)) [currentReplayWait, ] = crystal.getsDamaged(damage, EAttackType.MAGICAL, 800, playSound);
+      [currentReplayWait, ] = crystal.getsDamaged(damage, EAttackType.MAGICAL, 800, playSound);
       
       replayWait.push(currentReplayWait);
       playSound = false; // don't stack sound for loud volume (will stack ko sound)
