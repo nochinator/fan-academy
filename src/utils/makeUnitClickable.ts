@@ -57,6 +57,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
   // CASE 1: No active unit
   if (!activeUnit && isFriendly) {
+    if (isHero(unit) && unit.isKO) return;
 
     if (unit.boardPosition >= 45) {
       if (isHero(unit)) {
@@ -76,8 +77,6 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
       effectSequence(context, EGameSounds.SELECT_HERO_FROM_BOARD);
       context.thinkingMusic.play();
     }
-
-    if (isHero(unit) && unit.isKO) return; // Can't select KO'd units
 
     selectUnit(context, unit);
     return;
@@ -236,7 +235,8 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
         context.thinkingMusic.play();
       }
 
-      return selectUnit(context, unit);
+      selectUnit(context, unit);
+      return;
     }
   }
 }

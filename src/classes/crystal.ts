@@ -174,7 +174,19 @@ export class Crystal extends Phaser.GameObjects.Container {
   }
 
   async showDamage(damageTaken: number, delay: number, hitSound: boolean){
-    await timeDelay(this.context, delay);
+    let replayWait = 0;
+    if (this.currentHealth <= 0) {
+      replayWait = 2000
+      this.removeFromGame(delay);
+      await timeDelay(this.context, delay);
+    } else {
+      await timeDelay(this.context, delay);
+      replayWait = 100
+      if (hitSound) {
+        const damageSounds = [EGameSounds.DAMAGE_CRYSTAL_1, EGameSounds.DAMAGE_CRYSTAL_2] 
+        effectSequence(this.scene, Phaser.Math.RND.pick(damageSounds));
+      }
+    }
 
     // Update hp bar
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
@@ -190,24 +202,10 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.belongsTo === 1) this.context.gameController?.gameUI.banner.playerOneHpBar.setHealth();
     if (this.belongsTo === 2) this.context.gameController?.gameUI.banner.playerTwoHpBar.setHealth();
 
-    if (hitSound) {
-      if (this.currentHealth <= 0) {
-        effectSequence(this.scene, EGameSounds.DESTROY_CRYSTAL);
-        this.removeFromGame();
-      } else {
-        const damageSounds = [EGameSounds.DAMAGE_CRYSTAL_1, EGameSounds.DAMAGE_CRYSTAL_2] 
-        effectSequence(this.scene, Phaser.Math.RND.pick(damageSounds));
-      }
-    }
-
+    await timeDelay(this.context, replayWait);
   }
 
-  removeFromGame(): void {
-    const tile = this.getTile();
-    tile.crystal = undefined;
-    tile.obstacle = false;
-    tile.tileType = ETiles.BASIC;
-
+  async removeFromGame(delay: number): Promise<void> {
     // Remove destoyed crystal from the board array
     const crystalArray = this.context.gameController!.board.crystals;
     const index = crystalArray.findIndex(crystal => crystal.boardPosition === this.boardPosition);
@@ -226,6 +224,17 @@ export class Crystal extends Phaser.GameObjects.Container {
       otherCrystal.isLastCrystal = true;
       otherCrystal.updateTileData();
     }
+
+    await timeDelay(this.context, delay);
+
+    effectSequence(this.scene, EGameSounds.DESTROY_CRYSTAL);
+
+    await timeDelay(this.context, 1000); // TODO: sync with animations when added
+
+    const tile = this.getTile();
+    tile.crystal = undefined;
+    tile.obstacle = false;
+    tile.tileType = ETiles.BASIC;
 
     // Remove animations
     this.scene.tweens.killTweensOf(this);
