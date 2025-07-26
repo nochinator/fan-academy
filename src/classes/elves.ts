@@ -151,7 +151,7 @@ export class VoidMonk extends DarkElf {
 
       if (this.superCharge) {
         effectSequence(this.scene, EElfSounds.VOID_MONK_ATTACK_BIG);
-        // TODO: there are multiple hit sounds played during this attack
+        this.playHitSounds();
         delay = 2500
       } else {
         effectSequence(this.scene, EElfSounds.VOID_MONK_ATTACK);
@@ -197,6 +197,26 @@ export class VoidMonk extends DarkElf {
       case 7: return [-9, -1, 9];
       default: return [];
     }
+  }
+
+  async playHitSounds() {
+    const damageSounds = [EGameSounds.HIT_1, EGameSounds.HIT_2, EGameSounds.HIT_3, EGameSounds.HIT_4]
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 1350);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 150);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 200);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 250);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 250);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 200);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 600);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    // last sound is played by getsHit
   }
 
   heal(_target: Hero): void {};
@@ -356,13 +376,15 @@ export class Wraith extends DarkElf {
         this.basePower += 50;
         this.unitsConsumed++;
         this.increaseMaxHealth(100);
+        this.unitCard.updateCardHealth(this);
+        this.updateTileData();
       }
     } else {
       if (this.superCharge) {
         effectSequence(this.scene, EElfSounds.WRAITH_ATTACK_BIG);
+        this.playHitSounds()
         delay = 4000
       } else {
-        // NOTE: When animations are implemented there needs to be a slight delay before this
         effectSequence(this.scene, EElfSounds.WRAITH_ATTACK);
         delay = 100
       }
@@ -380,6 +402,25 @@ export class Wraith extends DarkElf {
     } else {
       await timeDelay(this.context, 500);
     }    
+  }
+
+  async playHitSounds() {
+    const damageSounds = [EGameSounds.HIT_1, EGameSounds.HIT_2, EGameSounds.HIT_3, EGameSounds.HIT_4]
+    await timeDelay(this.context, 1500);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 250);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 350);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 400);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 350);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 200);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    await timeDelay(this.context, 300);
+    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
+    // last sound is played by getsHit
   }
 
   heal(_target: Hero): void {};
