@@ -193,7 +193,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('resetTurn', `${CDN_PATH}/audio/Generic_Push_Button.mp3`);
   context.load.audio('reviveHero', `${CDN_PATH}/audio/Game_Revive.mp3`);
   context.load.audio('landSword', `${CDN_PATH}/audio/Game_Land_Sword.mp3`);
-  context.load.audio('landShield', `${CDN_PATH}/audio/Game_Land_Sword.mp3`);
+  context.load.audio('landShield', `${CDN_PATH}/audio/Game_Land_Shield.mp3`);
   context.load.audio('landHelm', `${CDN_PATH}/audio/Tile_Resist_Magic.mp3`);
   context.load.audio('landCrystal', `${CDN_PATH}/audio/Game_Land_X.mp3`);
   context.load.audio('ko', `${CDN_PATH}/audio/KO_Slow_Mo_Punch.mp3`);
