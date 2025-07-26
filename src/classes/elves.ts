@@ -151,8 +151,7 @@ export class VoidMonk extends DarkElf {
 
       if (this.superCharge) {
         effectSequence(this.scene, EElfSounds.VOID_MONK_ATTACK_BIG);
-        this.playHitSounds();
-        delay = 2500
+        delay = 3000
       } else {
         effectSequence(this.scene, EElfSounds.VOID_MONK_ATTACK);
         delay = 650
@@ -197,26 +196,6 @@ export class VoidMonk extends DarkElf {
       case 7: return [-9, -1, 9];
       default: return [];
     }
-  }
-
-  async playHitSounds() {
-    const damageSounds = [EGameSounds.HIT_1, EGameSounds.HIT_2, EGameSounds.HIT_3, EGameSounds.HIT_4]
-    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 1350);
-    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 150);
-    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 200);
-    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 250);
-    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 250);
-    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 200);
-    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 600);
-    this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    // last sound is played by getsHit
   }
 
   heal(_target: Hero): void {};
