@@ -224,17 +224,14 @@ export class GameController {
     return this.deck.getDeck();
   }
 
-  drawUnits() {
-    effectSequence(this.context, EGameSounds.NEW_ITEMS);
-    this.door.openDoor();
-
+  async drawUnits(): Promise<void> {
     const drawAmount = 6 - this.hand.getHandSize();
-
-    if (this.deck.getDeckSize() === 0 || drawAmount === 0) return;
 
     const drawnUnits = this.deck.removeFromDeck(drawAmount); // IHero IItem
 
-    this.hand.addToHand(drawnUnits);
+    if (this.deck.getDeckSize() === 0 || drawAmount === 0) { await timeDelay(this.context, 500); return; }
+
+    const renderUnits = this.hand.addToHand(drawnUnits);
 
     // Add action to turn state
     const { player, opponent } = getPlayersKey(this.context);
@@ -258,7 +255,14 @@ export class GameController {
       },
       boardState: this.board.getBoardState()
     });
+
+    await timeDelay(this.context, 500);
+    effectSequence(this.context, EGameSounds.NEW_ITEMS);
+    await this.door.openDoor();
+    await renderUnits;
   }
+
+
 
   async removeKOUnits() {
     // Remove KO'd units from the board
@@ -310,7 +314,7 @@ export class GameController {
 
     // Refresh actionPie, draw units and update door banner
     this.actionPie.resetActionPie();
-    this.drawUnits();
+    const renderUnits = this.drawUnits();
     this.door.updateBannerText();
 
     // Add the last action of the previous turn at index 0 of the actions array to serve as the base for the replay
@@ -323,6 +327,8 @@ export class GameController {
     sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.gameOver);
 
     if (this.gameOver) console.log('GAME ENDS! THE WINNER IS', this.gameOver?.winner);
+
+    await renderUnits
 
     // TODO: victory / defeat screen
   }
