@@ -208,10 +208,14 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('hit4', `${CDN_PATH}/audio/Game_Damage_Opponent_4.mp3`);
   context.load.audio('heal', `${CDN_PATH}/audio/Civ_Cleric_Heal.mp3`);
   context.load.audio('healExtra', `${CDN_PATH}/audio/Game_Heal.mp3`); // used on top of base heal sound sometimes
+  context.load.audio('winSFX', `${CDN_PATH}/audio/Game_Win_SFX_01.mp3`);
+  context.load.audio('loseSFX', `${CDN_PATH}/audio/Game_Lose_SFX_01.mp3`);
 
   // music
   context.load.audio('titleMusic', `${CDN_PATH}/audio/Mx_Title_Theme_v4.mp3`);
   context.load.audio('backgroundMusic', `${CDN_PATH}/audio/Background_Music.mp3`);
+  context.load.audio('winMusic', `${CDN_PATH}/audio/Mx_Win_Theme_v3.mp3`);
+  context.load.audio('loseMusic', `${CDN_PATH}/audio/Mx_Lose_Theme_v3.mp3`);
 
   // council
   context.load.audio('archerAttack', `${CDN_PATH}/audio/Civ_Archer_Attack_Arrow.mp3`);

@@ -341,7 +341,7 @@ export class Ninja extends Human {
         effectSequence(this.scene, ECouncilSounds.NINJA_ATTACK_BIG);
         delay = 500;
       } else {
-        effectSequence(this.scene, ECouncilSounds.NINJA_ATTACK);
+        effectSequence(this.scene, ECouncilSounds.NINJA_ATTACK_RANGED);
         delay = 500
       }
             [replayWait, ] = target.getsDamaged(this.getTotalPower(), this.attackType, delay);

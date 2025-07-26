@@ -75,6 +75,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.events.on('shutdown', this.shutdown, this);
+
     this.time.addEvent({
       delay: 300000, // 5 minutes
       callback: () => {
@@ -89,5 +91,10 @@ export default class GameScene extends Phaser.Scene {
     this.chatComponent = createChatComponent(this);
     this.gameController = new GameController(this);
     if (this.triggerReplay) this.gameController.replayTurn();
+  }
+
+  shutdown() {
+    console.log(`stopping music`);
+    this.gameController!.stopMusic();
   }
 };

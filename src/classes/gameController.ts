@@ -19,6 +19,9 @@ import { Tile } from "./tile";
 import { TurnButton } from "./turnButton";
 import { TurnWarningPopup } from "./turnPopup";
 
+let winMusic: Phaser.Sound.BaseSound | null = null;
+let loseMusic: Phaser.Sound.BaseSound | null = null;
+
 export class GameController {
   context: GameScene;
   game: IGame;
@@ -66,9 +69,14 @@ export class GameController {
     this.concedeButton = this.addConcedeButton(context);
     this.concedePopup = new ConcedeWarningPopup(context);
 
-    if (this.game.status === EGameStatus.FINISHED) {
+    if (context.triggerReplay) {
+      this.rematchButton.setVisible(false);
+      this.turnButton.buttonImage.setVisible(false);
+    }
+    else if (this.game.status === EGameStatus.FINISHED) {
       this.rematchButton.setVisible(true);
       this.turnButton.buttonImage.setVisible(false);
+      this.gameOverEffects();
     }
 
     if (context.activePlayer !== context.userId) this.turnButton.buttonImage.setVisible(false);
@@ -84,7 +92,7 @@ export class GameController {
         colyseusClient: context.colyseusClient,
         currentGame: context.currentGame,
         currentRoom: context.currentRoom,
-        triggerReplay: false
+        triggerReplay: false,
       });
     });
 
@@ -151,7 +159,6 @@ export class GameController {
       currentGame: this.context.currentGame,
       currentRoom: this.context.currentRoom,
       triggerReplay: false,
-      gameOver: undefined
     } );
   }
 
@@ -326,11 +333,30 @@ export class GameController {
     effectSequence(this.context, EGameSounds.BATTLE_BUTTON); // TODO: add fail sound in send turn failed
     sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.gameOver);
 
-    if (this.gameOver) console.log('GAME ENDS! THE WINNER IS', this.gameOver?.winner);
+    if (this.gameOver) this.gameOverEffects();
 
     await renderUnits
+  }
 
-    // TODO: victory / defeat screen
+  async gameOverEffects() {
+    if (this.gameOver?.winner === this.context.activePlayer) {
+      winMusic = this.context.sound.add(EGameSounds.WIN_MUSIC, { loop: true });
+      winMusic.play();
+      await timeDelay(this.context, 2000);
+      // TODO: Show win text
+      this.context.sound.play(EGameSounds.WIN_SFX);
+    } else {
+      loseMusic = this.context.sound.add(EGameSounds.LOSE_MUSIC, { loop: true });
+      loseMusic.play();
+      await timeDelay(this.context, 2000);
+      // TODO: Show win text
+      this.context.sound.play(EGameSounds.LOSE_SFX);
+    }
+  }
+
+  stopMusic(){
+    winMusic?.stop();
+    loseMusic?.stop();
   }
 
   onHeroClicked(hero: Hero) {

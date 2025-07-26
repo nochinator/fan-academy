@@ -139,7 +139,7 @@ export abstract class Item extends Phaser.GameObjects.Container {
     this.destroy(true);
   }
 
-  abstract use(target: any): void;
+  abstract use(target: any): Promise<void>;
 }
 
 // TODO: move item animations into effectSequence when adding all animations
