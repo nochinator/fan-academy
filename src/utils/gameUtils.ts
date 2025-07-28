@@ -5,7 +5,7 @@ import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulSt
 import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EActionClass, EActionType, ECardType, EClass, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
+import { EActionClass, EActionType, ECardType, EClass, EGameSounds, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, IHero, IItem, IPlayerState, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
@@ -81,6 +81,8 @@ export function createNewHero(context: GameScene, heroData: IHero, tile?: Tile):
 }
 
 export async function moveAnimation(context: GameScene, hero: Hero, targetTile: Tile): Promise<void> {
+  playSoundFunc(context, EGameSounds.MOVE_WALK); // TODO: add flying to wraith and maybe necro. No delay needed
+
   // Stop user input until the animation finishes playing
   context.input.enabled = false;
 
@@ -161,18 +163,29 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
   };
 }
 
-// Add animation calls here when ready
+// Add animation calls here when ready // FIXME: to remove once done
 export function effectSequence(scene: Phaser.Scene, sound: string): void {
   if (sound) {
     scene.sound.play(sound);
-  }  
+  }
+}
+
+export async function playSoundFunc(scene: Phaser.Scene, sound: string, delay = 0): Promise<void> {
+  scene.sound.play(sound);
+  await pauseCode(scene, delay);
+}
+
+export function pauseCode(scene: Phaser.Scene, delay: number): Promise<void> {
+  return new Promise(resolve => {
+    scene.time.delayedCall(delay, resolve);
+  });
 }
 
 export function timeDelay(scene: Phaser.Scene, delay: number): Promise<void> {
   return new Promise(resolve => {
     scene.time.delayedCall(delay, resolve);
   });
-}
+} // FIXME: remove
 
 export function getActionClass(action: EActionType): EActionClass {
   return [EActionType.PASS, EActionType.DRAW, EActionType.REMOVE_UNITS].includes(action) ? EActionClass.AUTO : EActionClass.USER;

@@ -1,6 +1,6 @@
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { createNewHero, createNewItem, isHero, isItem, timeDelay } from "../utils/gameUtils";
+import { createNewHero, createNewItem, isHero, isItem, pauseCode } from "../utils/gameUtils";
 import { getCurrentPlayer } from "../utils/playerUtils";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -52,7 +52,7 @@ export class Hand {
       }
     });
 
-    await timeDelay(this.context, 1000);
+    await pauseCode(this.context, 1000);
     for (const unit of toRender){
       unit.setVisible(true);
     }

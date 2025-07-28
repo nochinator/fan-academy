@@ -5,7 +5,7 @@ import { EGameSounds, ETiles, EWinConditions } from "../enums/gameEnums";
 >>>>>>> 04d9cad09d37d8ac05343b271c39f3b31035f04e
 import { ICrystal, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { roundToFive, effectSequence, timeDelay } from "../utils/gameUtils";
+import { roundToFive, effectSequence, pauseCode } from "../utils/gameUtils";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
 import { CrystalCard } from "./crystalCard";
 import { FloatingText } from "./floatingText";
@@ -188,12 +188,12 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.currentHealth <= 0) {
       replayWait = 2000
       this.removeFromGame(delay);
-      await timeDelay(this.context, delay);
+      await pauseCode(this.context, delay);
     } else {
-      await timeDelay(this.context, delay);
+      await pauseCode(this.context, delay);
       replayWait = 100
       if (hitSound) {
-        const damageSounds = [EGameSounds.DAMAGE_CRYSTAL_1, EGameSounds.DAMAGE_CRYSTAL_2] 
+        const damageSounds = [EGameSounds.DAMAGE_CRYSTAL_1, EGameSounds.DAMAGE_CRYSTAL_2]
         effectSequence(this.scene, Phaser.Math.RND.pick(damageSounds));
       }
     }
@@ -202,7 +202,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
 
     // Show damage numbers
-    if (damageTaken > 0) new FloatingText(this.context, this.x, this.y - 50, damageTaken.toString());        
+    if (damageTaken > 0) new FloatingText(this.context, this.x, this.y - 50, damageTaken.toString());
 
 
     this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
@@ -212,7 +212,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.belongsTo === 1) this.context.gameController?.gameUI.banner.playerOneHpBar.setHealth();
     if (this.belongsTo === 2) this.context.gameController?.gameUI.banner.playerTwoHpBar.setHealth();
 
-    await timeDelay(this.context, replayWait);
+    await pauseCode(this.context, replayWait);
   }
 
   async removeFromGame(delay: number): Promise<void> {
@@ -235,11 +235,11 @@ export class Crystal extends Phaser.GameObjects.Container {
       otherCrystal.updateTileData();
     }
 
-    await timeDelay(this.context, delay);
+    await pauseCode(this.context, delay);
 
     effectSequence(this.scene, EGameSounds.DESTROY_CRYSTAL);
 
-    await timeDelay(this.context, 1000); // TODO: sync with animations when added
+    await pauseCode(this.context, 1000); // TODO: sync with animations when added
 
     const tile = this.getTile();
     tile.crystal = undefined;

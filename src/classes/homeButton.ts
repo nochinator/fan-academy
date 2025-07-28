@@ -1,5 +1,5 @@
 import UIScene from "../scenes/ui.scene";
-import { EGameSounds } from "../enums/gameEnums";
+import { EUiSounds } from "../enums/gameEnums";
 import { effectSequence } from "../utils/gameUtils";
 // Import the backgroundMusicInstance from ui.scene.ts
 import { backgroundMusicInstance } from "../scenes/ui.scene"; // <-- ADD THIS IMPORT
@@ -23,7 +23,7 @@ export class HomeButton extends Phaser.GameObjects.Container {
     this.add([this.button, this.buttonText]).setScale(0.8);
 
     this.button.on('pointerdown', async() => {
-      effectSequence(this.scene, EGameSounds.BUTTON_PRESS_GENERIC);
+      this.scene.sound.play(EUiSounds.BUTTON_GENERIC);
 
       await context.lobbyRoom?.leave();
       await context.currentRoom?.leave();

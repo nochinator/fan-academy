@@ -1,6 +1,5 @@
 import { sendTurnMessage } from "../colyseus/colyseusGameRoom";
-import { EActionClass, EActionType, EWinConditions, EGameSounds } from "../enums/gameEnums";
-import { effectSequence } from "../utils/gameUtils";
+import { EActionClass, EActionType, EWinConditions, EUiSounds } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
 
 const turnPopupCoordinates = {
@@ -57,7 +56,7 @@ export class ConcedeWarningPopup extends Phaser.GameObjects.Container {
     }).setOrigin(0.5);
 
     this.okButtonImage.on('pointerdown', async () => {
-      effectSequence(this.scene, EGameSounds.RESIGN);
+      this.scene.sound.play(EUiSounds.RESIGN);
 
       this.setVisible(false);
       const gameController = context.gameController!;
@@ -91,7 +90,8 @@ export class ConcedeWarningPopup extends Phaser.GameObjects.Container {
     });
 
     this.cancelButtonImage.on('pointerdown', () => {
-      effectSequence(this.scene, EGameSounds.BUTTON_PRESS_GENERIC);
+      this.scene.sound.play(EUiSounds.BUTTON_GENERIC);
+
       this.setVisible(false);
     });
 

@@ -1,9 +1,9 @@
 import { sendTurnMessage } from "../colyseus/colyseusGameRoom";
-import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles, EGameSounds } from "../enums/gameEnums";
+import { EActionClass, EActionType, EGameSounds, EGameStatus, EHeroes, ETiles, EUiSounds } from "../enums/gameEnums";
 import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
-import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, textAnimation, visibleUnitCardCheck, effectSequence, timeDelay } from "../utils/gameUtils";
+import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, textAnimation, pauseCode, visibleUnitCardCheck } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -18,9 +18,6 @@ import { RematchButton } from "./rematchButton";
 import { Tile } from "./tile";
 import { TurnButton } from "./turnButton";
 import { TurnWarningPopup } from "./turnPopup";
-
-let winMusic: Phaser.Sound.BaseSound | null = null;
-let loseMusic: Phaser.Sound.BaseSound | null = null;
 
 export class GameController {
   context: GameScene;
@@ -92,7 +89,7 @@ export class GameController {
         colyseusClient: context.colyseusClient,
         currentGame: context.currentGame,
         currentRoom: context.currentRoom,
-        triggerReplay: false,
+        triggerReplay: false
       });
     });
 
@@ -107,15 +104,13 @@ export class GameController {
   addConcedeButton(context: GameScene): Phaser.GameObjects.Image {
     const button = context.add.image(1350, 70, 'concedeButton').setScale(0.9).setInteractive({ useHandCursor: true });
     button.on('pointerdown', ()=> {
-      effectSequence(this.context, EGameSounds.BUTTON_PRESS_GENERIC);
+      this.context.sound.play(EUiSounds.BUTTON_GENERIC);
       this.concedePopup.setVisible(true);
     });
     return button;
   }
 
   async replayTurn() {
-    await timeDelay(this.context, 1000);
-
     // Fake the opponent's hand if needed
     const opponentHand: (Hero | Item)[] = [];
     if (this.context.activePlayer === this.context.userId) {
@@ -145,7 +140,7 @@ export class GameController {
         actionTaken === EActionType.HEAL ||
         actionTaken === EActionType.TELEPORT
       ) await this.replayAttackHealTeleport(turn.action!);
-      
+
       if (actionTaken === EActionType.SHUFFLE) await this.replayShuffle();
 
       if (actionTaken === EActionType.USE) await this.replayUse(turn.action!, opponentHand);
@@ -158,7 +153,7 @@ export class GameController {
       colyseusClient: this.context.colyseusClient,
       currentGame: this.context.currentGame,
       currentRoom: this.context.currentRoom,
-      triggerReplay: false,
+      triggerReplay: false
     } );
   }
 
@@ -213,7 +208,8 @@ export class GameController {
       fontSize: 50,
       color: '#fffb00'
     });
-    effectSequence(this.context, EGameSounds.RETURN_ITEM);
+    this.context.sound.play(EGameSounds.SHUFFLE);
+
     await textAnimation(testText, 1.3);
   }
 
@@ -221,9 +217,8 @@ export class GameController {
     deselectUnit(this.context);
     this.context.longPressStart = undefined;
     this.context.visibleUnitCard = undefined;
+    this.context.sound.play(EGameSounds.RESET_TURN);
 
-    effectSequence(this.context, EGameSounds.RESET_TURN);
-    this.context.thinkingMusic.stop()
     this.context.scene.restart();
   };
 
@@ -236,7 +231,7 @@ export class GameController {
 
     const drawnUnits = this.deck.removeFromDeck(drawAmount); // IHero IItem
 
-    if (this.deck.getDeckSize() === 0 || drawAmount === 0) { await timeDelay(this.context, 500); return; }
+    if (this.deck.getDeckSize() === 0 || drawAmount === 0) return;
 
     const renderUnits = this.hand.addToHand(drawnUnits);
 
@@ -263,13 +258,12 @@ export class GameController {
       boardState: this.board.getBoardState()
     });
 
-    await timeDelay(this.context, 500);
-    effectSequence(this.context, EGameSounds.NEW_ITEMS);
+    await pauseCode(this.context, 500); // REVIEW:
+    this.context.sound.play(EGameSounds.DRAW);
+
     await this.door.openDoor();
     await renderUnits;
   }
-
-
 
   async removeKOUnits() {
     // Remove KO'd units from the board
@@ -330,33 +324,22 @@ export class GameController {
     this.context.activePlayer = this.context.opponentId;
     this.context.turnNumber!++;
 
-    effectSequence(this.context, EGameSounds.BATTLE_BUTTON); // TODO: add fail sound in send turn failed
+    this.context.sound.play(EUiSounds.BUTTON_GENERIC);
     sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.gameOver);
 
     if (this.gameOver) this.gameOverEffects();
 
-    await renderUnits
+    await renderUnits;
   }
 
   async gameOverEffects() {
     if (this.gameOver?.winner === this.context.activePlayer) {
-      winMusic = this.context.sound.add(EGameSounds.WIN_MUSIC, { loop: true });
-      winMusic.play();
-      await timeDelay(this.context, 2000);
       // TODO: Show win text
-      this.context.sound.play(EGameSounds.WIN_SFX);
+      this.context.sound.play(EUiSounds.WIN_SFX);
     } else {
-      loseMusic = this.context.sound.add(EGameSounds.LOSE_MUSIC, { loop: true });
-      loseMusic.play();
-      await timeDelay(this.context, 2000);
-      // TODO: Show win text
-      this.context.sound.play(EGameSounds.LOSE_SFX);
+      // TODO: Show lose text
+      this.context.sound.play(EUiSounds.LOSE_SFX);
     }
-  }
-
-  stopMusic(){
-    winMusic?.stop();
-    loseMusic?.stop();
   }
 
   onHeroClicked(hero: Hero) {
@@ -460,7 +443,7 @@ export class GameController {
       return;
     }
 
-    await timeDelay(this.context, delay);
+    await pauseCode(this.context, delay);
     target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
@@ -492,8 +475,8 @@ export class GameController {
       console.error(`pushEnemy() Can't pull a non-KO'd enemy onto a friendly spawn`);
       return;
     }
-    
-    await timeDelay(this.context, delay);
+
+    await pauseCode(this.context, delay);
     target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
     await forcedMoveAnimation(this.context, target, targetNewTile);
 

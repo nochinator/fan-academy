@@ -1,4 +1,4 @@
-import { EChallengePopup, EFaction } from "../enums/gameEnums";
+import { EChallengePopup, EFaction, EUiSounds } from "../enums/gameEnums";
 import { sendChallengeAcceptedMessage } from "../colyseus/colyseusLobbyRoom";
 import { newGameChallenge } from "../queries/gameQueries";
 import LeaderboardScene from "../scenes/leaderboard.scene";
@@ -61,6 +61,8 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
     }).setOrigin(0.5);
 
     const buttonCallback = async (faction: EFaction) => {
+      context.sound.play(EUiSounds.BUTTON_GENERIC);
+
       this.setVisible(false);
       if (challengeType === EChallengePopup.SEND) await newGameChallenge(context.userId, faction, opponentId);
 
@@ -72,6 +74,8 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
     this.elvesButtonImage.on('pointerdown', async () => await buttonCallback(EFaction.DARK_ELVES));
 
     this.cancelButtonImage.on('pointerdown', () => {
+      this.scene.sound.play(EUiSounds.BUTTON_FAILED);
+
       this.setVisible(false);
       this.destroy();
     });

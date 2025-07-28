@@ -131,12 +131,12 @@ export enum EPopups {
 }
 
 export enum EUiSounds {
-  BATTLE_BUTTON = 'battleButton',
-  BUTTON_PRESS_GENERIC = 'buttonPressGeneric',
+  BUTTON_PLAY = 'battleButton',
+  BUTTON_GENERIC = 'buttonPressGeneric',
   SEND_MOVE = 'sendMove',
   CHAT_MESSAGE = 'chatMessage',
   BUTTON_FAILED = 'buttonFailed',
-  DELETE_GAME = 'deleteGame',
+  GAME_DELETE = 'deleteGame',
   RESIGN = 'resign',
   WIN_MUSIC = 'winMusic',
   LOSE_MUSIC = 'loseMusic',
@@ -166,10 +166,10 @@ export enum EGameSounds {
   POTION_USE = 'usePotion',
   RESET_TURN = 'resetTurn',
   HERO_REVIVE = 'reviveHero',
-  SWORD_EQUIP = 'landSword',
+  SWORD_TILE = 'landSword',
   SHIELD_EQUIP = 'landShield',
-  HELM_EQUIP = 'landHelm',
-  LAND_CRYSTAL = 'landCrystal',
+  HELM_TILE = 'landHelm',
+  CRYSTAL_TILE = 'landCrystal',
   KO = 'ko',
   DRAW = 'newItems',
   SHUFFLE = 'returnItem',
@@ -203,7 +203,7 @@ export enum EGameSounds {
   WIZARD_ATTACK_BIG = 'wizardAttackBig',
   WIZARD_DEATH = 'wizardDeath',
   SELECT_FIREBOMB = 'selectFirebomb',
-  USE_FIREBOMB = 'useFirebomb',
+  INFERNO_USE = 'useFirebomb',
 
   // Elves sounds
   PRIESTESS_ATTACK = 'priestessAttack',
@@ -214,6 +214,7 @@ export enum EGameSounds {
   IMPALER_DEATH = 'impalerDeath',
   NECRO_ATTACK = 'necroAttack',
   NECRO_ATTACK_BIG = 'necroAttackBig',
+  // FIXME: necro death missing
   PHANTOM_SPAWN = 'phantomSpawn',
   PHANTOM_DEATH = 'phantomDeath',
   VOID_MONK_ATTACK = 'voidMonkAttack',

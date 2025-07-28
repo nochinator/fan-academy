@@ -3,7 +3,7 @@ import { Crystal } from "../classes/crystal";
 import { Hero } from "../classes/hero";
 import { Item} from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EGameStatus, EHeroes, EItems, ERange, ETiles, EGameSounds } from "../enums/gameEnums";
+import { EGameStatus, EHeroes, EItems, ERange, ETiles, EUiSounds } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck, effectSequence } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
@@ -61,7 +61,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
     if (unit.boardPosition >= 45) {
       if (isHero(unit)) {
-        effectSequence(context, EGameSounds.SELECT_HERO_FROM_HAND);
+        effectSequence(context, EUiSounds.SELECT_HERO_FROM_HAND);
       } else {
         let selectSound = 'selectItemGeneric'
         const itemType = String(unit.itemType)
@@ -74,7 +74,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
       }
       context.thinkingMusic.stop();
     } else {
-      effectSequence(context, EGameSounds.SELECT_HERO_FROM_BOARD);
+      effectSequence(context, EUiSounds.SELECT_HERO_FROM_BOARD);
       context.thinkingMusic.play();
     }
 
@@ -98,10 +98,10 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
   if (activeUnit && !isSameUnit) {
 
     // Unique case: Wraith can spawn on a KO'd unit
-    if (isHero(unit) && unit.isKO && 
-        isHero(activeUnit) && 
-        activeUnit.unitType === EHeroes.WRAITH && 
-        activeUnit.boardPosition >= 45 && 
+    if (isHero(unit) && unit.isKO &&
+        isHero(activeUnit) &&
+        activeUnit.unitType === EHeroes.WRAITH &&
+        activeUnit.boardPosition >= 45 &&
         !isEnemySpawn(context, unit.getTile())
     ) {
       activeUnit.spawn(unit.getTile());
@@ -233,7 +233,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
       if (unit.boardPosition >= 45) {
         if (isHero(unit)) {
-          effectSequence(context, EGameSounds.SELECT_HERO_FROM_HAND);
+          effectSequence(context, EUiSounds.SELECT_HERO_FROM_HAND);
         } else {
           let selectSound = 'selectItemGeneric'
           const itemType = String(unit.itemType)
@@ -246,7 +246,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
         }
         context.thinkingMusic.stop();
       } else {
-        effectSequence(context, EGameSounds.SELECT_HERO_FROM_BOARD);
+        effectSequence(context, EUiSounds.SELECT_HERO_FROM_BOARD);
         context.thinkingMusic.play();
       }
 
@@ -271,12 +271,12 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     if (!activeUnit || !gameController) return;
 
     // If unit is on the board and the tile clicked on is in range, move the unit
-    if (activeUnit.boardPosition < 45 && tile.isHighlighted && isHero(activeUnit)) 
+    if (activeUnit.boardPosition < 45 && tile.isHighlighted && isHero(activeUnit))
     {
       activeUnit.move(tile);
 
        // This doesn't play in replay, footstep sound is in move()
-      effectSequence(context, EGameSounds.MOVE_HERO);
+      effectSequence(context, EUiSounds.MOVE_HERO);
       context.thinkingMusic.stop();
     }
     // If unit is in hand and clicked tile is highlighted, spawn. Otherwise, use item

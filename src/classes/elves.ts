@@ -1,8 +1,8 @@
-import { EActionType, EAttackType, EClass, EFaction, EHeroes, EElfSounds, EGameSounds } from "../enums/gameEnums";
+import { EActionType, EAttackType, EClass, EFaction, EHeroes, EElfSounds, EUiSounds } from "../enums/gameEnums";
 
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { canBeAttacked, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind, effectSequence, timeDelay, useAnimation } from "../utils/gameUtils";
+import { canBeAttacked, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, roundToFive, turnIfBehind, effectSequence, pauseCode, useAnimation } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -25,13 +25,13 @@ export abstract class DarkElf extends Hero {
     this.unitCard.updateCardHealth(this);
     this.updateTileData();
 
-    effectSequence(this.scene, EGameSounds.USE_ITEM_GENERIC);
+    effectSequence(this.scene, EUiSounds.USE_ITEM_GENERIC);
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
   async lifeSteal(damage: number, delay = 0): Promise<void> {
-    await timeDelay(this.context, delay);
+    await pauseCode(this.context, delay);
     if (this.factionBuff) {
       const roundedHealing = roundToFive(damage * 0.666);
       this.getsHealed(roundedHealing);
@@ -64,7 +64,7 @@ export class Impaler extends DarkElf {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.IMPALER_ATTACK_MELEE);
-      replayWait = timeDelay(this.context, 750)
+      replayWait = pauseCode(this.context, 750)
       target.removeFromGame();
     } else {
       if (this.superCharge) {
@@ -85,11 +85,11 @@ export class Impaler extends DarkElf {
     }
 
     if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) this.context.gameController!.pullEnemy(this, target, delay);
-    
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.context, 500);    
+    await pauseCode(this.context, 500);
   }
 
   heal(_target: Hero): void {};
@@ -115,7 +115,7 @@ export class VoidMonk extends DarkElf {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.VOID_MONK_ATTACK);
-      replayWait.push(timeDelay(this.context, 650));
+      replayWait.push(pauseCode(this.context, 650));
       target.removeFromGame();
     } else {
       const board = this.context.gameController!.board;
@@ -184,8 +184,8 @@ export class VoidMonk extends DarkElf {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await Promise.all(replayWait);
-    await timeDelay(this.context, 500);
-    
+    await pauseCode(this.context, 500);
+
     splashedEnemies.forEach(enemy => {
       if (enemy instanceof Hero && enemy.unitType == EHeroes.PHANTOM) enemy.removeFromGame(true, false);
     });
@@ -223,7 +223,7 @@ export class Necromancer extends DarkElf {
       const tile = target.getTile();
 
       effectSequence(this.scene, EElfSounds.PHANTOM_SPAWN);
-      replayWait = timeDelay(this.context, 1500);
+      replayWait = pauseCode(this.context, 1500);
 
       const phantom = new Phantom(this.context, createElvesPhantomData({
         unitId: `${this.context.userId}_phantom_${generateFourDigitId()}`,
@@ -246,7 +246,7 @@ export class Necromancer extends DarkElf {
         effectSequence(this.scene, EElfSounds.NECRO_ATTACK);
         delay = 800
       }
-      
+
       const [replayWaitLocal, damageDone] = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
       replayWait = replayWaitLocal;
       if (damageDone) this.lifeSteal(damageDone, delay);
@@ -256,7 +256,7 @@ export class Necromancer extends DarkElf {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.context, 500);    
+    await pauseCode(this.context, 500);
   }
 
   heal(_target: Hero): void {};
@@ -286,7 +286,7 @@ export class Priestess extends DarkElf {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.PRIESTESS_ATTACK);
-      replayWait = timeDelay(this.context, 500);
+      replayWait = pauseCode(this.context, 500);
       target.removeFromGame();
     } else {
       // There is no big attack sound
@@ -307,13 +307,13 @@ export class Priestess extends DarkElf {
 
       this.removeAttackModifiers();
 
-      
+
     }
-        
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.context, 500);    
+    await pauseCode(this.context, 500);
   }
 
   async heal(target: Hero): Promise<void> {
@@ -327,7 +327,7 @@ export class Priestess extends DarkElf {
       const healingAmount = this.getTotalHealing(2);
       target.getsHealed(healingAmount);
     }
-    effectSequence(this.scene, EGameSounds.HEAL);
+    effectSequence(this.scene, EUiSounds.HEAL);
 
 <<<<<<< HEAD
     this.removeAttackModifiers();
@@ -358,7 +358,7 @@ export class Wraith extends DarkElf {
 
     if (target instanceof Hero && target.isKO) {
       effectSequence(this.scene, EElfSounds.WRAITH_CONSUME);
-      replayWait = timeDelay(this.context, 1500);
+      replayWait = pauseCode(this.context, 1500);
       target.removeFromGame(true, false);
 
 
@@ -385,30 +385,30 @@ export class Wraith extends DarkElf {
       this.removeAttackModifiers();
     }
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
-    
+
     await replayWait;
     if (delay === 100) {
-      await timeDelay(this.context, 1100);
+      await pauseCode(this.context, 1100);
     } else {
-      await timeDelay(this.context, 500);
-    }    
+      await pauseCode(this.context, 500);
+    }
   }
 
   async playHitSounds() {
-    const damageSounds = [EGameSounds.HIT_1, EGameSounds.HIT_2, EGameSounds.HIT_3, EGameSounds.HIT_4]
-    await timeDelay(this.context, 1500);
+    const damageSounds = [EUiSounds.HIT_1, EUiSounds.HIT_2, EUiSounds.HIT_3, EUiSounds.HIT_4]
+    await pauseCode(this.context, 1500);
     this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 250);
+    await pauseCode(this.context, 250);
     this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 350);
+    await pauseCode(this.context, 350);
     this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 400);
+    await pauseCode(this.context, 400);
     this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 350);
+    await pauseCode(this.context, 350);
     this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 200);
+    await pauseCode(this.context, 200);
     this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
-    await timeDelay(this.context, 300);
+    await pauseCode(this.context, 300);
     this.context.sound.play(Phaser.Math.RND.pick(damageSounds), {volume: 0.5});
     // last sound is played by getsHit
   }
@@ -446,7 +446,7 @@ export class Phantom extends Hero {
       isEnemySpawn(this.context, target.getTile())
     ) {
       effectSequence(this.scene, EElfSounds.WRAITH_ATTACK);
-      replayWait = timeDelay(this.context, 200);
+      replayWait = pauseCode(this.context, 200);
       target.removeFromGame();
     } else {
       effectSequence(this.scene, EElfSounds.WRAITH_ATTACK);
@@ -459,7 +459,7 @@ export class Phantom extends Hero {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
 
     await replayWait;
-    await timeDelay(this.context, 1100);
+    await pauseCode(this.context, 1100);
   }
 
   heal(_target: Hero): void {};
@@ -475,15 +475,15 @@ export class SoulStone extends Item {
   async use(target: Hero): Promise<void> {
     target.equipFactionBuff(this.boardPosition);
     this.removeFromGame();
-    
-    await timeDelay(this.context, 1000);
+
+    await pauseCode(this.context, 1000);
   }
 }
 
 export class ManaVial extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
-    this.selectSound = EGameSounds.SELECT_POTION 
+    this.selectSound = EUiSounds.SELECT_POTION
   }
 
   async use(target: Hero): Promise<void> {
@@ -493,13 +493,13 @@ export class ManaVial extends Item {
     if (target.isKO) return;
     target.healAndIncreaseHealth(1000, 50);
 
-    effectSequence(this.scene, EGameSounds.USE_POTION);
+    effectSequence(this.scene, EUiSounds.USE_POTION);
 
     this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
-    
+
     this.removeFromGame();
 
-    await timeDelay(this.context, 1000);
+    await pauseCode(this.context, 1000);
   }
 }
 
@@ -514,7 +514,7 @@ export class SoulHarvest extends Item {
     useAnimation(infernoImage);
 
     const gameController = this.context.gameController;
-    
+
     if (!gameController) {
       console.error('SoulHarvest use() No gamecontroller');
       return;
@@ -577,11 +577,11 @@ export class SoulHarvest extends Item {
     this.removeFromGame();
 
     if (enemyCrystalTiles.length === 0 && enemyHeroTiles.length === 0) {
-      await timeDelay(this.context, 700);
+      await pauseCode(this.context, 700);
     }
 
     await Promise.all(replayWait);
-    await timeDelay(this.context, 500);
+    await pauseCode(this.context, 500);
   }
 }
 

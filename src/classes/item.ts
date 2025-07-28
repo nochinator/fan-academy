@@ -1,5 +1,5 @@
-import { EClass, EFaction, EGameSounds, EItems } from "../enums/gameEnums";
-import { effectSequence, timeDelay } from "../utils/gameUtils";
+import { EClass, EFaction, EUiSounds, EItems } from "../enums/gameEnums";
+import { effectSequence, pauseCode } from "../utils/gameUtils";
 import { IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
@@ -71,7 +71,7 @@ export abstract class Item extends Phaser.GameObjects.Container {
       useHandCursor: true
     }).setName(this.unitId);
 
-    this.selectSound = EGameSounds.SELECT_ITEM_GENERIC;
+    this.selectSound = EUiSounds.SELECT_ITEM_GENERIC;
 
     context.add.existing(this);
   }
@@ -151,10 +151,10 @@ export class ShiningHelm extends Item {
 
   async use(target: Hero): Promise<void> {
     target.equipShiningHelm(this.boardPosition);
-    effectSequence(this.context, EGameSounds.USE_ITEM_GENERIC);
+    effectSequence(this.context, EUiSounds.USE_ITEM_GENERIC);
     this.removeFromGame();
 
-    await timeDelay(this.context, 1000);
+    await pauseCode(this.context, 1000);
   }
 }
 
@@ -165,10 +165,10 @@ export class RuneMetal extends Item {
 
   async use(target: Hero): Promise<void> {
     target.equipRunemetal(this.boardPosition);
-    effectSequence(this.context, EGameSounds.USE_SWORD);
+    effectSequence(this.context, EUiSounds.USE_SWORD);
     this.removeFromGame();
 
-    await timeDelay(this.context, 1000);
+    await pauseCode(this.context, 1000);
   }
 }
 
@@ -179,9 +179,9 @@ export class SuperCharge extends Item {
 
   async use(target: Hero): Promise<void> {
     target.equipSuperCharge(this.boardPosition);
-    effectSequence(this.context, EGameSounds.USE_SCROLL);
+    effectSequence(this.context, EUiSounds.USE_SCROLL);
     this.removeFromGame();
 
-    await timeDelay(this.context, 1000);
+    await pauseCode(this.context, 1000);
   }
 }
