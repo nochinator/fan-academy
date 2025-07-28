@@ -99,12 +99,18 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
       }
 
       // Stomp enemy KO'd units
-      if (
-        isHero(activeUnit) &&
-        activeUnit.boardPosition < 45 &&
-        unit.isKO && !isEnemySpawn(context, unitTile)) {
-        activeUnit.move(unitTile);
-        return;
+      if (isHero(activeUnit) && activeUnit.boardPosition < 45) {
+        const tilesInRange = context.gameController!.board.getHeroTilesInRange(activeUnit, ERange.MOVE);
+        const withinStompingRange = tilesInRange.find(tile => tile.boardPosition === unit.boardPosition);
+
+        if (
+          unit.isKO &&
+          activeUnit.unitType !== EHeroes.NECROMANCER &&
+          (withinStompingRange || unitTile.isHighlighted)
+        ) {
+          activeUnit.move(unitTile);
+          return;
+        }
       }
 
       // Stomp a KO unit or Phantom on a friendly spawn tile with a unit from hand
@@ -164,8 +170,8 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
           const withinStompingRange = tilesInRange.find(tile => tile.boardPosition === unit.boardPosition);
           if (
             unit.isKO &&
-          activeUnit.unitType !== EHeroes.NECROMANCER &&
-          withinStompingRange
+            activeUnit.unitType !== EHeroes.NECROMANCER &&
+            (withinStompingRange || unitTile.isHighlighted)
           ) {
             const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
             activeUnit.move(unitTile);
