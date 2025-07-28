@@ -94,7 +94,6 @@ export class Board {
 
     tilesInRange.forEach(tile => {
       const target = tile.hero ? this.units.find(unit => unit.unitId === tile.hero!.unitId) : tile.crystal ? this.crystals.find(crystal => crystal.boardPosition === tile.crystal?.boardPosition) : undefined;
-      const userId = this.context.userId;
       if (!target) {
         console.error('No target found', tile.hero);
         return;
@@ -107,9 +106,10 @@ export class Board {
        *  -target is KO and active unit is a Necro or a Wraith
        *  -target is KO and standing on an enemy spawn, and hero is orthogonally adjacent
        */
+
       if (
-        tile.isEnemy(userId) && target instanceof Hero && !target.isKO ||
-        tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
+        target instanceof Crystal && target.belongsTo !== hero.belongsTo ||
+        target instanceof Hero && target.belongsTo !== hero.belongsTo && !target.isKO ||
         (hero.unitType === EHeroes.NECROMANCER || hero.unitType === EHeroes.WRAITH) && target instanceof Hero && target.isKO ||
         target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile())
       ) {
@@ -209,20 +209,17 @@ export class Board {
   }
 
   removeReticles(): void {
-    this.tiles.forEach(tile => {
-      if (tile.hero || tile.crystal) {
-        const target = tile.hero ? this.units.find(unit => unit.unitId === tile.hero!.unitId) : tile.crystal ? this.crystals.find(crystal => crystal.boardPosition === tile.crystal?.boardPosition) : undefined;
+    this.units.forEach(unit => {
+      unit.attackReticle.setVisible(false);
+      unit.blockedLOS.setVisible(false);
 
-        if (!target) return;
+      unit.healReticle.setVisible(false);
+      unit.allyReticle.setVisible(false);
+    });
 
-        target.attackReticle.setVisible(false);
-        target.blockedLOS.setVisible(false);
-
-        if (target instanceof Hero) {
-          target.healReticle.setVisible(false);
-          target.allyReticle.setVisible(false);
-        }
-      }
+    this.crystals.forEach(crystal => {
+      crystal.attackReticle.setVisible(false);
+      crystal.blockedLOS.setVisible(false);
     });
   }
 

@@ -211,9 +211,6 @@ export function isLastUnit(context: GameScene, hero: Hero): boolean {
   const unitsArray = context.gameController?.board.units;
   if (!unitsArray) throw new Error('updateUnitsLeft() no units array found');
 
-  const unitIndex = unitsArray.findIndex(unit => unit.unitId === hero.unitId);
-  if (unitIndex !== -1) unitsArray.splice(unitIndex, 1);
-
   // Get remaining units of defending player. Populate gameOver flag if there are none left and the player has no revives in hand
   const remainingBoardUnits = unitsArray.filter(unit => unit.belongsTo === hero.belongsTo).find(unit => !unit.isKO);
 

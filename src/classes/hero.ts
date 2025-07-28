@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { useAnimation, getGridDistance, isInHand, moveAnimation, roundToFive, checkUnitGameOver } from "../utils/gameUtils";
+import { checkUnitGameOver, getGridDistance, isInHand, moveAnimation, roundToFive, useAnimation } from "../utils/gameUtils";
 import { positionHeroImage } from "../utils/heroImagePosition";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
