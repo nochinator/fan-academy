@@ -194,7 +194,7 @@ export function canBeAttacked(attacker: Hero, tile: Tile): boolean {
   return result;
 }
 
-export function updateUnitsLeft(context: GameScene, hero: Hero): void {
+export function isLastUnit(context: GameScene, hero: Hero): boolean {
   let attackingPlayer: IPlayerState | undefined;
   let defendingPlayer: IPlayerState | undefined;
 
@@ -214,24 +214,38 @@ export function updateUnitsLeft(context: GameScene, hero: Hero): void {
   const unitIndex = unitsArray.findIndex(unit => unit.unitId === hero.unitId);
   if (unitIndex !== -1) unitsArray.splice(unitIndex, 1);
 
-  // Get remaining units of defending player. Populate gameOver flag if there are none left
-  const remainingBoardUnits = unitsArray.find(unit => unit.belongsTo === hero.belongsTo);
+  // Get remaining units of defending player. Populate gameOver flag if there are none left and the player has no revives in hand
+  const remainingBoardUnits = unitsArray.filter(unit => unit.belongsTo === hero.belongsTo).find(unit => !unit.isKO);
 
+  let hand;
   let remainingHandUnits;
   const defendingPlayerIsActivePlayer = defendingPlayer.playerId === context.activePlayer;
   if (defendingPlayerIsActivePlayer) {
-    remainingHandUnits = context.gameController?.hand.getHand().find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
+    hand = context.gameController?.hand.getHand();
+    remainingHandUnits = hand!.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
   } else {
-    remainingHandUnits = defendingPlayer.factionData.unitsInHand.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
+    hand = defendingPlayer.factionData.unitsInHand;
+    remainingHandUnits = hand.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
   }
 
   const remainingDeckUnits = defendingPlayer.factionData.unitsInDeck.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
 
-  if (remainingBoardUnits || remainingHandUnits || remainingDeckUnits) return;
+  const reviveItems = [EItems.HEALING_POTION, EItems.SOUL_HARVEST];
+  const hasReviveInHand = hand ? hand.find(unit => reviveItems.includes((unit as Item)?.itemType)) : undefined;
+
+  if (remainingBoardUnits || remainingHandUnits || remainingDeckUnits || hasReviveInHand) return false;
+
+  return true;
+}
+
+export function checkUnitGameOver(context: GameScene, hero: Hero): void {
+  if (!isLastUnit(context, hero)) return;
+
+  const attackingPlayer = hero.unitId.includes(context.player1!.playerId) ? context.player2 : context.player1;
 
   context.gameController!.gameOver = {
     winCondition: EWinConditions.UNITS,
-    winner: attackingPlayer.playerId
+    winner: attackingPlayer!.playerId
   };
 }
 
