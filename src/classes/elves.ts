@@ -137,7 +137,7 @@ export class VoidMonk extends DarkElf {
         const splashDamage = this.getTotalPower() * 0.666;
         console.log(splashDamage);
         splashedEnemies.forEach(enemy => {
-          const unitDamage = enemy.getsDamaged(splashDamage, this.attackType);
+          const unitDamage = enemy.getsDamaged(splashDamage, this.attackType, 0.666);
           if (unitDamage) damageDone += unitDamage;
         });
       }
@@ -412,7 +412,7 @@ export class SoulHarvest extends Item {
       const crystal = gameController.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('SoulHarvest use() crystal not found');
 
-      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage);
+      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage, EAttackType.MAGICAL);
     });
 
     // Get total amount of friendly units in the map, including KO'd ones
