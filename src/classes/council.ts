@@ -342,12 +342,14 @@ export class Cleric extends Human {
     turnIfBehind(this.context, this, target);
 
     if (target.isKO) {
-      const healingAmount = this.getTotalHealing(this.basePower, 2);
+      const healingAmount = this.getTotalHealing(2);
       target.getsHealed(healingAmount);
     } else {
-      const healingAmount = this.getTotalHealing(this.basePower, 3);
+      const healingAmount = this.getTotalHealing(3);
       target.getsHealed(healingAmount);
     }
+
+    this.removeAttackModifiers();
 
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
