@@ -130,7 +130,7 @@ export enum EPopups {
   CONCEDE = 'concede'
 }
 
-export enum EGameSounds {
+export enum EUiSounds {
   BATTLE_BUTTON = 'battleButton',
   BUTTON_PRESS_GENERIC = 'buttonPressGeneric',
   SEND_MOVE = 'sendMove',
@@ -138,56 +138,52 @@ export enum EGameSounds {
   BUTTON_FAILED = 'buttonFailed',
   DELETE_GAME = 'deleteGame',
   RESIGN = 'resign',
-  THINKING_MUSIC = 'thinkingMusic',
-  BACKGROUND_MUSIC = 'backgroundMusic',
-  TITLE_MUSIC = 'titleMusic',
   WIN_MUSIC = 'winMusic',
   LOSE_MUSIC = 'loseMusic',
   WIN_SFX = 'winSFX',
-  LOSE_SFX = 'loseSFX',
-  SELECT_HERO_FROM_HAND = 'selectHeroFromHand',
-  SPAWN_HERO = 'spawnHero',
-  SELECT_HERO_FROM_BOARD = 'selectHeroFromBoard',
-  MOVE_HERO = 'moveHero',
+  LOSE_SFX = 'loseSFX'
+
+}
+
+export enum EGameSounds {
+  HERO_HAND_SELECT = 'selectHeroFromHand',
+  HERO_SPAWN = 'spawnHero',
+  HERO_BOARD_SELECT = 'selectHeroFromBoard',
+  HERO_MOVE = 'moveHero',
   MOVE_FLY = 'moveFly',
   MOVE_WALK = 'moveWalk',
-  STOMP = 'stomp',
+  HERO_STOMP = 'stomp',
   VANISH = 'vanish',
-  SELECT_SCROLL = 'selectScroll',
-  USE_SCROLL = 'useScroll',
-  SELECT_SWORD = 'selectSword',
-  USE_SWORD = 'useSword',
-  SELECT_SHIELD = 'selectShield',
-  USE_SHIELD = 'useShield',
-  SELECT_ITEM_GENERIC = 'selectItemGeneric',
-  USE_ITEM_GENERIC = 'useItemGeneric',
-  SELECT_POTION = 'selectPotion',
-  USE_POTION = 'usePotion',
+  SCROLL_SELECT = 'selectScroll',
+  SCROLL_USE = 'useScroll',
+  SWORD_SELECT = 'selectSword',
+  SWORD_USE = 'useSword',
+  SHIELD_SELECT = 'selectShield',
+  SHIELD_USE = 'useShield',
+  ITEM_SELECT5 = 'selectItemGeneric',
+  ITEM_USE = 'useItemGeneric',
+  POTION_SELECT = 'selectPotion',
+  POTION_USE = 'usePotion',
   RESET_TURN = 'resetTurn',
-  REVIVE_HERO = 'reviveHero',
-  LAND_SWORD = 'landSword',
-  LAND_SHIELD = 'landShield',
-  LAND_HELM = 'landHelm',
+  HERO_REVIVE = 'reviveHero',
+  SWORD_EQUIP = 'landSword',
+  SHIELD_EQUIP = 'landShield',
+  HELM_EQUIP = 'landHelm',
   LAND_CRYSTAL = 'landCrystal',
   KO = 'ko',
-  NEW_ITEMS = 'newItems',
-  RETURN_ITEM = 'returnItem',
-  DAMAGE_CRYSTAL_1 = 'damageCrystal1',
-  DAMAGE_CRYSTAL_2 = 'damageCrystal2',
-  DESTROY_CRYSTAL = 'destroyCrystal',
+  DRAW = 'newItems',
+  SHUFFLE = 'returnItem',
+  CRYSTAL_DAMAGE = 'damageCrystal1',
+  CRYSTAL_DAMAGE_BUFF = 'damageCrystal2',
+  CRYSTAL_DESTROY = 'destroyCrystal',
   HIT_1 = 'hit1',
   HIT_2 = 'hit2',
   HIT_3 = 'hit3',
   HIT_4 = 'hit4',
   HEAL = 'heal',
   HEAL_EXTRA = 'healExtra',
-}
 
-export enum EMusicSounds {
-  TITLE = 'title',
-}
-
-export enum ECouncilSounds {
+  // Council sounds
   ARCHER_ATTACK = 'archerAttack',
   ARCHER_ATTACK_BIG = 'archerAttackBig',
   ARCHER_ATTACK_MELEE = 'archerAttackMelee',
@@ -208,9 +204,8 @@ export enum ECouncilSounds {
   WIZARD_DEATH = 'wizardDeath',
   SELECT_FIREBOMB = 'selectFirebomb',
   USE_FIREBOMB = 'useFirebomb',
-}
 
-export enum EElfSounds {
+  // Elves sounds
   PRIESTESS_ATTACK = 'priestessAttack',
   PRIESTESS_DEATH = 'priestessDeath',
   IMPALER_ATTACK = 'impalerAttack',
@@ -229,5 +224,5 @@ export enum EElfSounds {
   WRAITH_ATTACK_BIG = 'wraithAttackBig',
   WRAITH_DEATH = 'wraithDeath',
   WRAITH_CONSUME = 'wraithConsume',
-  USE_HARVEST = 'useHarvest',
+  USE_HARVEST = 'useHarvest'
 }
