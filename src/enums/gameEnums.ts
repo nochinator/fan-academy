@@ -153,7 +153,7 @@ export enum EGameSounds {
   MOVE_FLY = 'moveFly',
   MOVE_WALK = 'moveWalk',
   HERO_STOMP = 'stomp',
-  VANISH = 'vanish',
+  VANISH = 'vanish', // FIXME: unused
   SCROLL_SELECT = 'selectScroll',
   SCROLL_USE = 'useScroll',
   SWORD_SELECT = 'selectSword',

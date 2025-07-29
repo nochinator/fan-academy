@@ -81,7 +81,12 @@ export function createNewHero(context: GameScene, heroData: IHero, tile?: Tile):
 }
 
 export async function moveAnimation(context: GameScene, hero: Hero, targetTile: Tile): Promise<void> {
-  playSound(context, EGameSounds.MOVE_WALK); // TODO: add flying to wraith and maybe necro. No delay needed
+  const flyingUnits = [EHeroes.NECROMANCER, EHeroes.WRAITH, EHeroes.PHANTOM];
+  if (flyingUnits.includes(hero.unitType)) {
+    playSound(context, EGameSounds.MOVE_FLY);
+  } else {
+    playSound(context, EGameSounds.MOVE_WALK);
+  }
 
   // Stop user input until the animation finishes playing
   context.input.enabled = false;
