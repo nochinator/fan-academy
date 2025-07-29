@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EClass, EFaction, EGameSounds, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { checkUnitGameOver, getGridDistance, isInHand, moveAnimation, playSoundFunc, roundToFive, useAnimation } from "../utils/gameUtils";
+import { checkUnitGameOver, getGridDistance, isInHand, moveAnimation, playSound, roundToFive, useAnimation } from "../utils/gameUtils";
 import { positionHeroImage } from "../utils/heroImagePosition";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
@@ -614,7 +614,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (targetTile.hero && targetTile.hero.isKO) {
       const hero = gameController.board.units.find(unit => unit.unitId === targetTile.hero?.unitId);
       if (!hero) console.error('move() Found heroData on targetTile, but no Hero to remove', targetTile);
-      playSoundFunc(this.context, EGameSounds.HERO_STOMP);
+      playSound(this.context, EGameSounds.HERO_STOMP);
       hero?.removeFromGame(true);
     }
 
@@ -635,7 +635,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (tile.hero && (tile.hero.isKO || tile.isEnemy(this.context.userId) && tile.hero.unitType === EHeroes.PHANTOM)) {
       const hero = gameController.board.units.find(unit => unit.unitId === tile.hero?.unitId);
       if (!hero) console.error('spawn() Found heroData on tile, but no Hero to remove', tile);
-      playSoundFunc(this.context, EGameSounds.HERO_STOMP);
+      playSound(this.context, EGameSounds.HERO_STOMP);
       hero?.removeFromGame(true);
     }
 
@@ -661,7 +661,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.healthBar.setVisible(true);
 
-    playSoundFunc(this.context, EGameSounds.HERO_SPAWN);
+    playSound(this.context, EGameSounds.HERO_SPAWN);
 
     gameController.afterAction(EActionType.SPAWN, startingPosition, tile.boardPosition);
   }
@@ -768,22 +768,22 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (targetTile === ETiles.CRYSTAL_DAMAGE) {
       this.updateCrystals(true);
       this.crystalDebuffTileAnim.setVisible(true);
-      playSoundFunc(this.scene, EGameSounds.CRYSTAL_TILE);
+      playSound(this.scene, EGameSounds.CRYSTAL_TILE);
     }
     if (targetTile === ETiles.POWER) {
       this.attackTile = true;
       this.powerTileAnim.setVisible(true);
-      playSoundFunc(this.scene, EGameSounds.SWORD_TILE);
+      playSound(this.scene, EGameSounds.SWORD_TILE);
     }
     if (targetTile === ETiles.MAGICAL_RESISTANCE) {
       this.magicalDamageResistance += 20;
       this.magicalResistanceTileAnim.setVisible(true);
-      playSoundFunc(this.scene, EGameSounds.HELM_TILE);
+      playSound(this.scene, EGameSounds.HELM_TILE);
     }
     if (targetTile === ETiles.PHYSICAL_RESISTANCE) {
       this.physicalDamageResistance += 20;
       this.physicalResistanceTileAnim.setVisible(true);
-      playSoundFunc(this.scene, EGameSounds.SHIELD_EQUIP);
+      playSound(this.scene, EGameSounds.SHIELD_EQUIP);
     }
 
     this.unitCard.updateCardData(this);

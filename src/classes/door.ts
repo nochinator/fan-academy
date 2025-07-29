@@ -1,6 +1,6 @@
-import { EActionType, EUiSounds } from "../enums/gameEnums";
+import { EActionType, EGameSounds } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { isInHand, effectSequence, pauseCode } from "../utils/gameUtils";
+import { isInHand, pauseCode, playSound } from "../utils/gameUtils";
 import { getCurrentPlayer } from "../utils/playerUtils";
 
 export class Door extends Phaser.GameObjects.Container {
@@ -14,7 +14,6 @@ export class Door extends Phaser.GameObjects.Container {
     super(context, 450, 715);
     this.context = context;
 
-    // TODO: On container 'hoover' -> show icons of remaining units and items in the deck
     this.doorClosed = context.add.image(50, -15, 'doorClosed').setScale(0.9);
 
     this.doorOpen = context.add.image(55, -15, 'doorOpen').setVisible(false);
@@ -39,7 +38,7 @@ export class Door extends Phaser.GameObjects.Container {
         // Add action to state
         context.gameController?.afterAction(EActionType.SHUFFLE, activePosition, 51 );
 
-        effectSequence(this.scene, EUiSounds.RETURN_ITEM);
+        playSound(this.scene, EGameSounds.SHUFFLE);
 
         this.updateBannerText();
       }
@@ -74,7 +73,7 @@ export class Door extends Phaser.GameObjects.Container {
     this.doorOpen.setVisible(true);
     this.doorClosed.setVisible(false);
 
-    await pauseCode(this.context, 1600)
+    await pauseCode(this.context, 1600);
     this.doorOpen.setVisible(false);
     this.doorClosed.setVisible(true);
   }

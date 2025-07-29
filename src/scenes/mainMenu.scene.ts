@@ -33,9 +33,9 @@ export default class MainMenuScene extends Phaser.Scene {
     this.load.font('proLight', '/fonts/BlambotFXProLightBB.woff', 'truetype');
 
     // sounds
-    this.load.audio('buttonFailed', `${CDN_PATH}/audio/Unit_Damage.mp3`);  this.load.audio('battleButton', `${CDN_PATH}/audio/UI_Front_End_Begin_Battle.mp3`);
+    this.load.audio('buttonFailed', `${CDN_PATH}/audio/Unit_Damage.mp3`);
+    this.load.audio('battleButton', `${CDN_PATH}/audio/UI_Front_End_Begin_Battle.mp3`);
     this.load.audio('buttonPressGeneric', `${CDN_PATH}/audio/UI_Front_End_Select.mp3`);
-    // FIXME: add play button
   }
 
   async create() {
@@ -149,6 +149,7 @@ export default class MainMenuScene extends Phaser.Scene {
       font: '130px proHeavy',
       callback: () => {
         this.sound.play(EUiSounds.BUTTON_PLAY);
+        if (this.currentSubScene) this.scene.stop(this.currentSubScene);
         this.scene.start('UIScene', { userId: this.userId });
         this.currentSubScene = 'UIScene';
       }
@@ -175,6 +176,10 @@ export default class MainMenuScene extends Phaser.Scene {
 
     // Login and sign up forms. Only show if user is not authenticated
     this.createSignUpAndLoginForms(this.userId);
+  }
+
+  onShutdown() {
+    this.sound.stopAll();
   }
 
   /*

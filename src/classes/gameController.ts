@@ -130,22 +130,28 @@ export class GameController {
 
       if (!actionTaken || actionsToIgnore.includes(actionTaken)) continue;
 
-      if (
-        actionTaken === EActionType.SPAWN ||
-        actionTaken === EActionType.MOVE
-      ) await this.replaySpawnOrMove(turn.action!, opponentHand);
+      await new Promise<void>(resolve => {
+        this.context.time.delayedCall(1000, async () => {
+          if (
+            actionTaken === EActionType.SPAWN ||
+            actionTaken === EActionType.MOVE
+          ) this.replaySpawnOrMove(turn.action!, opponentHand);
 
-      if (
-        actionTaken === EActionType.ATTACK ||
-        actionTaken === EActionType.HEAL ||
-        actionTaken === EActionType.TELEPORT
-      ) await this.replayAttackHealTeleport(turn.action!);
+          if (
+            actionTaken === EActionType.ATTACK ||
+            actionTaken === EActionType.HEAL ||
+            actionTaken === EActionType.TELEPORT
+          ) await this.replayAttackHealTeleport(turn.action!);
 
-      if (actionTaken === EActionType.SHUFFLE) await this.replayShuffle();
+          if (actionTaken === EActionType.SHUFFLE) await this.replayShuffle();
 
-      if (actionTaken === EActionType.USE) await this.replayUse(turn.action!, opponentHand);
+          if (actionTaken === EActionType.USE) await this.replayUse(turn.action!, opponentHand);
 
-      if (actionTaken === EActionType.REMOVE_UNITS) await this.removeKOUnits();
+          if (actionTaken === EActionType.REMOVE_UNITS) await this.removeKOUnits();
+
+          resolve();
+        });
+      });
     }
 
     this.context.scene.restart({
@@ -153,7 +159,8 @@ export class GameController {
       colyseusClient: this.context.colyseusClient,
       currentGame: this.context.currentGame,
       currentRoom: this.context.currentRoom,
-      triggerReplay: false
+      triggerReplay: false,
+      gameOver: undefined
     } );
   }
 
@@ -452,7 +459,7 @@ export class GameController {
     targetTile.removeHero();
   }
 
-  async pullEnemy(attacker: Hero, target: Hero, delay = 0): Promise<void> {
+  async pullEnemy(attacker: Hero, target: Hero): Promise<void> {
     const attackerTile = this.board.getTileFromBoardPosition(attacker.boardPosition);
     const targetTile = this.board.getTileFromBoardPosition(target.boardPosition);
     if (!attackerTile || !targetTile) {
@@ -476,7 +483,6 @@ export class GameController {
       return;
     }
 
-    await pauseCode(this.context, delay);
     target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
     await forcedMoveAnimation(this.context, target, targetNewTile);
 

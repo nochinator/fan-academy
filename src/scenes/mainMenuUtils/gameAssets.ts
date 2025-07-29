@@ -157,13 +157,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('attackSquare', `${CDN_PATH}/images/gameItems/card/TooltipIcon_RangeTile-hd.webp`);
   context.load.image('hpIcon', `${CDN_PATH}/images/gameItems/card/HelpTooltip_HP-hd.webp`);
 
-
-
-  // --- audio ---
-  // Wow, Robot sucks at file naming (look at council). TODO: Fix file names
-
-  // general/universal game audio
-  //context.load.audio('backgroundMusic', `${CDN_PATH}/audio/.mp3`);
+  // audio
   context.load.audio('battleButton', `${CDN_PATH}/audio/UI_Front_End_Begin_Battle.mp3`);
   context.load.audio('buttonPressGeneric', `${CDN_PATH}/audio/UI_Front_End_Select.mp3`);
   context.load.audio('sendMove', `${CDN_PATH}/audio/Game_Submit_Round.mp3`);
@@ -171,7 +165,6 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('buttonFailed', `${CDN_PATH}/audio/Unit_Damage.mp3`);
   context.load.audio('deleteGame', `${CDN_PATH}/audio/Game_Delete.mp3`);
   context.load.audio('resign', `${CDN_PATH}/audio/Game_Resign.mp3`);
-  context.load.audio('thinkingMusic', `${CDN_PATH}/audio/Game_Ponder_LP.mp3`);
   context.load.audio('selectHeroFromHand', `${CDN_PATH}/audio/Game_Pickup_CharacterTile_Generic.mp3`);
   context.load.audio('spawnHero', `${CDN_PATH}/audio/Game_Place_CharacterTile.mp3`);
   context.load.audio('selectHeroFromBoard', `${CDN_PATH}/audio/Game_Select_Character.mp3`);
@@ -238,7 +231,6 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('wizardDeath', `${CDN_PATH}/audio/Civ_Death_Wizard_Element.mp3`);
   context.load.audio('selectinferno', `${CDN_PATH}/audio/Game_FireBomb_Grab_Tile.mp3`);
   context.load.audio('useFirebomb', `${CDN_PATH}/audio/Game_FireBomb_Activate.mp3`);
-
 
   // elves
   context.load.audio('priestessAttack', `${CDN_PATH}/audio/DE-Heretic_Attack_Curse.mp3`);

@@ -72,8 +72,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.events.on('shutdown', this.shutdown, this); // REVIEW:
-
     this.time.addEvent({
       delay: 300000, // 5 minutes
       callback: () => {
@@ -88,7 +86,8 @@ export default class GameScene extends Phaser.Scene {
     if (this.triggerReplay) this.gameController.replayTurn();
   }
 
-  shutdown() {
+  onShutdown() {
+    console.log('Game scene shutdown logs, remove');
     this.sound.stopAll();
   }
 };

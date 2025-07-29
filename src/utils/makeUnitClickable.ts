@@ -1,11 +1,11 @@
 import { Types } from "phaser";
 import { Crystal } from "../classes/crystal";
 import { Hero } from "../classes/hero";
-import { Item} from "../classes/item";
+import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EGameStatus, EHeroes, EItems, ERange, ETiles, EUiSounds } from "../enums/gameEnums";
+import { EGameSounds, EGameStatus, EHeroes, EItems, ERange, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck, effectSequence } from "./gameUtils";
+import { belongsToPlayer, isEnemySpawn, isHero, isItem, playSound, visibleUnitCardCheck } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
@@ -61,21 +61,20 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
     if (unit.boardPosition >= 45) {
       if (isHero(unit)) {
-        effectSequence(context, EUiSounds.SELECT_HERO_FROM_HAND);
+        playSound(context, EGameSounds.HERO_HAND_SELECT);
       } else {
-        let selectSound = 'selectItemGeneric'
-        const itemType = String(unit.itemType)
-        if (itemType === 'runeMetal' || itemType === 'superCharge' || itemType === 'dragonScale') {
-          selectSound = `select${unit.itemType}`
-        } else if (itemType === 'healingPotion' || itemType === 'manaVial') {
-          selectSound = `selectPotion`
-        }
-        effectSequence(context, selectSound);
+        // FIXME: select item type
+        // let selectSound = 'selectItemGeneric';
+        // const itemType = String(unit.itemType);
+        // if (itemType === 'runeMetal' || itemType === 'superCharge' || itemType === 'dragonScale') {
+        //   selectSound = `select${unit.itemType}`;
+        // } else if (itemType === 'healingPotion' || itemType === 'manaVial') {
+        //   selectSound = `selectPotion`;
+        // }
+        // effectSequence(context, selectSound);
       }
-      context.thinkingMusic.stop();
     } else {
-      effectSequence(context, EUiSounds.SELECT_HERO_FROM_BOARD);
-      context.thinkingMusic.play();
+      playSound(context, EGameSounds.HERO_BOARD_SELECT);
     }
 
     selectUnit(context, unit);
@@ -84,7 +83,6 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
   // CASE 2: Clicking the active unit deselects it, unless it's a healer
   if (isSameUnit) {
-    context.thinkingMusic.stop();
     if (isHero(activeUnit) && activeUnit.canHeal && healReticle?.visible && isHero(unit)) {
       activeUnit.heal(unit);
       return;
@@ -96,7 +94,6 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
   // CASE 3: There is already an active unit
   if (activeUnit && !isSameUnit) {
-
     // Unique case: Wraith can spawn on a KO'd unit
     if (isHero(unit) && unit.isKO &&
         isHero(activeUnit) &&
@@ -114,12 +111,10 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
       if (isHero(activeUnit) && attackReticle?.visible) {
         activeUnit.attack(unit);
-        context.thinkingMusic.stop()
         return;
       }
 
       // Stomp enemy KO'd units
-<<<<<<< HEAD
       if (isHero(activeUnit) && activeUnit.boardPosition < 45) {
         const tilesInRange = context.gameController!.board.getHeroTilesInRange(activeUnit, ERange.MOVE);
         const withinStompingRange = tilesInRange.find(tile => tile.boardPosition === unit.boardPosition);
@@ -132,16 +127,6 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
           activeUnit.move(unitTile);
           return;
         }
-=======
-      if (
-        isHero(activeUnit) &&
-        activeUnit.boardPosition < 45 &&
-        unit.isKO && !isEnemySpawn(context, unitTile)) {
-        activeUnit.move(unitTile);
-        effectSequence(context, EGameSounds.MOVE_HERO); // so doesn't play in replay
-        context.thinkingMusic.stop()
-        return;
->>>>>>> 04d9cad09d37d8ac05343b271c39f3b31035f04e
       }
 
       // Stomp a KO unit or Phantom on a friendly spawn tile with a unit from hand
@@ -173,7 +158,6 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
       // Necromancer and Wraith can target friendly units if they are knocked down. NOTE: this check should always go before the stomping check
       if (isHero(activeUnit) && [EHeroes.NECROMANCER, EHeroes.WRAITH].includes(activeUnit.unitType) && unit.isKO && attackReticle?.visible) {
         activeUnit.attack(unit);
-        context.thinkingMusic.stop();
         return;
       }
 
@@ -187,14 +171,12 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
         if (activeUnit.canHeal && healReticle?.visible) {
           activeUnit.heal(unit);
-          context.thinkingMusic.stop();
           return;
         }
 
         // Ninja can swap places with any friendly unit on the board
         if (activeUnit.unitType === EHeroes.NINJA && allyReticle?.visible && !unit.isKO) {
           activeUnit.teleport(unit);
-          context.thinkingMusic.stop();
           return;
         }
 
@@ -209,7 +191,6 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
           ) {
             const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
             activeUnit.move(unitTile);
-            context.thinkingMusic.stop();
             return;
           }
         }
@@ -232,22 +213,10 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
       deselectUnit(context);
 
       if (unit.boardPosition >= 45) {
-        if (isHero(unit)) {
-          effectSequence(context, EUiSounds.SELECT_HERO_FROM_HAND);
-        } else {
-          let selectSound = 'selectItemGeneric'
-          const itemType = String(unit.itemType)
-          if (itemType === 'runeMetal' || itemType === 'superCharge' || itemType === 'dragonScale') {
-            selectSound = `select${unit.itemType}`
-          } else if (itemType === 'healingPotion' || itemType === 'manaVial') {
-            selectSound = `selectPotion`
-          }
-          effectSequence(context, selectSound);
-        }
-        context.thinkingMusic.stop();
+        if (isHero(unit)) playSound(context, EGameSounds.HERO_HAND_SELECT);
+        // if (isItem(unit) selectItemSound(context, unit.itemType))
       } else {
-        effectSequence(context, EUiSounds.SELECT_HERO_FROM_BOARD);
-        context.thinkingMusic.play();
+        playSound(context, EGameSounds.HERO_BOARD_SELECT);
       }
 
       selectUnit(context, unit);
@@ -271,14 +240,11 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     if (!activeUnit || !gameController) return;
 
     // If unit is on the board and the tile clicked on is in range, move the unit
-    if (activeUnit.boardPosition < 45 && tile.isHighlighted && isHero(activeUnit))
-    {
+    if (activeUnit.boardPosition < 45 && tile.isHighlighted && isHero(activeUnit)) {
       activeUnit.move(tile);
-
-       // This doesn't play in replay, footstep sound is in move()
-      effectSequence(context, EUiSounds.MOVE_HERO);
-      context.thinkingMusic.stop();
+      playSound(context, EGameSounds.HERO_MOVE);
     }
+
     // If unit is in hand and clicked tile is highlighted, spawn. Otherwise, use item
     if (activeUnit.boardPosition > 44 && tile.isHighlighted) {
       if (isHero(activeUnit))  activeUnit.spawn(tile);
@@ -310,7 +276,6 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
     if (pointer.button === 0) {
       const attackReticle = crystal.attackReticle;
       const activeUnit = context.activeUnit;
-      context.thinkingMusic.stop()
 
       if (activeUnit) {
         if (isHero(activeUnit) && attackReticle.visible) {

@@ -1,11 +1,7 @@
-<<<<<<< HEAD
-import { EAttackType, ETiles, EWinConditions } from "../enums/gameEnums";
-=======
-import { EGameSounds, ETiles, EWinConditions } from "../enums/gameEnums";
->>>>>>> 04d9cad09d37d8ac05343b271c39f3b31035f04e
+import { EAttackType, EGameSounds, ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { roundToFive, effectSequence, pauseCode } from "../utils/gameUtils";
+import { playSound, roundToFive } from "../utils/gameUtils";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
 import { CrystalCard } from "./crystalCard";
 import { FloatingText } from "./floatingText";
@@ -162,40 +158,14 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
   }
 
-<<<<<<< HEAD
   getsDamaged(damage: number, _attackType: EAttackType, multiplier = 1): void {
     const damageMultiplier = 300 * multiplier * this.debuffLevel;
     const totalDamage = roundToFive(damage + damageMultiplier);
-=======
-  //attackType and hitSound included to match hero.getsDamaged to simplify calls
-  getsDamaged(damage: number, _attackType: any, delay = 0, hitSound = true): [Promise<void>, number] {
-    const totalDamage = roundToFive(damage + 300 * this.debuffLevel);
->>>>>>> 04d9cad09d37d8ac05343b271c39f3b31035f04e
     const damageTaken = totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
     this.currentHealth -= damageTaken;
 
-    if (this.currentHealth <= this.maxHealth / 2 && this.currentHealth + totalDamage >= this.maxHealth / 2) {
-      this.crystalImage.setTexture('crystalDamaged');
-    }
-
-    const replayDelay = this.showDamage(damageTaken, delay, hitSound);
-
-    return [replayDelay, 0]
-  }
-
-  async showDamage(damageTaken: number, delay: number, hitSound: boolean){
-    let replayWait = 0;
-    if (this.currentHealth <= 0) {
-      replayWait = 2000
-      this.removeFromGame(delay);
-      await pauseCode(this.context, delay);
-    } else {
-      await pauseCode(this.context, delay);
-      replayWait = 100
-      if (hitSound) {
-        const damageSounds = [EGameSounds.DAMAGE_CRYSTAL_1, EGameSounds.DAMAGE_CRYSTAL_2]
-        effectSequence(this.scene, Phaser.Math.RND.pick(damageSounds));
-      }
+    if (this.currentHealth <= this.maxHealth / 2) {
+      this.crystalImage.setTexture('crystalDamaged'); // FIXME: below 50%, this changes the texture every time the crystal is damaged
     }
 
     // Update hp bar
@@ -204,7 +174,6 @@ export class Crystal extends Phaser.GameObjects.Container {
     // Show damage numbers
     if (damageTaken > 0) new FloatingText(this.context, this.x, this.y - 50, damageTaken.toString());
 
-
     this.unitCard.updateCardHealth(this.currentHealth, this.maxHealth);
     this.updateTileData();
 
@@ -212,10 +181,17 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.belongsTo === 1) this.context.gameController?.gameUI.banner.playerOneHpBar.setHealth();
     if (this.belongsTo === 2) this.context.gameController?.gameUI.banner.playerTwoHpBar.setHealth();
 
-    await pauseCode(this.context, replayWait);
+    if (this.currentHealth <= 0) this.removeFromGame();
   }
 
-  async removeFromGame(delay: number): Promise<void> {
+  removeFromGame(): void {
+    playSound(this.scene, EGameSounds.CRYSTAL_DESTROY);
+
+    const tile = this.getTile();
+    tile.crystal = undefined;
+    tile.obstacle = false;
+    tile.tileType = ETiles.BASIC;
+
     // Remove destoyed crystal from the board array
     const crystalArray = this.context.gameController!.board.crystals;
     const index = crystalArray.findIndex(crystal => crystal.boardPosition === this.boardPosition);
@@ -234,17 +210,6 @@ export class Crystal extends Phaser.GameObjects.Container {
       otherCrystal.isLastCrystal = true;
       otherCrystal.updateTileData();
     }
-
-    await pauseCode(this.context, delay);
-
-    effectSequence(this.scene, EGameSounds.DESTROY_CRYSTAL);
-
-    await pauseCode(this.context, 1000); // TODO: sync with animations when added
-
-    const tile = this.getTile();
-    tile.crystal = undefined;
-    tile.obstacle = false;
-    tile.tileType = ETiles.BASIC;
 
     // Remove animations
     this.scene.tweens.killTweensOf(this);
