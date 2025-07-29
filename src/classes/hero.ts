@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { useAnimation, getGridDistance, isInHand, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
+import { checkUnitGameOver, getGridDistance, isInHand, moveAnimation, roundToFive, useAnimation } from "../utils/gameUtils";
 import { positionHeroImage } from "../utils/heroImagePosition";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
@@ -435,11 +435,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     return totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
   }
 
-  getTotalHealing(baseHealing: number, unitHealingMult: number): number {
+  getTotalHealing(unitHealingMult: number): number {
     const runeMetalBuff = this.runeMetal ? 1.5 : 1;
     const attackTileBuff = this.attackTile ? 100 : 0;
+    const superCharge = this.superCharge ? 3 : 1;
+    const priestessDebuff = this.isDebuffed ? 0.5 : 1;
 
-    return (baseHealing + attackTileBuff) * unitHealingMult * runeMetalBuff;
+    return (this.basePower + attackTileBuff) * unitHealingMult * superCharge * priestessDebuff * runeMetalBuff;
   }
 
   getsHealed(healing: number, addText = true): number | undefined {
@@ -522,6 +524,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, true);
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
+
+    checkUnitGameOver(this.context, this);
   }
 
   getTile(): Tile {
@@ -579,8 +583,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const index = this.context.gameController!.board.units.findIndex(unit => unit.unitId === this.unitId);
     if (index !== -1) { this.context.gameController!.board.units.splice(index, 1); }
 
-    // Update hero counter
-    if (this.unitType !== EHeroes.PHANTOM) updateUnitsLeft(this.context, this);
+    checkUnitGameOver(this.context, this);
   }
 
   getDistanceToTarget(target: Hero | Crystal): number {

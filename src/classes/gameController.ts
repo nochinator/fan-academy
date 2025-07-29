@@ -359,6 +359,7 @@ export class GameController {
 
     // Remove a slice from the action pie
     this.actionPie.hideActionSlice(this.context.currentTurnAction!++);
+
     // Deselect unit and clear highlights
     if (this.context.activeUnit) deselectUnit(this.context);
   }

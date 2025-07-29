@@ -138,8 +138,8 @@ export class Wizard extends Human {
 
       // Apply damage to targets
       target.getsDamaged(this.getTotalPower(), this.attackType);
-      if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
-      if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
+      if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType, 0.75);
+      if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType, 0.56);
 
       if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
       if (secondTarget && secondTarget instanceof Hero && secondTarget.unitType === EHeroes.PHANTOM) secondTarget.removeFromGame();
@@ -342,12 +342,14 @@ export class Cleric extends Human {
     turnIfBehind(this.context, this, target);
 
     if (target.isKO) {
-      const healingAmount = this.getTotalHealing(this.basePower, 2);
+      const healingAmount = this.getTotalHealing(2);
       target.getsHealed(healingAmount);
     } else {
-      const healingAmount = this.getTotalHealing(this.basePower, 3);
+      const healingAmount = this.getTotalHealing(3);
       target.getsHealed(healingAmount);
     }
+
+    this.removeAttackModifiers();
 
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
@@ -409,13 +411,15 @@ export class Inferno extends Item {
       }
 
       hero.getsDamaged(damage, EAttackType.MAGICAL);
+
+      if (hero && hero instanceof Hero && hero.unitType === EHeroes.PHANTOM) hero.removeFromGame();
     });
 
     enemyCrystalTiles.forEach(tile => {
       const crystal = this.context.gameController?.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('Inferno use() crystal not found');
 
-      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage);
+      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage, EAttackType.MAGICAL);
     });
 
     this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);

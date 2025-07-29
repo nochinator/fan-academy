@@ -137,7 +137,7 @@ export class VoidMonk extends DarkElf {
         const splashDamage = this.getTotalPower() * 0.666;
         console.log(splashDamage);
         splashedEnemies.forEach(enemy => {
-          const unitDamage = enemy.getsDamaged(splashDamage, this.attackType);
+          const unitDamage = enemy.getsDamaged(splashDamage, this.attackType, 0.666);
           if (unitDamage) damageDone += unitDamage;
         });
       }
@@ -239,10 +239,11 @@ export class Priestess extends DarkElf {
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
       if (damageDone) this.lifeSteal(damageDone);
 
-      // Apply a 50% debuff to the target's next attack
-      if (target instanceof Hero && !target.isDebuffed && !target.isKO) {
+      // Apply a 50% debuff to the target's next attack or heal
+      if (target instanceof Hero) {
         target.isDebuffed = true;
         target.debuffImage.setVisible(true);
+        target.updateTileData();
         target.unitCard.updateCardPower(target);
       }
 
@@ -259,12 +260,14 @@ export class Priestess extends DarkElf {
     turnIfBehind(this.context, this, target);
 
     if (target.isKO) {
-      const healingAmount = this.getTotalHealing(this.basePower, 0.5);
+      const healingAmount = this.getTotalHealing(0.5);
       target.getsHealed(healingAmount);
     } else {
-      const healingAmount = this.getTotalHealing(this.basePower, 2);
+      const healingAmount = this.getTotalHealing(2);
       target.getsHealed(healingAmount);
     }
+
+    this.removeAttackModifiers();
 
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
@@ -406,13 +409,15 @@ export class SoulHarvest extends Item {
       if (hero.isKO) return;
 
       totalDamageInflicted += hero.getsDamaged(damage, EAttackType.MAGICAL);
+
+      if (hero && hero instanceof Hero && hero.unitType === EHeroes.PHANTOM) hero.removeFromGame();
     });
 
     enemyCrystalTiles.forEach(tile => {
       const crystal = gameController.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('SoulHarvest use() crystal not found');
 
-      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage);
+      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage, EAttackType.MAGICAL);
     });
 
     // Get total amount of friendly units in the map, including KO'd ones

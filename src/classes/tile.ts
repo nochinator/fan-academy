@@ -39,7 +39,7 @@ export class Tile extends Phaser.GameObjects.Container {
     this.isHighlighted = this.baseRectangle.isFilled;
 
     // If tileType is not BASIC, add the visual representation
-    if (this.tileType !== ETiles.BASIC) {
+    if (this.tileType !== ETiles.BASIC && this.tileType !== ETiles.CRYSTAL) {
       const tileIcon = context.add.image(0, 0, this.tileType);
       if (this.col > 4) tileIcon.setFlipX(true);
       this.add(tileIcon);

@@ -1,4 +1,4 @@
-import { ETiles, EWinConditions } from "../enums/gameEnums";
+import { EAttackType, ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { roundToFive } from "../utils/gameUtils";
@@ -158,8 +158,9 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
   }
 
-  getsDamaged(damage: number): void {
-    const totalDamage = roundToFive(damage + 300 * this.debuffLevel);
+  getsDamaged(damage: number, _attackType: EAttackType, multiplier = 1): void {
+    const damageMultiplier = 300 * multiplier * this.debuffLevel;
+    const totalDamage = roundToFive(damage + damageMultiplier);
     const damageTaken = totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
     this.currentHealth -= damageTaken;
 
