@@ -54,7 +54,7 @@ export default class UIScene extends Phaser.Scene {
 
     this.load.html('disconnectWarning', 'html/disconnectWarning.html');
 
-    this.load.audio('deleteGame', `${CDN_PATH}/audio/Game_Delete.mp3`);
+    this.load.audio('deleteGameSound', `${CDN_PATH}/audio/ui/deleteGame.mp3`);
   }
 
   async create() {

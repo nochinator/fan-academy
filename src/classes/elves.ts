@@ -91,8 +91,8 @@ export class VoidMonk extends DarkElf {
 
     const splashedEnemies: (Hero | Crystal)[] = [];
 
-    if (this.superCharge)  playSound(this.scene, EGameSounds.VOID_MONK_ATTACK_BIG, 1000);
-    if (!this.superCharge)  playSound(this.scene, EGameSounds.VOID_MONK_ATTACK, 650);
+    if (this.superCharge)  playSound(this.scene, EGameSounds.VOIDMONK_ATTACK_BIG, 1000);
+    if (!this.superCharge)  playSound(this.scene, EGameSounds.VOIDMONK_ATTACK, 650);
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -200,8 +200,8 @@ export class Necromancer extends DarkElf {
 
       this.context.gameController!.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.NECRO_ATTACK_BIG, 1000);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.NECRO_ATTACK, 1000);
+      if (this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK_BIG, 1000);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK, 1000);
     }
 
     const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);

@@ -14,7 +14,7 @@ export abstract class Human extends Hero {
   }
 
   equipFactionBuff(handPosition: number): void {
-    playSound(this.scene, EGameSounds.SHIELD_USE);
+    playSound(this.scene, EGameSounds.DRAGON_SCALE_USE);
 
     const dragonScaleImg = this.scene.add.image(this.x + 10, this.y - 10, 'dragonScale').setOrigin(0.5).setDepth(100);
     useAnimation(dragonScaleImg);

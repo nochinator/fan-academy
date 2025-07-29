@@ -176,7 +176,7 @@ export async function playSound(scene: Phaser.Scene, sound: EGameSounds | EUiSou
 
 export function selectItemSound(scene: Phaser.Scene, item: EItems): void {
   const itemMap = {
-    [EItems.RUNE_METAL]: EGameSounds.SWORD_SELECT,
+    [EItems.RUNE_METAL]: EGameSounds.RUNE_METAL_SELECT,
     [EItems.SUPERCHARGE]: EGameSounds.SCROLL_SELECT,
     [EItems.SHINING_HELM]: EGameSounds.ITEM_SELECT,
 
@@ -204,9 +204,9 @@ export function selectDeathSound(scene: Phaser.Scene, hero: EHeroes): void {
     [EHeroes.NINJA]: EGameSounds.NINJA_DEATH,
 
     [EHeroes.IMPALER]: EGameSounds.IMPALER_DEATH,
-    [EHeroes.VOIDMONK]: EGameSounds.VOID_MONK_DEATH,
+    [EHeroes.VOIDMONK]: EGameSounds.VOIDMONK_DEATH,
     [EHeroes.PRIESTESS]: EGameSounds.PRIESTESS_DEATH,
-    [EHeroes.NECROMANCER]: EGameSounds.WRAITH_DEATH,
+    [EHeroes.NECROMANCER]: EGameSounds.NECROMANCER_DEATH,
     [EHeroes.WRAITH]: EGameSounds.WRAITH_DEATH,
     [EHeroes.PHANTOM]: EGameSounds.PHANTOM_DEATH
   };

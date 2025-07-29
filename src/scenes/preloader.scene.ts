@@ -1,4 +1,4 @@
-export const CDN_PATH = 'https://cdn.jsdelivr.net/gh/Dan-DH/fa-assets@d4ce54fc0d4054b073bb231257b558134da21a9f';
+export const CDN_PATH = 'https://cdn.jsdelivr.net/gh/Dan-DH/fa-assets@d4c8bd3';
 
 // PreloaderScene.ts
 export default class PreloaderScene extends Phaser.Scene {

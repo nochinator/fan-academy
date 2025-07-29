@@ -33,9 +33,9 @@ export default class MainMenuScene extends Phaser.Scene {
     this.load.font('proLight', '/fonts/BlambotFXProLightBB.woff', 'truetype');
 
     // sounds
-    this.load.audio('buttonFailed', `${CDN_PATH}/audio/Unit_Damage.mp3`);
-    this.load.audio('battleButton', `${CDN_PATH}/audio/UI_Front_End_Begin_Battle.mp3`);
-    this.load.audio('buttonPressGeneric', `${CDN_PATH}/audio/UI_Front_End_Select.mp3`);
+    this.load.audio('buttonFailedSound', `${CDN_PATH}/audio/ui/buttonFailed.mp3`);
+    this.load.audio('battleButtonSound', `${CDN_PATH}/audio/ui/battleButton.mp3`);
+    this.load.audio('buttonPressGenericSound', `${CDN_PATH}/audio/ui/buttonPressGeneric.mp3`);
   }
 
   async create() {

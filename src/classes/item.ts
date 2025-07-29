@@ -157,7 +157,7 @@ export class RuneMetal extends Item {
 
   async use(target: Hero): Promise<void> {
     target.equipRunemetal(this.boardPosition);
-    playSound(this.scene, EGameSounds.SWORD_USE, 500);
+    playSound(this.scene, EGameSounds.RUNE_METAL_USE, 500);
 
     this.removeFromGame();
   }
