@@ -81,7 +81,7 @@ export class GameController {
     this.door = new Door(context);
 
     // Used to block the user from clicking on some other part of the game during a replay. Clicking skips replay
-    this.blockingLayer = context.add.rectangle(910, 0, 1040, 1650, 0x000000, 0.0).setOrigin(0.5).setInteractive().setDepth(999).setVisible(this.context.triggerReplay);
+    this.blockingLayer = context.add.rectangle(910, 0, 1040, 1650, 0x000000, 0.3).setOrigin(0.5).setInteractive().setDepth(999).setVisible(this.context.triggerReplay);
 
     this.blockingLayer.on('pointerdown', () => {
       context.scene.restart({

@@ -91,7 +91,7 @@ export class ConcedeWarningPopup extends Phaser.GameObjects.Container {
     });
 
     this.cancelButtonImage.on('pointerdown', () => {
-      playSound(this.scene, EUiSounds.BUTTON_GENERIC);
+      playSound(this.scene, EUiSounds.BUTTON_FAILED);
 
       this.setVisible(false);
     });

@@ -1,4 +1,4 @@
-import { EActionType } from "../enums/gameEnums";
+import { EActionType, EUiSounds } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
 
 export class TurnButton {
@@ -11,6 +11,8 @@ export class TurnButton {
     // Sending a turn
     this.buttonImage.on('pointerdown', async () => {
       if (context.currentGame && context.activePlayer === context.userId) {
+        context.sound.play(EUiSounds.BUTTON_PLAY);
+
         console.log('Clicked on send turn');
 
         if (context.gameController!.hasActionsLeft()) {

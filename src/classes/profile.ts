@@ -1,5 +1,7 @@
+import { EUiSounds } from "../enums/gameEnums";
 import { deleteAccount, updateProfile } from "../queries/userQueries";
 import ProfileScene from "../scenes/profile.scene";
+import { playSound } from "../utils/gameUtils";
 import { isValidPassword } from "../utils/playerUtils";
 import { DeleteWarningPopup } from "./deletePopup";
 import { ProfilePicPopup } from "./profilePicPopup";
@@ -139,6 +141,7 @@ export class Profile extends Phaser.GameObjects.Container {
     });
 
     this.saveButtonImage.on('pointerdown', async () => {
+      playSound(this.scene, EUiSounds.BUTTON_GENERIC);
       await this.handleSubmit();
     });
 
@@ -161,6 +164,7 @@ export class Profile extends Phaser.GameObjects.Container {
     });
 
     this.deleteAccountButtonImage.on('pointerdown', () => {
+      playSound(this.scene, EUiSounds.BUTTON_GENERIC);
       console.log('Clicked on delete account');
       this.toggleFormVisibility(false);
       this.deletePopup.setVisible(true);

@@ -180,7 +180,7 @@ export async function createGameList(context: UIScene) {
   councilEmblem.on('pointerdown', async () => {
     // Create the faction's deck and starting hand
     if (context.userId) {
-      context.sound.play(EUiSounds.BUTTON_GENERIC);
+      context.sound.play(EUiSounds.BUTTON_PLAY);
       await createGame(context, EFaction.COUNCIL);
       await context.currentRoom?.leave();
       context.currentRoom = undefined;
@@ -191,7 +191,7 @@ export async function createGameList(context: UIScene) {
   elvesEmblem.on('pointerdown', async () => {
     // Create the faction's deck and starting hand
     if (context.userId) {
-      context.sound.play(EUiSounds.BUTTON_GENERIC);
+      context.sound.play(EUiSounds.BUTTON_PLAY);
       await createGame(context, EFaction.DARK_ELVES);
       await context.currentRoom?.leave();
       context.currentRoom = undefined;

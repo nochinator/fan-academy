@@ -3,7 +3,7 @@ import { sendChallengeAcceptedMessage } from "../colyseus/colyseusLobbyRoom";
 import { newGameChallenge } from "../queries/gameQueries";
 import LeaderboardScene from "../scenes/leaderboard.scene";
 import UIScene from "../scenes/ui.scene";
-import { truncateText } from "../utils/gameUtils";
+import { playSound, truncateText } from "../utils/gameUtils";
 import GameScene from "../scenes/game.scene";
 
 const challengePopupCoordinates = {
@@ -69,13 +69,18 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
       if (challengeType === EChallengePopup.ACCEPT && context instanceof UIScene) sendChallengeAcceptedMessage(context.lobbyRoom!, gameId!, context.userId, faction);
     };
 
-    this.councilButtonImage.on('pointerdown', async () => await buttonCallback(EFaction.COUNCIL));
+    this.councilButtonImage.on('pointerdown', async () => {
+      playSound(this.scene, EUiSounds.BUTTON_PLAY);
+      await buttonCallback(EFaction.COUNCIL);
+    });
 
-    this.elvesButtonImage.on('pointerdown', async () => await buttonCallback(EFaction.DARK_ELVES));
+    this.elvesButtonImage.on('pointerdown', async () => {
+      playSound(this.scene, EUiSounds.BUTTON_PLAY);
+      await buttonCallback(EFaction.DARK_ELVES);
+    });
 
     this.cancelButtonImage.on('pointerdown', () => {
       this.scene.sound.play(EUiSounds.BUTTON_FAILED);
-
       this.setVisible(false);
       this.destroy();
     });
