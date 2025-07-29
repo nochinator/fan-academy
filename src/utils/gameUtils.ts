@@ -196,7 +196,7 @@ export function selectItemSound(scene: Phaser.Scene, item: EItems): void {
 }
 
 export function selectDeathSound(scene: Phaser.Scene, hero: EHeroes): void {
-  const heroMap: Partial<Record<EHeroes, EGameSounds>> = {
+  const heroMap = {
     [EHeroes.ARCHER]: EGameSounds.ARCHER_DEATH,
     [EHeroes.KNIGHT]: EGameSounds.KNIGHT_DEATH,
     [EHeroes.CLERIC]: EGameSounds.CLERIC_DEATH,
@@ -207,7 +207,8 @@ export function selectDeathSound(scene: Phaser.Scene, hero: EHeroes): void {
     [EHeroes.VOIDMONK]: EGameSounds.VOID_MONK_DEATH,
     [EHeroes.PRIESTESS]: EGameSounds.PRIESTESS_DEATH,
     [EHeroes.NECROMANCER]: EGameSounds.WRAITH_DEATH,
-    [EHeroes.WRAITH]: EGameSounds.WRAITH_DEATH
+    [EHeroes.WRAITH]: EGameSounds.WRAITH_DEATH,
+    [EHeroes.PHANTOM]: EGameSounds.PHANTOM_DEATH
   };
 
   const soundToPlay = heroMap[hero];

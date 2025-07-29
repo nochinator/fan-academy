@@ -303,10 +303,11 @@ export class Wraith extends DarkElf {
         this.updateTileData();
       }
     } else {
-      playSound(this.scene, EGameSounds.WRAITH_ATTACK, 100);
+      if (this.superCharge) playSound(this.scene, EGameSounds.WRAITH_ATTACK_BIG, 500);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.WRAITH_ATTACK, 100);
 
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
-      ;
+
       if (damageDone) this.lifeSteal(damageDone);
 
       this.removeAttackModifiers();

@@ -133,16 +133,11 @@ export enum EPopups {
 export enum EUiSounds {
   BUTTON_PLAY = 'battleButton',
   BUTTON_GENERIC = 'buttonPressGeneric',
-  SEND_MOVE = 'sendMove',
-  CHAT_MESSAGE = 'chatMessage',
   BUTTON_FAILED = 'buttonFailed',
   GAME_DELETE = 'deleteGame',
   RESIGN = 'resign',
-  WIN_MUSIC = 'winMusic',
-  LOSE_MUSIC = 'loseMusic',
   WIN_SFX = 'winSFX',
   LOSE_SFX = 'loseSFX'
-
 }
 
 export enum EGameSounds {
@@ -155,30 +150,32 @@ export enum EGameSounds {
   HEAL = 'heal',
   HEAL_EXTRA = 'healExtra',
   HERO_STOMP = 'stomp',
-  VANISH = 'vanish', // FIXME: unused
+  VANISH = 'vanish',
   HERO_REVIVE = 'reviveHero',
 
   SCROLL_SELECT = 'selectScroll',
-  SCROLL_USE = 'useScroll',
   SWORD_SELECT = 'selectSword',
-  SWORD_USE = 'useSword',
   SHIELD_SELECT = 'selectShield',
-  SHIELD_USE = 'useShield',
   ITEM_SELECT = 'selectItemGeneric',
-  ITEM_USE = 'useItemGeneric', // Shining helm and Soul stone
   POTION_SELECT = 'selectPotion',
+  AOE_SPELL_SELECT = 'selectFirebomb',
+
+  SCROLL_USE = 'useScroll',
+  SWORD_USE = 'useSword',
+  SHIELD_USE = 'useShield',
+  ITEM_USE = 'useItemGeneric', // Shining helm and Soul stone
   POTION_USE = 'usePotion',
-  RESET_TURN = 'resetTurn',
 
   SWORD_TILE = 'landSword',
   SHIELD_TILE = 'landShield',
   HELM_TILE = 'landHelm',
   CRYSTAL_TILE = 'landCrystal',
 
+  RESET_TURN = 'resetTurn',
   DRAW = 'newItems',
   SHUFFLE = 'returnItem',
-  CRYSTAL_DAMAGE = 'damageCrystal1', // FIXME: unused
-  CRYSTAL_DAMAGE_BUFF = 'damageCrystal2', // FIXME: unused
+  CRYSTAL_DAMAGE = 'damageCrystal1',
+  CRYSTAL_DAMAGE_BUFF = 'damageCrystal2',
   CRYSTAL_DESTROY = 'destroyCrystal',
 
   // Council sounds
@@ -200,7 +197,6 @@ export enum EGameSounds {
   WIZARD_ATTACK = 'wizardAttack',
   WIZARD_ATTACK_BIG = 'wizardAttackBig',
   WIZARD_DEATH = 'wizardDeath',
-  AOE_SPELL_SELECT = 'selectFirebomb',
   INFERNO_USE = 'useFirebomb',
 
   // Elves sounds
@@ -212,16 +208,14 @@ export enum EGameSounds {
   IMPALER_DEATH = 'impalerDeath',
   NECRO_ATTACK = 'necroAttack',
   NECRO_ATTACK_BIG = 'necroAttackBig',
-  // FIXME: necro death missing
   PHANTOM_SPAWN = 'phantomSpawn',
   PHANTOM_DEATH = 'phantomDeath',
   VOID_MONK_ATTACK = 'voidMonkAttack',
   VOID_MONK_ATTACK_BIG = 'voidMonkAttackBig',
   VOID_MONK_DEATH = 'voidMonkDeath',
-  WRAITH_SPAWN = 'wraithSpawn',
   WRAITH_ATTACK = 'wraithAttack',
   WRAITH_ATTACK_BIG = 'wraithAttackBig',
-  WRAITH_DEATH = 'wraithDeath',
+  WRAITH_DEATH = 'wraithDeath', // used also for Necromancer's death
   WRAITH_CONSUME = 'wraithConsume',
   USE_HARVEST = 'useHarvest'
 }

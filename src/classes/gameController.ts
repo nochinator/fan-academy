@@ -286,6 +286,7 @@ export class GameController {
     });
 
     if (unitsToRemove.length) {
+      playSound(this.context, EGameSounds.VANISH);
       const animation = (hero: Hero): Promise<void> => {
         return new Promise((resolve) => {
           this.context.tweens.add({
