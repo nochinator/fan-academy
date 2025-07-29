@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EClass, EFaction, EGameSounds, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { checkUnitGameOver, getGridDistance, isInHand, moveAnimation, playSound, roundToFive, useAnimation } from "../utils/gameUtils";
+import { checkUnitGameOver, getGridDistance, isInHand, moveAnimation, playSound, roundToFive, selectDeathSound, useAnimation } from "../utils/gameUtils";
 import { positionHeroImage } from "../utils/heroImagePosition";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
@@ -514,6 +514,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   };
 
   getsKnockedDown(): void {
+    if (this.unitType !== EHeroes.PHANTOM) selectDeathSound(this.scene, this.unitType);
     this.removeSpecialTileOnKo();
 
     this.currentHealth = 0;
@@ -783,7 +784,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (targetTile === ETiles.PHYSICAL_RESISTANCE) {
       this.physicalDamageResistance += 20;
       this.physicalResistanceTileAnim.setVisible(true);
-      playSound(this.scene, EGameSounds.SHIELD_EQUIP);
+      playSound(this.scene, EGameSounds.SHIELD_TILE);
     }
 
     this.unitCard.updateCardData(this);

@@ -3,7 +3,7 @@ import { EActionClass, EActionType, EGameSounds, EGameStatus, EHeroes, ETiles, E
 import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
-import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, textAnimation, pauseCode, visibleUnitCardCheck } from "../utils/gameUtils";
+import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, textAnimation, pauseCode, visibleUnitCardCheck, playSound } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -104,7 +104,7 @@ export class GameController {
   addConcedeButton(context: GameScene): Phaser.GameObjects.Image {
     const button = context.add.image(1350, 70, 'concedeButton').setScale(0.9).setInteractive({ useHandCursor: true });
     button.on('pointerdown', ()=> {
-      this.context.sound.play(EUiSounds.BUTTON_GENERIC);
+      playSound(this.context, EUiSounds.BUTTON_GENERIC);
       this.concedePopup.setVisible(true);
     });
     return button;
@@ -215,7 +215,7 @@ export class GameController {
       fontSize: 50,
       color: '#fffb00'
     });
-    this.context.sound.play(EGameSounds.SHUFFLE);
+    playSound(this.context, EGameSounds.SHUFFLE);
 
     await textAnimation(testText, 1.3);
   }
@@ -224,7 +224,7 @@ export class GameController {
     deselectUnit(this.context);
     this.context.longPressStart = undefined;
     this.context.visibleUnitCard = undefined;
-    this.context.sound.play(EGameSounds.RESET_TURN);
+    playSound(this.context, EGameSounds.RESET_TURN);
 
     this.context.scene.restart();
   };
@@ -265,8 +265,7 @@ export class GameController {
       boardState: this.board.getBoardState()
     });
 
-    await pauseCode(this.context, 500); // REVIEW:
-    this.context.sound.play(EGameSounds.DRAW);
+    playSound(this.context, EGameSounds.DRAW, 500);
 
     await this.door.openDoor();
     await renderUnits;
@@ -331,7 +330,7 @@ export class GameController {
     this.context.activePlayer = this.context.opponentId;
     this.context.turnNumber!++;
 
-    this.context.sound.play(EUiSounds.BUTTON_GENERIC);
+    playSound(this.context, EUiSounds.BUTTON_GENERIC);
     sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.gameOver);
 
     if (this.gameOver) this.gameOverEffects();
@@ -342,10 +341,10 @@ export class GameController {
   async gameOverEffects() {
     if (this.gameOver?.winner === this.context.activePlayer) {
       // TODO: Show win text
-      this.context.sound.play(EUiSounds.WIN_SFX);
+      playSound(this.context, EUiSounds.WIN_SFX);
     } else {
       // TODO: Show lose text
-      this.context.sound.play(EUiSounds.LOSE_SFX);
+      playSound(this.context, EUiSounds.LOSE_SFX);
     }
   }
 

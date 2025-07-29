@@ -147,13 +147,17 @@ export enum EUiSounds {
 
 export enum EGameSounds {
   HERO_HAND_SELECT = 'selectHeroFromHand',
-  HERO_SPAWN = 'spawnHero',
   HERO_BOARD_SELECT = 'selectHeroFromBoard',
+  HERO_SPAWN = 'spawnHero',
   HERO_MOVE = 'moveHero',
   MOVE_FLY = 'moveFly',
   MOVE_WALK = 'moveWalk',
+  HEAL = 'heal',
+  HEAL_EXTRA = 'healExtra',
   HERO_STOMP = 'stomp',
   VANISH = 'vanish', // FIXME: unused
+  HERO_REVIVE = 'reviveHero',
+
   SCROLL_SELECT = 'selectScroll',
   SCROLL_USE = 'useScroll',
   SWORD_SELECT = 'selectSword',
@@ -161,27 +165,21 @@ export enum EGameSounds {
   SHIELD_SELECT = 'selectShield',
   SHIELD_USE = 'useShield',
   ITEM_SELECT = 'selectItemGeneric',
-  ITEM_USE = 'useItemGeneric',
+  ITEM_USE = 'useItemGeneric', // Shining helm and Soul stone
   POTION_SELECT = 'selectPotion',
   POTION_USE = 'usePotion',
   RESET_TURN = 'resetTurn',
-  HERO_REVIVE = 'reviveHero',
+
   SWORD_TILE = 'landSword',
-  SHIELD_EQUIP = 'landShield',
+  SHIELD_TILE = 'landShield',
   HELM_TILE = 'landHelm',
   CRYSTAL_TILE = 'landCrystal',
-  KO = 'ko',
+
   DRAW = 'newItems',
   SHUFFLE = 'returnItem',
-  CRYSTAL_DAMAGE = 'damageCrystal1',
-  CRYSTAL_DAMAGE_BUFF = 'damageCrystal2',
+  CRYSTAL_DAMAGE = 'damageCrystal1', // FIXME: unused
+  CRYSTAL_DAMAGE_BUFF = 'damageCrystal2', // FIXME: unused
   CRYSTAL_DESTROY = 'destroyCrystal',
-  HIT_1 = 'hit1',
-  HIT_2 = 'hit2',
-  HIT_3 = 'hit3',
-  HIT_4 = 'hit4',
-  HEAL = 'heal',
-  HEAL_EXTRA = 'healExtra',
 
   // Council sounds
   ARCHER_ATTACK = 'archerAttack',

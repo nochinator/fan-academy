@@ -14,6 +14,8 @@ export abstract class Human extends Hero {
   }
 
   equipFactionBuff(handPosition: number): void {
+    playSound(this.scene, EGameSounds.SHIELD_USE);
+
     const dragonScaleImg = this.scene.add.image(this.x + 10, this.y - 10, 'dragonScale').setOrigin(0.5).setDepth(100);
     useAnimation(dragonScaleImg);
 
@@ -29,7 +31,7 @@ export abstract class Human extends Hero {
     this.unitCard.updateCardPhysicalResistance(this);
     this.updateTileData();
 
-    this.scene.sound.play(EGameSounds.SHIELD_EQUIP);
+    this.scene.sound.play(EGameSounds.SHIELD_TILE);
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }

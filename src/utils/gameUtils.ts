@@ -178,16 +178,39 @@ export function selectItemSound(scene: Phaser.Scene, item: EItems): void {
   const itemMap = {
     [EItems.RUNE_METAL]: EGameSounds.SWORD_SELECT,
     [EItems.SUPERCHARGE]: EGameSounds.SCROLL_SELECT,
+    [EItems.SHINING_HELM]: EGameSounds.ITEM_SELECT,
+
     [EItems.DRAGON_SCALE]: EGameSounds.SHIELD_SELECT,
     [EItems.HEALING_POTION]: EGameSounds.POTION_SELECT,
-    [EItems.MANA_VIAL]: EGameSounds.POTION_SELECT,
-    [EItems.SHINING_HELM]: EGameSounds.ITEM_SELECT,
-    [EItems.SOUL_STONE]: EGameSounds.ITEM_SELECT,
     [EItems.INFERNO]: EGameSounds.AOE_SPELL_SELECT,
+
+    [EItems.SOUL_STONE]: EGameSounds.ITEM_SELECT,
+    [EItems.MANA_VIAL]: EGameSounds.POTION_SELECT,
     [EItems.SOUL_HARVEST]: EGameSounds.AOE_SPELL_SELECT
   };
 
   const soundToPlay = itemMap[item];
+  if (!soundToPlay) return;
+
+  playSound(scene, soundToPlay);
+}
+
+export function selectDeathSound(scene: Phaser.Scene, hero: EHeroes): void {
+  const heroMap: Partial<Record<EHeroes, EGameSounds>> = {
+    [EHeroes.ARCHER]: EGameSounds.ARCHER_DEATH,
+    [EHeroes.KNIGHT]: EGameSounds.KNIGHT_DEATH,
+    [EHeroes.CLERIC]: EGameSounds.CLERIC_DEATH,
+    [EHeroes.WIZARD]: EGameSounds.WIZARD_DEATH,
+    [EHeroes.NINJA]: EGameSounds.NINJA_DEATH,
+
+    [EHeroes.IMPALER]: EGameSounds.IMPALER_DEATH,
+    [EHeroes.VOIDMONK]: EGameSounds.VOID_MONK_DEATH,
+    [EHeroes.PRIESTESS]: EGameSounds.PRIESTESS_DEATH,
+    [EHeroes.NECROMANCER]: EGameSounds.WRAITH_DEATH,
+    [EHeroes.WRAITH]: EGameSounds.WRAITH_DEATH
+  };
+
+  const soundToPlay = heroMap[hero];
   if (!soundToPlay) return;
 
   playSound(scene, soundToPlay);
