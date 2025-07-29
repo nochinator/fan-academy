@@ -234,11 +234,11 @@ export function getAOETiles(context: GameScene, spell: Item,  targetTile: Tile):
   const board = context.gameController?.board;
   if (!board) throw new Error('Inferno use() board not found');
 
-  const areOfEffect = board.getAreaOfEffectTiles(targetTile);
+  const areaOfEffect = board.getAreaOfEffectTiles(targetTile);
 
-  const enemyHeroTiles = areOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo !== spell.belongsTo);
+  const enemyHeroTiles = areaOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo !== spell.belongsTo);
 
-  const enemyCrystalTiles = areOfEffect?.filter(tile => tile.tileType === ETiles.CRYSTAL && tile.crystal?.belongsTo !== spell.belongsTo);
+  const enemyCrystalTiles = areaOfEffect?.filter(tile => tile.tileType === ETiles.CRYSTAL && tile.crystal?.belongsTo !== spell.belongsTo);
 
   return {
     enemyHeroTiles,
@@ -392,7 +392,7 @@ export function getCardText(unit: EHeroes | EItems): {
     [EItems.RUNE_METAL]: {
       cardName: 'Runemetal',
       cardType: ECardType.EQUIPMENT,
-      cardText: "Permanently increases and ally's power by 50%."
+      cardText: "Permanently increases an ally's power by 50%."
     },
 
     [EItems.DRAGON_SCALE]: {
@@ -403,7 +403,7 @@ export function getCardText(unit: EHeroes | EItems): {
     [EItems.HEALING_POTION]: {
       cardName: 'Healing Potion',
       cardType: ECardType.CONSUMABLE,
-      cardText: "Heals and ally for 1000 HP, or revives an ally with 100 HP."
+      cardText: "Heals an ally for 1000 HP, or revives an ally with 100 HP."
     },
     [EItems.INFERNO]: {
       cardName: 'Inferno',
@@ -424,7 +424,7 @@ export function getCardText(unit: EHeroes | EItems): {
     [EItems.SOUL_STONE]: {
       cardName: 'Soulstone',
       cardType: ECardType.EQUIPMENT,
-      cardText: "Doubles the effect of a unit's life leech and increases max health by 10%"
+      cardText: "Doubles the effect of a unit's life leech and increases max health by 10%."
     }
   };
 
