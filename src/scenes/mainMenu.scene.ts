@@ -1,4 +1,5 @@
 import { EUiSounds } from "../enums/gameEnums";
+import { IUserPreferences } from "../interfaces/userInterface";
 import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 import { isValidPassword } from "../utils/playerUtils";
 import createMainMenuButton from "./mainMenuUtils/buttons";
@@ -7,6 +8,7 @@ import { CDN_PATH } from "./preloader.scene";
 export default class MainMenuScene extends Phaser.Scene {
   userId: string | undefined;
   gameList: string | undefined;
+  userPreferences: IUserPreferences | undefined;
 
   currentSubScene: string | undefined;
 
@@ -40,7 +42,13 @@ export default class MainMenuScene extends Phaser.Scene {
 
   async create() {
     // Auth check
-    this.userId = await authCheck();
+    const authCheckResult = await authCheck();
+    this.userId = authCheckResult!.userId;
+    this.userPreferences = authCheckResult!.preferences;
+
+    console.log(this.userId, this.userPreferences);
+
+    this.sound.mute = !this.userPreferences.sound;
 
     // Background image
     const bg = this.add.image(0, 0, 'uiBackground').setOrigin (0);

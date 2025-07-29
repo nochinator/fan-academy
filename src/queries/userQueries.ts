@@ -91,7 +91,10 @@ export async function signUpQuery(email: string, username: string, password: str
  * Used on MainMenuScene's onCreate() to check if the player is authenticated
  * @returns
  */
-export async function authCheck(): Promise<string | undefined> {
+export async function authCheck(): Promise<{
+  userId: string,
+  preferences: IUserPreferences
+} | undefined> {
   console.log('Checking Authentication Status...');
   const jwt = localStorage.getItem('jwt');
 
@@ -108,10 +111,10 @@ export async function authCheck(): Promise<string | undefined> {
     return undefined;
   }
 
-  const userId = await result.json();
+  const data = await result.json();
 
-  console.log('User authenticated...', userId);
-  return userId;
+  console.log('User authenticated...', data.userId);
+  return data;
 };
 
 /**
