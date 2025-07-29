@@ -5,7 +5,7 @@ import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
 import { EGameSounds, EGameStatus, EHeroes, EItems, ERange, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, isEnemySpawn, isHero, isItem, playSound, visibleUnitCardCheck } from "./gameUtils";
+import { belongsToPlayer, isEnemySpawn, isHero, isItem, playSound, selectItemSound, visibleUnitCardCheck } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
@@ -60,19 +60,8 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
     if (isHero(unit) && unit.isKO) return;
 
     if (unit.boardPosition >= 45) {
-      if (isHero(unit)) {
-        playSound(context, EGameSounds.HERO_HAND_SELECT);
-      } else {
-        // FIXME: select item type
-        // let selectSound = 'selectItemGeneric';
-        // const itemType = String(unit.itemType);
-        // if (itemType === 'runeMetal' || itemType === 'superCharge' || itemType === 'dragonScale') {
-        //   selectSound = `select${unit.itemType}`;
-        // } else if (itemType === 'healingPotion' || itemType === 'manaVial') {
-        //   selectSound = `selectPotion`;
-        // }
-        // effectSequence(context, selectSound);
-      }
+      if (isHero(unit)) playSound(context, EGameSounds.HERO_HAND_SELECT);
+      if (isItem(unit)) selectItemSound(context, unit.itemType);
     } else {
       playSound(context, EGameSounds.HERO_BOARD_SELECT);
     }
@@ -214,7 +203,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
       if (unit.boardPosition >= 45) {
         if (isHero(unit)) playSound(context, EGameSounds.HERO_HAND_SELECT);
-        // if (isItem(unit) selectItemSound(context, unit.itemType))
+        if (isItem(unit)) selectItemSound(context, unit.itemType);
       } else {
         playSound(context, EGameSounds.HERO_BOARD_SELECT);
       }

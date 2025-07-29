@@ -5,7 +5,7 @@ import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulSt
 import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EActionClass, EActionType, ECardType, EClass, EGameSounds, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
+import { EActionClass, EActionType, ECardType, EClass, EGameSounds, EHeroes, EItems, ETiles, EUiSounds, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, IHero, IItem, IPlayerState, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
@@ -168,10 +168,29 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
   };
 }
 
-export async function playSound(scene: Phaser.Scene, sound: string, delay = 0): Promise<void> {
+export async function playSound(scene: Phaser.Scene, sound: EGameSounds | EUiSounds, delay = 0): Promise<void> {
   console.log('sound playing: ', sound);
   scene.sound.play(sound);
   await pauseCode(scene, delay);
+}
+
+export function selectItemSound(scene: Phaser.Scene, item: EItems): void {
+  const itemMap = {
+    [EItems.RUNE_METAL]: EGameSounds.SWORD_SELECT,
+    [EItems.SUPERCHARGE]: EGameSounds.SCROLL_SELECT,
+    [EItems.DRAGON_SCALE]: EGameSounds.SHIELD_SELECT,
+    [EItems.HEALING_POTION]: EGameSounds.POTION_SELECT,
+    [EItems.MANA_VIAL]: EGameSounds.POTION_SELECT,
+    [EItems.SHINING_HELM]: EGameSounds.ITEM_SELECT,
+    [EItems.SOUL_STONE]: EGameSounds.ITEM_SELECT,
+    [EItems.INFERNO]: EGameSounds.AOE_SPELL_SELECT,
+    [EItems.SOUL_HARVEST]: EGameSounds.AOE_SPELL_SELECT
+  };
+
+  const soundToPlay = itemMap[item];
+  if (!soundToPlay) return;
+
+  playSound(scene, soundToPlay);
 }
 
 export function pauseCode(scene: Phaser.Scene, delay: number): Promise<void> {

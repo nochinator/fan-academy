@@ -160,7 +160,7 @@ export enum EGameSounds {
   SWORD_USE = 'useSword',
   SHIELD_SELECT = 'selectShield',
   SHIELD_USE = 'useShield',
-  ITEM_SELECT5 = 'selectItemGeneric',
+  ITEM_SELECT = 'selectItemGeneric',
   ITEM_USE = 'useItemGeneric',
   POTION_SELECT = 'selectPotion',
   POTION_USE = 'usePotion',
@@ -202,7 +202,7 @@ export enum EGameSounds {
   WIZARD_ATTACK = 'wizardAttack',
   WIZARD_ATTACK_BIG = 'wizardAttackBig',
   WIZARD_DEATH = 'wizardDeath',
-  SELECT_FIREBOMB = 'selectFirebomb',
+  AOE_SPELL_SELECT = 'selectFirebomb',
   INFERNO_USE = 'useFirebomb',
 
   // Elves sounds
