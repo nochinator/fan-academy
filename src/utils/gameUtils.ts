@@ -341,7 +341,7 @@ export function getCardText(unit: EHeroes | EItems): {
     [EItems.HEALING_POTION]: {
       cardName: 'Healing Potion',
       cardType: ECardType.CONSUMABLE,
-      cardText: "Heals and ally for 1000 HP, or revives an ally with 100 HP."
+      cardText: "Heals an ally for 1000 HP, or revives an ally with 100 HP."
     },
     [EItems.INFERNO]: {
       cardName: 'Inferno',
