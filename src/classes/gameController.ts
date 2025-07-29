@@ -42,7 +42,7 @@ export class GameController {
   concedePopup: ConcedeWarningPopup;
 
   constructor(context: GameScene) {
-    if (context.triggerReplay) context.chatComponent!.pointerEvents = 'none';
+    if (context.triggerReplay && context.chatComponent) context.chatComponent!.pointerEvents = 'none';
 
     this.context = context;
     this.game = context.currentGame!;

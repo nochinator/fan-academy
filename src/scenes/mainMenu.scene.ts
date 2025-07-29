@@ -44,11 +44,13 @@ export default class MainMenuScene extends Phaser.Scene {
     // Auth check
     const authCheckResult = await authCheck();
     this.userId = authCheckResult!.userId;
-    this.userPreferences = authCheckResult!.preferences;
 
-    console.log(this.userId, this.userPreferences);
+    this.registry.set('userPreferences', {
+      chat: authCheckResult!.preferences.chat,
+      sound: authCheckResult!.preferences.sound
+    });
 
-    this.sound.mute = !this.userPreferences.sound;
+    this.sound.mute = !authCheckResult!.preferences.sound;
 
     // Background image
     const bg = this.add.image(0, 0, 'uiBackground').setOrigin (0);

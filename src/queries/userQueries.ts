@@ -192,7 +192,8 @@ export async function updateProfile(payload: {
   password?: string,
   picture?: string
   emailNotifications?: boolean
-  chat?: boolean
+  chat?: boolean,
+  sound?: boolean
 }) {
   try {
     const jwt = localStorage.getItem('jwt');
