@@ -229,7 +229,7 @@ export class Board {
 
     switch (rangeType) {
       case ERange.MOVE:
-        range = hero.movement;
+        range = hero.speedTile ? hero.movement + 2 : hero.movement;
         break;
 
       case ERange.ATTACK:

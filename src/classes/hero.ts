@@ -44,6 +44,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   unitsConsumed: number;
   isDebuffed: boolean;
   manaVial?: boolean;
+  speedTile?: boolean;
 
   context: GameScene;
   unitCard: HeroCard;
@@ -113,6 +114,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.unitsConsumed = data.unitsConsumed ?? 0;
     this.isDebuffed = data.isDebuffed;
     this.manaVial = data?.manaVial ?? undefined;
+    this.speedTile = data.speedTile;
 
     this.unitCard = new HeroCard(context, {
       ...data,
@@ -205,7 +207,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.powerTileEvent = this.continuousEvent(this.powerTileAnim, ['powerTileAnim_1', 'powerTileAnim_2', 'powerTileAnim_3']);
 
     this.magicalResistanceTileAnim = context.add.image(0, 30, 'magicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tile?.tileType === ETiles.MAGICAL_RESISTANCE && !this.isKO) {
+    if ((tile?.tileType === ETiles.MAGICAL_RESISTANCE || tile?.tileType === ETiles.SPEED) && !this.isKO) {
       this.magicalResistanceTileAnim.setVisible(true);
     } else {
       this.magicalResistanceTileAnim.setVisible(false);
@@ -323,7 +325,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       canHeal: this.canHeal,
       unitsConsumed: this.unitsConsumed,
       isDebuffed: this.isDebuffed,
-      manaVial: this.manaVial
+      manaVial: this.manaVial,
+      speedTile: this.speedTile
     };
   }
 
@@ -619,8 +622,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       hero?.removeFromGame(true);
     }
 
-    console.log('targettilehero', targetTile.hero);
-
     // Check if the unit is leaving or entering a special tile and apply any effects
     this.specialTileCheck(targetTile.tileType, startTile.tileType);
     this.updatePosition(targetTile);
@@ -749,6 +750,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   };
 
   specialTileCheck(targetTile: ETiles, currentTile?: ETiles): void {
+    console.log('target', targetTile);
+    console.log('current', currentTile);
     // If hero is leaving a special tile
     if (currentTile === ETiles.CRYSTAL_DAMAGE) {
       this.updateCrystals(false);
@@ -765,6 +768,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (currentTile === ETiles.PHYSICAL_RESISTANCE) {
       this.physicalDamageResistance -= 20;
       this.physicalResistanceTileAnim.setVisible(false);
+    }
+    if (currentTile === ETiles.SPEED) {
+      this.speedTile = false;
+      this.magicalResistanceTileAnim.setVisible(false);
     }
 
     // If hero is entering a special tile
@@ -787,6 +794,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.physicalDamageResistance += 20;
       this.physicalResistanceTileAnim.setVisible(true);
       playSound(this.scene, EGameSounds.SHIELD_TILE);
+    }
+    if (targetTile === ETiles.SPEED) {
+      this.speedTile = true;
+      this.magicalResistanceTileAnim.setVisible(true); // Reusing the animation since it's basically the same color
     }
 
     this.unitCard.updateCardData(this);
