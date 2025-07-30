@@ -1,6 +1,6 @@
 import { Client, Room } from "colyseus.js";
 import { EFaction, EGameStatus } from "../enums/gameEnums";
-import { IGameState } from "../interfaces/gameInterface";
+import { IGameOver, IGameState } from "../interfaces/gameInterface";
 import { createGameList } from "../scenes/gameSceneUtils/gameList";
 import UIScene from "../scenes/ui.scene";
 import { showDisconnectWarning } from "../scenes/uiSceneUtils/disconnectWarning";
@@ -75,7 +75,8 @@ export async function connectToGameLobby(client: Client, userId: string, context
       previousTurn: IGameState[],
       userIds: string[],
       turnNumber: number,
-      lastPlayedAt: Date
+      lastPlayedAt: Date,
+      gameOver: IGameOver
     }) => {
       console.log('A game has ended, updating game list');
       const gameList = context.gameList;
@@ -96,6 +97,7 @@ export async function connectToGameLobby(client: Client, userId: string, context
       game.turnNumber = message.turnNumber;
       game.status = EGameStatus.FINISHED;
       game.lastPlayedAt = message.lastPlayedAt;
+      game.gameOver = message.gameOver;
 
       context.gameList = [...unfinishedGames ?? [], ...finishedGames ?? []];
 
