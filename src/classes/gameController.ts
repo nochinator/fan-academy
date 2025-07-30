@@ -10,6 +10,7 @@ import { Board } from "./board";
 import { ConcedeWarningPopup } from "./concedePopup";
 import { Deck } from "./deck";
 import { Door } from "./door";
+import { GameOverScreen } from "./gameOverScreen";
 import { GameUI } from "./gameUI";
 import { Hand } from "./hand";
 import { Hero } from "./hero";
@@ -38,11 +39,17 @@ export class GameController {
   playerData: IUserData[];
 
   gameOver: IGameOver | undefined;
+  gameOverScreen: GameOverScreen | undefined;
   concedeButton: Phaser.GameObjects.Image;
   concedePopup: ConcedeWarningPopup;
 
   constructor(context: GameScene) {
     if (context.triggerReplay && context.chatComponent) context.chatComponent!.pointerEvents = 'none';
+
+    if (context.currentGame.status === EGameStatus.FINISHED && !context.triggerReplay){
+      const gameOverScreen =  new GameOverScreen(context);
+      gameOverScreen.init();
+    }
 
     this.context = context;
     this.game = context.currentGame!;
