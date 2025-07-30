@@ -147,7 +147,8 @@ export class GameController {
           if (
             actionTaken === EActionType.ATTACK ||
             actionTaken === EActionType.HEAL ||
-            actionTaken === EActionType.TELEPORT
+            actionTaken === EActionType.TELEPORT ||
+            actionTaken === EActionType.SPAWN_PHANTOM
           ) await this.replayAttackHealTeleport(turn.action!);
 
           if (actionTaken === EActionType.SHUFFLE) await this.replayShuffle();
@@ -187,12 +188,13 @@ export class GameController {
 
   async replayAttackHealTeleport(action: ITurnAction): Promise<void> {
     const hero = this.board.units.find(unit => unit.boardPosition === action.actorPosition);
+    console.log('hero', hero);
     const target = this.board.crystals.find(crystal => crystal.boardPosition === action.targetPosition) ?? this.board.units.find(unit => unit.boardPosition === action.targetPosition);
-
+    console.log('target', target);
     if (!hero || !target) throw new Error('Missing hero or target in attack or heal action');
 
     // VSCode says await has no effect on them, but it does work
-    if (action.action === EActionType.ATTACK) await hero.attack(target);
+    if (action.action === EActionType.ATTACK || action.action === EActionType.SPAWN_PHANTOM) await hero.attack(target);
     if (action.action === EActionType.HEAL) await hero.heal(target as Hero);
     if (action.action === EActionType.TELEPORT) await hero.teleport(target as Hero);
   };

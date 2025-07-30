@@ -193,18 +193,20 @@ export class Necromancer extends DarkElf {
         col: target.col
       }), tile, true);
 
+      this.context.gameController?.board.units.push(phantom);
+      tile.hero = phantom.exportData();
       target.removeFromGame(true);
 
-      tile.hero = phantom.exportData();
+      this.context.gameController!.afterAction(EActionType.SPAWN_PHANTOM, this.boardPosition, target.boardPosition);
 
-      this.context.gameController!.addActionToState(EActionType.SPAWN_PHANTOM, this.boardPosition);
+      return;
     } else {
       if (this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK_BIG, 1000);
       if (!this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK, 1000);
     }
 
     const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
-    ;
+
     if (damageDone) this.lifeSteal(damageDone);
 
     this.removeAttackModifiers();
