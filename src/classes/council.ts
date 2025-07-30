@@ -73,7 +73,7 @@ export class Archer extends Human {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -111,7 +111,7 @@ export class Knight extends Human {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -159,9 +159,9 @@ export class Wizard extends Human {
       if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType, 0.75);
       if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType, 0.56);
 
-      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
-      if (secondTarget && secondTarget instanceof Hero && secondTarget.unitType === EHeroes.PHANTOM) secondTarget.removeFromGame();
-      if (thirdTarget && thirdTarget instanceof Hero && thirdTarget.unitType === EHeroes.PHANTOM) thirdTarget.removeFromGame();
+      if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+      if (secondTarget && secondTarget instanceof Hero && secondTarget.isKO && secondTarget.unitType === EHeroes.PHANTOM) secondTarget.removeFromGame();
+      if (thirdTarget && thirdTarget instanceof Hero && thirdTarget.isKO && thirdTarget.unitType === EHeroes.PHANTOM) thirdTarget.removeFromGame();
 
       this.removeAttackModifiers();
     }
@@ -302,7 +302,7 @@ export class Ninja extends Human {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -356,7 +356,7 @@ export class Cleric extends Human {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
