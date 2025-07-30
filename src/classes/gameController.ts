@@ -3,7 +3,7 @@ import { EActionClass, EActionType, EGameSounds, EGameStatus, EHeroes, ETiles, E
 import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
-import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, textAnimation, pauseCode, visibleUnitCardCheck, playSound } from "../utils/gameUtils";
+import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, playSound, textAnimation, visibleUnitCardCheck } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -418,7 +418,7 @@ export class GameController {
     });
   }
 
-  async pushEnemy(attacker: Hero, target: Hero, delay = 0): Promise<void> {
+  async pushEnemy(attacker: Hero, target: Hero): Promise<void> {
     const attackerTile = this.board.getTileFromBoardPosition(attacker.boardPosition);
     const targetTile = this.board.getTileFromBoardPosition(target.boardPosition);
     if (!attackerTile || !targetTile) {
@@ -450,7 +450,6 @@ export class GameController {
       return;
     }
 
-    await pauseCode(this.context, delay);
     target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
     await forcedMoveAnimation(this.context, target, targetNewTile);
 

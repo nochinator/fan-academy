@@ -2,7 +2,7 @@ import { EActionType, EAttackType, EClass, EFaction, EGameSounds, EHeroes } from
 
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { canBeAttacked, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, pauseCode, playSound, roundToFive, turnIfBehind, useAnimation } from "../utils/gameUtils";
+import { canBeAttacked, generateFourDigitId, getAOETiles, isEnemySpawn, isOnBoard, playSound, roundToFive, turnIfBehind, useAnimation } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -30,8 +30,7 @@ export abstract class DarkElf extends Hero {
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
-  async lifeSteal(damage: number, delay = 0): Promise<void> {
-    await pauseCode(this.context, delay);
+  lifeSteal(damage: number): void {
     if (this.factionBuff) {
       const roundedHealing = roundToFive(damage * 0.666);
       this.getsHealed(roundedHealing);
@@ -370,8 +369,6 @@ export class SoulStone extends Item {
   async use(target: Hero): Promise<void> {
     target.equipFactionBuff(this.boardPosition);
     this.removeFromGame();
-
-    await pauseCode(this.context, 1000);
   }
 }
 

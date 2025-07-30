@@ -1,6 +1,6 @@
 import { EActionType, EGameSounds } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { isInHand, pauseCode, playSound } from "../utils/gameUtils";
+import { isInHand, playSound } from "../utils/gameUtils";
 import { getCurrentPlayer } from "../utils/playerUtils";
 
 export class Door extends Phaser.GameObjects.Container {
@@ -69,12 +69,13 @@ export class Door extends Phaser.GameObjects.Container {
     this.bannerText.setText(deckSize.toString());
   }
 
-  async openDoor(): Promise<void> {
+  openDoor(): void {
     this.doorOpen.setVisible(true);
     this.doorClosed.setVisible(false);
 
-    await pauseCode(this.context, 1600);
-    this.doorOpen.setVisible(false);
-    this.doorClosed.setVisible(true);
+    this.scene.time.delayedCall(1000, () => {
+      this.doorOpen.setVisible(false);
+      this.doorClosed.setVisible(true);
+    });
   }
 }

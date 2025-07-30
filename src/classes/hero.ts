@@ -480,8 +480,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, false);
     this.specialTileCheck(this.getTile().tileType);
 
-    // effectSequence(this.scene, EUiSounds.REVIVE_HERO); // FIXME: add revive sound
-
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
   }

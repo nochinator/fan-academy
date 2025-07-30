@@ -174,6 +174,12 @@ export async function playSound(scene: Phaser.Scene, sound: EGameSounds | EUiSou
   await pauseCode(scene, delay);
 }
 
+export function pauseCode(scene: Phaser.Scene, delay: number): Promise<void> {
+  return new Promise(resolve => {
+    scene.time.delayedCall(delay, resolve);
+  });
+}
+
 export function selectItemSound(scene: Phaser.Scene, item: EItems): void {
   const itemMap = {
     [EItems.RUNE_METAL]: EGameSounds.RUNE_METAL_SELECT,
@@ -215,12 +221,6 @@ export function selectDeathSound(scene: Phaser.Scene, hero: EHeroes): void {
   if (!soundToPlay) return;
 
   playSound(scene, soundToPlay);
-}
-
-export function pauseCode(scene: Phaser.Scene, delay: number): Promise<void> {
-  return new Promise(resolve => {
-    scene.time.delayedCall(delay, resolve);
-  });
 }
 
 export function getActionClass(action: EActionType): EActionClass {

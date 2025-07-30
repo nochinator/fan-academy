@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EGameSounds, EHeroes } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, pauseCode, playSound, turnIfBehind, useAnimation } from "../utils/gameUtils";
+import { canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, playSound, turnIfBehind, useAnimation } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -388,7 +388,6 @@ export class DragonScale extends Item {
   async use(target: Hero): Promise<void> {
     target.equipFactionBuff(this.boardPosition);
     this.removeFromGame();
-    await pauseCode(this.context, 1000);
   }
 }
 
