@@ -348,10 +348,8 @@ export class GameController {
 
   async gameOverEffects() {
     if (this.gameOver?.winner === this.context.activePlayer) {
-      // TODO: Show win text
       playSound(this.context, EUiSounds.WIN_SFX);
     } else {
-      // TODO: Show lose text
       playSound(this.context, EUiSounds.LOSE_SFX);
     }
   }
