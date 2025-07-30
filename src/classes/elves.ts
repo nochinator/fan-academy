@@ -196,9 +196,10 @@ export class Necromancer extends DarkElf {
         col: target.col
       }), tile, true);
 
+      target.removeFromGame(true);
+
       this.context.gameController?.board.units.push(phantom);
       tile.hero = phantom.exportData();
-      target.removeFromGame(true);
 
       this.context.gameController!.afterAction(EActionType.SPAWN_PHANTOM, this.boardPosition, target.boardPosition);
 
