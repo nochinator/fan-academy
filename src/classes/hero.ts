@@ -577,7 +577,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   removeFromBoard(): void {
     // Remove hero data from tile
     const tile = this.getTile();
-    if (tile.tileType === ETiles.CRYSTAL_DAMAGE) this.updateCrystals(false);
     tile.removeHero();
 
     // Remove hero from board array
@@ -616,6 +615,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       playSound(this.context, EGameSounds.HERO_STOMP);
       hero?.removeFromGame(true);
     }
+
+    console.log('targettilehero', targetTile.hero);
 
     // Check if the unit is leaving or entering a special tile and apply any effects
     this.specialTileCheck(targetTile.tileType, startTile.tileType);
@@ -737,7 +738,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
         let newLevel: number = 0;
 
         if (increase) newLevel = crystal.debuffLevel + 1;
-        if (!increase && crystal.debuffLevel !== 0) newLevel = crystal.debuffLevel - 1; // Safeguard to avoid it going negative until I figure out the bug
+        if (!increase && crystal.debuffLevel > 0) newLevel = crystal.debuffLevel - 1; // Safeguard to avoid it going negative until I figure out the bug
 
         crystal.updateDebuffAnimation(newLevel);
       }
