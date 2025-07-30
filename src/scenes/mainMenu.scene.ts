@@ -44,16 +44,7 @@ export default class MainMenuScene extends Phaser.Scene {
     // Auth check
     const authCheckResult = await authCheck();
 
-    if (authCheckResult) {
-      this.userId = authCheckResult!.userId;
-
-      this.registry.set('userPreferences', {
-        chat: authCheckResult!.preferences.chat,
-        sound: authCheckResult!.preferences.sound
-      });
-
-      this.sound.mute = !authCheckResult!.preferences.sound;
-    }
+    if (authCheckResult) this.updateUserPreferences(authCheckResult);
 
     // Background image
     const bg = this.add.image(0, 0, 'uiBackground').setOrigin (0);
@@ -240,10 +231,10 @@ export default class MainMenuScene extends Phaser.Scene {
       if (loginUsernameInput.value && loginPasswordInput.value) {
         const result = await loginQuery(loginUsernameInput.value, loginPasswordInput.value);
         if (result.success) {
-          this.sound.play(EUiSounds.BUTTON_GENERIC);
+          if (result.userData) this.updateUserPreferences(result.userData);
           loginForm.setVisible(false);
           blockingLayer.setVisible(false);
-          this.userId = result.userId;
+          this.sound.play(EUiSounds.BUTTON_GENERIC);
           console.log('UserId after login:', this.userId);
         }else {
           this.sound.play(EUiSounds.BUTTON_FAILED);
@@ -279,10 +270,10 @@ export default class MainMenuScene extends Phaser.Scene {
       if (signUpEmailInput.value && signUpUsernameInput.value && signUpPasswordInput.value) {
         const result = await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
         if (result.success) {
-          this.sound.play(EUiSounds.BUTTON_GENERIC);
+          if (result.userData) this.updateUserPreferences(result.userData);
           signUpForm.setVisible(false);
           blockingLayer.setVisible(false);
-          this.userId = result.userId;
+          this.sound.play(EUiSounds.BUTTON_GENERIC);
           console.log('UserId after sign up:', this.userId);
         } else {
           this.sound.play(EUiSounds.BUTTON_FAILED);
@@ -324,5 +315,19 @@ export default class MainMenuScene extends Phaser.Scene {
       loginForm,
       signUpForm
     };
+  }
+
+  updateUserPreferences(userData: {
+    userId: string,
+    preferences: IUserPreferences
+  }): void {
+    this.userId = userData.userId;
+
+    this.registry.set('userPreferences', {
+      chat: userData.preferences.chat,
+      sound: userData.preferences.sound
+    });
+
+    this.sound.mute = !userData.preferences.sound;
   }
 }

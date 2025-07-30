@@ -25,7 +25,7 @@ export async function loginQuery(username: string, password: string) {
 
       return {
         success: true,
-        userId: data.userId
+        userData: data.userData
       };
     } else {
       console.error('Server responded with an error:', data.message || 'Unknown error');
@@ -62,6 +62,8 @@ export async function signUpQuery(email: string, username: string, password: str
 
     const data = await response.json();
 
+    console.log('data', data);
+
     if (response.ok) {
       console.log('Successful sign up! :)');
 
@@ -69,7 +71,7 @@ export async function signUpQuery(email: string, username: string, password: str
 
       return {
         success: true,
-        userId: data.userId
+        userData: data.userData
       };
     } else {
       console.log('Server responded with an error:', data.message || 'Unknown error');
