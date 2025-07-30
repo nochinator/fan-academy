@@ -52,9 +52,10 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.healthBar = new HealthBar(context, data, -38, -70);
     this.unitCard = new CrystalCard(context, data).setVisible(false);
 
-    this.pedestalImage = context.add.image(0, 0, 'pedestal').setScale(0.8);
+    const isBigCrystal = this.maxHealth === 9000;
+    this.pedestalImage = context.add.image(0, 10, 'pedestal').setScale(0.8);
     const crystalTexture = data.currentHealth <= data.maxHealth / 2 ? 'crystalDamaged' : 'crystalFull';
-    this.crystalImage = context.add.image(0, -30, crystalTexture).setScale(0.8);
+    this.crystalImage = context.add.image(0, -30, crystalTexture).setScale(isBigCrystal ? 1 : 0.8);
 
     this.blockedLOS = context.add.image(0, -10, 'blockedLOS').setOrigin(0.5).setName('blockedLOS').setVisible(false);
 
@@ -171,7 +172,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.currentHealth -= damageTaken;
 
     if (this.currentHealth <= this.maxHealth / 2) {
-      this.crystalImage.setTexture('crystalDamaged'); // FIXME: below 50%, this changes the texture every time the crystal is damaged
+      this.crystalImage.setTexture('crystalDamaged');
     }
 
     // Update hp bar
