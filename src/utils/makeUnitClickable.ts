@@ -116,6 +116,14 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
           activeUnit.move(unitTile);
           return;
         }
+        if (
+          unit.isKO &&
+          (activeUnit.unitType === EHeroes.NECROMANCER && unit.blockedLOS.visible) &&
+          (withinStompingRange || unitTile.isHighlighted)
+        ) {
+          activeUnit.move(unitTile);
+          return;
+        }
       }
 
       // Stomp a KO unit or Phantom on a friendly spawn tile with a unit from hand
