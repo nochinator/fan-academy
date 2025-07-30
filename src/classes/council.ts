@@ -73,6 +73,7 @@ export class Archer extends Human {
       this.removeAttackModifiers();
     }
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -110,6 +111,7 @@ export class Knight extends Human {
       this.removeAttackModifiers();
     }
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -300,6 +302,7 @@ export class Ninja extends Human {
       this.removeAttackModifiers();
     }
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -353,6 +356,7 @@ export class Cleric extends Human {
       this.removeAttackModifiers();
     }
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 

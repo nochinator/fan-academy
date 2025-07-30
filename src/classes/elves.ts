@@ -73,8 +73,10 @@ export class Impaler extends DarkElf {
 
     if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) this.context.gameController!.pullEnemy(this, target);
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
+
   heal(_target: Hero): void {};
   teleport(_target: Hero): void {};
 }
@@ -149,9 +151,10 @@ export class VoidMonk extends DarkElf {
     }
 
     splashedEnemies.forEach(enemy => {
-      if (enemy instanceof Hero && enemy.unitType == EHeroes.PHANTOM) enemy.removeFromGame(true);
+      if (enemy instanceof Hero && enemy.unitType === EHeroes.PHANTOM) enemy.removeFromGame(true);
     });
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -211,6 +214,7 @@ export class Necromancer extends DarkElf {
 
     this.removeAttackModifiers();
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -257,6 +261,7 @@ export class Priestess extends DarkElf {
       this.removeAttackModifiers();
     }
 
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -313,6 +318,8 @@ export class Wraith extends DarkElf {
 
       this.removeAttackModifiers();
     }
+
+    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
