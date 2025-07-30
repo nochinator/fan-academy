@@ -574,10 +574,11 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.superChargeEvent.remove(false);
     if (this.spawnEvent) this.spawnEvent?.remove(false);
 
-    if (board) this.removeFromBoard();
-
-    // One more special tile check for good measure
-    this.removeSpecialTileOnKo();
+    if (board) {
+      this.removeFromBoard();
+      // One more special tile check for good measure
+      this.removeSpecialTileOnKo();
+    }
 
     // Destroy container and children
     this.destroy(true);

@@ -242,14 +242,17 @@ export class GameController {
     return this.deck.getDeck();
   }
 
-  async drawUnits(): Promise<void> {
+  drawUnits() {
+    playSound(this.context, EGameSounds.DRAW, 500);
+
     const drawAmount = 6 - this.hand.getHandSize();
+    if (this.deck.getDeckSize() === 0 || drawAmount === 0) return;
+
+    this.door.openDoor();
 
     const drawnUnits = this.deck.removeFromDeck(drawAmount); // IHero IItem
 
-    if (this.deck.getDeckSize() === 0 || drawAmount === 0) return;
-
-    const renderUnits = this.hand.addToHand(drawnUnits);
+    this.hand.addToHand(drawnUnits);
 
     // Add action to turn state
     const { player, opponent } = getPlayersKey(this.context);
@@ -273,11 +276,6 @@ export class GameController {
       },
       boardState: this.board.getBoardState()
     });
-
-    playSound(this.context, EGameSounds.DRAW, 500);
-
-    await this.door.openDoor();
-    await renderUnits;
   }
 
   async removeKOUnits() {
