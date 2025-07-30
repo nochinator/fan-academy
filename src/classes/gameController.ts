@@ -188,9 +188,7 @@ export class GameController {
 
   async replayAttackHealTeleport(action: ITurnAction): Promise<void> {
     const hero = this.board.units.find(unit => unit.boardPosition === action.actorPosition);
-    console.log('hero', hero);
     const target = this.board.crystals.find(crystal => crystal.boardPosition === action.targetPosition) ?? this.board.units.find(unit => unit.boardPosition === action.targetPosition);
-    console.log('target', target);
     if (!hero || !target) throw new Error('Missing hero or target in attack or heal action');
 
     // VSCode says await has no effect on them, but it does work
