@@ -168,12 +168,11 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
   };
 }
 
-export async function playSound(scene: Phaser.Scene, sound: EGameSounds | EUiSounds, delay = 0): Promise<void> {
-  console.log('sound playing: ', sound);
+export function playSound(scene: Phaser.Scene, sound: EGameSounds | EUiSounds): void {
   scene.sound.play(sound);
-  await pauseCode(scene, delay);
 }
 
+// Not used at the moment, could be useful when animations are added. Otherwise remove
 export function pauseCode(scene: Phaser.Scene, delay: number): Promise<void> {
   return new Promise(resolve => {
     scene.time.delayedCall(delay, resolve);

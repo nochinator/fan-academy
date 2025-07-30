@@ -135,7 +135,7 @@ export abstract class Item extends Phaser.GameObjects.Container {
     this.destroy(true);
   }
 
-  abstract use(target: any): Promise<void>;
+  abstract use(target: any): void;
 }
 
 export class ShiningHelm extends Item {
@@ -143,9 +143,9 @@ export class ShiningHelm extends Item {
     super(context, data);
   }
 
-  async use(target: Hero): Promise<void> {
+  use(target: Hero): void {
     target.equipShiningHelm(this.boardPosition);
-    playSound(this.scene, EGameSounds.ITEM_USE, 500);
+    playSound(this.scene, EGameSounds.ITEM_USE);
     this.removeFromGame();
   }
 }
@@ -155,9 +155,9 @@ export class RuneMetal extends Item {
     super(context, data);
   }
 
-  async use(target: Hero): Promise<void> {
+  use(target: Hero): void {
     target.equipRunemetal(this.boardPosition);
-    playSound(this.scene, EGameSounds.RUNE_METAL_USE, 500);
+    playSound(this.scene, EGameSounds.RUNE_METAL_USE);
 
     this.removeFromGame();
   }
@@ -168,9 +168,9 @@ export class SuperCharge extends Item {
     super(context, data);
   }
 
-  async use(target: Hero): Promise<void> {
+  use(target: Hero): void {
     target.equipSuperCharge(this.boardPosition);
-    playSound(this.scene, EGameSounds.SCROLL_USE, 500);
+    playSound(this.scene, EGameSounds.SCROLL_USE);
 
     this.removeFromGame();
   }

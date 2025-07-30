@@ -635,7 +635,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     gameController.afterAction(EActionType.MOVE, startTile.boardPosition, targetTile.boardPosition);
   }
 
-  async spawn(tile: Tile): Promise<void> {
+  spawn(tile: Tile): void {
     const startingPosition = this.boardPosition;
     const gameController = this.context.gameController!;
 

@@ -42,7 +42,7 @@ export class Archer extends Human {
     super(context, data, tile);
   }
 
-  async attack(target: Hero | Crystal): Promise<void> {
+  attack(target: Hero | Crystal): void {
     this.flashActingUnit();
 
     const distance = this.getDistanceToTarget(target);
@@ -56,18 +56,18 @@ export class Archer extends Human {
         target.isKO &&
         isEnemySpawn(this.context, target.getTile())
       ) {
-        playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE, 500);
+        playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
 
         target.removeFromGame();
       } else {
-        playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE, 500);
+        playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
 
         target.getsDamaged(this.getTotalPower(0.5), this.attackType);
         this.removeAttackModifiers();
       }
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK_BIG, 750);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK, 650);
+      if (this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK_BIG);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK);
 
       target.getsDamaged(this.getTotalPower(), this.attackType);
       this.removeAttackModifiers();
@@ -98,11 +98,11 @@ export class Knight extends Human {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      playSound(this.scene, EGameSounds.KNIGHT_ATTACK, 500);
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.KNIGHT_ATTACK_BIG, 750);
-      if (!this.superCharge)playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE, 650);
+      if (this.superCharge) playSound(this.scene, EGameSounds.KNIGHT_ATTACK_BIG);
+      if (!this.superCharge)playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
 
       target.getsDamaged(this.getTotalPower(), this.attackType);
 
@@ -124,7 +124,7 @@ export class Wizard extends Human {
     super(context, data, tile);
   }
 
-  async attack(target: Hero | Crystal): Promise<void> {
+  attack(target: Hero | Crystal): void {
     this.flashActingUnit();
 
     const gameController = this.context.gameController!;
@@ -139,11 +139,11 @@ export class Wizard extends Human {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      playSound(this.scene, EGameSounds.WIZARD_ATTACK, 650);
+      playSound(this.scene, EGameSounds.WIZARD_ATTACK);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK, 750);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK_BIG, 750);
+      if (this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK_BIG);
 
       // Get directions for finding out the next targets
       const attackDirection = gameController.board.getAttackDirection(this.boardPosition, target.boardPosition);
@@ -270,7 +270,7 @@ export class Ninja extends Human {
     super(context, data, tile);
   }
 
-  async attack(target: Hero | Crystal): Promise<void> {
+  attack(target: Hero | Crystal): void {
     this.flashActingUnit();
 
     turnIfBehind(this.context, this, target);
@@ -278,8 +278,8 @@ export class Ninja extends Human {
     const distance = this.getDistanceToTarget(target);
 
     const ninjaAttackSound = () => {
-      if (this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK_BIG, 750);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK, 300);
+      if (this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK_BIG);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK);
     };
 
     if (distance === 1) {
@@ -289,7 +289,7 @@ export class Ninja extends Human {
         target.isKO &&
         isEnemySpawn(this.context, target.getTile())
       ) {
-        playSound(this.scene, EGameSounds.NINJA_ATTACK, 500);
+        playSound(this.scene, EGameSounds.NINJA_ATTACK);
         target.removeFromGame();
       } else {
         ninjaAttackSound();
@@ -306,8 +306,8 @@ export class Ninja extends Human {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  async teleport(target: Hero): Promise<void> {
-    playSound(this.scene, EGameSounds.NINJA_SMOKE, 750);
+  teleport(target: Hero): void {
+    playSound(this.scene, EGameSounds.NINJA_SMOKE);
     const targetDestination = this.getTile();
     const unitDestination = target.getTile();
 
@@ -334,7 +334,7 @@ export class Cleric extends Human {
     super(context, data, tile);
   }
 
-  async attack(target: Hero | Crystal): Promise<void> {
+  attack(target: Hero | Crystal): void {
     this.flashActingUnit();
 
     turnIfBehind(this.context, this, target);
@@ -347,11 +347,11 @@ export class Cleric extends Human {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK, 300);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK_BIG, 750);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK, 300);
+      if (this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK_BIG);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK);
       target.getsDamaged(this.getTotalPower(), this.attackType);
       this.removeAttackModifiers();
     }
@@ -360,11 +360,11 @@ export class Cleric extends Human {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  async heal(target: Hero): Promise<void> {
+  heal(target: Hero): void {
     this.flashActingUnit();
 
-    if (!this.superCharge) playSound(this.scene, EGameSounds.HEAL, 750);
-    if (this.superCharge)  playSound(this.scene, EGameSounds.HEAL_EXTRA, 750);
+    if (!this.superCharge) playSound(this.scene, EGameSounds.HEAL);
+    if (this.superCharge)  playSound(this.scene, EGameSounds.HEAL_EXTRA);
 
     turnIfBehind(this.context, this, target);
 
@@ -389,7 +389,7 @@ export class DragonScale extends Item {
     super(context, data);
   }
 
-  async use(target: Hero): Promise<void> {
+  use(target: Hero): void {
     target.equipFactionBuff(this.boardPosition);
     this.removeFromGame();
   }
@@ -400,8 +400,8 @@ export class HealingPotion extends Item {
     super(context, data);
   }
 
-  async use(target: Hero): Promise<void> {
-    playSound(this.scene, EGameSounds.POTION_USE, 1000);
+  use(target: Hero): void {
+    playSound(this.scene, EGameSounds.POTION_USE);
 
     const potionImage = this.scene.add.image(target.x, target.y - 10, 'healingPotion').setDepth(100);
     useAnimation(potionImage);
@@ -420,10 +420,10 @@ export class Inferno extends Item {
     super(context, data);
   };
 
-  async use(targetTile: Tile): Promise<void> {
+  use(targetTile: Tile): void {
     const infernoImage = this.scene.add.image(targetTile.x, targetTile.y, 'infernoShockWave').setDepth(100);
     useAnimation(infernoImage, 3);
-    playSound(this.scene, EGameSounds.INFERNO_USE, 500);
+    playSound(this.scene, EGameSounds.INFERNO_USE);
 
     // Damages enemy units and crystals, and removes enemy KO'd units
     const damage = 350;

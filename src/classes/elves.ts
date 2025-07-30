@@ -59,11 +59,11 @@ export class Impaler extends DarkElf {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      playSound(this.scene, EGameSounds.IMPALER_ATTACK_MELEE, 750);
+      playSound(this.scene, EGameSounds.IMPALER_ATTACK_MELEE);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.IMPALER_ATTACK_BIG, 1000);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.IMPALER_ATTACK, 1000);
+      if (this.superCharge) playSound(this.scene, EGameSounds.IMPALER_ATTACK_BIG);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.IMPALER_ATTACK);
     }
     const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
 
@@ -86,14 +86,14 @@ export class VoidMonk extends DarkElf {
     super(context, data, tile);
   }
 
-  async attack(target: Hero | Crystal): Promise<void> {
+  attack(target: Hero | Crystal): void {
     this.flashActingUnit();
     turnIfBehind(this.context, this, target);
 
     const splashedEnemies: (Hero | Crystal)[] = [];
 
-    if (this.superCharge)  playSound(this.scene, EGameSounds.VOIDMONK_ATTACK_BIG, 1000);
-    if (!this.superCharge)  playSound(this.scene, EGameSounds.VOIDMONK_ATTACK, 650);
+    if (this.superCharge) playSound(this.scene, EGameSounds.VOIDMONK_ATTACK_BIG);
+    if (!this.superCharge) playSound(this.scene, EGameSounds.VOIDMONK_ATTACK);
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -178,7 +178,7 @@ export class Necromancer extends DarkElf {
     super(context, data, tile);
   }
 
-  async attack(target: Hero | Crystal): Promise<void> {
+  attack(target: Hero | Crystal): void {
     this.flashActingUnit();
 
     turnIfBehind(this.context, this, target);
@@ -186,7 +186,7 @@ export class Necromancer extends DarkElf {
     if (target instanceof Hero && target.isKO) {
       const tile = target.getTile();
 
-      playSound(this.scene, EGameSounds.PHANTOM_SPAWN, 1500);
+      playSound(this.scene, EGameSounds.PHANTOM_SPAWN);
 
       const phantom = new Phantom(this.context, createElvesPhantomData({
         unitId: `${this.context.userId}_phantom_${generateFourDigitId()}`,
@@ -205,8 +205,8 @@ export class Necromancer extends DarkElf {
 
       return;
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK_BIG, 1000);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK, 1000);
+      if (this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK_BIG);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK);
     }
 
     const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
@@ -228,7 +228,7 @@ export class Priestess extends DarkElf {
     super(context, data, tile);
   }
 
-  async attack(target: Hero | Crystal): Promise<void> {
+  attack(target: Hero | Crystal): void {
     this.flashActingUnit();
 
     turnIfBehind(this.context, this, target);
@@ -242,10 +242,10 @@ export class Priestess extends DarkElf {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      playSound(this.scene, EGameSounds.PRIESTESS_ATTACK, 500);
+      playSound(this.scene, EGameSounds.PRIESTESS_ATTACK);
       target.removeFromGame();
     } else {
-      playSound(this.scene, EGameSounds.PRIESTESS_ATTACK, 500);
+      playSound(this.scene, EGameSounds.PRIESTESS_ATTACK);
 
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
       ;
@@ -269,8 +269,8 @@ export class Priestess extends DarkElf {
   async heal(target: Hero): Promise<void> {
     this.flashActingUnit();
     turnIfBehind(this.context, this, target);
-    if (!this.superCharge) playSound(this.scene, EGameSounds.HEAL, 500);
-    if (this.superCharge)  playSound(this.scene, EGameSounds.HEAL_EXTRA, 750);
+    if (!this.superCharge) playSound(this.scene, EGameSounds.HEAL);
+    if (this.superCharge)  playSound(this.scene, EGameSounds.HEAL_EXTRA);
 
     if (target.isKO) {
       const healingAmount = this.getTotalHealing(0.5);
@@ -293,13 +293,13 @@ export class Wraith extends DarkElf {
     super(context, data, tile);
   }
 
-  async attack(target: Hero | Crystal): Promise<void> {
+  attack(target: Hero | Crystal): void {
     this.flashActingUnit();
 
     turnIfBehind(this.context, this, target);
 
     if (target instanceof Hero && target.isKO) {
-      playSound(this.scene, EGameSounds.WRAITH_CONSUME, 1000);
+      playSound(this.scene, EGameSounds.WRAITH_CONSUME);
       target.removeFromGame(true);
 
       if (this.unitsConsumed < 3) {
@@ -310,8 +310,8 @@ export class Wraith extends DarkElf {
         this.updateTileData();
       }
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.WRAITH_ATTACK_BIG, 500);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.WRAITH_ATTACK, 100);
+      if (this.superCharge) playSound(this.scene, EGameSounds.WRAITH_ATTACK_BIG);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.WRAITH_ATTACK);
 
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
 
@@ -348,7 +348,7 @@ export class Phantom extends Hero {
 
     turnIfBehind(this.context, this, target);
 
-    playSound(this.scene, EGameSounds.WRAITH_ATTACK, 200);
+    playSound(this.scene, EGameSounds.WRAITH_ATTACK);
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -376,7 +376,7 @@ export class SoulStone extends Item {
     super(context, data);
   }
 
-  async use(target: Hero): Promise<void> {
+  use(target: Hero): void {
     target.equipFactionBuff(this.boardPosition);
     this.removeFromGame();
   }
@@ -387,8 +387,8 @@ export class ManaVial extends Item {
     super(context, data);
   }
 
-  async use(target: Hero): Promise<void> {
-    playSound(this.scene, EGameSounds.POTION_USE, 1000);
+  use(target: Hero): void {
+    playSound(this.scene, EGameSounds.POTION_USE);
     const potionImage = this.scene.add.image(target.x, target.y - 10, 'manaVial').setDepth(100);
     useAnimation(potionImage);
 
@@ -412,11 +412,11 @@ export class SoulHarvest extends Item {
     super(context, data);
   }
 
-  async use(targetTile: Tile): Promise<void> {
+  use(targetTile: Tile): void {
     const harvestIamge = this.scene.add.image(targetTile.x, targetTile.y - 20, 'soulHarvestShockWave').setDepth(100);
     useAnimation(harvestIamge);
 
-    playSound(this.scene, EGameSounds.USE_HARVEST, 500);
+    playSound(this.scene, EGameSounds.USE_HARVEST);
 
     const gameController = this.context.gameController;
 

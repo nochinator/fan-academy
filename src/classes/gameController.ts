@@ -172,7 +172,7 @@ export class GameController {
     } );
   }
 
-  async replaySpawnOrMove(action: ITurnAction, opponentHand: (Hero | Item)[]): Promise<void> {
+  replaySpawnOrMove(action: ITurnAction, opponentHand: (Hero | Item)[]): void {
     const actionTaken = action.action;
     const hand = opponentHand.length ? opponentHand : this.hand.hand;
 
@@ -182,8 +182,8 @@ export class GameController {
 
     if (!hero || !tile) throw new Error('Missing hero or tile in spawn or move action');
 
-    if (actionTaken === EActionType.MOVE) await hero.move(tile);
-    if (actionTaken === EActionType.SPAWN) await hero.setVisible(true).spawn(tile);
+    if (actionTaken === EActionType.MOVE) hero.move(tile);
+    if (actionTaken === EActionType.SPAWN) hero.setVisible(true).spawn(tile);
   };
 
   async replayAttackHealTeleport(action: ITurnAction): Promise<void> {
@@ -243,7 +243,7 @@ export class GameController {
   }
 
   drawUnits() {
-    playSound(this.context, EGameSounds.DRAW, 500);
+    playSound(this.context, EGameSounds.DRAW);
 
     const drawAmount = 6 - this.hand.getHandSize();
     if (this.deck.getDeckSize() === 0 || drawAmount === 0) return;
@@ -329,7 +329,7 @@ export class GameController {
 
     // Refresh actionPie, draw units and update door banner
     this.actionPie.resetActionPie();
-    const renderUnits = this.drawUnits();
+    this.drawUnits();
     this.door.updateBannerText();
 
     // Add the last action of the previous turn at index 0 of the actions array to serve as the base for the replay
@@ -338,12 +338,9 @@ export class GameController {
     this.context.activePlayer = this.context.opponentId;
     this.context.turnNumber!++;
 
-    playSound(this.context, EUiSounds.BUTTON_GENERIC);
     sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.gameOver);
 
     if (this.gameOver) this.gameOverEffects();
-
-    await renderUnits;
   }
 
   async gameOverEffects() {
