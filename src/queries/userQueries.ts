@@ -62,8 +62,6 @@ export async function signUpQuery(email: string, username: string, password: str
 
     const data = await response.json();
 
-    console.log('data', data);
-
     if (response.ok) {
       console.log('Successful sign up! :)');
 

@@ -754,8 +754,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   };
 
   specialTileCheck(targetTile: ETiles, currentTile?: ETiles): void {
-    console.log('target', targetTile);
-    console.log('current', currentTile);
     // If hero is leaving a special tile
     if (currentTile === ETiles.CRYSTAL_DAMAGE) {
       this.updateCrystals(false);

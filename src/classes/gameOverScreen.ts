@@ -19,7 +19,6 @@ export class GameOverScreen extends GameObjects.Container {
 
     let gameOverEffectKey: string;
     let gameOverImageKey: string;
-    console.log('gameOver', this.context.currentGame.gameOver);
     if (this.context.currentGame.gameOver?.winner === this.context.userId) {
       gameOverEffectKey = 'gameOverVictoryEffect';
       gameOverImageKey = 'gameOverVictoryText';
