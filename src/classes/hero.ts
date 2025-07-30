@@ -43,6 +43,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   canHeal: boolean;
   unitsConsumed: number;
   isDebuffed: boolean;
+  manaVial?: boolean;
 
   context: GameScene;
   unitCard: HeroCard;
@@ -111,6 +112,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.canHeal = data.canHeal ?? false;
     this.unitsConsumed = data.unitsConsumed ?? 0;
     this.isDebuffed = data.isDebuffed;
+    this.manaVial = data?.manaVial ?? undefined;
 
     this.unitCard = new HeroCard(context, {
       ...data,
@@ -320,7 +322,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       belongsTo: this.belongsTo,
       canHeal: this.canHeal,
       unitsConsumed: this.unitsConsumed,
-      isDebuffed: this.isDebuffed
+      isDebuffed: this.isDebuffed,
+      manaVial: this.manaVial
     };
   }
 

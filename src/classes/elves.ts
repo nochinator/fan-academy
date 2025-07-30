@@ -383,7 +383,13 @@ export class ManaVial extends Item {
     useAnimation(potionImage);
 
     if (target.isKO) return;
-    target.healAndIncreaseHealth(1000, 50);
+    if (target.manaVial) {
+      target.getsHealed(1000);
+    } else {
+      target.healAndIncreaseHealth(1000, 50);
+      target.manaVial = true;
+      target.updateTileData();
+    }
 
     this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
 
