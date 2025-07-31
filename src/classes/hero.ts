@@ -406,7 +406,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Show damage numbers
     if (totalDamage > 0) new FloatingText(this.context, this.x, this.y - 50, totalDamage.toString());
 
-    this.unitCard.updateCardHealth(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
     return totalDamage; // Return damage taken for lifesteal
@@ -471,7 +471,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     if (this.isKO) this.getsRevived();
 
-    this.unitCard.updateCardHealth(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
     return actualHealing;
@@ -504,7 +504,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Show healing numbers
     if (addText) new FloatingText(this.context, this.x, this.y - 50, amount.toString(), true);
 
-    this.unitCard.updateCardHealth(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
   }
 
@@ -707,7 +707,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.shiningHelmImage.setVisible(true);
     this.characterImage.setTexture(this.updateCharacterImage());
 
-    this.unitCard.updateCardMagicalResistance(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
@@ -723,7 +723,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.runeMetalImage.setVisible(true);
     this.characterImage.setTexture(this.updateCharacterImage());
 
-    this.unitCard.updateCardPower(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
@@ -732,7 +732,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   equipSuperCharge(handPosition: number): void {
     this.superCharge = true;
 
-    this.unitCard.updateCardPower(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
     this.superChargeAnim.setVisible(true);
@@ -850,7 +850,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.superCharge = false;
     this.superChargeAnim.setVisible(false);
 
-    this.unitCard.updateCardPower(this);
+    this.unitCard.updateCardData(this);
 
     const tile = this.getTile();
     tile.hero = this.exportData();

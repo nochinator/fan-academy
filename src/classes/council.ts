@@ -27,8 +27,7 @@ export abstract class Human extends Hero {
 
     this.increaseMaxHealth(this.baseHealth * 0.1);
 
-    this.unitCard.updateCardHealth(this);
-    this.unitCard.updateCardPhysicalResistance(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
     this.scene.sound.play(EGameSounds.SHIELD_TILE);

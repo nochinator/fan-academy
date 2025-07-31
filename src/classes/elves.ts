@@ -22,7 +22,7 @@ export abstract class DarkElf extends Hero {
     this.characterImage.setTexture(this.updateCharacterImage());
     this.increaseMaxHealth(this.baseHealth * 0.1);
 
-    this.unitCard.updateCardHealth(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
     playSound(this.scene, EGameSounds.ITEM_USE);
@@ -256,7 +256,7 @@ export class Priestess extends DarkElf {
         target.isDebuffed = true;
         target.debuffImage.setVisible(true);
         target.updateTileData();
-        target.unitCard.updateCardPower(target);
+        target.unitCard.updateCardData(target);
       }
 
       this.removeAttackModifiers();
@@ -306,8 +306,8 @@ export class Wraith extends DarkElf {
         this.basePower += 50;
         this.unitsConsumed++;
         this.increaseMaxHealth(100);
-        this.unitCard.updateCardHealth(this);
         this.updateTileData();
+        this.unitCard.updateCardData(this);
       }
     } else {
       if (this.superCharge) playSound(this.scene, EGameSounds.WRAITH_ATTACK_BIG);
