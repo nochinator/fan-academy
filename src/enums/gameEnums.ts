@@ -96,6 +96,8 @@ export enum ETiles {
   CRYSTAL_DAMAGE = 'crystalDamageTile',
   TELEPORTER = 'teleporterTile',
   CRYSTAL = 'crystal',
+  CRYSTAL_BIG = 'crystalBig',
+  CRYSTAL_SMALL = 'crystalSmall',
   SPAWN = 'spawnTile',
   SPEED = 'speedTile'
 }
@@ -158,7 +160,7 @@ export enum EGameSounds {
   SHIELD_SELECT = 'selectDragonScaleSound',
   ITEM_SELECT = 'selectItemGenericSound',
   POTION_SELECT = 'selectPotionSound',
-  AOE_SPELL_SELECT = 'selectFirebombSound',
+  AOE_SPELL_SELECT = 'selectInfernoSound',
 
   SCROLL_USE = 'useScrollSound',
   RUNE_METAL_USE = 'useRuneMetalSound',
@@ -197,7 +199,7 @@ export enum EGameSounds {
   WIZARD_ATTACK = 'wizardAttackSound',
   WIZARD_ATTACK_BIG = 'wizardAttackBigSound',
   WIZARD_DEATH = 'wizardDeathSound',
-  INFERNO_USE = 'useFirebombSound',
+  INFERNO_USE = 'useInfernoSound',
 
   // Elves sounds
   PRIESTESS_ATTACK = 'priestessAttackSound',

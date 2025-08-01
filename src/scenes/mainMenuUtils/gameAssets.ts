@@ -223,7 +223,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('wizardAttackSound', `${CDN_PATH}/audio/council/Civ_Wizard_Attack.mp3`);
   context.load.audio('wizardAttackBigSound', `${CDN_PATH}/audio/council/Civ_Human_Wizard_BigAttack.mp3`);
   context.load.audio('wizardDeathSound', `${CDN_PATH}/audio/council/Civ_Death_Wizard_Element.mp3`);
-  context.load.audio('selectFirebombSound', `${CDN_PATH}/audio/council/Game_FireBomb_Grab_Tile.mp3`);
+  context.load.audio('selectInfernoSound', `${CDN_PATH}/audio/council/Game_FireBomb_Grab_Tile.mp3`);
 
   // Elves specific audio
   context.load.audio('priestessAttackSound', `${CDN_PATH}/audio/elves/DE-Heretic_Attack_Curse.mp3`);

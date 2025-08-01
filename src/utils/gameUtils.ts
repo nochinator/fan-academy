@@ -237,7 +237,7 @@ export function getAOETiles(context: GameScene, spell: Item,  targetTile: Tile):
 
   const enemyHeroTiles = areaOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo !== spell.belongsTo);
 
-  const enemyCrystalTiles = areaOfEffect?.filter(tile => tile.tileType === ETiles.CRYSTAL && tile.crystal?.belongsTo !== spell.belongsTo);
+  const enemyCrystalTiles = areaOfEffect?.filter(tile => tile.crystal && tile.crystal?.belongsTo !== spell.belongsTo);
 
   return {
     enemyHeroTiles,

@@ -32,9 +32,7 @@ export class Board {
     tiles.forEach(tile => {
       const newTile = new Tile(this.context, tile);
       if (newTile.hero) this.units.push(createNewHero(this.context, newTile.hero, newTile));
-      if (newTile.crystal) {
-        this.crystals.push(new Crystal(this.context, newTile.crystal, tile));
-      }
+      if (newTile.crystal) this.crystals.push(new Crystal(this.context, newTile.crystal, tile));
       grid.push(newTile);
     });
 
