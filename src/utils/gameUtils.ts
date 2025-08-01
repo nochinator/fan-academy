@@ -462,13 +462,28 @@ export function useAnimation(image: GameObjects.Image, scale = 2): void {
   });
 }
 
-export function textAnimation(text: GameObjects.Text, scale = 2): Promise<void> {
+export function textAnimationSizeIncrease(text: GameObjects.Text, scale = 2): Promise<void> {
   return new Promise((resolve) => {
     text.scene.tweens.add({
       targets: text,
       scale,
       alpha: 50,
       duration: 1000,
+      onComplete: () => {
+        text.destroy();
+        resolve();
+      }
+    });
+  });
+}
+
+export function textAnimationFadeOut(text: GameObjects.Text, duration = 1000): Promise<void> {
+  return new Promise((resolve) => {
+    text.scene.tweens.add({
+      targets: text,
+      alpha: 0,
+      duration,
+      ease: 'Linear',
       onComplete: () => {
         text.destroy();
         resolve();

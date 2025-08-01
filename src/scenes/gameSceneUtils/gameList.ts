@@ -3,7 +3,7 @@ import { createGame } from "../../colyseus/colyseusGameRoom";
 import { sendDeletedGameMessage } from "../../colyseus/colyseusLobbyRoom";
 import { EChallengePopup, EFaction, EGameStatus, EUiSounds } from "../../enums/gameEnums";
 import { IGame, IPlayerData } from "../../interfaces/gameInterface";
-import { textAnimation, truncateText } from "../../utils/gameUtils";
+import { textAnimationFadeOut, truncateText } from "../../utils/gameUtils";
 import { timeAgo } from "../../utils/timeAgo";
 import UIScene from "../ui.scene";
 import { accessGame } from "./gameMenuUI";
@@ -182,7 +182,7 @@ export async function createGameList(context: UIScene) {
   const openGameLimitText = () => {
     return context.add.text(300, 350, `You have reached the max amount of open games`, {
       fontFamily: "proLight",
-      fontSize: 50,
+      fontSize: 60,
       color: '#fffb00'
     }).setDepth(999);
   };
@@ -192,7 +192,7 @@ export async function createGameList(context: UIScene) {
     if (context.activeGamesAmount >= context.activeGamesAmountLimit) {
       console.log('Reached game cap');
       const openGameLimitReached = openGameLimitText();
-      textAnimation(openGameLimitReached, 1.2);
+      textAnimationFadeOut(openGameLimitReached, 3000);
       return;
     }
     // Create the faction's deck and starting hand

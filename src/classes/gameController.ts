@@ -3,7 +3,7 @@ import { EActionClass, EActionType, EGameSounds, EGameStatus, EHeroes, ETiles, E
 import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
-import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, playSound, textAnimation, visibleUnitCardCheck } from "../utils/gameUtils";
+import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, playSound, textAnimationSizeIncrease, visibleUnitCardCheck } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -224,7 +224,7 @@ export class GameController {
     }).setDepth(999);
     playSound(this.context, EGameSounds.SHUFFLE);
 
-    await textAnimation(shuffleText, 1.3);
+    await textAnimationSizeIncrease(shuffleText, 1.3);
   }
 
   async resetTurn() {

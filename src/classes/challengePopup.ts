@@ -1,10 +1,10 @@
-import { EChallengePopup, EFaction, EUiSounds } from "../enums/gameEnums";
 import { sendChallengeAcceptedMessage } from "../colyseus/colyseusLobbyRoom";
+import { EChallengePopup, EFaction, EUiSounds } from "../enums/gameEnums";
 import { newGameChallenge } from "../queries/gameQueries";
+import GameScene from "../scenes/game.scene";
 import LeaderboardScene from "../scenes/leaderboard.scene";
 import UIScene from "../scenes/ui.scene";
-import { playSound, truncateText } from "../utils/gameUtils";
-import GameScene from "../scenes/game.scene";
+import { playSound, textAnimationFadeOut, truncateText } from "../utils/gameUtils";
 
 const challengePopupCoordinates = {
   x: 800,
@@ -64,7 +64,19 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
       context.sound.play(EUiSounds.BUTTON_GENERIC);
 
       this.setVisible(false);
-      if (challengeType === EChallengePopup.SEND) await newGameChallenge(context.userId, faction, opponentId);
+      if (challengeType === EChallengePopup.SEND) {
+        const result = await newGameChallenge(context.userId, faction, opponentId);
+        if (!result) {
+          const openGameLimitText = () => {
+            return context.add.text(200, 350, `A player has reached the max amount of open games`, {
+              fontFamily: "proLight",
+              fontSize: 60,
+              color: '#fffb00'
+            }).setDepth(999);
+          };
+          textAnimationFadeOut(openGameLimitText(), 3000);
+        }
+      }
 
       if (challengeType === EChallengePopup.ACCEPT && context instanceof UIScene) sendChallengeAcceptedMessage(context.lobbyRoom!, gameId!, context.userId, faction);
     };
