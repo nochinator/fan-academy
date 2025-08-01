@@ -32,6 +32,8 @@ export async function connectToGameLobby(client: Client, userId: string, context
 
       context.gameList?.push(message.game);
 
+      context.activeGamesAmount++;
+
       await createGameList(context);
     });
 
@@ -101,6 +103,8 @@ export async function connectToGameLobby(client: Client, userId: string, context
 
       context.gameList = [...unfinishedGames ?? [], ...finishedGames ?? []];
 
+      context.activeGamesAmount--;
+
       await createGameList(context);
 
       if (message.gameId === context.currentRoom?.roomId) {
@@ -143,6 +147,8 @@ export async function connectToGameLobby(client: Client, userId: string, context
           if (game?.length && context.currentRoom?.roomId === game[0]._id) context.scene.get('GameScene').scene.stop();
         }
       });
+
+      context.activeGamesAmount--;
 
       await createGameList(context);
       console.log('Games removed from list');

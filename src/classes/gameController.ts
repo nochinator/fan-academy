@@ -221,7 +221,7 @@ export class GameController {
       fontFamily: "proLight",
       fontSize: 50,
       color: '#fffb00'
-    });
+    }).setDepth(999);
     playSound(this.context, EGameSounds.SHUFFLE);
 
     await textAnimation(shuffleText, 1.3);

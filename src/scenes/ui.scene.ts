@@ -25,6 +25,10 @@ export default class UIScene extends Phaser.Scene {
   activeGameImage: Phaser.GameObjects.Image | undefined;
   activeGameImageId: string | undefined;
 
+  // There is limit of 50 active games per player. Games currently playing, searching for players and open challenges all count towards the limit
+  activeGamesAmountLimit = 50;
+  activeGamesAmount = 0;
+
   constructor() {
     super({ key: 'UIScene' });
     this.colyseusClient = new Client(`${import.meta.env.VITE_SOCKET}`);

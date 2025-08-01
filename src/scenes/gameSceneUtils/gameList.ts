@@ -3,7 +3,7 @@ import { createGame } from "../../colyseus/colyseusGameRoom";
 import { sendDeletedGameMessage } from "../../colyseus/colyseusLobbyRoom";
 import { EChallengePopup, EFaction, EGameStatus, EUiSounds } from "../../enums/gameEnums";
 import { IGame, IPlayerData } from "../../interfaces/gameInterface";
-import { truncateText } from "../../utils/gameUtils";
+import { textAnimation, truncateText } from "../../utils/gameUtils";
 import { timeAgo } from "../../utils/timeAgo";
 import UIScene from "../ui.scene";
 import { accessGame } from "./gameMenuUI";
@@ -34,6 +34,9 @@ export async function createGameList(context: UIScene) {
     }
     if (game.status === EGameStatus.FINISHED) listFinishedArray.push(game);
   });
+
+  // Update game limit
+  context.activeGamesAmount = listPlayerTurnArray.length + listOpponentTurnArray.length + listSearchingArray.length + listChallengeReceivedArray.length + listChallengeSentArray.length;
 
   // Update the browser tab title if the player has games pending action
   if (listPlayerTurnArray.length || listChallengeReceivedArray.length) {
@@ -176,29 +179,35 @@ export async function createGameList(context: UIScene) {
   const councilEmblem = context.add.image(380, lastListItemY, EFaction.COUNCIL).setOrigin(0).setScale(0.5).setInteractive({ useHandCursor: true });
   const elvesEmblem = context.add.image(530, lastListItemY, EFaction.DARK_ELVES).setOrigin(0).setScale(0.5).setInteractive({ useHandCursor: true });
 
+  const openGameLimitText = () => {
+    return context.add.text(300, 350, `You have reached the max amount of open games`, {
+      fontFamily: "proLight",
+      fontSize: 50,
+      color: '#fffb00'
+    }).setDepth(999);
+  };
+
   // Creating a new game when clicking on the desired faction
-  councilEmblem.on('pointerdown', async () => {
+  const createNewGame = async (faction: EFaction) => {
+    if (context.activeGamesAmount >= context.activeGamesAmountLimit) {
+      console.log('Reached game cap');
+      const openGameLimitReached = openGameLimitText();
+      textAnimation(openGameLimitReached, 1.2);
+      return;
+    }
     // Create the faction's deck and starting hand
     if (context.userId) {
       context.sound.play(EUiSounds.BUTTON_PLAY);
-      await createGame(context, EFaction.COUNCIL);
+      await createGame(context, faction);
       await context.currentRoom?.leave();
       context.currentRoom = undefined;
     } else {
       console.error('No userId when creating a new game');
     }
-  });
-  elvesEmblem.on('pointerdown', async () => {
-    // Create the faction's deck and starting hand
-    if (context.userId) {
-      context.sound.play(EUiSounds.BUTTON_PLAY);
-      await createGame(context, EFaction.DARK_ELVES);
-      await context.currentRoom?.leave();
-      context.currentRoom = undefined;
-    } else {
-      console.error('No userId when creating a new game');
-    }
-  });
+  };
+
+  councilEmblem.on('pointerdown', async () => await createNewGame(EFaction.COUNCIL));
+  elvesEmblem.on('pointerdown', async () => await createNewGame(EFaction.DARK_ELVES));
 
   lastListItemY += 150;
 
