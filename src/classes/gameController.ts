@@ -217,14 +217,14 @@ export class GameController {
   }
 
   async replayShuffle(): Promise<void> {
-    const testText = this.context.add.text(600, 350, 'OPPONENT SWAPPED AN ITEM!', {
+    const shuffleText = this.context.add.text(600, 350, 'OPPONENT SWAPPED AN ITEM!', {
       fontFamily: "proLight",
       fontSize: 50,
       color: '#fffb00'
     });
     playSound(this.context, EGameSounds.SHUFFLE);
 
-    await textAnimation(testText, 1.3);
+    await textAnimation(shuffleText, 1.3);
   }
 
   async resetTurn() {
