@@ -64,7 +64,7 @@ npm install
 Create a `.env` file in the project root. Example:
 ```env
 VITE_BE_URL=https://fan-academy-be.onrender.com
-VITE_SOCKET=https://fan-academy-be.onrender.com
+VITE_SOCKET=wss://fan-academy-be.onrender.com
 ```
 You can copy and rename `.env.example` as `.env`:
 ```sh
