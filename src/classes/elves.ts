@@ -158,15 +158,47 @@ export class VoidMonk extends DarkElf {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  getOffsetTiles(_target: number, attackDirection: number): number[] {
-    // Direction can only be 1, 3, 5 or 7
+  getOffsetTiles(targetBoardPosition: number, attackDirection: number): number[] {
+    const boardWidth = 9;
+    let offsets: number[] = [];
+
     switch (attackDirection) {
-      case 1: return [-1, 1, -9];
-      case 3: return [-9, 1, 9];
-      case 5: return [-1, 1, 9];
-      case 7: return [-9, -1, 9];
-      default: return [];
+      case 1: // Attacking from top
+      case 5: // Attacking from bottom
+        offsets = [-1, 1, (attackDirection === 1 ? -9 : 9)];
+        break;
+      case 3: // Attacking from left
+      case 7: // Attacking from right
+        offsets = [-9, 9, (attackDirection === 3 ? 1 : -1)];
+        break;
+      default:
+        return [];
     }
+
+    const isTargetOnLeftEdge = targetBoardPosition % boardWidth === 0;
+    const isTargetOnRightEdge = (targetBoardPosition + 1) % boardWidth === 0;
+    const isTargetOnTopRow = targetBoardPosition < boardWidth;
+    const isTargetOnBottomRow = targetBoardPosition >= (5 * boardWidth) - boardWidth;
+
+    return offsets.filter(offset => {
+      // Check for horizontal wrap-around
+      if (isTargetOnLeftEdge && (offset === -1)) {
+        return false;
+      }
+      if (isTargetOnRightEdge && (offset === 1)) {
+        return false;
+      }
+
+      // Check for vertical wrap-around
+      if (isTargetOnTopRow && offset === -9) {
+        return false;
+      }
+      if (isTargetOnBottomRow && offset === 9) {
+        return false;
+      }
+
+      return true;
+    });
   }
 
   heal(_target: Hero): void {};
