@@ -227,22 +227,28 @@ export class Wizard extends Human {
   }
 
   getAdjacentEnemyTiles(boardPosition: number, ignorePosition: number[] = []): Tile[] {
-    const adjacentBoardPositions = [-10, -9, -8, -1, +1, +8, +9, +10];
-
+    const adjacentOffsets = [-10, -9, -8, -1, +1, +8, +9, +10];
     const adjacentTiles: Tile[] = [];
+    const boardWidth = 9;
 
-    adjacentBoardPositions.forEach(adjacentBp => {
-      const tilePosition = boardPosition + adjacentBp;
+    const isOnLeftEdge = boardPosition % boardWidth === 0;
+    const isOnRightEdge = (boardPosition + 1) % boardWidth === 0;
 
-      if (isOnBoard(tilePosition)) {
+    for (const offset of adjacentOffsets) {
+      if ((isOnLeftEdge && (offset === -1 || offset === -10 || offset === +8)) ||
+          (isOnRightEdge && (offset === +1 || offset === -8 || offset === +10))) {
+        continue;
+      }
+
+      const tilePosition = boardPosition + offset;
+
+      if (isOnBoard(tilePosition) && !ignorePosition.includes(tilePosition)) {
         const tile = this.context.gameController!.board.getTileFromBoardPosition(tilePosition);
-
-        if (canBeAttacked(this, tile) &&
-        !ignorePosition.includes(tile.boardPosition)) {
+        if (canBeAttacked(this, tile)) {
           adjacentTiles.push(tile);
-        }}
-    });
-
+        }
+      }
+    }
     return adjacentTiles;
   }
 
