@@ -42,7 +42,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.maxHealth = data.maxHealth;
     this.currentHealth = data.currentHealth;
     this.isDestroyed = data.isDestroyed;
-    this.isLastCrystal = data.isLastCrystal;
+    this.isLastCrystal = tile.tileType === ETiles.CRYSTAL_BIG ? true : data.isLastCrystal;
     this.boardPosition = data.boardPosition;
     this.row = tile.row;
     this.col = tile.col;
@@ -211,11 +211,13 @@ export class Crystal extends Phaser.GameObjects.Container {
         winner: this.context.activePlayer!
       };
     } else {
-      const otherCrystal = crystalArray.find(crystal => crystal.belongsTo === this.belongsTo);
-      if (!otherCrystal) throw new Error('Crystal getsDestroyed() No other crystal found');
+      const otherCrystals = crystalArray.filter(crystal => crystal.belongsTo === this.belongsTo);
+      if (!otherCrystals.length) throw new Error('Crystal getsDestroyed() No other crystals found');
 
-      otherCrystal.isLastCrystal = true;
-      otherCrystal.updateTileData();
+      if (otherCrystals.length === 1) {
+        otherCrystals[0].isLastCrystal = true;
+        otherCrystals[0].updateTileData();
+      }
     }
 
     // Remove animations
