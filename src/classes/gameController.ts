@@ -450,9 +450,8 @@ export class GameController {
       return;
     }
 
-    if (!target.isKO) {
-      target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
-    }
+    if (!target.isKO) target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
+
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);
@@ -484,9 +483,7 @@ export class GameController {
       return;
     }
 
-    if (!target.isKO) {
-      target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
-    }
+    if (!target.isKO) target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
 
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
