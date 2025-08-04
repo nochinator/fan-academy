@@ -187,7 +187,7 @@ export class Board {
   highlightTeleportOptions(hero: Hero) {
     // Teleporting tile
     if (hero.getTile().tileType === ETiles.TELEPORTER) {
-      const teleportTiles: Tile[] = this.tiles.filter(tile => tile.tileType === ETiles.TELEPORTER);
+      const teleportTiles: Tile[] = this.tiles.filter(tile => tile.tileType === ETiles.TELEPORTER && (!tile.hero || tile.hero.isKO));
       this.highlightTiles(teleportTiles);
     }
 
@@ -283,8 +283,9 @@ export class Board {
         if (
           rangeType === ERange.MOVE &&
           !isEnemySpawn(this.context, tile) &&
-          (!tile.hero || tile.hero.isKO)
-        )  inRangeTiles.add(tile);
+          (!tile.hero || tile.hero.isKO) &&
+          !tile.crystal
+        ) inRangeTiles.add(tile);
 
         if (rangeType === ERange.ATTACK || rangeType === ERange.HEAL) {
           if (tile.crystal || tile.hero && tile.hero.unitId !== hero.unitId) inRangeTiles.add(tile);

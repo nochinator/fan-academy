@@ -42,7 +42,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.maxHealth = data.maxHealth;
     this.currentHealth = data.currentHealth;
     this.isDestroyed = data.isDestroyed;
-    this.isLastCrystal = data.isLastCrystal;
+    this.isLastCrystal = tile.tileType === ETiles.CRYSTAL_BIG ? true : data.isLastCrystal;
     this.boardPosition = data.boardPosition;
     this.row = tile.row;
     this.col = tile.col;
@@ -202,7 +202,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     const crystalArray = this.context.gameController!.board.crystals;
     const index = crystalArray.findIndex(crystal => crystal.boardPosition === this.boardPosition);
     crystalArray.splice(index, 1);
-
+    
     // Remove animations
     this.scene.tweens.killTweensOf(this);
 
