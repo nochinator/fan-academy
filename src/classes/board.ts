@@ -55,32 +55,39 @@ export class Board {
     return this.tiles.map(tile =>  tile.getTileData());
   }
 
-  setBoardState(boardState: any[]): void {
-    // Clear the existing board
-    this.units.forEach(unit => unit.removeFromGame(false));
-    this.crystals.forEach(crystal => crystal.removeFromGame(false));
-    this.tiles.forEach(tile => {
+setBoardState(boardState: any[]): void {
+  // remove all units and crystals from the board and the game state
+  const objectsToRemove: (Hero | Crystal)[] = []; 
+  this.units.forEach(unit => objectsToRemove.push(unit));
+  this.crystals.forEach(crystal => objectsToRemove.push(crystal));
+  objectsToRemove.forEach(object => object.removeFromGame(false));
+
+  // Reset the game's internal unit and crystal arrays
+  this.units = [];
+  this.crystals = [];
+  
+  // Rebuild the board from the saved state
+  boardState.forEach(tileData => {
+    const tile = this.getTileFromBoardPosition(tileData.boardPosition);
+    if (tile) {
+      // Clear any remaining state on the tile
       tile.removeHero();
       tile.removeCrystal();
-    });
-  
-    // Rebuild the board from the saved state
-    boardState.forEach(tileData => {
-      const tile = this.getTileFromBoardPosition(tileData.boardPosition);
-      if (tile) {
-        if (tileData.hero) {
-          const hero = createNewHero(this.context, tileData.hero);
-          hero.updatePosition(tile);
-          this.units.push(hero);
-          hero.specialTileCheck(tile.tileType, undefined, false);
-        }
-        if (tileData.crystal) {
-          const crystal = new Crystal(this.context, tileData.crystal, tile);
-          this.crystals.push(crystal);
-        }
+
+      if (tileData.hero) {
+        const hero = createNewHero(this.context, tileData.hero);
+        hero.updatePosition(tile);
+        this.units.push(hero);
+        hero.specialTileCheck(tile.tileType, undefined, false);
       }
-    });
-  }
+      if (tileData.crystal) {
+        const crystal = new Crystal(this.context, tileData.crystal, tile);
+        this.crystals.push(crystal);
+        tile.setCrystal(crystal); // Make sure the tile knows about the crystal
+      }
+    }
+  });
+}
 
   clearHighlights() {
     this.tiles.forEach(tile => tile.clearHighlight());

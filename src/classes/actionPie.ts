@@ -39,11 +39,18 @@ export class ActionPie extends Phaser.GameObjects.Container {
 
 
     this.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      console.log("pressed")
+      this.context.longPressStart = this.context.time.now;
+
       if (pointer.button === 2) {
         this.context.gameController!.resetTurn();
       } else if (pointer.button === 0) {
         this.context.gameController!.undoLastAction();
+      }
+    });
+    this.on('pointerup', () => {
+      // Check if a long press occurred
+      if (this.context.longPressStart && this.context.time.now - this.context.longPressStart > 500) {
+        this.context.gameController!.resetTurn();
       }
     });
 

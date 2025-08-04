@@ -387,7 +387,6 @@ export class GameController {
     
     this.board.setBoardState(state.boardState);
 
-    console.log(playerState);
     this.hand.importHandData(playerState!.factionData.unitsInHand);
     
     this.deck.setDeck(playerState!.factionData.unitsInDeck);

@@ -191,8 +191,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.currentHealth <= 0) this.removeFromGame();
   }
 
-  removeFromGame(board = true): void {
-
+  removeFromGame(permanent = true): void {
     const tile = this.getTile();
     tile.crystal = undefined;
     tile.obstacle = false;
@@ -214,7 +213,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.debuffEventSingle.remove(false);
     this.debuffEventDouble.remove(false);
 
-    if (board) {
+    if (permanent) {
       playSound(this.scene, EGameSounds.CRYSTAL_DESTROY);
 
       // Update the remaining crystal or set gameOver
