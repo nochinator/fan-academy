@@ -40,9 +40,9 @@ export class ActionPie extends Phaser.GameObjects.Container {
 
     this.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       console.log("pressed")
-      if (pointer.button === 0) {
+      if (pointer.button === 2) {
         this.context.gameController!.resetTurn();
-      } else if (pointer.button === 2) {
+      } else if (pointer.button === 0) {
         this.context.gameController!.undoLastAction();
       }
     });

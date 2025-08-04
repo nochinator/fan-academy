@@ -492,7 +492,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.lastBreath = false;
     this.characterImage.setTexture(this.updateCharacterImage());
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, false);
-    this.specialTileCheck(this.getTile().tileType, undefined, false);
+    this.specialTileCheck(this.getTile().tileType);
 
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
