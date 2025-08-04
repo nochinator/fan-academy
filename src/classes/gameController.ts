@@ -228,6 +228,7 @@ export class GameController {
   }
 
   async resetTurn() {
+    console.log("reset turn");
     deselectUnit(this.context);
     this.context.longPressStart = undefined;
     this.context.visibleUnitCard = undefined;
@@ -373,6 +374,43 @@ export class GameController {
 
   onTileClicked(tile: Tile) {
     console.log(`A tile ${tile.tileType} has been clicked`);
+  }
+
+  rebuildFromState(state: IGameState): void {
+    const { player, opponent } = getPlayersKey(this.context);
+    
+    const playerState = this.context.isPlayerOne ? state.player1 : state.player2;
+    this.context[player] = playerState;
+
+    const opponentState = this.context.isPlayerOne ? state.player2 : state.player1;
+    this.context[opponent] = opponentState;
+    
+    this.board.setBoardState(state.boardState);
+
+    console.log(playerState);
+    this.hand.importHandData(playerState!.factionData.unitsInHand);
+    
+    this.deck.setDeck(playerState!.factionData.unitsInDeck);
+    
+    this.context.currentTurnAction!--;
+  }
+
+  undoLastAction(): void {
+    playSound(this.context, EUiSounds.BUTTON_GENERIC);
+
+      if (this.currentTurn.length <= 0) {
+        return;
+      }
+
+      this.currentTurn.pop();
+    
+      // initial board state is stored in lastTurnState
+      const previousState = this.currentTurn[this.currentTurn.length - 1] ?? this.lastTurnState;
+    
+      this.rebuildFromState(previousState);
+    
+      this.actionPie.showActionSlice(this.context.currentTurnAction!);
+      if (this.context.activeUnit) deselectUnit(this.context);
   }
 
   afterAction(actionType: EActionType, activePosition: number, targetPosition?: number): void {

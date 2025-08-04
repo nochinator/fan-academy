@@ -55,6 +55,33 @@ export class Board {
     return this.tiles.map(tile =>  tile.getTileData());
   }
 
+  setBoardState(boardState: any[]): void {
+    // Clear the existing board
+    this.units.forEach(unit => unit.removeFromGame(false));
+    this.crystals.forEach(crystal => crystal.removeFromGame(false));
+    this.tiles.forEach(tile => {
+      tile.removeHero();
+      tile.removeCrystal();
+    });
+  
+    // Rebuild the board from the saved state
+    boardState.forEach(tileData => {
+      const tile = this.getTileFromBoardPosition(tileData.boardPosition);
+      if (tile) {
+        if (tileData.hero) {
+          const hero = createNewHero(this.context, tileData.hero);
+          hero.updatePosition(tile);
+          this.units.push(hero);
+          hero.specialTileCheck(tile.tileType, undefined, false);
+        }
+        if (tileData.crystal) {
+          const crystal = new Crystal(this.context, tileData.crystal, tile);
+          this.crystals.push(crystal);
+        }
+      }
+    });
+  }
+
   clearHighlights() {
     this.tiles.forEach(tile => tile.clearHighlight());
   }
