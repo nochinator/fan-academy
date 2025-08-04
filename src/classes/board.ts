@@ -160,12 +160,8 @@ export class Board {
   highlightTeleportOptions(hero: Hero) {
     // Teleporting tile
     if (hero.getTile().tileType === ETiles.TELEPORTER) {
-      const teleportTiles: Tile[] = this.tiles.filter(tile => tile.tileType === ETiles.TELEPORTER);
-      teleportTiles.forEach(tile => {
-        if (!tile.hero) {
-          this.highlightTiles([tile]);
-        }
-      });
+      const teleportTiles: Tile[] = this.tiles.filter(tile => tile.tileType === ETiles.TELEPORTER && (!tile.hero || tile.hero.isKO));
+      this.highlightTiles(teleportTiles);
     }
 
     // Ninja teleporting
@@ -262,7 +258,7 @@ export class Board {
           !isEnemySpawn(this.context, tile) &&
           (!tile.hero || tile.hero.isKO) &&
           !tile.crystal
-        )  inRangeTiles.add(tile);
+        ) inRangeTiles.add(tile);
 
         if (rangeType === ERange.ATTACK || rangeType === ERange.HEAL) {
           if (tile.crystal || tile.hero && tile.hero.unitId !== hero.unitId) inRangeTiles.add(tile);
