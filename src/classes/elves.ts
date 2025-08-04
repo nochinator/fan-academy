@@ -160,42 +160,29 @@ export class VoidMonk extends DarkElf {
 
   getOffsetTiles(targetBoardPosition: number, attackDirection: number): number[] {
     const boardWidth = 9;
-    let offsets: number[] = [];
+    const offsets: number[] = [];
 
     switch (attackDirection) {
-      case 1: // Attacking from top
-      case 5: // Attacking from bottom
-        offsets = [-1, 1, (attackDirection === 1 ? -9 : 9)];
-        break;
-      case 3: // Attacking from left
-      case 7: // Attacking from right
-        offsets = [-9, 9, (attackDirection === 3 ? 1 : -1)];
-        break;
-      default:
-        return [];
+      case 1: return [-1, 1, -9];
+      case 3: return [-9, 1, 9];
+      case 5: return [-1, 1, 9];
+      case 7: return [-9, -1, 9];
+      default: return [];
     }
 
     const isTargetOnLeftEdge = targetBoardPosition % boardWidth === 0;
     const isTargetOnRightEdge = (targetBoardPosition + 1) % boardWidth === 0;
     const isTargetOnTopRow = targetBoardPosition < boardWidth;
-    const isTargetOnBottomRow = targetBoardPosition >= (5 * boardWidth) - boardWidth;
+    const isTargetOnBottomRow = targetBoardPosition >= 5 * boardWidth - boardWidth;
 
     return offsets.filter(offset => {
       // Check for horizontal wrap-around
-      if (isTargetOnLeftEdge && (offset === -1)) {
-        return false;
-      }
-      if (isTargetOnRightEdge && (offset === 1)) {
-        return false;
-      }
+      if (isTargetOnLeftEdge && offset === -1) return false;
+      if (isTargetOnRightEdge && offset === 1) return false;
 
       // Check for vertical wrap-around
-      if (isTargetOnTopRow && offset === -9) {
-        return false;
-      }
-      if (isTargetOnBottomRow && offset === 9) {
-        return false;
-      }
+      if (isTargetOnTopRow && offset === -9) return false;
+      if (isTargetOnBottomRow && offset === 9) return false;
 
       return true;
     });
