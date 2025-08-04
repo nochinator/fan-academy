@@ -333,14 +333,22 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   private continuousEvent(image: Phaser.GameObjects.Image, textures: string[]): Phaser.Time.TimerEvent {
     let frame = 0;
 
-    return this.scene.time.addEvent({
+    const animationTimer = this.scene.time.addEvent({
       delay: 100, // milliseconds between frames
       loop: true,
       callback: () => {
-        image.setTexture(textures[frame]);
-        frame = (frame + 1) % textures.length;
+        // safety check to ensure there are never lingering animations
+        if (!image.scene) {
+          animationTimer.remove(false);
+          return;
+        } else {
+          image.setTexture(textures[frame]);
+          frame = (frame + 1) % textures.length;
+        }
       }
     });
+
+    return animationTimer
   };
 
   singleEvent(image: Phaser.GameObjects.Image, textures: string[], delay: number): Phaser.Time.TimerEvent {
@@ -484,7 +492,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.lastBreath = false;
     this.characterImage.setTexture(this.updateCharacterImage());
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, false);
-    this.specialTileCheck(this.getTile().tileType);
+    this.specialTileCheck(this.getTile().tileType, undefined, false);
 
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
@@ -559,6 +567,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   removeFromGame(board = true): void {
+    if (!this.scene) {
+      return;
+    }
+
     // Remove animations
     this.scene.tweens.killTweensOf(this);
 
@@ -584,6 +596,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Remove hero data from tile
     const tile = this.getTile();
     tile.removeHero();
+
 
     // Remove hero from board array
     const index = this.context.gameController!.board.units.findIndex(unit => unit.unitId === this.unitId);
@@ -749,7 +762,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     });
   };
 
-  specialTileCheck(targetTile: ETiles, currentTile?: ETiles): void {
+  specialTileCheck(targetTile: ETiles, currentTile?: ETiles, sound = true): void {
     // If hero is leaving a special tile
     if (currentTile === ETiles.CRYSTAL_DAMAGE) {
       this.updateCrystals(false);
@@ -776,26 +789,27 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (targetTile === ETiles.CRYSTAL_DAMAGE) {
       this.updateCrystals(true);
       this.crystalDebuffTileAnim.setVisible(true);
-      playSound(this.scene, EGameSounds.CRYSTAL_TILE);
+      if (sound) playSound(this.scene, EGameSounds.CRYSTAL_TILE);
     }
     if (targetTile === ETiles.POWER) {
       this.attackTile = true;
       this.powerTileAnim.setVisible(true);
-      playSound(this.scene, EGameSounds.SWORD_TILE);
+      if (sound) playSound(this.scene, EGameSounds.SWORD_TILE);
     }
     if (targetTile === ETiles.MAGICAL_RESISTANCE) {
       this.magicalDamageResistance += 20;
       this.magicalResistanceTileAnim.setVisible(true);
-      playSound(this.scene, EGameSounds.HELM_TILE);
+      if (sound) playSound(this.scene, EGameSounds.HELM_TILE);
     }
     if (targetTile === ETiles.PHYSICAL_RESISTANCE) {
       this.physicalDamageResistance += 20;
       this.physicalResistanceTileAnim.setVisible(true);
-      playSound(this.scene, EGameSounds.SHIELD_TILE);
+      if (sound) playSound(this.scene, EGameSounds.SHIELD_TILE);
     }
     if (targetTile === ETiles.SPEED) {
       this.speedTile = true;
       this.magicalResistanceTileAnim.setVisible(true); // Reusing the animation since it's basically the same color
+      if (sound) playSound(this.scene, EGameSounds.HELM_TILE);
     }
 
     this.unitCard.updateCardData(this);

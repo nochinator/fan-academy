@@ -59,4 +59,19 @@ export class Hand {
     if (this.hand.length === 0) return [];
     return this.hand.map(unit =>  unit.exportData());
   }
+
+  importHandData(handData: any[]): void {
+    this.hand.forEach(unit => unit.destroy());
+    this.hand = [];
+    handData.forEach(unitData => {
+      if (isHero(unitData)) {
+        const hero = createNewHero(this.context, unitData);
+        this.hand.push(hero);
+      }
+      if (isItem(unitData)) {
+        const item = createNewItem(this.context, unitData);
+        this.hand.push(item);
+      }
+    });
+  }
 }
