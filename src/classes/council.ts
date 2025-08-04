@@ -1,7 +1,7 @@
-import { EActionType, EAttackType, EHeroes } from "../enums/gameEnums";
+import { EActionType, EAttackType, EGameSounds, EHeroes } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, turnIfBehind, useAnimation } from "../utils/gameUtils";
+import { canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, playSound, turnIfBehind, useAnimation } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
@@ -14,6 +14,8 @@ export abstract class Human extends Hero {
   }
 
   equipFactionBuff(handPosition: number): void {
+    playSound(this.scene, EGameSounds.DRAGON_SCALE_USE);
+
     const dragonScaleImg = this.scene.add.image(this.x + 10, this.y - 10, 'dragonScale').setOrigin(0.5).setDepth(100);
     useAnimation(dragonScaleImg);
 
@@ -25,9 +27,10 @@ export abstract class Human extends Hero {
 
     this.increaseMaxHealth(this.baseHealth * 0.1);
 
-    this.unitCard.updateCardHealth(this);
-    this.unitCard.updateCardPhysicalResistance(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
+
+    this.scene.sound.play(EGameSounds.SHIELD_TILE);
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
@@ -37,6 +40,7 @@ export class Archer extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
+
   attack(target: Hero | Crystal): void {
     this.flashActingUnit();
 
@@ -51,19 +55,25 @@ export class Archer extends Human {
         target.isKO &&
         isEnemySpawn(this.context, target.getTile())
       ) {
+        playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
+
         target.removeFromGame();
       } else {
+        playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
+
         target.getsDamaged(this.getTotalPower(0.5), this.attackType);
         this.removeAttackModifiers();
       }
     } else {
+      if (this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK_BIG);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK);
+
       target.getsDamaged(this.getTotalPower(), this.attackType);
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
-
-    this.context.gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(_target: Hero): void {};
@@ -77,11 +87,9 @@ export class Knight extends Human {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
+
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
-
-    // Keep original position for replay purposes
-    const startingPosition = target.boardPosition;
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -89,18 +97,21 @@ export class Knight extends Human {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
       target.removeFromGame();
     } else {
+      if (this.superCharge) playSound(this.scene, EGameSounds.KNIGHT_ATTACK_BIG);
+      if (!this.superCharge)playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
+
       target.getsDamaged(this.getTotalPower(), this.attackType);
 
-      if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) await gameController.pushEnemy(this, target);
+      if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
 
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
-
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, startingPosition);
+    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(_target: Hero): void {};
@@ -111,8 +122,10 @@ export class Wizard extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
+
   attack(target: Hero | Crystal): void {
     this.flashActingUnit();
+
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
@@ -125,30 +138,34 @@ export class Wizard extends Human {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
+      playSound(this.scene, EGameSounds.WIZARD_ATTACK);
       target.removeFromGame();
     } else {
+      if (this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK_BIG);
+
       // Get directions for finding out the next targets
       const attackDirection = gameController.board.getAttackDirection(this.boardPosition, target.boardPosition);
       const opponentDirection = this.context.isPlayerOne ? [2, 3, 4] : [6, 7, 8];
 
-      // Get targets
+      // Collect all targets
       const secondTarget = this.getNextTarget(target, attackDirection, opponentDirection, gameController.board, false);
       let thirdTarget: Hero | Crystal | undefined;
       if (secondTarget) thirdTarget = this.getNextTarget(secondTarget, attackDirection, opponentDirection, gameController.board, false, [target.boardPosition, secondTarget.boardPosition]);
 
       // Apply damage to targets
       target.getsDamaged(this.getTotalPower(), this.attackType);
-      if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
-      if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
+      if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType, 0.75);
+      if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType, 0.56);
 
-      if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
-      if (secondTarget && secondTarget instanceof Hero && secondTarget.unitType === EHeroes.PHANTOM) secondTarget.removeFromGame();
-      if (thirdTarget && thirdTarget instanceof Hero && thirdTarget.unitType === EHeroes.PHANTOM) thirdTarget.removeFromGame();
+      if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+      if (secondTarget && secondTarget instanceof Hero && secondTarget.isKO && secondTarget.unitType === EHeroes.PHANTOM) secondTarget.removeFromGame();
+      if (thirdTarget && thirdTarget instanceof Hero && thirdTarget.isKO && thirdTarget.unitType === EHeroes.PHANTOM) thirdTarget.removeFromGame();
 
       this.removeAttackModifiers();
     }
 
-    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   getNextTarget(target: Hero | Crystal, attackDirection: number, opponentDirection: number[], board: Board, isLastTarget: boolean, toIgnore?: number[]): Hero | Crystal | undefined {
@@ -210,22 +227,26 @@ export class Wizard extends Human {
   }
 
   getAdjacentEnemyTiles(boardPosition: number, ignorePosition: number[] = []): Tile[] {
-    const adjacentBoardPositions = [-10, -9, -8, -1, +1, +8, +9, +10];
-
+    const adjacentOffsets = [-10, -9, -8, -1, +1, +8, +9, +10];
+    const leftOffset = [-10, -1, +8];
+    const rightOffset = [+10, +1, -8];
     const adjacentTiles: Tile[] = [];
+    const boardWidth = 9;
 
-    adjacentBoardPositions.forEach(adjacentBp => {
-      const tilePosition = boardPosition + adjacentBp;
+    const isOnLeftEdge = boardPosition % boardWidth === 0;
+    const isOnRightEdge = (boardPosition + 1) % boardWidth === 0;
 
-      if (isOnBoard(tilePosition)) {
+    for (const offset of adjacentOffsets) {
+      if (isOnLeftEdge && leftOffset.includes(offset) ||
+          isOnRightEdge && rightOffset.includes(offset)) continue;
+
+      const tilePosition = boardPosition + offset;
+
+      if (isOnBoard(tilePosition) && !ignorePosition.includes(tilePosition)) {
         const tile = this.context.gameController!.board.getTileFromBoardPosition(tilePosition);
-
-        if (canBeAttacked(this, tile) &&
-        !ignorePosition.includes(tile.boardPosition)) {
-          adjacentTiles.push(tile);
-        }}
-    });
-
+        if (canBeAttacked(this, tile)) adjacentTiles.push(tile);
+      }
+    }
     return adjacentTiles;
   }
 
@@ -251,12 +272,18 @@ export class Ninja extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
+
   attack(target: Hero | Crystal): void {
     this.flashActingUnit();
-    const gameController = this.context.gameController!;
+
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
+
+    const ninjaAttackSound = () => {
+      if (this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK_BIG);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK);
+    };
 
     if (distance === 1) {
       // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
@@ -265,23 +292,25 @@ export class Ninja extends Human {
         target.isKO &&
         isEnemySpawn(this.context, target.getTile())
       ) {
+        playSound(this.scene, EGameSounds.NINJA_ATTACK);
         target.removeFromGame();
       } else {
+        ninjaAttackSound();
         target.getsDamaged(this.getTotalPower(2), this.attackType);
         this.removeAttackModifiers();
-      }} else {
+      }
+    } else {
+      ninjaAttackSound();
       target.getsDamaged(this.getTotalPower(), this.attackType);
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
-
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   teleport(target: Hero): void {
-    const gameController = this.context.gameController!;
-
+    playSound(this.scene, EGameSounds.NINJA_SMOKE);
     const targetDestination = this.getTile();
     const unitDestination = target.getTile();
 
@@ -297,7 +326,7 @@ export class Ninja extends Human {
     this.updatePosition(unitDestination);
     unitDestination.hero = this.exportData();
 
-    gameController?.afterAction(EActionType.TELEPORT, targetDestination.boardPosition, unitDestination.boardPosition);
+    this.context.gameController!.afterAction(EActionType.TELEPORT, targetDestination.boardPosition, unitDestination.boardPosition);
   };
 
   heal(_target: Hero): void {};
@@ -307,47 +336,50 @@ export class Cleric extends Human {
   constructor(context: GameScene, data: IHero, tile?: Tile) {
     super(context, data, tile);
   }
+
   attack(target: Hero | Crystal): void {
     this.flashActingUnit();
-    const gameController = this.context.gameController!;
 
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
 
-    if (distance === 1) {
-      // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
-      if (
-        target instanceof Hero &&
-        target.isKO &&
-        isEnemySpawn(this.context, target.getTile())
-      ) {
-        target.removeFromGame();
-      } else {
-        target.getsDamaged(this.getTotalPower(), this.attackType);
-        this.removeAttackModifiers();
-      }
+    if (
+      distance === 1 &&
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile())
+    ) {
+      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK);
+      target.removeFromGame();
     } else {
+      if (this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK_BIG);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK);
       target.getsDamaged(this.getTotalPower(), this.attackType);
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
-
-    gameController?.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(target: Hero): void {
     this.flashActingUnit();
+
+    if (!this.superCharge) playSound(this.scene, EGameSounds.HEAL);
+    if (this.superCharge)  playSound(this.scene, EGameSounds.HEAL_EXTRA);
+
     turnIfBehind(this.context, this, target);
 
     if (target.isKO) {
-      const healingAmount = this.getTotalHealing(this.basePower, 2);
+      const healingAmount = this.getTotalHealing(2);
       target.getsHealed(healingAmount);
     } else {
-      const healingAmount = this.getTotalHealing(this.basePower, 3);
+      const healingAmount = this.getTotalHealing(3);
       target.getsHealed(healingAmount);
     }
+
+    this.removeAttackModifiers();
 
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
@@ -372,15 +404,17 @@ export class HealingPotion extends Item {
   }
 
   use(target: Hero): void {
+    playSound(this.scene, EGameSounds.POTION_USE);
+
     const potionImage = this.scene.add.image(target.x, target.y - 10, 'healingPotion').setDepth(100);
     useAnimation(potionImage);
 
     const healingAmount = target.isKO ? 100 : 1000;
     target.getsHealed(healingAmount);
 
-    this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
-
     this.removeFromGame();
+
+    this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
   }
 }
 
@@ -392,6 +426,7 @@ export class Inferno extends Item {
   use(targetTile: Tile): void {
     const infernoImage = this.scene.add.image(targetTile.x, targetTile.y, 'infernoShockWave').setDepth(100);
     useAnimation(infernoImage, 3);
+    playSound(this.scene, EGameSounds.INFERNO_USE);
 
     // Damages enemy units and crystals, and removes enemy KO'd units
     const damage = 350;
@@ -399,7 +434,7 @@ export class Inferno extends Item {
     const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, this, targetTile);
 
     enemyHeroTiles?.forEach(tile => {
-      const hero = this.context.gameController?.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+      const hero = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
       if (!hero) throw new Error('Inferno use() hero not found');
 
       // Inferno removes KO'd enemy units
@@ -409,17 +444,18 @@ export class Inferno extends Item {
       }
 
       hero.getsDamaged(damage, EAttackType.MAGICAL);
+
+      if (hero && hero instanceof Hero && hero.unitType === EHeroes.PHANTOM) hero.removeFromGame();
     });
 
     enemyCrystalTiles.forEach(tile => {
-      const crystal = this.context.gameController?.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
+      const crystal = this.context.gameController!.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('Inferno use() crystal not found');
 
-      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage);
+      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage, EAttackType.MAGICAL);
     });
 
-    this.context.gameController?.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
-
     this.removeFromGame();
+    this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
   }
 }

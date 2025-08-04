@@ -32,9 +32,7 @@ export class Board {
     tiles.forEach(tile => {
       const newTile = new Tile(this.context, tile);
       if (newTile.hero) this.units.push(createNewHero(this.context, newTile.hero, newTile));
-      if (newTile.crystal) {
-        this.crystals.push(new Crystal(this.context, newTile.crystal, tile));
-      }
+      if (newTile.crystal) this.crystals.push(new Crystal(this.context, newTile.crystal, tile));
       grid.push(newTile);
     });
 
@@ -94,7 +92,6 @@ export class Board {
 
     tilesInRange.forEach(tile => {
       const target = tile.hero ? this.units.find(unit => unit.unitId === tile.hero!.unitId) : tile.crystal ? this.crystals.find(crystal => crystal.boardPosition === tile.crystal?.boardPosition) : undefined;
-      const userId = this.context.userId;
       if (!target) {
         console.error('No target found', tile.hero);
         return;
@@ -107,9 +104,10 @@ export class Board {
        *  -target is KO and active unit is a Necro or a Wraith
        *  -target is KO and standing on an enemy spawn, and hero is orthogonally adjacent
        */
+
       if (
-        tile.isEnemy(userId) && target instanceof Hero && !target.isKO ||
-        tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
+        target instanceof Crystal && target.belongsTo !== hero.belongsTo ||
+        target instanceof Hero && target.belongsTo !== hero.belongsTo && !target.isKO ||
         (hero.unitType === EHeroes.NECROMANCER || hero.unitType === EHeroes.WRAITH) && target instanceof Hero && target.isKO ||
         target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile())
       ) {
@@ -162,7 +160,7 @@ export class Board {
   highlightTeleportOptions(hero: Hero) {
     // Teleporting tile
     if (hero.getTile().tileType === ETiles.TELEPORTER) {
-      const teleportTiles: Tile[] = this.tiles.filter(tile => tile.tileType === ETiles.TELEPORTER);
+      const teleportTiles: Tile[] = this.tiles.filter(tile => tile.tileType === ETiles.TELEPORTER && (!tile.hero || tile.hero.isKO));
       this.highlightTiles(teleportTiles);
     }
 
@@ -209,20 +207,17 @@ export class Board {
   }
 
   removeReticles(): void {
-    this.tiles.forEach(tile => {
-      if (tile.hero || tile.crystal) {
-        const target = tile.hero ? this.units.find(unit => unit.unitId === tile.hero!.unitId) : tile.crystal ? this.crystals.find(crystal => crystal.boardPosition === tile.crystal?.boardPosition) : undefined;
+    this.units.forEach(unit => {
+      unit.attackReticle.setVisible(false);
+      unit.blockedLOS.setVisible(false);
 
-        if (!target) return;
+      unit.healReticle.setVisible(false);
+      unit.allyReticle.setVisible(false);
+    });
 
-        target.attackReticle.setVisible(false);
-        target.blockedLOS.setVisible(false);
-
-        if (target instanceof Hero) {
-          target.healReticle.setVisible(false);
-          target.allyReticle.setVisible(false);
-        }
-      }
+    this.crystals.forEach(crystal => {
+      crystal.attackReticle.setVisible(false);
+      crystal.blockedLOS.setVisible(false);
     });
   }
 
@@ -232,7 +227,7 @@ export class Board {
 
     switch (rangeType) {
       case ERange.MOVE:
-        range = hero.movement;
+        range = hero.speedTile ? hero.movement + 2 : hero.movement;
         break;
 
       case ERange.ATTACK:
@@ -261,8 +256,9 @@ export class Board {
         if (
           rangeType === ERange.MOVE &&
           !isEnemySpawn(this.context, tile) &&
-          (!tile.hero || tile.hero.isKO)
-        )  inRangeTiles.add(tile);
+          (!tile.hero || tile.hero.isKO) &&
+          !tile.crystal
+        ) inRangeTiles.add(tile);
 
         if (rangeType === ERange.ATTACK || rangeType === ERange.HEAL) {
           if (tile.crystal || tile.hero && tile.hero.unitId !== hero.unitId) inRangeTiles.add(tile);

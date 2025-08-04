@@ -40,3 +40,71 @@ This means:
 ### **Disclaimer for Third-Party Assets**
 
 This project includes proprietary assets from **Hero Academy**, which are the property of **Robot Entertainment**. These assets are used for educational and non-commercial purposes under the assumption of fair use for a fan project. **This license applies only to the code in this repository and not to the assets.** All rights to the proprietary assets remain with their respective owners.
+
+## Local Setup & Running Locally
+
+To run Fan Academy locally, follow these steps:
+
+### 1. Clone the repository
+```sh
+git clone https://github.com/Dan-DH/fan-academy.git
+cd fan-academy
+```
+
+### 2. Install dependencies
+```sh
+yarn install
+```
+Or, if you use npm:
+```sh
+npm install
+```
+
+### 3. Configure environment variables
+Create a `.env` file in the project root. Example:
+```env
+VITE_BE_URL=https://fan-academy-be.onrender.com
+VITE_SOCKET=wss://fan-academy-be.onrender.com
+```
+You can copy and rename `.env.example` as `.env`:
+```sh
+cp .env.example .env
+```
+
+- `VITE_BE_URL`: The backend API URL (in example: production backend)
+- `VITE_SOCKET`: The Colyseus socket server URL (in example: production backend)
+
+For local development, you may point these to your own backend/server if needed.
+
+### 4. Run the development server
+```sh
+yarn dev
+```
+Or:
+```sh
+npm run dev
+```
+
+The app will be available at [http://localhost:5173](http://localhost:5173) by default.
+
+### 5. Build for production
+```sh
+yarn build
+```
+Or:
+```sh
+npm run build
+```
+
+### 6. Preview the production build
+```sh
+yarn preview
+```
+Or:
+```sh
+npm run preview
+```
+
+---
+
+See `.env.example` for a template of required environment variables.

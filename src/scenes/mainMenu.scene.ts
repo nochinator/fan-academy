@@ -1,3 +1,5 @@
+import { EUiSounds } from "../enums/gameEnums";
+import { IUserPreferences } from "../interfaces/userInterface";
 import { authCheck, loginQuery, signUpQuery } from "../queries/userQueries";
 import { isValidPassword } from "../utils/playerUtils";
 import createMainMenuButton from "./mainMenuUtils/buttons";
@@ -6,6 +8,7 @@ import { CDN_PATH } from "./preloader.scene";
 export default class MainMenuScene extends Phaser.Scene {
   userId: string | undefined;
   gameList: string | undefined;
+  userPreferences: IUserPreferences | undefined;
 
   currentSubScene: string | undefined;
 
@@ -30,11 +33,18 @@ export default class MainMenuScene extends Phaser.Scene {
     // fonts
     this.load.font('proHeavy', '/fonts/BlambotFXProHeavyLowerCapsBB.woff', 'truetype');
     this.load.font('proLight', '/fonts/BlambotFXProLightBB.woff', 'truetype');
+
+    // sounds
+    this.load.audio('buttonFailedSound', `${CDN_PATH}/audio/ui/buttonFailed.mp3`);
+    this.load.audio('battleButtonSound', `${CDN_PATH}/audio/ui/battleButton.mp3`);
+    this.load.audio('buttonPressGenericSound', `${CDN_PATH}/audio/ui/buttonPressGeneric.mp3`);
   }
 
   async create() {
     // Auth check
-    this.userId = await authCheck();
+    const authCheckResult = await authCheck();
+
+    if (authCheckResult) this.updateUserPreferences(authCheckResult);
 
     // Background image
     const bg = this.add.image(0, 0, 'uiBackground').setOrigin (0);
@@ -78,6 +88,7 @@ export default class MainMenuScene extends Phaser.Scene {
       text: 'Profile',
       font: '70px proHeavy',
       callback: () => {
+        this.sound.play(EUiSounds.BUTTON_GENERIC);
         backgroundGameScreen.setVisible(true);
         menuImg.setVisible(false);
         if (this.currentSubScene) this.scene.stop(this.currentSubScene);
@@ -95,6 +106,7 @@ export default class MainMenuScene extends Phaser.Scene {
       text: 'Leaderboard',
       font: '70px proHeavy',
       callback: () => {
+        this.sound.play(EUiSounds.BUTTON_GENERIC);
         if (this.currentSubScene) this.scene.stop(this.currentSubScene);
         this.scene.launch('LeaderboardScene', { userId: this.userId });
         this.currentSubScene = 'LeaderboardScene';
@@ -110,6 +122,7 @@ export default class MainMenuScene extends Phaser.Scene {
       text: 'About',
       font: '70px proHeavy',
       callback: () => {
+        this.sound.play(EUiSounds.BUTTON_GENERIC);
         if (this.currentSubScene) this.scene.stop(this.currentSubScene);
         this.scene.launch('AboutScene');
         this.currentSubScene = 'AboutScene';
@@ -125,6 +138,7 @@ export default class MainMenuScene extends Phaser.Scene {
       text: 'Discord',
       font: '70px proHeavy',
       callback: () => {
+        this.sound.play(EUiSounds.BUTTON_GENERIC);
         window.open('https://discord.gg/pkfwDvKyxX');
       }
     });
@@ -138,6 +152,7 @@ export default class MainMenuScene extends Phaser.Scene {
       text: 'Play!',
       font: '130px proHeavy',
       callback: () => {
+        this.sound.play(EUiSounds.BUTTON_PLAY);
         if (this.currentSubScene) this.scene.stop(this.currentSubScene);
         this.scene.start('UIScene', { userId: this.userId });
         this.currentSubScene = 'UIScene';
@@ -154,6 +169,7 @@ export default class MainMenuScene extends Phaser.Scene {
       font: '70px proHeavy',
       tint: '0x990000',
       callback: async () => {
+        this.sound.play(EUiSounds.BUTTON_GENERIC);
         localStorage.removeItem('jwt');
         this.userId = undefined;
         document.title = 'Fan Academy';
@@ -164,6 +180,10 @@ export default class MainMenuScene extends Phaser.Scene {
 
     // Login and sign up forms. Only show if user is not authenticated
     this.createSignUpAndLoginForms(this.userId);
+  }
+
+  onShutdown() {
+    this.sound.stopAll();
   }
 
   /*
@@ -211,13 +231,18 @@ export default class MainMenuScene extends Phaser.Scene {
       if (loginUsernameInput.value && loginPasswordInput.value) {
         const result = await loginQuery(loginUsernameInput.value, loginPasswordInput.value);
         if (result.success) {
+          if (result.userData) this.updateUserPreferences(result.userData);
           loginForm.setVisible(false);
           blockingLayer.setVisible(false);
-          this.userId = result.userId;
+          this.sound.play(EUiSounds.BUTTON_GENERIC);
           console.log('UserId after login:', this.userId);
         }else {
+          this.sound.play(EUiSounds.BUTTON_FAILED);
           showFormError(loginError, result.error); // Show server error to user
         }
+      } else {
+        this.sound.play(EUiSounds.BUTTON_FAILED);
+        showFormError(loginError, 'Incorrect username or password.'); // Show server error to user
       }
     });
 
@@ -226,15 +251,18 @@ export default class MainMenuScene extends Phaser.Scene {
       hideFormError(signUpError);
 
       if (signUpPasswordInput.value !== signUpPasswordConfirm.value) {
+        this.sound.play(EUiSounds.BUTTON_FAILED);
         showFormError(signUpError, 'Passwords do not match');
         return;
       };
       if (!isValidPassword(signUpPasswordInput.value)) {
+        this.sound.play(EUiSounds.BUTTON_FAILED);
         showFormError(signUpError, 'Password must be at least 8 characters long and contain a letter and a number');
         return;
       };
 
       if(signUpUsernameInput.value.length > 20) {
+        this.sound.play(EUiSounds.BUTTON_FAILED);
         showFormError(signUpError, 'Username must be 20 characters or shorter');
         return;
       }
@@ -242,11 +270,13 @@ export default class MainMenuScene extends Phaser.Scene {
       if (signUpEmailInput.value && signUpUsernameInput.value && signUpPasswordInput.value) {
         const result = await signUpQuery(signUpEmailInput.value, signUpUsernameInput.value, signUpPasswordInput.value);
         if (result.success) {
+          if (result.userData) this.updateUserPreferences(result.userData);
           signUpForm.setVisible(false);
           blockingLayer.setVisible(false);
-          this.userId = result.userId;
+          this.sound.play(EUiSounds.BUTTON_GENERIC);
           console.log('UserId after sign up:', this.userId);
         } else {
+          this.sound.play(EUiSounds.BUTTON_FAILED);
           showFormError(signUpError, result.error); // Show server error to user
         }
       }
@@ -285,5 +315,19 @@ export default class MainMenuScene extends Phaser.Scene {
       loginForm,
       signUpForm
     };
+  }
+
+  updateUserPreferences(userData: {
+    userId: string,
+    preferences: IUserPreferences
+  }): void {
+    this.userId = userData.userId;
+
+    this.registry.set('userPreferences', {
+      chat: userData.preferences.chat,
+      sound: userData.preferences.sound
+    });
+
+    this.sound.mute = !userData.preferences.sound;
   }
 }

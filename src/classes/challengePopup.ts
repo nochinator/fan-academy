@@ -1,10 +1,10 @@
-import { EChallengePopup, EFaction } from "../enums/gameEnums";
 import { sendChallengeAcceptedMessage } from "../colyseus/colyseusLobbyRoom";
+import { EChallengePopup, EFaction, EUiSounds } from "../enums/gameEnums";
 import { newGameChallenge } from "../queries/gameQueries";
+import GameScene from "../scenes/game.scene";
 import LeaderboardScene from "../scenes/leaderboard.scene";
 import UIScene from "../scenes/ui.scene";
-import { truncateText } from "../utils/gameUtils";
-import GameScene from "../scenes/game.scene";
+import { playSound, textAnimationFadeOut, truncateText } from "../utils/gameUtils";
 
 const challengePopupCoordinates = {
   x: 800,
@@ -61,17 +61,38 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
     }).setOrigin(0.5);
 
     const buttonCallback = async (faction: EFaction) => {
+      context.sound.play(EUiSounds.BUTTON_GENERIC);
+
       this.setVisible(false);
-      if (challengeType === EChallengePopup.SEND) await newGameChallenge(context.userId, faction, opponentId);
+      if (challengeType === EChallengePopup.SEND) {
+        const result = await newGameChallenge(context.userId, faction, opponentId);
+        if (!result) {
+          const openGameLimitText = () => {
+            return context.add.text(200, 350, `A player has reached the max amount of open games`, {
+              fontFamily: "proLight",
+              fontSize: 60,
+              color: '#fffb00'
+            }).setDepth(999);
+          };
+          textAnimationFadeOut(openGameLimitText(), 3000);
+        }
+      }
 
       if (challengeType === EChallengePopup.ACCEPT && context instanceof UIScene) sendChallengeAcceptedMessage(context.lobbyRoom!, gameId!, context.userId, faction);
     };
 
-    this.councilButtonImage.on('pointerdown', async () => await buttonCallback(EFaction.COUNCIL));
+    this.councilButtonImage.on('pointerdown', async () => {
+      playSound(this.scene, EUiSounds.BUTTON_PLAY);
+      await buttonCallback(EFaction.COUNCIL);
+    });
 
-    this.elvesButtonImage.on('pointerdown', async () => await buttonCallback(EFaction.DARK_ELVES));
+    this.elvesButtonImage.on('pointerdown', async () => {
+      playSound(this.scene, EUiSounds.BUTTON_PLAY);
+      await buttonCallback(EFaction.DARK_ELVES);
+    });
 
     this.cancelButtonImage.on('pointerdown', () => {
+      this.scene.sound.play(EUiSounds.BUTTON_FAILED);
       this.setVisible(false);
       this.destroy();
     });

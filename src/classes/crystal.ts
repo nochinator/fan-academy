@@ -1,7 +1,7 @@
-import { ETiles, EWinConditions } from "../enums/gameEnums";
+import { EAttackType, EGameSounds, ETiles, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { roundToFive } from "../utils/gameUtils";
+import { playSound, roundToFive } from "../utils/gameUtils";
 import { makeCrystalClickable } from "../utils/makeUnitClickable";
 import { CrystalCard } from "./crystalCard";
 import { FloatingText } from "./floatingText";
@@ -42,7 +42,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.maxHealth = data.maxHealth;
     this.currentHealth = data.currentHealth;
     this.isDestroyed = data.isDestroyed;
-    this.isLastCrystal = data.isLastCrystal;
+    this.isLastCrystal = tile.tileType === ETiles.CRYSTAL_BIG ? true : data.isLastCrystal;
     this.boardPosition = data.boardPosition;
     this.row = tile.row;
     this.col = tile.col;
@@ -52,9 +52,10 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.healthBar = new HealthBar(context, data, -38, -70);
     this.unitCard = new CrystalCard(context, data).setVisible(false);
 
-    this.pedestalImage = context.add.image(0, 0, 'pedestal').setScale(0.8);
+    const isBigCrystal = this.maxHealth === 9000;
+    this.pedestalImage = context.add.image(0, 10, 'pedestal').setScale(0.8);
     const crystalTexture = data.currentHealth <= data.maxHealth / 2 ? 'crystalDamaged' : 'crystalFull';
-    this.crystalImage = context.add.image(0, -30, crystalTexture).setScale(0.8);
+    this.crystalImage = context.add.image(0, -30, crystalTexture).setScale(isBigCrystal ? 1 : 0.8);
 
     this.blockedLOS = context.add.image(0, -10, 'blockedLOS').setOrigin(0.5).setName('blockedLOS').setVisible(false);
 
@@ -158,13 +159,20 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
   }
 
-  getsDamaged(damage: number): void {
-    const totalDamage = roundToFive(damage + 300 * this.debuffLevel);
+  getsDamaged(damage: number, _attackType: EAttackType, multiplier = 1): void {
+    if (this.debuffLevel > 0) {
+      playSound(this.scene, EGameSounds.CRYSTAL_DAMAGE_BUFF);
+    } else {
+      playSound(this.scene, EGameSounds.CRYSTAL_DAMAGE);
+    }
+
+    const damageMultiplier = 300 * multiplier * this.debuffLevel;
+    const totalDamage = roundToFive(damage + damageMultiplier);
     const damageTaken = totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
     this.currentHealth -= damageTaken;
 
     if (this.currentHealth <= this.maxHealth / 2) {
-      this.crystalImage.setTexture('crystalDamaged'); // FIXME: below 50%, this changes the texture every time the crystal is damaged
+      this.crystalImage.setTexture('crystalDamaged');
     }
 
     // Update hp bar
@@ -184,6 +192,8 @@ export class Crystal extends Phaser.GameObjects.Container {
   }
 
   removeFromGame(): void {
+    playSound(this.scene, EGameSounds.CRYSTAL_DESTROY);
+
     const tile = this.getTile();
     tile.crystal = undefined;
     tile.obstacle = false;
@@ -201,11 +211,13 @@ export class Crystal extends Phaser.GameObjects.Container {
         winner: this.context.activePlayer!
       };
     } else {
-      const otherCrystal = crystalArray.find(crystal => crystal.belongsTo === this.belongsTo);
-      if (!otherCrystal) throw new Error('Crystal getsDestroyed() No other crystal found');
+      const otherCrystals = crystalArray.filter(crystal => crystal.belongsTo === this.belongsTo);
+      if (!otherCrystals.length) throw new Error('Crystal getsDestroyed() No other crystals found');
 
-      otherCrystal.isLastCrystal = true;
-      otherCrystal.updateTileData();
+      if (otherCrystals.length === 1) {
+        otherCrystals[0].isLastCrystal = true;
+        otherCrystals[0].updateTileData();
+      }
     }
 
     // Remove animations

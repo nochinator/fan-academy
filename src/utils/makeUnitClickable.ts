@@ -3,9 +3,9 @@ import { Crystal } from "../classes/crystal";
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EGameStatus, EHeroes, EItems, ERange, ETiles } from "../enums/gameEnums";
+import { EGameSounds, EGameStatus, EHeroes, EItems, ERange, ETiles } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, isEnemySpawn, isHero, isItem, visibleUnitCardCheck } from "./gameUtils";
+import { belongsToPlayer, isEnemySpawn, isHero, isItem, playSound, selectItemSound, visibleUnitCardCheck } from "./gameUtils";
 import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
@@ -57,7 +57,14 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
   // CASE 1: No active unit
   if (!activeUnit && isFriendly) {
-    if (isHero(unit) && unit.isKO) return; // Can't select KO'd units
+    if (isHero(unit) && unit.isKO) return;
+
+    if (unit.boardPosition >= 45) {
+      if (isHero(unit)) playSound(context, EGameSounds.HERO_HAND_SELECT);
+      if (isItem(unit)) selectItemSound(context, unit.itemType);
+    } else {
+      playSound(context, EGameSounds.HERO_BOARD_SELECT);
+    }
 
     selectUnit(context, unit);
     return;
@@ -77,13 +84,11 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
   // CASE 3: There is already an active unit
   if (activeUnit && !isSameUnit) {
     // Unique case: Wraith can spawn on a KO'd unit
-    if (
-      isHero(unit) &&
-      unit.isKO &&
-      isHero(activeUnit) &&
-      activeUnit.unitType === EHeroes.WRAITH &&
-      activeUnit.boardPosition >= 45 &&
-      !isEnemySpawn(context, unit.getTile())
+    if (isHero(unit) && unit.isKO &&
+        isHero(activeUnit) &&
+        activeUnit.unitType === EHeroes.WRAITH &&
+        activeUnit.boardPosition >= 45 &&
+        !isEnemySpawn(context, unit.getTile())
     ) {
       activeUnit.spawn(unit.getTile());
       return;
@@ -99,12 +104,26 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
       }
 
       // Stomp enemy KO'd units
-      if (
-        isHero(activeUnit) &&
-        activeUnit.boardPosition < 45 &&
-        unit.isKO && !isEnemySpawn(context, unitTile)) {
-        activeUnit.move(unitTile);
-        return;
+      if (isHero(activeUnit) && activeUnit.boardPosition < 45) {
+        const tilesInRange = context.gameController!.board.getHeroTilesInRange(activeUnit, ERange.MOVE);
+        const withinStompingRange = tilesInRange.find(tile => tile.boardPosition === unit.boardPosition);
+
+        if (
+          unit.isKO &&
+          activeUnit.unitType !== EHeroes.NECROMANCER &&
+          (withinStompingRange || unitTile.isHighlighted)
+        ) {
+          activeUnit.move(unitTile);
+          return;
+        }
+        if (
+          unit.isKO &&
+          (activeUnit.unitType === EHeroes.NECROMANCER && unit.blockedLOS.visible) &&
+          (withinStompingRange || unitTile.isHighlighted)
+        ) {
+          activeUnit.move(unitTile);
+          return;
+        }
       }
 
       // Stomp a KO unit or Phantom on a friendly spawn tile with a unit from hand
@@ -164,8 +183,8 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
           const withinStompingRange = tilesInRange.find(tile => tile.boardPosition === unit.boardPosition);
           if (
             unit.isKO &&
-          activeUnit.unitType !== EHeroes.NECROMANCER &&
-          withinStompingRange
+            activeUnit.unitType !== EHeroes.NECROMANCER &&
+            (withinStompingRange || unitTile.isHighlighted)
           ) {
             const unitTile = context.gameController!.board.getTileFromBoardPosition(unit.boardPosition);
             activeUnit.move(unitTile);
@@ -189,7 +208,16 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
     if (isFriendly) {
       if (isHero(unit) && unit.isKO) return;
       deselectUnit(context);
-      return selectUnit(context, unit);
+
+      if (unit.boardPosition >= 45) {
+        if (isHero(unit)) playSound(context, EGameSounds.HERO_HAND_SELECT);
+        if (isItem(unit)) selectItemSound(context, unit.itemType);
+      } else {
+        playSound(context, EGameSounds.HERO_BOARD_SELECT);
+      }
+
+      selectUnit(context, unit);
+      return;
     }
   }
 }
@@ -209,7 +237,10 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     if (!activeUnit || !gameController) return;
 
     // If unit is on the board and the tile clicked on is in range, move the unit
-    if (activeUnit.boardPosition < 45 && tile.isHighlighted && isHero(activeUnit)) activeUnit.move(tile);
+    if (activeUnit.boardPosition < 45 && tile.isHighlighted && isHero(activeUnit)) {
+      activeUnit.move(tile);
+      playSound(context, EGameSounds.HERO_MOVE);
+    }
 
     // If unit is in hand and clicked tile is highlighted, spawn. Otherwise, use item
     if (activeUnit.boardPosition > 44 && tile.isHighlighted) {
@@ -222,6 +253,8 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
 export function makeCrystalClickable(crystal: Crystal, context: GameScene): void {
   crystal.on('pointerdown', (pointer: Phaser.Input.Pointer, _x: number, _Y: number, event: Types.Input.EventData) => {
     if (context.currentGame.status === EGameStatus.FINISHED) return;
+
+    console.log(`Crystal on ${crystal.boardPosition}`, crystal );
 
     visibleUnitCardCheck(context);
 

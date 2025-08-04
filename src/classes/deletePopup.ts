@@ -1,4 +1,6 @@
+import { EUiSounds } from "../enums/gameEnums";
 import ProfileScene from "../scenes/profile.scene";
+import { playSound } from "../utils/gameUtils";
 import { Profile } from "./profile";
 
 const turnPopupCoordinates = {
@@ -55,11 +57,13 @@ export class DeleteWarningPopup extends Phaser.GameObjects.Container {
     }).setOrigin(0.5);
 
     this.okButtonImage.on('pointerdown', async () => {
+      playSound(this.scene, EUiSounds.BUTTON_GENERIC);
       this.setVisible(false);
       await profile.handleDelete();
     });
 
     this.cancelButtonImage.on('pointerdown', () => {
+      this.scene.sound.play(EUiSounds.BUTTON_FAILED);
       this.setVisible(false);
       profile.toggleFormVisibility(true);
     });

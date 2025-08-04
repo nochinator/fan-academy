@@ -172,10 +172,12 @@ export class HeroCard extends Phaser.GameObjects.Container {
     const totalPow = hero.getTotalPower();
     this.powerText.setText(`${totalPow} ${this.attackType}`);
 
+    const basePower = hero.unitType === EHeroes.WRAITH ? 250 : hero.basePower;
+
     if (hero.isDebuffed) {
       this.powerText.setColor('#ff0000');
     } else {
-      this.powerText.setColor(this.getTextColor(totalPow, hero.basePower));
+      this.powerText.setColor(this.getTextColor(totalPow, basePower));
     }
   }
 

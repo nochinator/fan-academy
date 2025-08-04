@@ -25,7 +25,7 @@ export async function loginQuery(username: string, password: string) {
 
       return {
         success: true,
-        userId: data.userId
+        userData: data.userData
       };
     } else {
       console.error('Server responded with an error:', data.message || 'Unknown error');
@@ -69,7 +69,7 @@ export async function signUpQuery(email: string, username: string, password: str
 
       return {
         success: true,
-        userId: data.userId
+        userData: data.userData
       };
     } else {
       console.log('Server responded with an error:', data.message || 'Unknown error');
@@ -91,7 +91,10 @@ export async function signUpQuery(email: string, username: string, password: str
  * Used on MainMenuScene's onCreate() to check if the player is authenticated
  * @returns
  */
-export async function authCheck(): Promise<string | undefined> {
+export async function authCheck(): Promise<{
+  userId: string,
+  preferences: IUserPreferences
+} | undefined> {
   console.log('Checking Authentication Status...');
   const jwt = localStorage.getItem('jwt');
 
@@ -108,10 +111,10 @@ export async function authCheck(): Promise<string | undefined> {
     return undefined;
   }
 
-  const userId = await result.json();
+  const data = await result.json();
 
-  console.log('User authenticated...', userId);
-  return userId;
+  console.log('User authenticated...', data.userId);
+  return data;
 };
 
 /**
@@ -189,7 +192,8 @@ export async function updateProfile(payload: {
   password?: string,
   picture?: string
   emailNotifications?: boolean
-  chat?: boolean
+  chat?: boolean,
+  sound?: boolean
 }) {
   try {
     const jwt = localStorage.getItem('jwt');

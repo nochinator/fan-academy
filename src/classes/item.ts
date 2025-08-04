@@ -1,6 +1,7 @@
-import { EClass, EFaction, EItems } from "../enums/gameEnums";
+import { EClass, EFaction, EGameSounds, EItems } from "../enums/gameEnums";
 import { IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import { playSound } from "../utils/gameUtils";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Hero } from "./hero";
 import { ItemCard } from "./itemCard";
@@ -144,6 +145,7 @@ export class ShiningHelm extends Item {
 
   use(target: Hero): void {
     target.equipShiningHelm(this.boardPosition);
+    playSound(this.scene, EGameSounds.ITEM_USE);
     this.removeFromGame();
   }
 }
@@ -155,6 +157,8 @@ export class RuneMetal extends Item {
 
   use(target: Hero): void {
     target.equipRunemetal(this.boardPosition);
+    playSound(this.scene, EGameSounds.RUNE_METAL_USE);
+
     this.removeFromGame();
   }
 }
@@ -166,6 +170,8 @@ export class SuperCharge extends Item {
 
   use(target: Hero): void {
     target.equipSuperCharge(this.boardPosition);
+    playSound(this.scene, EGameSounds.SCROLL_USE);
+
     this.removeFromGame();
   }
 }

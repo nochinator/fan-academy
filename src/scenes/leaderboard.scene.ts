@@ -25,4 +25,8 @@ export default class LeaderboardScene extends Phaser.Scene {
 
     if (leaderboardData) new Leaderboard(this, leaderboardData);
   }
+
+  onShutdown() {
+    this.sound.stopAll();
+  }
 }

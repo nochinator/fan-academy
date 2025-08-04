@@ -1,8 +1,8 @@
-import { EChallengePopup } from "../enums/gameEnums";
+import { EChallengePopup, EUiSounds } from "../enums/gameEnums";
 import { IUserStats } from "../interfaces/userInterface";
 import { getLeaderBoard } from "../queries/userQueries";
 import LeaderboardScene from "../scenes/leaderboard.scene";
-import { truncateText } from "../utils/gameUtils";
+import { playSound, truncateText } from "../utils/gameUtils";
 import { ChallengePopup } from "./challengePopup";
 
 export class Leaderboard extends Phaser.GameObjects.Container {
@@ -73,6 +73,8 @@ export class Leaderboard extends Phaser.GameObjects.Container {
       const challengeIcon = context.add.image(1030, 15, 'challengeIcon').setInteractive({ useHandCursor: true });
 
       challengeIcon.on('pointerdown', () => {
+        playSound(this.scene, EUiSounds.BUTTON_GENERIC);
+
         new ChallengePopup({
           context,
           username: player.username,
@@ -103,6 +105,7 @@ export class Leaderboard extends Phaser.GameObjects.Container {
     const lastPageButton = context.add.image(180, 0, 'arrowButton').setScale(0.7).setVisible(page !== data.totalPages);
 
     firstPageButton.setInteractive({ useHandCursor: true }).on('pointerdown', async () => {
+      this.scene.sound.play(EUiSounds.BUTTON_GENERIC);
       if (page > 1) {
         const leaderboardData = await getLeaderBoard(1);
         if (leaderboardData) {
@@ -113,6 +116,7 @@ export class Leaderboard extends Phaser.GameObjects.Container {
     });
 
     backButton.setInteractive({ useHandCursor: true }).on('pointerdown', async () => {
+      this.scene.sound.play(EUiSounds.BUTTON_GENERIC);
       if (page > 1) {
         const leaderboardData = await getLeaderBoard(--page);
         if (leaderboardData) {
@@ -123,6 +127,7 @@ export class Leaderboard extends Phaser.GameObjects.Container {
     });
 
     forwardButton.setInteractive({ useHandCursor: true }).on('pointerdown', async () => {
+      this.scene.sound.play(EUiSounds.BUTTON_GENERIC);
       const leaderboardData = await getLeaderBoard(++page);
       if (leaderboardData) {
         new Leaderboard(this.context, leaderboardData);
@@ -131,6 +136,7 @@ export class Leaderboard extends Phaser.GameObjects.Container {
     });
 
     lastPageButton.setInteractive({ useHandCursor: true }).on('pointerdown', async () => {
+      this.scene.sound.play(EUiSounds.BUTTON_GENERIC);
       if (page !== data.totalPages) {
         const leaderboardData = await getLeaderBoard(data.totalPages);
         if (leaderboardData) {

@@ -41,7 +41,7 @@ export async function newGameChallenge(userId: string, faction: EFaction, oppone
   const data = await result.json();
 
   if (result.status !== 200) {
-    console.error('Error sending challenge...');
+    console.error('Error sending challenge...', data.message);
     return null;
   }
 

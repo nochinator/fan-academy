@@ -1,15 +1,16 @@
 import { sendTurnMessage } from "../colyseus/colyseusGameRoom";
-import { EActionClass, EActionType, EGameStatus, EHeroes, ETiles } from "../enums/gameEnums";
+import { EActionClass, EActionType, EGameSounds, EGameStatus, EHeroes, ETiles, EUiSounds } from "../enums/gameEnums";
 import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
-import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, textAnimation, visibleUnitCardCheck } from "../utils/gameUtils";
+import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, playSound, textAnimationSizeIncrease, visibleUnitCardCheck } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
 import { ConcedeWarningPopup } from "./concedePopup";
 import { Deck } from "./deck";
 import { Door } from "./door";
+import { GameOverScreen } from "./gameOverScreen";
 import { GameUI } from "./gameUI";
 import { Hand } from "./hand";
 import { Hero } from "./hero";
@@ -38,11 +39,17 @@ export class GameController {
   playerData: IUserData[];
 
   gameOver: IGameOver | undefined;
+  gameOverScreen: GameOverScreen | undefined;
   concedeButton: Phaser.GameObjects.Image;
   concedePopup: ConcedeWarningPopup;
 
   constructor(context: GameScene) {
-    if (context.triggerReplay) context.chatComponent!.pointerEvents = 'none';
+    if (context.triggerReplay && context.chatComponent) context.chatComponent!.pointerEvents = 'none';
+
+    if (context.currentGame.status === EGameStatus.FINISHED && !context.triggerReplay){
+      const gameOverScreen =  new GameOverScreen(context);
+      gameOverScreen.init();
+    }
 
     this.context = context;
     this.game = context.currentGame!;
@@ -66,9 +73,14 @@ export class GameController {
     this.concedeButton = this.addConcedeButton(context);
     this.concedePopup = new ConcedeWarningPopup(context);
 
-    if (this.game.status === EGameStatus.FINISHED) {
+    if (context.triggerReplay) {
+      this.rematchButton.setVisible(false);
+      this.turnButton.buttonImage.setVisible(false);
+    }
+    else if (this.game.status === EGameStatus.FINISHED) {
       this.rematchButton.setVisible(true);
       this.turnButton.buttonImage.setVisible(false);
+      this.gameOverEffects();
     }
 
     if (context.activePlayer !== context.userId) this.turnButton.buttonImage.setVisible(false);
@@ -99,6 +111,7 @@ export class GameController {
   addConcedeButton(context: GameScene): Phaser.GameObjects.Image {
     const button = context.add.image(1350, 70, 'concedeButton').setScale(0.9).setInteractive({ useHandCursor: true });
     button.on('pointerdown', ()=> {
+      playSound(this.context, EUiSounds.BUTTON_GENERIC);
       this.concedePopup.setVisible(true);
     });
     return button;
@@ -134,7 +147,8 @@ export class GameController {
           if (
             actionTaken === EActionType.ATTACK ||
             actionTaken === EActionType.HEAL ||
-            actionTaken === EActionType.TELEPORT
+            actionTaken === EActionType.TELEPORT ||
+            actionTaken === EActionType.SPAWN_PHANTOM
           ) await this.replayAttackHealTeleport(turn.action!);
 
           if (actionTaken === EActionType.SHUFFLE) await this.replayShuffle();
@@ -175,12 +189,12 @@ export class GameController {
   async replayAttackHealTeleport(action: ITurnAction): Promise<void> {
     const hero = this.board.units.find(unit => unit.boardPosition === action.actorPosition);
     const target = this.board.crystals.find(crystal => crystal.boardPosition === action.targetPosition) ?? this.board.units.find(unit => unit.boardPosition === action.targetPosition);
-
     if (!hero || !target) throw new Error('Missing hero or target in attack or heal action');
 
-    if (action.action === EActionType.ATTACK) hero.attack(target);
-    if (action.action === EActionType.HEAL) hero.heal(target as Hero);
-    if (action.action === EActionType.TELEPORT) hero.teleport(target as Hero);
+    // VSCode says await has no effect on them, but it does work
+    if (action.action === EActionType.ATTACK || action.action === EActionType.SPAWN_PHANTOM) await hero.attack(target);
+    if (action.action === EActionType.HEAL) await hero.heal(target as Hero);
+    if (action.action === EActionType.TELEPORT) await hero.teleport(target as Hero);
   };
 
   async replayUse(action: ITurnAction, opponentHand: (Hero | Item)[]): Promise<void> {
@@ -192,29 +206,32 @@ export class GameController {
     if (item.dealsDamage) {
       const tile = this.board.getTileFromBoardPosition(action.targetPosition!);
       if (!item) throw new Error('Missing tile in use action');
-      item.use(tile);
+      await item.use(tile);
     }
 
     if (!item.dealsDamage) {
       const hero = this.board.units.find(unit => unit.boardPosition === action.targetPosition);
       if (!hero) throw new Error('Missing target in use action');
-      item.use(hero);
+      await item.use(hero);
     }
   }
 
   async replayShuffle(): Promise<void> {
-    const testText = this.context.add.text(600, 350, 'OPPONENT SWAPPED AN ITEM!', {
+    const shuffleText = this.context.add.text(600, 350, 'OPPONENT SWAPPED AN ITEM!', {
       fontFamily: "proLight",
       fontSize: 50,
       color: '#fffb00'
-    });
-    await textAnimation(testText, 1.3);
+    }).setDepth(999);
+    playSound(this.context, EGameSounds.SHUFFLE);
+
+    await textAnimationSizeIncrease(shuffleText, 1.3);
   }
 
   async resetTurn() {
     deselectUnit(this.context);
     this.context.longPressStart = undefined;
     this.context.visibleUnitCard = undefined;
+    playSound(this.context, EGameSounds.RESET_TURN);
 
     this.context.scene.restart();
   };
@@ -224,11 +241,12 @@ export class GameController {
   }
 
   drawUnits() {
-    this.door.openDoor();
+    playSound(this.context, EGameSounds.DRAW);
 
     const drawAmount = 6 - this.hand.getHandSize();
-
     if (this.deck.getDeckSize() === 0 || drawAmount === 0) return;
+
+    this.door.openDoor();
 
     const drawnUnits = this.deck.removeFromDeck(drawAmount); // IHero IItem
 
@@ -273,6 +291,7 @@ export class GameController {
     });
 
     if (unitsToRemove.length) {
+      playSound(this.context, EGameSounds.VANISH);
       const animation = (hero: Hero): Promise<void> => {
         return new Promise((resolve) => {
           this.context.tweens.add({
@@ -319,9 +338,15 @@ export class GameController {
 
     sendTurnMessage(this.context.currentRoom, this.currentTurn, this.context.opponentId, this.context.turnNumber!, this.gameOver);
 
-    if (this.gameOver) console.log('GAME ENDS! THE WINNER IS', this.gameOver?.winner);
+    if (this.gameOver) this.gameOverEffects();
+  }
 
-    // TODO: victory / defeat screen
+  async gameOverEffects() {
+    if (this.gameOver?.winner === this.context.activePlayer) {
+      playSound(this.context, EUiSounds.WIN_SFX);
+    } else {
+      playSound(this.context, EUiSounds.LOSE_SFX);
+    }
   }
 
   onHeroClicked(hero: Hero) {
@@ -359,6 +384,7 @@ export class GameController {
 
     // Remove a slice from the action pie
     this.actionPie.hideActionSlice(this.context.currentTurnAction!++);
+
     // Deselect unit and clear highlights
     if (this.context.activeUnit) deselectUnit(this.context);
   }
@@ -424,7 +450,8 @@ export class GameController {
       return;
     }
 
-    target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
+    if (!target.isKO) target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
+
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);
@@ -456,7 +483,8 @@ export class GameController {
       return;
     }
 
-    target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
+    if (!target.isKO) target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
+
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);

@@ -80,9 +80,16 @@ export default class GameScene extends Phaser.Scene {
       loop: true
     });
 
+    const userPreferences = this.registry.get('userPreferences');
+    if (userPreferences.chat) this.chatComponent = createChatComponent(this);
+
     this.input.mouse!.disableContextMenu();
-    this.chatComponent = createChatComponent(this);
     this.gameController = new GameController(this);
     if (this.triggerReplay) this.gameController.replayTurn();
+  }
+
+  onShutdown() {
+    console.log('Game scene shutdown logs, remove');
+    this.sound.stopAll();
   }
 };

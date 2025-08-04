@@ -1,7 +1,7 @@
-import { EActionType, EAttackType, EClass, EFaction, EHeroes, EItems, ETiles } from "../enums/gameEnums";
+import { EActionType, EAttackType, EClass, EFaction, EGameSounds, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { useAnimation, getGridDistance, isInHand, moveAnimation, roundToFive, updateUnitsLeft } from "../utils/gameUtils";
+import { checkUnitGameOver, getGridDistance, isInHand, moveAnimation, playSound, roundToFive, selectDeathSound, useAnimation } from "../utils/gameUtils";
 import { positionHeroImage } from "../utils/heroImagePosition";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
@@ -43,6 +43,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   canHeal: boolean;
   unitsConsumed: number;
   isDebuffed: boolean;
+  manaVial?: boolean;
+  speedTile?: boolean;
 
   context: GameScene;
   unitCard: HeroCard;
@@ -111,6 +113,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.canHeal = data.canHeal ?? false;
     this.unitsConsumed = data.unitsConsumed ?? 0;
     this.isDebuffed = data.isDebuffed;
+    this.manaVial = data?.manaVial ?? undefined;
+    this.speedTile = data.speedTile;
 
     this.unitCard = new HeroCard(context, {
       ...data,
@@ -203,7 +207,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.powerTileEvent = this.continuousEvent(this.powerTileAnim, ['powerTileAnim_1', 'powerTileAnim_2', 'powerTileAnim_3']);
 
     this.magicalResistanceTileAnim = context.add.image(0, 30, 'magicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tile?.tileType === ETiles.MAGICAL_RESISTANCE && !this.isKO) {
+    if ((tile?.tileType === ETiles.MAGICAL_RESISTANCE || tile?.tileType === ETiles.SPEED) && !this.isKO) {
       this.magicalResistanceTileAnim.setVisible(true);
     } else {
       this.magicalResistanceTileAnim.setVisible(false);
@@ -320,7 +324,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       belongsTo: this.belongsTo,
       canHeal: this.canHeal,
       unitsConsumed: this.unitsConsumed,
-      isDebuffed: this.isDebuffed
+      isDebuffed: this.isDebuffed,
+      manaVial: this.manaVial,
+      speedTile: this.speedTile
     };
   }
 
@@ -400,7 +406,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Show damage numbers
     if (totalDamage > 0) new FloatingText(this.context, this.x, this.y - 50, totalDamage.toString());
 
-    this.unitCard.updateCardHealth(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
     return totalDamage; // Return damage taken for lifesteal
@@ -435,11 +441,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     return totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
   }
 
-  getTotalHealing(baseHealing: number, unitHealingMult: number): number {
+  getTotalHealing(unitHealingMult: number): number {
     const runeMetalBuff = this.runeMetal ? 1.5 : 1;
     const attackTileBuff = this.attackTile ? 100 : 0;
+    const superCharge = this.superCharge ? 3 : 1;
+    const priestessDebuff = this.isDebuffed ? 0.5 : 1;
 
-    return (baseHealing + attackTileBuff) * unitHealingMult * runeMetalBuff;
+    return (this.basePower + attackTileBuff) * unitHealingMult * superCharge * priestessDebuff * runeMetalBuff;
   }
 
   getsHealed(healing: number, addText = true): number | undefined {
@@ -463,7 +471,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     if (this.isKO) this.getsRevived();
 
-    this.unitCard.updateCardHealth(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
     return actualHealing;
@@ -496,7 +504,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Show healing numbers
     if (addText) new FloatingText(this.context, this.x, this.y - 50, amount.toString(), true);
 
-    this.unitCard.updateCardHealth(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
   }
 
@@ -510,6 +518,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   };
 
   getsKnockedDown(): void {
+    if (this.unitType !== EHeroes.PHANTOM) selectDeathSound(this.scene, this.unitType);
     this.removeSpecialTileOnKo();
 
     this.currentHealth = 0;
@@ -522,6 +531,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, true);
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
+
+    checkUnitGameOver(this.context, this);
   }
 
   getTile(): Tile {
@@ -572,15 +583,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   removeFromBoard(): void {
     // Remove hero data from tile
     const tile = this.getTile();
-    if (tile.tileType === ETiles.CRYSTAL_DAMAGE) this.updateCrystals(false);
     tile.removeHero();
 
     // Remove hero from board array
     const index = this.context.gameController!.board.units.findIndex(unit => unit.unitId === this.unitId);
     if (index !== -1) { this.context.gameController!.board.units.splice(index, 1); }
 
-    // Update hero counter
-    if (this.unitType !== EHeroes.PHANTOM) updateUnitsLeft(this.context, this);
+    checkUnitGameOver(this.context, this);
   }
 
   getDistanceToTarget(target: Hero | Crystal): number {
@@ -609,6 +618,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (targetTile.hero && targetTile.hero.isKO) {
       const hero = gameController.board.units.find(unit => unit.unitId === targetTile.hero?.unitId);
       if (!hero) console.error('move() Found heroData on targetTile, but no Hero to remove', targetTile);
+      playSound(this.context, EGameSounds.HERO_STOMP);
       hero?.removeFromGame(true);
     }
 
@@ -629,6 +639,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (tile.hero && (tile.hero.isKO || tile.isEnemy(this.context.userId) && tile.hero.unitType === EHeroes.PHANTOM)) {
       const hero = gameController.board.units.find(unit => unit.unitId === tile.hero?.unitId);
       if (!hero) console.error('spawn() Found heroData on tile, but no Hero to remove', tile);
+      playSound(this.context, EGameSounds.HERO_STOMP);
       hero?.removeFromGame(true);
     }
 
@@ -653,6 +664,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.updateTileData();
 
     this.healthBar.setVisible(true);
+
+    playSound(this.context, EGameSounds.HERO_SPAWN);
 
     gameController.afterAction(EActionType.SPAWN, startingPosition, tile.boardPosition);
   }
@@ -690,10 +703,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.shiningHelmImage.setVisible(true);
     this.characterImage.setTexture(this.updateCharacterImage());
 
-    this.unitCard.updateCardMagicalResistance(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
-    this.context.gameController?.afterAction(EActionType.USE, handPosition, this.boardPosition);
+    this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
   equipRunemetal(handPosition: number): void {
@@ -706,7 +719,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.runeMetalImage.setVisible(true);
     this.characterImage.setTexture(this.updateCharacterImage());
 
-    this.unitCard.updateCardPower(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
@@ -715,7 +728,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   equipSuperCharge(handPosition: number): void {
     this.superCharge = true;
 
-    this.unitCard.updateCardPower(this);
+    this.unitCard.updateCardData(this);
     this.updateTileData();
 
     this.superChargeAnim.setVisible(true);
@@ -729,7 +742,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
         let newLevel: number = 0;
 
         if (increase) newLevel = crystal.debuffLevel + 1;
-        if (!increase && crystal.debuffLevel !== 0) newLevel = crystal.debuffLevel - 1; // Safeguard to avoid it going negative until I figure out the bug
+        if (!increase && crystal.debuffLevel > 0) newLevel = crystal.debuffLevel - 1; // Safeguard to avoid it going negative until I figure out the bug
 
         crystal.updateDebuffAnimation(newLevel);
       }
@@ -754,23 +767,35 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.physicalDamageResistance -= 20;
       this.physicalResistanceTileAnim.setVisible(false);
     }
+    if (currentTile === ETiles.SPEED) {
+      this.speedTile = false;
+      this.magicalResistanceTileAnim.setVisible(false);
+    }
 
     // If hero is entering a special tile
     if (targetTile === ETiles.CRYSTAL_DAMAGE) {
       this.updateCrystals(true);
       this.crystalDebuffTileAnim.setVisible(true);
+      playSound(this.scene, EGameSounds.CRYSTAL_TILE);
     }
     if (targetTile === ETiles.POWER) {
       this.attackTile = true;
       this.powerTileAnim.setVisible(true);
+      playSound(this.scene, EGameSounds.SWORD_TILE);
     }
     if (targetTile === ETiles.MAGICAL_RESISTANCE) {
       this.magicalDamageResistance += 20;
       this.magicalResistanceTileAnim.setVisible(true);
+      playSound(this.scene, EGameSounds.HELM_TILE);
     }
     if (targetTile === ETiles.PHYSICAL_RESISTANCE) {
       this.physicalDamageResistance += 20;
       this.physicalResistanceTileAnim.setVisible(true);
+      playSound(this.scene, EGameSounds.SHIELD_TILE);
+    }
+    if (targetTile === ETiles.SPEED) {
+      this.speedTile = true;
+      this.magicalResistanceTileAnim.setVisible(true); // Reusing the animation since it's basically the same color
     }
 
     this.unitCard.updateCardData(this);
@@ -821,7 +846,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.superCharge = false;
     this.superChargeAnim.setVisible(false);
 
-    this.unitCard.updateCardPower(this);
+    this.unitCard.updateCardData(this);
 
     const tile = this.getTile();
     tile.hero = this.exportData();

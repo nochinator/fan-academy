@@ -1,6 +1,6 @@
-import { EActionType } from "../enums/gameEnums";
+import { EActionType, EGameSounds } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { isInHand } from "../utils/gameUtils";
+import { isInHand, playSound } from "../utils/gameUtils";
 import { getCurrentPlayer } from "../utils/playerUtils";
 
 export class Door extends Phaser.GameObjects.Container {
@@ -14,7 +14,6 @@ export class Door extends Phaser.GameObjects.Container {
     super(context, 450, 715);
     this.context = context;
 
-    // TODO: On container 'hoover' -> show icons of remaining units and items in the deck
     this.doorClosed = context.add.image(50, -15, 'doorClosed').setScale(0.9);
 
     this.doorOpen = context.add.image(55, -15, 'doorOpen').setVisible(false);
@@ -33,13 +32,15 @@ export class Door extends Phaser.GameObjects.Container {
 
     this.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       if (pointer.button === 0 && context.activeUnit && isInHand(context.activeUnit.boardPosition)) {
+        playSound(this.scene, EGameSounds.SHUFFLE);
+
         const activePosition = context.activeUnit.boardPosition;
         context.activeUnit.shuffleInDeck();
 
-        this.updateBannerText();
-
         // Add action to state
-        context.gameController?.afterAction(EActionType.SHUFFLE, activePosition, 51 );
+        context.gameController?.afterAction(EActionType.SHUFFLE, activePosition, 51);
+
+        this.updateBannerText();
       }
 
       if (pointer.button === 2) {

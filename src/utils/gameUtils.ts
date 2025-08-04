@@ -5,7 +5,7 @@ import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulSt
 import { Hero } from "../classes/hero";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EActionClass, EActionType, ECardType, EClass, EHeroes, EItems, ETiles, EWinConditions } from "../enums/gameEnums";
+import { EActionClass, EActionType, ECardType, EClass, EGameSounds, EHeroes, EItems, ETiles, EUiSounds, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, IHero, IItem, IPlayerState, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
@@ -81,6 +81,13 @@ export function createNewHero(context: GameScene, heroData: IHero, tile?: Tile):
 }
 
 export async function moveAnimation(context: GameScene, hero: Hero, targetTile: Tile): Promise<void> {
+  const flyingUnits = [EHeroes.NECROMANCER, EHeroes.WRAITH, EHeroes.PHANTOM];
+  if (flyingUnits.includes(hero.unitType)) {
+    playSound(context, EGameSounds.MOVE_FLY);
+  } else {
+    playSound(context, EGameSounds.MOVE_WALK);
+  }
+
   // Stop user input until the animation finishes playing
   context.input.enabled = false;
 
@@ -104,7 +111,7 @@ export async function moveAnimation(context: GameScene, hero: Hero, targetTile: 
         targets: hero,
         x: targetTile.x,
         y: targetTile.y,
-        duration: 300,
+        duration: 400,
         ease: 'Linear',
         onComplete: () => {
           context.input.enabled = true;
@@ -161,6 +168,60 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
   };
 }
 
+export function playSound(scene: Phaser.Scene, sound: EGameSounds | EUiSounds): void {
+  scene.sound.play(sound);
+}
+
+// Not used at the moment, could be useful when animations are added. Otherwise remove
+export function pauseCode(scene: Phaser.Scene, delay: number): Promise<void> {
+  return new Promise(resolve => {
+    scene.time.delayedCall(delay, resolve);
+  });
+}
+
+export function selectItemSound(scene: Phaser.Scene, item: EItems): void {
+  const itemMap = {
+    [EItems.RUNE_METAL]: EGameSounds.RUNE_METAL_SELECT,
+    [EItems.SUPERCHARGE]: EGameSounds.SCROLL_SELECT,
+    [EItems.SHINING_HELM]: EGameSounds.ITEM_SELECT,
+
+    [EItems.DRAGON_SCALE]: EGameSounds.SHIELD_SELECT,
+    [EItems.HEALING_POTION]: EGameSounds.POTION_SELECT,
+    [EItems.INFERNO]: EGameSounds.AOE_SPELL_SELECT,
+
+    [EItems.SOUL_STONE]: EGameSounds.ITEM_SELECT,
+    [EItems.MANA_VIAL]: EGameSounds.POTION_SELECT,
+    [EItems.SOUL_HARVEST]: EGameSounds.AOE_SPELL_SELECT
+  };
+
+  const soundToPlay = itemMap[item];
+  if (!soundToPlay) return;
+
+  playSound(scene, soundToPlay);
+}
+
+export function selectDeathSound(scene: Phaser.Scene, hero: EHeroes): void {
+  const heroMap = {
+    [EHeroes.ARCHER]: EGameSounds.ARCHER_DEATH,
+    [EHeroes.KNIGHT]: EGameSounds.KNIGHT_DEATH,
+    [EHeroes.CLERIC]: EGameSounds.CLERIC_DEATH,
+    [EHeroes.WIZARD]: EGameSounds.WIZARD_DEATH,
+    [EHeroes.NINJA]: EGameSounds.NINJA_DEATH,
+
+    [EHeroes.IMPALER]: EGameSounds.IMPALER_DEATH,
+    [EHeroes.VOIDMONK]: EGameSounds.VOIDMONK_DEATH,
+    [EHeroes.PRIESTESS]: EGameSounds.PRIESTESS_DEATH,
+    [EHeroes.NECROMANCER]: EGameSounds.NECROMANCER_DEATH,
+    [EHeroes.WRAITH]: EGameSounds.WRAITH_DEATH,
+    [EHeroes.PHANTOM]: EGameSounds.PHANTOM_DEATH
+  };
+
+  const soundToPlay = heroMap[hero];
+  if (!soundToPlay) return;
+
+  playSound(scene, soundToPlay);
+}
+
 export function getActionClass(action: EActionType): EActionClass {
   return [EActionType.PASS, EActionType.DRAW, EActionType.REMOVE_UNITS].includes(action) ? EActionClass.AUTO : EActionClass.USER;
 }
@@ -172,11 +233,11 @@ export function getAOETiles(context: GameScene, spell: Item,  targetTile: Tile):
   const board = context.gameController?.board;
   if (!board) throw new Error('Inferno use() board not found');
 
-  const areOfEffect = board.getAreaOfEffectTiles(targetTile);
+  const areaOfEffect = board.getAreaOfEffectTiles(targetTile);
 
-  const enemyHeroTiles = areOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo !== spell.belongsTo);
+  const enemyHeroTiles = areaOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo !== spell.belongsTo);
 
-  const enemyCrystalTiles = areOfEffect?.filter(tile => tile.tileType === ETiles.CRYSTAL && tile.crystal?.belongsTo !== spell.belongsTo);
+  const enemyCrystalTiles = areaOfEffect?.filter(tile => tile.crystal && tile.crystal?.belongsTo !== spell.belongsTo);
 
   return {
     enemyHeroTiles,
@@ -194,7 +255,7 @@ export function canBeAttacked(attacker: Hero, tile: Tile): boolean {
   return result;
 }
 
-export function updateUnitsLeft(context: GameScene, hero: Hero): void {
+export function isLastUnit(context: GameScene, hero: Hero): boolean {
   let attackingPlayer: IPlayerState | undefined;
   let defendingPlayer: IPlayerState | undefined;
 
@@ -211,27 +272,38 @@ export function updateUnitsLeft(context: GameScene, hero: Hero): void {
   const unitsArray = context.gameController?.board.units;
   if (!unitsArray) throw new Error('updateUnitsLeft() no units array found');
 
-  const unitIndex = unitsArray.findIndex(unit => unit.unitId === hero.unitId);
-  if (unitIndex !== -1) unitsArray.splice(unitIndex, 1);
+  // Get remaining units of defending player. Populate gameOver flag if there are none left and the player has no revives in hand
+  const remainingBoardUnits = unitsArray.filter(unit => unit.belongsTo === hero.belongsTo).find(unit => !unit.isKO);
 
-  // Get remaining units of defending player. Populate gameOver flag if there are none left
-  const remainingBoardUnits = unitsArray.find(unit => unit.belongsTo === hero.belongsTo);
-
+  let hand;
   let remainingHandUnits;
   const defendingPlayerIsActivePlayer = defendingPlayer.playerId === context.activePlayer;
   if (defendingPlayerIsActivePlayer) {
-    remainingHandUnits = context.gameController?.hand.getHand().find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
+    hand = context.gameController?.hand.getHand();
+    remainingHandUnits = hand!.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
   } else {
-    remainingHandUnits = defendingPlayer.factionData.unitsInHand.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
+    hand = defendingPlayer.factionData.unitsInHand;
+    remainingHandUnits = hand.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
   }
 
   const remainingDeckUnits = defendingPlayer.factionData.unitsInDeck.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
 
-  if (remainingBoardUnits || remainingHandUnits || remainingDeckUnits) return;
+  const reviveItems = [EItems.HEALING_POTION, EItems.SOUL_HARVEST];
+  const hasReviveInHand = hand ? hand.find(unit => reviveItems.includes((unit as Item)?.itemType)) : undefined;
+
+  if (remainingBoardUnits || remainingHandUnits || remainingDeckUnits || hasReviveInHand) return false;
+
+  return true;
+}
+
+export function checkUnitGameOver(context: GameScene, hero: Hero): void {
+  if (!isLastUnit(context, hero)) return;
+
+  const attackingPlayer = hero.unitId.includes(context.player1!.playerId) ? context.player2 : context.player1;
 
   context.gameController!.gameOver = {
     winCondition: EWinConditions.UNITS,
-    winner: attackingPlayer.playerId
+    winner: attackingPlayer!.playerId
   };
 }
 
@@ -319,7 +391,7 @@ export function getCardText(unit: EHeroes | EItems): {
     [EItems.RUNE_METAL]: {
       cardName: 'Runemetal',
       cardType: ECardType.EQUIPMENT,
-      cardText: "Permanently increases and ally's power by 50%."
+      cardText: "Permanently increases an ally's power by 50%."
     },
 
     [EItems.DRAGON_SCALE]: {
@@ -330,7 +402,7 @@ export function getCardText(unit: EHeroes | EItems): {
     [EItems.HEALING_POTION]: {
       cardName: 'Healing Potion',
       cardType: ECardType.CONSUMABLE,
-      cardText: "Heals and ally for 1000 HP, or revives an ally with 100 HP."
+      cardText: "Heals an ally for 1000 HP, or revives an ally with 100 HP."
     },
     [EItems.INFERNO]: {
       cardName: 'Inferno',
@@ -351,7 +423,7 @@ export function getCardText(unit: EHeroes | EItems): {
     [EItems.SOUL_STONE]: {
       cardName: 'Soulstone',
       cardType: ECardType.EQUIPMENT,
-      cardText: "Doubles the effect of a unit's life leech and increases max health by 50 HP"
+      cardText: "Doubles the effect of a unit's life leech and increases max health by 10%."
     }
   };
 
@@ -390,13 +462,28 @@ export function useAnimation(image: GameObjects.Image, scale = 2): void {
   });
 }
 
-export function textAnimation(text: GameObjects.Text, scale = 2): Promise<void> {
+export function textAnimationSizeIncrease(text: GameObjects.Text, scale = 2): Promise<void> {
   return new Promise((resolve) => {
     text.scene.tweens.add({
       targets: text,
       scale,
       alpha: 50,
       duration: 1000,
+      onComplete: () => {
+        text.destroy();
+        resolve();
+      }
+    });
+  });
+}
+
+export function textAnimationFadeOut(text: GameObjects.Text, duration = 1000): Promise<void> {
+  return new Promise((resolve) => {
+    text.scene.tweens.add({
+      targets: text,
+      alpha: 0,
+      duration,
+      ease: 'Linear',
       onComplete: () => {
         text.destroy();
         resolve();

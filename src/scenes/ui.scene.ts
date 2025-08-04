@@ -1,13 +1,15 @@
 import { Client, Room } from "colyseus.js";
 import { HomeButton } from "../classes/homeButton";
 import { connectToGameLobby } from "../colyseus/colyseusLobbyRoom";
-import { EFaction } from "../enums/gameEnums";
+import { EFaction } from "../enums/gameEnums"; // Import EGameSounds
 import { IGame } from "../interfaces/gameInterface";
 import { getGameList } from "../queries/gameQueries";
 import { createGameList } from "./gameSceneUtils/gameList";
 import { CDN_PATH } from "./preloader.scene";
 import { profilePicNames } from "./profileSceneUtils/profilePicNames";
 import { createWarningComponent } from "./uiSceneUtils/disconnectWarning";
+
+export const backgroundMusicInstance: Phaser.Sound.BaseSound | null = null;
 
 export default class UIScene extends Phaser.Scene {
   colyseusClient: Client;
@@ -22,6 +24,10 @@ export default class UIScene extends Phaser.Scene {
   // Used to highlight the active game in the game list
   activeGameImage: Phaser.GameObjects.Image | undefined;
   activeGameImageId: string | undefined;
+
+  // There is limit of 50 active games per player. Games currently playing, searching for players and open challenges all count towards the limit
+  activeGamesAmountLimit = 50;
+  activeGamesAmount = 0;
 
   constructor() {
     super({ key: 'UIScene' });
@@ -51,6 +57,8 @@ export default class UIScene extends Phaser.Scene {
     this.load.image('concedeButton', `${CDN_PATH}/ui/concede_button.webp`);
 
     this.load.html('disconnectWarning', 'html/disconnectWarning.html');
+
+    this.load.audio('deleteGameSound', `${CDN_PATH}/audio/ui/deleteGame.mp3`);
   }
 
   async create() {
@@ -76,10 +84,13 @@ export default class UIScene extends Phaser.Scene {
     // Create the game list UI
     await createGameList(this);
 
-    // Add Home button
     new HomeButton(this);
 
     // Background game screen
     this.add.image(397, 15, 'gameBackground').setOrigin(0, 0).setScale(1.06, 1.2);
+  }
+
+  onShutdown() {
+    this.sound.stopAll();
   }
 }

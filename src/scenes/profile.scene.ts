@@ -39,4 +39,9 @@ export default class ProfileScene extends Phaser.Scene {
     this.profile = new Profile(this);
     // TODO: throw error if no user data
   }
+
+  onShutdown() {
+    console.log('Profile scene shutdown logs, remove');
+    this.sound.stopAll();
+  }
 }

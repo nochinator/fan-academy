@@ -1,5 +1,7 @@
+import { EUiSounds } from "../enums/gameEnums";
 import { deleteAccount, updateProfile } from "../queries/userQueries";
 import ProfileScene from "../scenes/profile.scene";
+import { playSound } from "../utils/gameUtils";
 import { isValidPassword } from "../utils/playerUtils";
 import { DeleteWarningPopup } from "./deletePopup";
 import { ProfilePicPopup } from "./profilePicPopup";
@@ -16,6 +18,7 @@ export class Profile extends Phaser.GameObjects.Container {
 
   notificationsCheckBox: Phaser.GameObjects.DOMElement;
   chatCheckBox: Phaser.GameObjects.DOMElement;
+  soundCheckBox: Phaser.GameObjects.DOMElement;
 
   saveButtonImage: Phaser.GameObjects.Image;
   saveButtonText: Phaser.GameObjects.Text;
@@ -87,34 +90,36 @@ export class Profile extends Phaser.GameObjects.Container {
       *  PREFERENCES
       *
      */
-    // Notification toggle
-    this.notificationsCheckBox = this.createCheckbox(1150, 230, 'Email notifications');
-    this.chatCheckBox = this.createCheckbox(1087, 290, 'Enable chat');
+
+    const preferences = context.userData!.preferences;
+    this.notificationsCheckBox = this.createCheckbox(1150, 230, 'Email notifications', preferences.emailNotifications);
+    this.chatCheckBox = this.createCheckbox(1087, 290, 'Enable chat', preferences.chat);
+    this.soundCheckBox = this.createCheckbox(1103, 350, 'Enable sound', preferences.sound);
 
     /**
      * STATS
      */
-    context.add.text(1000, 350, 'STATS', {
+    context.add.text(1000, 390, 'STATS', {
       fontFamily: 'proHeavy',
       fontSize: 40,
       color: '#ffffff'
     });
-    context.add.text(1000, 400, `Games: ${context.userData?.stats.totalGames}`, {
+    context.add.text(1000, 440, `Games: ${context.userData?.stats.totalGames}`, {
       fontFamily: 'proLight',
       fontSize: 35,
       color: '#ffffff'
     });
-    context.add.text(1000, 450, `Wins: ${context.userData?.stats.totalWins}`, {
+    context.add.text(1000, 490, `Wins: ${context.userData?.stats.totalWins}`, {
       fontFamily: 'proLight',
       fontSize: 35,
       color: '#ffffff'
     });
-    context.add.text(1000, 500, `Council wins: ${context.userData?.stats.councilWins}`, {
+    context.add.text(1000, 540, `Council wins: ${context.userData?.stats.councilWins}`, {
       fontFamily: 'proLight',
       fontSize: 35,
       color: '#ffffff'
     });
-    context.add.text(1000, 550, `Elves wins: ${context.userData?.stats.elvesWins}`, {
+    context.add.text(1000, 590, `Elves wins: ${context.userData?.stats.elvesWins}`, {
       fontFamily: 'proLight',
       fontSize: 35,
       color: '#ffffff'
@@ -139,6 +144,7 @@ export class Profile extends Phaser.GameObjects.Container {
     });
 
     this.saveButtonImage.on('pointerdown', async () => {
+      playSound(this.scene, EUiSounds.BUTTON_GENERIC);
       await this.handleSubmit();
     });
 
@@ -161,6 +167,7 @@ export class Profile extends Phaser.GameObjects.Container {
     });
 
     this.deleteAccountButtonImage.on('pointerdown', () => {
+      playSound(this.scene, EUiSounds.BUTTON_GENERIC);
       console.log('Clicked on delete account');
       this.toggleFormVisibility(false);
       this.deletePopup.setVisible(true);
@@ -174,6 +181,7 @@ export class Profile extends Phaser.GameObjects.Container {
       this.profileUpdateSuccess,
       this.notificationsCheckBox,
       this.chatCheckBox,
+      this.soundCheckBox,
       this.saveButtonImage,
       this.saveButtonText,
       this.deleteAccountButtonImage,
@@ -197,10 +205,10 @@ export class Profile extends Phaser.GameObjects.Container {
     return this.context.add.dom(x, y).createFromHTML(html);
   }
 
-  createCheckbox(x: number, y: number, label: string) {
+  createCheckbox(x: number, y: number, label: string, checked: boolean) {
     const dom = this.context.add.dom(x, y).createFromHTML(`
       <label style="color:white; font-size: 50px; font-family: proLight">
-        <input type="checkbox" style="width: 35px; height: 35px;"/> ${label}
+        <input type="checkbox" ${checked ? 'checked' : ''} style="width: 35px; height: 35px;"/> ${label}
       </label>
     `);
     return dom;
@@ -210,6 +218,7 @@ export class Profile extends Phaser.GameObjects.Container {
     (this.emailInput!.getChildByName('') as HTMLInputElement).value = this.context.userData!.email;
     (this.notificationsCheckBox!.getChildByName('') as HTMLInputElement).checked = this.context.userData!.preferences.emailNotifications;
     (this.chatCheckBox!.getChildByName('') as HTMLInputElement).checked = this.context.userData!.preferences.chat;
+    (this.soundCheckBox!.getChildByName('') as HTMLInputElement).checked = this.context.userData!.preferences.sound;
   }
 
   async handleSubmit() {
@@ -221,6 +230,7 @@ export class Profile extends Phaser.GameObjects.Container {
     const passwordConfirm = (this.passwordConfirmInput!.getChildByName('') as HTMLInputElement).value;
     const receiveNotifications = (this.notificationsCheckBox!.getChildByName('') as HTMLInputElement).checked;
     const enableChat = (this.chatCheckBox!.getChildByName('') as HTMLInputElement).checked;
+    const enableSound = (this.soundCheckBox!.getChildByName('') as HTMLInputElement).checked;
 
     const emailInputEl = this.emailInput.node.querySelector('input') as HTMLInputElement;
 
@@ -244,15 +254,17 @@ export class Profile extends Phaser.GameObjects.Container {
     const payload: {
       email?: string,
       password?: string,
-      picture?: string
-      emailNotifications?: boolean
-      chat?: boolean
+      picture?: string,
+      emailNotifications?: boolean,
+      chat?: boolean,
+      sound?: boolean
     } = {};
 
     if (email && email !== this.context.userData?.email) payload.email = email;
     if (password && password.trim() !== '') payload.password = password;
-    if (receiveNotifications !== this.context.userData?.preferences.emailNotifications) payload.emailNotifications = receiveNotifications;
-    if (enableChat !== this.context.userData?.preferences.chat) payload.chat = enableChat;
+    if (receiveNotifications !== undefined && receiveNotifications !== this.context.userData?.preferences.emailNotifications) payload.emailNotifications = receiveNotifications;
+    if (enableChat !== undefined && enableChat !== this.context.userData?.preferences.chat) payload.chat = enableChat;
+    if (enableSound !== undefined && enableSound !== this.context.userData?.preferences.sound) payload.sound = enableSound;
     if (this.context.userData?.picture !== this.previousPicture) payload.picture = this.context.userData!.picture;
 
     if (Object.keys(payload).length === 0) return;
@@ -263,6 +275,13 @@ export class Profile extends Phaser.GameObjects.Container {
       console.log('Profile updated');
       this.showForm(this.profileUpdateSuccess, 'profileSuccess', 'Profile successfully updated');
       this.context.userData = result.user;
+
+      this.scene.registry.set('userPreferences', {
+        chat: result.user.preferences.chat,
+        sound: result.user.preferences.sound
+      });
+
+      this.scene.sound.mute = !result.user.preferences.sound;
     } else {
       this.loadUserData();
       this.profilePicture.setTexture(this.previousPicture!);
@@ -281,6 +300,7 @@ export class Profile extends Phaser.GameObjects.Container {
     this.passwordConfirmInput.setVisible(visible);
     this.notificationsCheckBox.setVisible(visible);
     this.chatCheckBox.setVisible(visible);
+    this.soundCheckBox.setVisible(visible);
     this.profileUpdateError.setVisible(visible);
     this.profileUpdateSuccess.setVisible(visible);
   }
