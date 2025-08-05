@@ -396,7 +396,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.setScale(1);
   }
 
-  getsDamaged(damage: number, attackType: EAttackType): number {
+  getsDamaged(damage: number, attackType: EAttackType, delay: number): number {
     // Flash the unit red
     this.characterImage.setTint(0xff0000);
     this.scene.time.delayedCall(500, () => this.characterImage.clearTint());
@@ -406,7 +406,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.currentHealth -= totalDamage;
 
-    if (this.currentHealth <= 0) this.getsKnockedDown();
+    if (this.currentHealth <= 0) this.getsKnockedDown(delay);
+    else {
+      // don't play a normal hit sound on ko
+      const hitSounds = [EGameSounds.HERO_DAMAGE_1, EGameSounds.HERO_DAMAGE_2, EGameSounds.HERO_DAMAGE_3, EGameSounds.HERO_DAMAGE_4]
+      this.scene.time.delayedCall(delay, playSound, [this.context, hitSounds[Math.floor(Math.random() * hitSounds.length)]]);
+  
+    }
 
     // Update hp bar
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
@@ -416,6 +422,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.unitCard.updateCardData(this);
     this.updateTileData();
+
 
     return totalDamage; // Return damage taken for lifesteal
   }
@@ -525,8 +532,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     new FloatingText(this.context, this.x, this.y - 50, textFigure.toString(), true);
   };
 
-  getsKnockedDown(): void {
-    if (this.unitType !== EHeroes.PHANTOM) selectDeathSound(this.scene, this.unitType);
+  getsKnockedDown(delay: number): void {
+    this.scene.time.delayedCall(delay, playSound, [this.context, EGameSounds.HERO_DAMAGE_KO]);
+    if (this.unitType !== EHeroes.PHANTOM) this.scene.time.delayedCall(delay, selectDeathSound, [this.scene, this.unitType]);
+
     this.removeSpecialTileOnKo();
 
     this.currentHealth = 0;
