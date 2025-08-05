@@ -30,8 +30,6 @@ export abstract class Human extends Hero {
     this.unitCard.updateCardData(this);
     this.updateTileData();
 
-    this.scene.sound.play(EGameSounds.DRAGON_SCALE_USE);
-
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 }
@@ -48,6 +46,8 @@ export class Archer extends Human {
 
     turnIfBehind(this.context, this, target);
 
+    let delay = 0;
+
     if (distance === 1) {
       // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
       if (
@@ -56,19 +56,21 @@ export class Archer extends Human {
         isEnemySpawn(this.context, target.getTile())
       ) {
         playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
+        delay = 500
 
         target.removeFromGame();
       } else {
         playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
+        delay = 500
 
-        target.getsDamaged(this.getTotalPower(0.5), this.attackType);
+        target.getsDamaged(this.getTotalPower(0.5), this.attackType, delay);
         this.removeAttackModifiers();
       }
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK_BIG);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK);
+      if (this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK_BIG); delay = 750;
+      if (!this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK); delay = 600;
 
-      target.getsDamaged(this.getTotalPower(), this.attackType);
+      target.getsDamaged(this.getTotalPower(), this.attackType, delay);
       this.removeAttackModifiers();
     }
 
@@ -91,6 +93,8 @@ export class Knight extends Human {
     const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
+    let delay = 0;
+
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
       target instanceof Hero &&
@@ -100,10 +104,10 @@ export class Knight extends Human {
       playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.KNIGHT_ATTACK_BIG);
-      if (!this.superCharge)playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
+      if (this.superCharge) playSound(this.scene, EGameSounds.KNIGHT_ATTACK_BIG); delay = 750;
+      if (!this.superCharge)playSound(this.scene, EGameSounds.KNIGHT_ATTACK); delay = 500;
 
-      target.getsDamaged(this.getTotalPower(), this.attackType);
+      target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
       if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
 
@@ -149,18 +153,26 @@ export class Wizard extends Human {
       const opponentDirection = this.context.isPlayerOne ? [2, 3, 4] : [6, 7, 8];
 
       // Collect all targets
+      let targets: (Hero | Crystal)[] = [target];
+
       const secondTarget = this.getNextTarget(target, attackDirection, opponentDirection, gameController.board, false);
-      let thirdTarget: Hero | Crystal | undefined;
-      if (secondTarget) thirdTarget = this.getNextTarget(secondTarget, attackDirection, opponentDirection, gameController.board, false, [target.boardPosition, secondTarget.boardPosition]);
+      if (secondTarget) {
+        targets.push(secondTarget);
+        const thirdTarget = this.getNextTarget(secondTarget, attackDirection, opponentDirection, gameController.board, false, [target.boardPosition, secondTarget.boardPosition]);
+        if (thirdTarget) {
+          targets.push(thirdTarget);
+        }
+      }
 
-      // Apply damage to targets
-      target.getsDamaged(this.getTotalPower(), this.attackType);
-      if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType, 0.75);
-      if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType, 0.56);
-
-      if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
-      if (secondTarget && secondTarget instanceof Hero && secondTarget.isKO && secondTarget.unitType === EHeroes.PHANTOM) secondTarget.removeFromGame();
-      if (thirdTarget && thirdTarget instanceof Hero && thirdTarget.isKO && thirdTarget.unitType === EHeroes.PHANTOM) thirdTarget.removeFromGame();
+      const damageMultipliers = [1, 0.75, 0.56];
+      const delayIncrements = [650, 750, 850];
+  
+      targets.forEach((currentTarget, index) => {
+        const power = this.getTotalPower() * (damageMultipliers[index] || 0);
+        const delay = delayIncrements[index] || delayIncrements[0];
+        currentTarget.getsDamaged(power, this.attackType, delay);
+        if (currentTarget && currentTarget instanceof Hero && currentTarget.isKO && currentTarget.unitType === EHeroes.PHANTOM) currentTarget.removeFromGame();
+      });
 
       this.removeAttackModifiers();
     }
@@ -280,9 +292,11 @@ export class Ninja extends Human {
 
     const distance = this.getDistanceToTarget(target);
 
+    let delay = 0;
     const ninjaAttackSound = () => {
-      if (this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK_BIG);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK);
+      if (this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK_BIG); delay = 650;
+      if (distance === 1) playSound(this.scene, EGameSounds.NINJA_ATTACK); delay = 500;
+      if (distance !== 1) playSound(this.scene, EGameSounds.NINJA_ATTACK_RANGED); delay = 500
     };
 
     if (distance === 1) {
@@ -296,12 +310,12 @@ export class Ninja extends Human {
         target.removeFromGame();
       } else {
         ninjaAttackSound();
-        target.getsDamaged(this.getTotalPower(2), this.attackType);
+        target.getsDamaged(this.getTotalPower(2), this.attackType, delay);
         this.removeAttackModifiers();
       }
     } else {
       ninjaAttackSound();
-      target.getsDamaged(this.getTotalPower(), this.attackType);
+      target.getsDamaged(this.getTotalPower(), this.attackType, delay);
       this.removeAttackModifiers();
     }
 
@@ -344,6 +358,8 @@ export class Cleric extends Human {
 
     const distance = this.getDistanceToTarget(target);
 
+    let delay = 0;
+
     if (
       distance === 1 &&
       target instanceof Hero &&
@@ -353,9 +369,9 @@ export class Cleric extends Human {
       if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK_BIG);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK);
-      target.getsDamaged(this.getTotalPower(), this.attackType);
+      if (this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK_BIG); delay = 750;
+      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK); delay = 300;
+      target.getsDamaged(this.getTotalPower(), this.attackType, delay);
       this.removeAttackModifiers();
     }
 
@@ -365,9 +381,6 @@ export class Cleric extends Human {
 
   heal(target: Hero): void {
     this.flashActingUnit();
-
-    if (!this.superCharge) playSound(this.scene, EGameSounds.HEAL);
-    if (this.superCharge)  playSound(this.scene, EGameSounds.HEAL_EXTRA);
 
     turnIfBehind(this.context, this, target);
 
@@ -382,6 +395,9 @@ export class Cleric extends Human {
     this.removeAttackModifiers();
 
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
+
+    playSound(this.scene, EGameSounds.HEAL);
+    setTimeout(playSound, 750, this.scene, EGameSounds.HEAL_EXTRA);
   };
 
   teleport(_target: Hero): void {};
@@ -443,7 +459,7 @@ export class Inferno extends Item {
         return;
       }
 
-      hero.getsDamaged(damage, EAttackType.MAGICAL);
+      hero.getsDamaged(damage, EAttackType.MAGICAL, 800);
 
       if (hero && hero instanceof Hero && hero.unitType === EHeroes.PHANTOM) hero.removeFromGame();
     });
@@ -452,7 +468,7 @@ export class Inferno extends Item {
       const crystal = this.context.gameController!.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('Inferno use() crystal not found');
 
-      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage, EAttackType.MAGICAL);
+      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage, EAttackType.MAGICAL, 800);
     });
 
     this.removeFromGame();
