@@ -165,7 +165,7 @@ export class Wizard extends Human {
       }
 
       const damageMultipliers = [1, 0.75, 0.56];
-      const delayIncrements = [650, 750, 850];
+      const delayIncrements = [650, 775, 900];
   
       targets.forEach((currentTarget, index) => {
         const power = this.getTotalPower() * (damageMultipliers[index] || 0);

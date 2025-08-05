@@ -86,10 +86,10 @@ export default class GameScene extends Phaser.Scene {
     this.input.mouse!.disableContextMenu();
     this.gameController = new GameController(this);
     if (this.triggerReplay) this.gameController.replayTurn();
-  }
 
-  onShutdown() {
-    console.log('Game scene shutdown logs, remove');
-    this.sound.stopAll();
+    // Listen for the 'shutdown' event and stop all sounds
+    this.events.on('shutdown', () => {
+        this.sound.stopAll();
+    });
   }
 };

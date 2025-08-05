@@ -621,6 +621,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const startTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
     if (!startTile) return;
 
+    gameController.afterAction(EActionType.MOVE, startTile.boardPosition, targetTile.boardPosition);
+
     await moveAnimation(this.context, this, targetTile);
 
     // Stomp KO'd units
@@ -636,8 +638,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.updatePosition(targetTile);
     targetTile.hero = this.exportData();
     startTile.removeHero();
-
-    gameController.afterAction(EActionType.MOVE, startTile.boardPosition, targetTile.boardPosition);
   }
 
   spawn(tile: Tile): void {
