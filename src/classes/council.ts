@@ -30,7 +30,7 @@ export abstract class Human extends Hero {
     this.unitCard.updateCardData(this);
     this.updateTileData();
 
-    this.scene.sound.play(EGameSounds.SHIELD_TILE);
+    this.scene.sound.play(EGameSounds.DRAGON_SCALE_USE);
 
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
@@ -141,8 +141,8 @@ export class Wizard extends Human {
       playSound(this.scene, EGameSounds.WIZARD_ATTACK);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK_BIG);
+      if (this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK_BIG);
+      if (!this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK);
 
       // Get directions for finding out the next targets
       const attackDirection = gameController.board.getAttackDirection(this.boardPosition, target.boardPosition);
