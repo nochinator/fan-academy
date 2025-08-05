@@ -62,8 +62,12 @@ export class Impaler extends DarkElf {
       playSound(this.scene, EGameSounds.IMPALER_ATTACK_MELEE);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.IMPALER_ATTACK_BIG);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.IMPALER_ATTACK);
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.IMPALER_ATTACK_BIG);
+      } else {
+        if (distance === 1) playSound(this.scene, EGameSounds.IMPALER_ATTACK_MELEE);
+        if (distance !== 1) playSound(this.scene, EGameSounds.IMPALER_ATTACK);
+      }
     }
     const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
 
