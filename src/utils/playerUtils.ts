@@ -34,7 +34,9 @@ export function selectUnit(context: GameScene, unit: Hero | Item): void {
   context.activeUnit = unit;
 
   // Play the sound
-  context.sound.play(EGameSounds.HERO_THINKING);
+  if (unit.boardPosition <= 45) {
+    context.sound.play(EGameSounds.HERO_THINKING);
+  }
 
   // Highlight tiles
   if (unit.class === EClass.HERO) context.gameController?.onHeroClicked(unit as Hero);
