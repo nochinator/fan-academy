@@ -119,7 +119,8 @@ export enum ECardType {
   SUPER = 'Super Unit',
   SUMMONED = 'Summoned',
   SPELL = 'Spell',
-  CONSUMABLE = 'Consumable'
+  CONSUMABLE = 'Consumable',
+  SPECIAL_TILE = 'Special Tile',
 }
 
 export enum EChallengePopup {
