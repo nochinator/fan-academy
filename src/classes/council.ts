@@ -67,8 +67,13 @@ export class Archer extends Human {
         this.removeAttackModifiers();
       }
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK_BIG); delay = 750;
-      if (!this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK); delay = 600;
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.ARCHER_ATTACK_BIG);
+        delay = 750;
+      } else {
+        playSound(this.scene, EGameSounds.ARCHER_ATTACK);
+        delay = 600;
+      }
 
       target.getsDamaged(this.getTotalPower(), this.attackType, delay);
       this.removeAttackModifiers();
@@ -78,8 +83,8 @@ export class Archer extends Human {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  teleport(_target: Hero): void { };
 }
 
 export class Knight extends Human {
@@ -104,8 +109,13 @@ export class Knight extends Human {
       playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.KNIGHT_ATTACK_BIG); delay = 750;
-      if (!this.superCharge)playSound(this.scene, EGameSounds.KNIGHT_ATTACK); delay = 500;
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.KNIGHT_ATTACK_BIG);
+        delay = 750;
+      } else {
+        playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
+        delay = 500;
+      }
 
       target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
@@ -118,8 +128,8 @@ export class Knight extends Human {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  teleport(_target: Hero): void { };
 }
 
 export class Wizard extends Human {
@@ -145,8 +155,11 @@ export class Wizard extends Human {
       playSound(this.scene, EGameSounds.WIZARD_ATTACK);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK_BIG);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK);
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.WIZARD_ATTACK_BIG);
+      } else {
+        playSound(this.scene, EGameSounds.WIZARD_ATTACK);
+      }
 
       // Get directions for finding out the next targets
       const attackDirection = gameController.board.getAttackDirection(this.boardPosition, target.boardPosition);
@@ -160,13 +173,12 @@ export class Wizard extends Human {
         targets.push(secondTarget);
         const thirdTarget = this.getNextTarget(secondTarget, attackDirection, opponentDirection, gameController.board, false, [target.boardPosition, secondTarget.boardPosition]);
         if (thirdTarget) {
-          targets.push(thirdTarget);
         }
       }
 
       const damageMultipliers = [1, 0.75, 0.56];
       const delayIncrements = [650, 775, 900];
-  
+
       targets.forEach((currentTarget, index) => {
         const power = this.getTotalPower() * (damageMultipliers[index] || 0);
         const delay = delayIncrements[index] || delayIncrements[0];
@@ -193,13 +205,13 @@ export class Wizard extends Human {
       let score = 0;
 
       /**
-       *  An enemy unit gets points for:
-       *    -being in the same direction of the attack
-       *    -being in the general direction of the attack
-       *    -being in the direction of the opponent's side of the board
-       *    -being in an orthogonal direction (tie breaker)
-       *    -having an adjacent enemy unit (the attack prioritizes number of target versus direction)
-       *  */
+       * An enemy unit gets points for:
+       * -being in the same direction of the attack
+       * -being in the general direction of the attack
+       * -being in the direction of the opponent's side of the board
+       * -being in an orthogonal direction (tie breaker)
+       * -having an adjacent enemy unit (the attack prioritizes number of target versus direction)
+       * */
       if (enemyTileDirection === attackDirection) score += 2;
       if (this.getGeneralDirections(attackDirection).includes(enemyTileDirection)) score += 1.5;
       if (opponentDirection.includes(enemyTileDirection)) score += 1;
@@ -250,7 +262,7 @@ export class Wizard extends Human {
 
     for (const offset of adjacentOffsets) {
       if (isOnLeftEdge && leftOffset.includes(offset) ||
-          isOnRightEdge && rightOffset.includes(offset)) continue;
+        isOnRightEdge && rightOffset.includes(offset)) continue;
 
       const tilePosition = boardPosition + offset;
 
@@ -276,8 +288,8 @@ export class Wizard extends Human {
     }
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  teleport(_target: Hero): void { };
 }
 
 export class Ninja extends Human {
@@ -294,9 +306,16 @@ export class Ninja extends Human {
 
     let delay = 0;
     const ninjaAttackSound = () => {
-      if (this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK_BIG); delay = 650;
-      if (distance === 1) playSound(this.scene, EGameSounds.NINJA_ATTACK); delay = 500;
-      if (distance !== 1) playSound(this.scene, EGameSounds.NINJA_ATTACK_RANGED); delay = 500
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.NINJA_ATTACK_BIG);
+        delay = 650;
+      } else if (distance === 1) {
+        playSound(this.scene, EGameSounds.NINJA_ATTACK);
+        delay = 500;
+      } else {
+        playSound(this.scene, EGameSounds.NINJA_ATTACK_RANGED);
+        delay = 500
+      }
     };
 
     if (distance === 1) {
@@ -343,7 +362,7 @@ export class Ninja extends Human {
     this.context.gameController!.afterAction(EActionType.TELEPORT, targetDestination.boardPosition, unitDestination.boardPosition);
   };
 
-  heal(_target: Hero): void {};
+  heal(_target: Hero): void { };
 }
 
 export class Cleric extends Human {
@@ -366,11 +385,20 @@ export class Cleric extends Human {
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK);
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.CLERIC_ATTACK_BIG);
+      } else {
+        playSound(this.scene, EGameSounds.CLERIC_ATTACK);
+      }
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK_BIG); delay = 750;
-      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK); delay = 300;
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.CLERIC_ATTACK_BIG);
+        delay = 750;
+      } else {
+        playSound(this.scene, EGameSounds.CLERIC_ATTACK);
+        delay = 300;
+      }
       target.getsDamaged(this.getTotalPower(), this.attackType, delay);
       this.removeAttackModifiers();
     }
@@ -400,7 +428,7 @@ export class Cleric extends Human {
     setTimeout(playSound, 750, this.scene, EGameSounds.HEAL_EXTRA);
   };
 
-  teleport(_target: Hero): void {};
+  teleport(_target: Hero): void { };
 }
 
 export class DragonScale extends Item {
@@ -454,7 +482,7 @@ export class Inferno extends Item {
       if (!hero) throw new Error('Inferno use() hero not found');
 
       // Inferno removes KO'd enemy units
-      if (hero.isKO){
+      if (hero.isKO) {
         hero.removeFromGame(true);
         return;
       }

@@ -48,7 +48,7 @@ export class Impaler extends DarkElf {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
-    turnIfBehind(this.context, this, target); // Ensure turnIfBehind is imported/defined
+    turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
 
@@ -65,8 +65,13 @@ export class Impaler extends DarkElf {
         target.removeFromGame();
       }
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.IMPALER_ATTACK_BIG); delay = 1500;
-      if (!this.superCharge) playSound(this.scene, EGameSounds.IMPALER_ATTACK); delay = 650
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.IMPALER_ATTACK_BIG);
+        delay = 1500;
+      } else {
+        playSound(this.scene, EGameSounds.IMPALER_ATTACK);
+        delay = 650;
+      }
     }
     const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
@@ -80,8 +85,8 @@ export class Impaler extends DarkElf {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  teleport(_target: Hero): void { };
 }
 
 export class VoidMonk extends DarkElf {
@@ -97,8 +102,13 @@ export class VoidMonk extends DarkElf {
 
     let delay = 0;
 
-    if (this.superCharge) playSound(this.scene, EGameSounds.VOIDMONK_ATTACK_BIG); delay = 3000;
-    if (!this.superCharge) playSound(this.scene, EGameSounds.VOIDMONK_ATTACK); delay = 650;
+    if (this.superCharge) {
+      playSound(this.scene, EGameSounds.VOIDMONK_ATTACK_BIG);
+      delay = 3000;
+    } else {
+      playSound(this.scene, EGameSounds.VOIDMONK_ATTACK);
+      delay = 650;
+    }
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -193,8 +203,8 @@ export class VoidMonk extends DarkElf {
     });
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  teleport(_target: Hero): void { };
 }
 
 export class Necromancer extends DarkElf {
@@ -231,8 +241,13 @@ export class Necromancer extends DarkElf {
 
       return;
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK_BIG); delay = 1500;
-      if (!this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK); delay = 800;
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.NECROMANCER_ATTACK_BIG);
+        delay = 1500;
+      } else {
+        playSound(this.scene, EGameSounds.NECROMANCER_ATTACK);
+        delay = 800;
+      }
     }
 
     const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
@@ -245,8 +260,8 @@ export class Necromancer extends DarkElf {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  teleport(_target: Hero): void { };
 }
 
 export class Priestess extends DarkElf {
@@ -260,7 +275,7 @@ export class Priestess extends DarkElf {
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
-    
+
     let delay = 0;
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
@@ -313,7 +328,7 @@ export class Priestess extends DarkElf {
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
 
-  teleport(_target: Hero): void {};
+  teleport(_target: Hero): void { };
 }
 
 export class Wraith extends DarkElf {
@@ -325,7 +340,7 @@ export class Wraith extends DarkElf {
     this.flashActingUnit();
 
     turnIfBehind(this.context, this, target);
-    
+
     let delay = 0;
 
     if (target instanceof Hero && target.isKO) {
@@ -340,8 +355,13 @@ export class Wraith extends DarkElf {
         this.unitCard.updateCardData(this);
       }
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.WRAITH_ATTACK_BIG); delay = 4000;
-      if (!this.superCharge) playSound(this.scene, EGameSounds.WRAITH_ATTACK); delay = 100;
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.WRAITH_ATTACK_BIG);
+        delay = 4000;
+      } else {
+        playSound(this.scene, EGameSounds.WRAITH_ATTACK);
+        delay = 100;
+      }
 
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
@@ -359,54 +379,54 @@ export class Wraith extends DarkElf {
     const damageSounds = [EGameSounds.HERO_DAMAGE_1, EGameSounds.HERO_DAMAGE_2, EGameSounds.HERO_DAMAGE_3, EGameSounds.HERO_DAMAGE_4];
 
     let delay = 0;
-  
+
     // First sound
     delay += 1500;
     this.context.time.delayedCall(delay, () => {
       this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
     });
-  
+
     // Second sound
     delay += 250;
     this.context.time.delayedCall(delay, () => {
       this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
     });
-  
+
     // Third sound
     delay += 350;
     this.context.time.delayedCall(delay, () => {
       this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
     });
-  
+
     // Fourth sound
     delay += 400;
     this.context.time.delayedCall(delay, () => {
       this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
     });
-  
+
     // Fifth sound
     delay += 350;
     this.context.time.delayedCall(delay, () => {
       this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
     });
-  
+
     // Sixth sound
     delay += 200;
     this.context.time.delayedCall(delay, () => {
       this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
     });
-  
+
     // Seventh sound
     delay += 300;
     this.context.time.delayedCall(delay, () => {
       this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
     });
-  
+
     // last sound handled by getsDamaged
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  teleport(_target: Hero): void { };
 }
 
 export class Phantom extends Hero {
@@ -447,9 +467,9 @@ export class Phantom extends Hero {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
-  equipFactionBuff(): void {}
+  heal(_target: Hero): void { };
+  teleport(_target: Hero): void { };
+  equipFactionBuff(): void { }
 }
 
 export class SoulStone extends Item {
