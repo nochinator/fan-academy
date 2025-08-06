@@ -390,6 +390,8 @@ export class GameController {
     this.hand.importHandData(playerState!.factionData.unitsInHand);
     
     this.deck.setDeck(playerState!.factionData.unitsInDeck);
+
+    this.door.updateBannerText();
     
     this.context.currentTurnAction!--;
   }
