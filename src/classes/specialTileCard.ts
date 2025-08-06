@@ -29,7 +29,7 @@ export class SpecialTileCard extends Phaser.GameObjects.Container {
             case ETiles.POWER:
                 unitImageKey = 'powerTile';
                 typeLabel = 'Power Tile';
-                description = 'Grants 50% damage to the unit on this tile.';
+                description = 'Adds 100 damage to the unit on this tile.';
                 break;
             case ETiles.PHYSICAL_RESISTANCE:
                 unitImageKey = 'shieldTile';
@@ -54,7 +54,7 @@ export class SpecialTileCard extends Phaser.GameObjects.Container {
             case ETiles.SPEED:
                 unitImageKey = 'speedTile';
                 typeLabel = 'Speed Tile';
-                description = 'Grants 1 extra movement to the unit on this tile.';
+                description = 'Grants 2 extra movement to the unit on this tile.';
                 break;
             // skip CRYSTAL
             default:
