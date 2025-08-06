@@ -82,7 +82,7 @@ export class SpecialTileCard extends Phaser.GameObjects.Container {
         }).setOrigin(0.5);
 
         // Flavour text
-        this.cardFlavorText = this.context.add.text(0, -70, description, {
+        this.cardFlavorText = this.context.add.text(0, -55, description, {
             fontFamily: "proLight",
             fontSize: 30,
             color: '#ffffff',
