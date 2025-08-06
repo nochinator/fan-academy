@@ -173,6 +173,7 @@ export class Wizard extends Human {
         targets.push(secondTarget);
         const thirdTarget = this.getNextTarget(secondTarget, attackDirection, opponentDirection, gameController.board, false, [target.boardPosition, secondTarget.boardPosition]);
         if (thirdTarget) {
+          targets.push(thirdTarget);
         }
       }
 
