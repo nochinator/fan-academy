@@ -70,6 +70,14 @@ export class Tile extends Phaser.GameObjects.Container {
     this.hero = undefined;
   }
 
+  removeCrystal(): void {
+    this.crystal = undefined;
+  }
+
+  setCrystal(crystal: ICrystal): void {
+    this.crystal = crystal;
+  }
+
   isFriendly(userId: string) {
     return this.hero && this.hero.unitId.includes(userId);
   }
