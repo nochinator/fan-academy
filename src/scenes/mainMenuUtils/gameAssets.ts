@@ -166,6 +166,7 @@ export function loadGameAssets(context: GameScene) {
   // Generic game sounds
   context.load.audio('selectHeroFromHandSound', `${CDN_PATH}/audio/game/Game_Pickup_CharacterTile_Generic.mp3`);
   context.load.audio('selectHeroFromBoardSound', `${CDN_PATH}/audio/game/Game_Select_Character.mp3`);
+  context.load.audio('thinkingSound', `${CDN_PATH}/audio/game/Game_Ponder_LP.mp3`);
   context.load.audio('spawnHeroSound', `${CDN_PATH}/audio/game/Game_Place_CharacterTile.mp3`);
   context.load.audio('moveHeroSound', `${CDN_PATH}/audio/game/Game_Release_ToMove_Character.mp3`);
   context.load.audio('moveFlySound', `${CDN_PATH}/audio/game/Character_Movement_Flying.mp3`);
@@ -200,6 +201,11 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('damageCrystal1Sound', `${CDN_PATH}/audio/game/Game_Crystal_Damage_1.mp3`);
   context.load.audio('damageCrystal2Sound', `${CDN_PATH}/audio/game/Game_Crystal_Damage_2.mp3`);
   context.load.audio('destroyCrystalSound', `${CDN_PATH}/audio/game/Game_Crystal_Destroy.mp3`);
+  context.load.audio('damageHero1Sound', `${CDN_PATH}/audio/game/Game_Damage_Opponent_1.mp3`)
+  context.load.audio('damageHero2Sound', `${CDN_PATH}/audio/game/Game_Damage_Opponent_2.mp3`)
+  context.load.audio('damageHero3Sound', `${CDN_PATH}/audio/game/Game_Damage_Opponent_3.mp3`)
+  context.load.audio('damageHero4Sound', `${CDN_PATH}/audio/game/Game_Damage_Opponent_4.mp3`)
+  context.load.audio('damageHeroKOSound', `${CDN_PATH}/audio/game/KO_Slow_Mo_Punch.mp3`)
 
   context.load.audio('winSFXSound', `${CDN_PATH}/audio/game/Game_Win_SFX_01.mp3`);
   context.load.audio('loseSFXSound', `${CDN_PATH}/audio/game/Game_Lose_SFX_01.mp3`);

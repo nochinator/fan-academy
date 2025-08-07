@@ -146,6 +146,7 @@ export enum EUiSounds {
 export enum EGameSounds {
   HERO_HAND_SELECT = 'selectHeroFromHandSound',
   HERO_BOARD_SELECT = 'selectHeroFromBoardSound',
+  HERO_THINKING = 'thinkingSound',
   HERO_SPAWN = 'spawnHeroSound',
   HERO_MOVE = 'moveHeroSound',
   MOVE_FLY = 'moveFlySound',
@@ -180,6 +181,11 @@ export enum EGameSounds {
   CRYSTAL_DAMAGE = 'damageCrystal1Sound',
   CRYSTAL_DAMAGE_BUFF = 'damageCrystal2Sound',
   CRYSTAL_DESTROY = 'destroyCrystalSound',
+  HERO_DAMAGE_1 = 'damageHero1Sound',
+  HERO_DAMAGE_2 = 'damageHero2Sound',
+  HERO_DAMAGE_3 = 'damageHero3Sound',
+  HERO_DAMAGE_4 = 'damageHero4Sound',
+  HERO_DAMAGE_KO = 'damageHeroKOSound',
 
   // Council sounds
   ARCHER_ATTACK = 'archerAttackSound',
