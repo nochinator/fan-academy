@@ -8,6 +8,7 @@ import { calculateAllCenterPoints } from "../utils/boardCalculations";
 import { createChatComponent } from "./gameSceneUtils/chatComponent";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameAssets } from "./mainMenuUtils/gameAssets";
+import { Tile } from "../classes/tile";
 
 export default class GameScene extends Phaser.Scene {
   userId!: string;
@@ -19,7 +20,7 @@ export default class GameScene extends Phaser.Scene {
   currentTurnAction: number | undefined;
   turnNumber: number | undefined;
 
-  activeUnit: Hero | Item |  undefined;
+  activeUnit: Hero | Item | undefined;
 
   gameController: GameController | undefined;
 
@@ -31,7 +32,7 @@ export default class GameScene extends Phaser.Scene {
   player2: IPlayerState | undefined;
 
   longPressStart: number | undefined;
-  visibleUnitCard: Hero | Item | Crystal | undefined;
+  visibleUnitCard: Hero | Item | Crystal | Tile | undefined;
 
   triggerReplay = true;
 
@@ -60,7 +61,7 @@ export default class GameScene extends Phaser.Scene {
     this.triggerReplay = data.triggerReplay ?? true;
 
     // Updating GameScene properties
-    this.activePlayer =  this.currentGame.activePlayer.toString();
+    this.activePlayer = this.currentGame.activePlayer.toString();
     this.isPlayerOne = this.currentGame?.players[0].userData._id === this.userId;
     this.currentTurnAction = this.turnNumber === 0 ? 3 : 1;
   }
