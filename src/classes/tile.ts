@@ -53,7 +53,7 @@ export class Tile extends Phaser.GameObjects.Container {
     this.setSize(90, 90).setInteractive({ useHandCursor: true }).setDepth(2);
     makeTileClickable(this, context);
 
-    this.add(this.unitCard)
+    this.add(this.unitCard);
 
     context.add.existing(this);
   }
