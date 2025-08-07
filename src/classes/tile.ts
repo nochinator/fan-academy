@@ -2,6 +2,7 @@ import { ETiles } from "../enums/gameEnums";
 import { ICrystal, IHero, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { makeTileClickable } from "../utils/makeUnitClickable";
+import { SpecialTileCard } from "./specialTileCard";
 
 export class Tile extends Phaser.GameObjects.Container {
   baseRectangle: Phaser.GameObjects.Rectangle;
@@ -18,6 +19,8 @@ export class Tile extends Phaser.GameObjects.Container {
   tileType: ETiles;
 
   isHighlighted: boolean;
+  unitCard: SpecialTileCard;
+  icon: Phaser.GameObjects.Image | undefined;
 
   constructor(context: GameScene,
     data: ITile) {
@@ -38,16 +41,19 @@ export class Tile extends Phaser.GameObjects.Container {
     this.add(this.baseRectangle);
     this.isHighlighted = this.baseRectangle.isFilled;
 
+    this.unitCard = new SpecialTileCard(context, this.tileType).setVisible(false);
+
     // If tileType is not basic or a crystal, add the visual representation
     const typesToIgnore = [ETiles.BASIC, ETiles.CRYSTAL, ETiles.CRYSTAL_SMALL, ETiles.CRYSTAL_BIG];
     if (!typesToIgnore.includes(this.tileType)) {
-      const tileIcon = context.add.image(0, 0, this.tileType);
-      if (this.col > 4) tileIcon.setFlipX(true);
-      this.add(tileIcon);
+      this.icon = context.add.image(0, 0, this.tileType);
+      if (this.col > 4) this.icon.setFlipX(true);
+      this.add(this.icon);
     }
-
     this.setSize(90, 90).setInteractive({ useHandCursor: true }).setDepth(2);
     makeTileClickable(this, context);
+
+    this.add(this.unitCard)
 
     context.add.existing(this);
   }

@@ -85,10 +85,10 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
   if (activeUnit && !isSameUnit) {
     // Unique case: Wraith can spawn on a KO'd unit
     if (isHero(unit) && unit.isKO &&
-        isHero(activeUnit) &&
-        activeUnit.unitType === EHeroes.WRAITH &&
-        activeUnit.boardPosition >= 45 &&
-        !isEnemySpawn(context, unit.getTile())
+      isHero(activeUnit) &&
+      activeUnit.unitType === EHeroes.WRAITH &&
+      activeUnit.boardPosition >= 45 &&
+      !isEnemySpawn(context, unit.getTile())
     ) {
       activeUnit.spawn(unit.getTile());
       return;
@@ -223,11 +223,23 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 }
 
 export function makeTileClickable(tile: Tile, context: GameScene): void {
-  tile.on('pointerdown', () => {
+  tile.on('pointerdown', (pointer: Phaser.Input.Pointer, _x: number, _y: number, event: Types.Input.EventData) => {
     if (context.currentGame.status === EGameStatus.FINISHED) return;
 
     visibleUnitCardCheck(context);
     context.longPressStart = undefined;
+
+    // Handle right click: show card if empty special tile
+    if (pointer.button === 2) {
+      const isSpecial = tile.tileType !== ETiles.BASIC && tile.tileType !== ETiles.CRYSTAL;
+      const isEmpty = !tile.hero && !tile.crystal;
+      if (isSpecial && isEmpty) {
+        tile.setDepth(1001);
+        tile.unitCard.setVisible(true);
+        context.visibleUnitCard = tile;
+        event.stopPropagation();
+      }
+    }
 
     // Only the active player can click on tiles, and only if they still have actions available
     if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
@@ -244,9 +256,38 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
 
     // If unit is in hand and clicked tile is highlighted, spawn. Otherwise, use item
     if (activeUnit.boardPosition > 44 && tile.isHighlighted) {
-      if (isHero(activeUnit))  activeUnit.spawn(tile);
+      if (isHero(activeUnit)) activeUnit.spawn(tile);
       if (isItem(activeUnit) && activeUnit.dealsDamage) activeUnit.use(tile);
     }
+  });
+
+  // Handle click outside of the tile
+  context.input.on('pointerdown', () => {
+    if (tile.icon) {
+      tile.icon.setDepth(2);
+    }
+  });
+
+  // Handle long press on the tile
+  tile.on('pointerup', () => {
+    if (context.currentGame.status === EGameStatus.FINISHED) return;
+
+    if (context.longPressStart && context.time.now - context.longPressStart > 500) {
+      tile.setDepth(1001);
+
+      tile.unitCard.setVisible(true);
+      context.visibleUnitCard = tile;
+    }
+  });
+
+  tile.on('pointerout', () => {
+    // Ignore if there was a long press. Used on mobile
+    if (context.visibleUnitCard) return;
+
+    if (tile.icon) {
+      tile.icon.setDepth(2);
+    }
+    tile.unitCard.setVisible(false);
   });
 }
 
@@ -254,7 +295,7 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
   crystal.on('pointerdown', (pointer: Phaser.Input.Pointer, _x: number, _Y: number, event: Types.Input.EventData) => {
     if (context.currentGame.status === EGameStatus.FINISHED) return;
 
-    console.log(`Crystal on ${crystal.boardPosition}`, crystal );
+    console.log(`Crystal on ${crystal.boardPosition}`, crystal);
 
     visibleUnitCardCheck(context);
 
