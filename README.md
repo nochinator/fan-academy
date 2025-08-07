@@ -8,7 +8,7 @@ Scribble Academy is a fork of Fan Academy which is a fan-made revival of the gam
 
 This is not a reverse engineering of the game. The game logic has been written from scratch based on the original gameplay while using the original assets to try to preserve the game's aesthetic as much as possible.
 
-As of now Scribble Academy is largely the same as Hero Academy, with only a few minor differences. However, in the future the assets will be replaced with custom ones, and eventually the game will be expanded upon.
+As of now Scribble Academy is largely the same as Fan academy, with only a few minor differences. However, in the future the assets will be replaced with custom ones, and eventually the game will be built upon.
 
 ## What is Hero Academy?
 
