@@ -228,13 +228,11 @@ export class GameController {
   }
 
   async resetTurn() {
-    console.log("reset turn");
     deselectUnit(this.context);
     this.context.longPressStart = undefined;
     this.context.visibleUnitCard = undefined;
-    playSound(this.context, EGameSounds.RESET_TURN);
-
     this.context.scene.restart();
+    playSound(this.context, EGameSounds.RESET_TURN);
   };
 
   getDeck() {
