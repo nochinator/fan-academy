@@ -796,6 +796,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     // If hero is entering a special tile
     if (targetTile === ETiles.CRYSTAL_DAMAGE) {
+      console.log("crystal")
       this.updateCrystals(true);
       this.crystalDebuffTileAnim.setVisible(true);
       if (sound) playSound(this.scene, EGameSounds.CRYSTAL_TILE);

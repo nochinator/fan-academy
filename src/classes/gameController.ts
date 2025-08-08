@@ -399,19 +399,19 @@ export class GameController {
   undoLastAction(): void {
     playSound(this.context, EUiSounds.BUTTON_GENERIC);
 
-      if (this.currentTurn.length <= 0) {
-        return;
-      }
+    if (this.currentTurn.length <= 0) {
+      return;
+    }
 
-      this.currentTurn.pop();
-    
-      // initial board state is stored in lastTurnState
-      const previousState = this.currentTurn[this.currentTurn.length - 1] ?? this.lastTurnState;
-    
-      this.rebuildFromState(previousState);
-    
-      this.actionPie.showActionSlice(this.context.currentTurnAction!);
-      if (this.context.activeUnit) deselectUnit(this.context);
+    // initial board state is stored in lastTurnState
+    const previousState = this.currentTurn[this.currentTurn.length - 1] ?? this.lastTurnState;
+  
+    this.rebuildFromState(previousState);
+
+    this.currentTurn.pop();
+  
+    this.actionPie.showActionSlice(this.context.currentTurnAction!);
+    if (this.context.activeUnit) deselectUnit(this.context);
   }
 
   afterAction(actionType: EActionType, activePosition: number, targetPosition?: number): void {
