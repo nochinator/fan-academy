@@ -113,6 +113,7 @@ popAnimation(image: Phaser.GameObjects.Image, show = false) {
         break;
       case 4:
         this.popAnimation(this.actionPie4);
+        this.actionArrow.setVisible(true);
         break;
       case 5:
         this.popAnimation(this.actionPie5);
