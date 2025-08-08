@@ -34,7 +34,7 @@ export function selectUnit(context: GameScene, unit: Hero | Item): void {
   context.activeUnit = unit;
 
   // Play the sound
-  if (unit.boardPosition <= 45) {
+  if (unit.boardPosition < 45) {
     context.sound.play(EGameSounds.HERO_THINKING);
   }
 
