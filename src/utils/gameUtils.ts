@@ -447,7 +447,7 @@ export function truncateText(text: string, maxLength: number) {
 export function visibleUnitCardCheck(context: GameScene): void {
   if (context.visibleUnitCard) {
     context.visibleUnitCard.setDepth(context.visibleUnitCard.boardPosition + 10);
-    context.visibleUnitCard.unitCard.setVisible(false);
+    context.visibleUnitCard.unitCard?.setVisible(false);
   }
 }
 
