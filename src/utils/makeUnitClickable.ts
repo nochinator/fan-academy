@@ -227,7 +227,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     if (context.currentGame.status === EGameStatus.FINISHED) return;
 
     visibleUnitCardCheck(context);
-    context.longPressStart = undefined;
+    context.longPressStart = context.time.now;
 
     // Handle right click: show card if empty special tile
     if (pointer.button === 2) {
@@ -235,7 +235,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
       const isEmpty = !tile.hero && !tile.crystal;
       if (isSpecial && isEmpty) {
         tile.setDepth(1001);
-        tile.unitCard.setVisible(true);
+        if (tile.unitCard) tile.unitCard.setVisible(true);
         context.visibleUnitCard = tile;
         event.stopPropagation();
       }
@@ -275,7 +275,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     if (context.longPressStart && context.time.now - context.longPressStart > 500) {
       tile.setDepth(1001);
 
-      tile.unitCard.setVisible(true);
+      if (tile.unitCard) tile.unitCard.setVisible(true);
       context.visibleUnitCard = tile;
     }
   });
@@ -284,10 +284,8 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
     // Ignore if there was a long press. Used on mobile
     if (context.visibleUnitCard) return;
 
-    if (tile.icon) {
-      tile.icon.setDepth(2);
-    }
-    tile.unitCard.setVisible(false);
+    if (tile.icon) tile.icon.setDepth(2);
+    if (tile.unitCard) tile.unitCard.setVisible(false);
   });
 }
 

@@ -3,7 +3,7 @@ import { EActionClass, EActionType, EGameSounds, EGameStatus, EHeroes, ETiles, E
 import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
-import { createNewHero, createNewItem, forcedMoveAnimation, getActionClass, getNewPositionAfterForce, isEnemySpawn, isHero, isItem, playSound, textAnimationSizeIncrease, visibleUnitCardCheck } from "../utils/gameUtils";
+import { createNewHero, createNewItem, forcedMoveAnimation, forcedMoveSpawnCheck, getActionClass, getNewPositionAfterForce, isHero, isItem, playSound, textAnimationSizeIncrease, visibleUnitCardCheck } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
@@ -462,6 +462,7 @@ export class GameController {
       console.error('pushEnemy() no attacker or target board position');
       return;
     }
+    console.log('this logs');
 
     const newPosition = getNewPositionAfterForce(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col, true);
 
@@ -482,7 +483,7 @@ export class GameController {
       console.error('pushEnemy() Destination tile is occupied');
       return;
     }
-    if (targetNewTile.tileType == ETiles.SPAWN && !isEnemySpawn(this.context, targetNewTile) && !target.isKO) {
+    if (targetNewTile.tileType == ETiles.SPAWN && forcedMoveSpawnCheck(targetNewTile, attacker) && !target.isKO) {
       console.error(`pushEnemy() Can't push a non-KO'd enemy onto a friendly spawn`);
       return;
     }
@@ -515,7 +516,7 @@ export class GameController {
       console.error('pullEnemy() Destination tile is occupied');
       return;
     }
-    if (targetNewTile.tileType == ETiles.SPAWN && !isEnemySpawn(this.context, targetNewTile) && !target.isKO) {
+    if (targetNewTile.tileType == ETiles.SPAWN && forcedMoveSpawnCheck(targetNewTile, attacker) && !target.isKO) {
       console.error(`pushEnemy() Can't pull a non-KO'd enemy onto a friendly spawn`);
       return;
     }

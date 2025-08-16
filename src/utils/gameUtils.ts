@@ -307,6 +307,11 @@ export function checkUnitGameOver(context: GameScene, hero: Hero): void {
   };
 }
 
+export function forcedMoveSpawnCheck(tile: Tile | ITile, hero: Hero): boolean {
+  const spawnBelongsTo = tile.col < 5 ? 1 : 2;
+  return tile.tileType === ETiles.SPAWN && hero.belongsTo === spawnBelongsTo;
+}
+
 export function isEnemySpawn(context: GameScene, tile: Tile | ITile): boolean {
   return tile.tileType === ETiles.SPAWN && (context.isPlayerOne ? tile.col > 5 : tile.col < 5);
 }
@@ -442,7 +447,7 @@ export function truncateText(text: string, maxLength: number) {
 export function visibleUnitCardCheck(context: GameScene): void {
   if (context.visibleUnitCard) {
     context.visibleUnitCard.setDepth(context.visibleUnitCard.boardPosition + 10);
-    context.visibleUnitCard.unitCard.setVisible(false);
+    context.visibleUnitCard.unitCard?.setVisible(false);
   }
 }
 

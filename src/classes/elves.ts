@@ -72,16 +72,18 @@ export class Impaler extends DarkElf {
         playSound(this.scene, EGameSounds.IMPALER_ATTACK);
         delay = 650;
       }
+      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
     }
-    const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
-    if (damageDone !== undefined) this.lifeSteal(damageDone);
+      if (damageDone !== undefined) this.lifeSteal(damageDone);
 
-    this.removeAttackModifiers();
+      this.removeAttackModifiers();
+    }
 
     if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) this.context.gameController!.pullEnemy(this, target);
 
     if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -292,7 +294,7 @@ export class Priestess extends DarkElf {
       delay = 500; // no supercharged sound
 
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
-      ;
+
       if (damageDone) this.lifeSteal(damageDone);
 
       // Apply a 50% debuff to the target's next attack or heal
