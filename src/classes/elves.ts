@@ -73,7 +73,6 @@ export class Impaler extends DarkElf {
         delay = 650;
       }
       const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
-    }
 
       if (damageDone !== undefined) this.lifeSteal(damageDone);
 
