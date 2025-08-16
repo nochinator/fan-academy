@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'proLight';
-  src:url('/fonts/BlambotFXProLightBB.woff')
+  src:url('/scribble-academy/fonts/BlambotFXProLightBB.woff')
 }
 
 @font-face {
   font-family: 'proHeavy';
-  src:url('/fonts/BlambotFXProHeavyLowerCapsBB.woff')
+  src:url('/scribble-academy/fonts/BlambotFXProHeavyLowerCapsBB.woff')
 }
 
 body {

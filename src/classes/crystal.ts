@@ -159,11 +159,13 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
   }
 
-  getsDamaged(damage: number, _attackType: EAttackType, multiplier = 1): void {
+  getsDamaged(damage: number, _attackType: EAttackType, delay: number, multiplier = 1,): void {
     if (this.debuffLevel > 0) {
-      playSound(this.scene, EGameSounds.CRYSTAL_DAMAGE_BUFF);
+      // Use Phaser's delayedCall for game-related timing
+      this.scene.time.delayedCall(delay, playSound, [this.scene, EGameSounds.CRYSTAL_DAMAGE_BUFF]);
     } else {
-      playSound(this.scene, EGameSounds.CRYSTAL_DAMAGE);
+      // Use Phaser's delayedCall for game-related timing
+      this.scene.time.delayedCall(delay, playSound, [this.scene, EGameSounds.CRYSTAL_DAMAGE]);
     }
 
     const damageMultiplier = 300 * multiplier * this.debuffLevel;
@@ -191,9 +193,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.currentHealth <= 0) this.removeFromGame();
   }
 
-  removeFromGame(): void {
-    playSound(this.scene, EGameSounds.CRYSTAL_DESTROY);
-
+  removeFromGame(permanent = true): void {
     const tile = this.getTile();
     tile.crystal = undefined;
     tile.obstacle = false;
@@ -203,23 +203,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     const crystalArray = this.context.gameController!.board.crystals;
     const index = crystalArray.findIndex(crystal => crystal.boardPosition === this.boardPosition);
     crystalArray.splice(index, 1);
-
-    // Update the remaining crystal or set gameOver
-    if (this.isLastCrystal) {
-      this.context.gameController!.gameOver = {
-        winCondition: EWinConditions.CRYSTAL,
-        winner: this.context.activePlayer!
-      };
-    } else {
-      const otherCrystals = crystalArray.filter(crystal => crystal.belongsTo === this.belongsTo);
-      if (!otherCrystals.length) throw new Error('Crystal getsDestroyed() No other crystals found');
-
-      if (otherCrystals.length === 1) {
-        otherCrystals[0].isLastCrystal = true;
-        otherCrystals[0].updateTileData();
-      }
-    }
-
+    
     // Remove animations
     this.scene.tweens.killTweensOf(this);
 
@@ -231,6 +215,23 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.debuffEventSingle.remove(false);
     this.debuffEventDouble.remove(false);
 
+    if (permanent) {
+      playSound(this.scene, EGameSounds.CRYSTAL_DESTROY);
+
+      // Update the remaining crystal or set gameOver
+      if (this.isLastCrystal) {
+        this.context.gameController!.gameOver = {
+          winCondition: EWinConditions.CRYSTAL,
+          winner: this.context.activePlayer!
+        };
+      } else {
+        const otherCrystal = crystalArray.find(crystal => crystal.belongsTo === this.belongsTo);
+        if (!otherCrystal) throw new Error('Crystal getsDestroyed() No other crystal found');
+
+        otherCrystal.isLastCrystal = true;
+        otherCrystal.updateTileData();
+      }
+    }
     // Destroy container and children
     this.destroy(true);
   }
