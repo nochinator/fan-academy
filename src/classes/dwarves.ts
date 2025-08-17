@@ -130,6 +130,35 @@ export class Paladin extends Dwarf {
     this.context.sound.play(EGameSounds.HEAL, { volume: 0.5 });
   }
 
+  async move(targetTile: Tile): Promise<void> {
+    // remove current auras
+    let allTiles = [...getAOETiles(this.context, this, targetTile, true).heroTiles, ...getAOETiles(this.context, this, targetTile, true).crystalTiles];
+    allTiles.forEach(tile => {
+      const unit = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+
+      if (unit && unit !== this) {
+        this.magicalDamageResistance -= 5;
+        this.physicalDamageResistance -= 5;
+        this.paladinAura -= 1;
+      }
+    });
+
+    // add new auras
+    allTiles = [...getAOETiles(this.context, this, targetTile, true).heroTiles, ...getAOETiles(this.context, this, targetTile, true).crystalTiles];
+    allTiles.forEach(tile => {
+      const unit = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+
+      if (unit && unit !== this) {
+        unit.magicalDamageResistance += 5;
+        unit.physicalDamageResistance += 5;
+        unit.paladinAura += 1;
+        unit.unitCard.updateCardData(unit);
+      }
+    });
+
+    super.move(targetTile);
+  }
+
   special(_target: Hero): void {};
 }
 
@@ -244,19 +273,21 @@ export class Engineer extends Dwarf {
   }
 
   // Engineer's special ability: Shield
-  async shield(target: Hero | Crystal): Promise<void> {
+  async special(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
     playSound(this.scene, EGameSounds.ENGINEER_SHIELD_MAKE);
 
     // Remove old shield if one exists
     if (this.shieldedTarget) {
       playSound(this.scene, EGameSounds.ENGINEER_SHIELD_BREAK);
+      this.shieldedTarget.shieldImage.setVisible(false);
       this.shieldedTarget.isShielded = false;
     }
 
     // Apply new shield
     this.shieldedTarget = target;
     target.isShielded = true;
+    target.shieldImage.setVisible(true);
 
     this.context.gameController!.afterAction(EActionType.SPECIAL, this.boardPosition, target.boardPosition);
   }
@@ -299,7 +330,7 @@ export class Engineer extends Dwarf {
   }
 
   heal(_target: Hero): void { };
-  special(_target: Hero): void {};}
+}
 
 // Hero Class: Annihilator
 export class Annihilator extends Dwarf {
@@ -397,6 +428,8 @@ export class DwarvenBrew extends Item {
   use(target: Hero): void {
     target.getsHealed(1000);
     target.isDrunk = true;
+    target.physicalDamageResistance += 50;
+    target.magicalDamageResistance += 50;
     target.unitCard.updateCardData(target);
     target.updateTileData();
     playSound(this.scene, EGameSounds.BREW_USE);

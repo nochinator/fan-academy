@@ -173,7 +173,13 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
         // Ninja can swap places with any friendly unit on the board
         if (activeUnit.unitType === EHeroes.NINJA && allyReticle?.visible && !unit.isKO) {
-          activeUnit.teleport(unit);
+          activeUnit.special(unit);
+          return;
+        }
+
+        // engineer can build shileds on allys
+        if (activeUnit.unitType === EHeroes.ENGINEER && healReticle?.visible && !unit.isKO) {
+          activeUnit.special(unit);
           return;
         }
 
