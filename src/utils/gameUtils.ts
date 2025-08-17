@@ -446,7 +446,7 @@ export function truncateText(text: string, maxLength: number) {
 // Used to remove any visible unit cards from a mobile long press action
 export function visibleUnitCardCheck(context: GameScene): void {
   if (context.visibleUnitCard) {
-    context.visibleUnitCard.setDepth(context.visibleUnitCard.boardPosition + 10);
+    context.visibleUnitCard.setDepth(context.visibleUnitCard.row + 10);
     context.visibleUnitCard.unitCard?.setVisible(false);
   }
 }

@@ -127,7 +127,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Create the unit's image and images for its upgrades
     const inHand = isInHand(this.boardPosition);
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, inHand, data.isKO);
-    this.characterImage = context.add.image(charImageX, charImageY, this.updateCharacterImage()).setOrigin(0.5).setName('body');
+    this.characterImage = context.add.image(charImageX, charImageY, this.updateCharacterImage()).setOrigin(0.5).setName('body').setDepth(this.row + 10);
     if (inHand) this.characterImage.setScale(0.8);
     if (this.belongsTo === 2 && this.boardPosition < 45) this.characterImage.setFlipX(true);
 
@@ -261,7 +261,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       hitArea,
       hitAreaCallback: Phaser.Geom.Rectangle.Contains,
       useHandCursor: true
-    }).setName(this.unitId).setDepth(this.boardPosition + 10);
+    }).setName(this.unitId).setDepth(this.row + 10);
 
     // Hide if in deck
     if (this.boardPosition === 51) this.setVisible(false);
@@ -291,6 +291,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.boardPosition = tile.boardPosition;
     this.row = tile.row;
     this.col = tile.col;
+    this.setDepth(this.row + 10);
+    console.log('depth', this.depth);
   }
 
   exportData(): IHero {
@@ -651,6 +653,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, false);
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
+    this.setDepth(this.row + 10);
     // Flip image if player is player 2
     if (this.belongsTo === 2) this.characterImage.setFlipX(true);
 

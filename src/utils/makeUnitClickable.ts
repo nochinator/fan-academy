@@ -10,6 +10,7 @@ import { deselectUnit, selectUnit } from "./playerUtils";
 
 export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
   unit.on('pointerdown', (pointer: Phaser.Input.Pointer, _x: number, _y: number, event: Types.Input.EventData) => {
+    console.log('clicked depth', unit.depth);
     if (context.currentGame.status === EGameStatus.FINISHED) return;
 
     visibleUnitCardCheck(context);
@@ -291,6 +292,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
 
 export function makeCrystalClickable(crystal: Crystal, context: GameScene): void {
   crystal.on('pointerdown', (pointer: Phaser.Input.Pointer, _x: number, _Y: number, event: Types.Input.EventData) => {
+    console.log('crystal depth', crystal.depth);
     if (context.currentGame.status === EGameStatus.FINISHED) return;
 
     console.log(`Crystal on ${crystal.boardPosition}`, crystal);
@@ -340,7 +342,7 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
     // Ignore if there was a long press. Used on mobile
     if (context.visibleUnitCard) return;
 
-    crystal.setDepth(crystal.boardPosition + 10);
+    crystal.setDepth(crystal.row + 10);
     crystal.unitCard.setVisible(false);
   });
 }
