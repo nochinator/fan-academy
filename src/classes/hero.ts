@@ -292,7 +292,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.row = tile.row;
     this.col = tile.col;
     this.setDepth(this.row + 10);
-    console.log('depth', this.depth);
   }
 
   exportData(): IHero {
