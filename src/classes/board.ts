@@ -23,7 +23,7 @@ export class Board {
   constructor(context: GameScene, data: ITile[]) {
     this.context = context;
     this.tiles = this.createTileGrid(data);
-    this.crystals.forEach(crystal => crystal.updateDebuffAnimation(crystal.debuffLevel));
+    this.crystals.forEach(crystal => crystal.updateDebuffAnimation(crystal.debuffAmount));
   }
 
   createTileGrid(tiles: ITile[]) {
@@ -92,7 +92,7 @@ export class Board {
           // Store hero processing till after crystals
           heroOperations.push(() => {
             const hero = createNewHero(this.context, tileData.hero);
-            hero.specialTileCheck(tile.tileType, undefined, false);
+            hero.specialTileCheck(tile, undefined, false);
             hero.updatePosition(tile);
             this.units.push(hero);
             tile.hero = hero.exportData();

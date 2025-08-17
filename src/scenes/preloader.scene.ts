@@ -1,4 +1,4 @@
-export const CDN_PATH = 'https://cdn.jsdelivr.net/gh/nochinator/sa-assets@990b21d';
+export const CDN_PATH = 'https://cdn.jsdelivr.net/gh/nochinator/sa-assets@58bee66d21c333c39eb001e86482163f849725f1';
 
 // PreloaderScene.ts
 export default class PreloaderScene extends Phaser.Scene {
@@ -17,8 +17,8 @@ export default class PreloaderScene extends Phaser.Scene {
 
   loadRestOfAssets() {
     // fonts
-    this.load.font('proHeavy', '/scribble-academy/fonts/BlambotFXProHeavyLowerCapsBB.woff', 'truetype');
-    this.load.font('proLight', '/scribble-academy/fonts/BlambotFXProLightBB.woff', 'truetype');
+    this.load.font('proHeavy', '/fan-academy/fonts/BlambotFXProHeavyLowerCapsBB.woff', 'truetype');
+    this.load.font('proLight', '/fan-academy/fonts/BlambotFXProLightBB.woff', 'truetype');
 
     // popups
     this.load.image('popupBackground', `${CDN_PATH}/images/gameItems/popup_button.webp`);

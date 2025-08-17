@@ -1,14 +1,12 @@
-# Scribble Academy
+# Fan Academy
 
 <p align="center">
 <a href="https://fan-academy.onrender.com/"><img src="./readmeImage.webp" alt="Fan Academy screenshot" width="600" height="auto"></a>
 </p>
 
-Scribble Academy is a fork of Fan Academy which is a fan-made revival of the game **Hero Academy**, a turn-based tactics game developed by Robot Entertainment. This project aims to bring back the joy of the original game, offering a way for fans to rediscover it.
+Fan Academy is a fan-made revival of the game **Hero Academy**, a turn-based tactics game developed by Robot Entertainment. This project aims to bring back the joy of the original game, offering a way for fans to rediscover it.
 
 This is not a reverse engineering of the game. The game logic has been written from scratch based on the original gameplay while using the original assets to try to preserve the game's aesthetic as much as possible.
-
-As of now Scribble Academy is largely the same as Fan academy, with only a few minor differences. However, in the future the assets will be replaced with custom ones, and eventually the game will be built upon.
 
 ## What is Hero Academy?
 
@@ -18,14 +16,13 @@ Learn more about the original game [here on its Wikipedia page](https://en.wikip
 
 ## How was Fan Academy made?
 
-Scribble Academy is written in Typescript, using the game engine [Phaser](https://phaser.io/) for the client and Node, Express, MongoDB and [Colyseus](https://colyseus.io/) for the back-end.
+Fan Academy is written in Typescript, using the game engine [Phaser](https://phaser.io/) for the client and Node, Express, MongoDB and [Colyseus](https://colyseus.io/) for the back-end.
 
 The server code is hosted on a [separate repository](https://github.com/Dan-DH/fan-academy-be).
 
 ## Who is behind the project?
 
-The original creator is Daniel, a full-stack developer with a background in HR and a passion for coding and data.
-This fork is managed and created by nochinator.
+Hi, I'm **Daniel, a.k.a. dadazbk**, a full-stack developer based in Belgium. You can learn more about me on my [GitHub profile](https://github.com/Dan-DH).
 
 ## Licensing and disclaimer
 
@@ -37,14 +34,12 @@ This means:
   - Adapt: Remix, transform, and build upon the code.
 
 - **Under the following terms:**
-  - **Attribution:** You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use. This includes both Daniel and nochinator.
+  - **Attribution:** You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
   - **NonCommercial:** You may not use the material for commercial purposes.
 
 ### **Disclaimer for Third-Party Assets**
 
-This project includes proprietary assets from **Hero Academy**, which are the property of **Robot Entertainment**. These assets are used for educational and non-commercial purposes under the assumption of fair use for a fan project. **The above license applies only to the code in this repository and not to the assets.** All rights to the proprietary assets remain with their respective owners.
-
-Note: Any new assets created for this project will be under the same CC BY-NC license as the code. Eventually none of the original assets will remain.
+This project includes proprietary assets from **Hero Academy**, which are the property of **Robot Entertainment**. These assets are used for educational and non-commercial purposes under the assumption of fair use for a fan project. **This license applies only to the code in this repository and not to the assets.** All rights to the proprietary assets remain with their respective owners.
 
 ## Local Setup & Running Locally
 
@@ -52,8 +47,8 @@ To run Fan Academy locally, follow these steps:
 
 ### 1. Clone the repository
 ```sh
-git clone https://github.com/nochinator/scribble-academy.git
-cd scribble-academy
+git clone https://github.com/Dan-DH/fan-academy.git
+cd fan-academy
 ```
 
 ### 2. Install dependencies
@@ -68,8 +63,8 @@ npm install
 ### 3. Configure environment variables
 Create a `.env` file in the project root. Example:
 ```env
-VITE_BE_URL=https://scribble-academy-be.onrender.com
-VITE_SOCKET=wss://scribble-academy-be.onrender.com
+VITE_BE_URL=https://fan-academy-be.onrender.com
+VITE_SOCKET=wss://fan-academy-be.onrender.com
 ```
 You can copy and rename `.env.example` as `.env`:
 ```sh

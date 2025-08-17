@@ -14,7 +14,7 @@ function renderChunks(deps) {
 
 export default defineConfig({
   // Add this line to set the base path for GitHub Pages
-  base: '/scribble-academy/', 
+  base: '/fan-academy/', 
 
   build: {
     rollupOptions: {

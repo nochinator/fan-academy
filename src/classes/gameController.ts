@@ -147,9 +147,8 @@ export class GameController {
           if (
             actionTaken === EActionType.ATTACK ||
             actionTaken === EActionType.HEAL ||
-            actionTaken === EActionType.TELEPORT ||
-            actionTaken === EActionType.SPAWN_PHANTOM
-          ) await this.replayAttackHealTeleport(turn.action!);
+            actionTaken === EActionType.SPECIAL
+          ) await this.replayAttackHealSpecial(turn.action!);
 
           if (actionTaken === EActionType.SHUFFLE) await this.replayShuffle();
 
@@ -186,15 +185,14 @@ export class GameController {
     if (actionTaken === EActionType.SPAWN) hero.setVisible(true).spawn(tile);
   };
 
-  async replayAttackHealTeleport(action: ITurnAction): Promise<void> {
+  async replayAttackHealSpecial(action: ITurnAction): Promise<void> {
     const hero = this.board.units.find(unit => unit.boardPosition === action.actorPosition);
     const target = this.board.crystals.find(crystal => crystal.boardPosition === action.targetPosition) ?? this.board.units.find(unit => unit.boardPosition === action.targetPosition);
     if (!hero || !target) throw new Error('Missing hero or target in attack or heal action');
 
     // VSCode says await has no effect on them, but it does work
-    if (action.action === EActionType.ATTACK || action.action === EActionType.SPAWN_PHANTOM) await hero.attack(target);
     if (action.action === EActionType.HEAL) await hero.heal(target as Hero);
-    if (action.action === EActionType.TELEPORT) await hero.teleport(target as Hero);
+    if (action.action === EActionType.SPECIAL) await hero.special(target as Hero);
   };
 
   async replayUse(action: ITurnAction, opponentHand: (Hero | Item)[]): Promise<void> {
@@ -401,6 +399,7 @@ export class GameController {
       return;
     }
 
+    console.log(this.lastTurnState);
     // initial board state is stored in lastTurnState
     const previousState = this.currentTurn[this.currentTurn.length - 1] ?? this.lastTurnState;
   
@@ -488,7 +487,7 @@ export class GameController {
       return;
     }
 
-    if (!target.isKO) target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
+    if (!target.isKO) target.specialTileCheck(targetNewTile, targetTile);
 
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
@@ -521,7 +520,7 @@ export class GameController {
       return;
     }
 
-    if (!target.isKO) target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
+    if (!target.isKO) target.specialTileCheck(targetNewTile, targetTile);
 
     await forcedMoveAnimation(this.context, target, targetNewTile);
 

@@ -17,7 +17,10 @@ export class Crystal extends Phaser.GameObjects.Container {
   boardPosition: number;
   row: number;
   col: number;
+  debuffAmount: number;
   debuffLevel: number;
+  isShielded: boolean;
+  paladinAura: boolean;
 
   context: GameScene;
 
@@ -25,6 +28,8 @@ export class Crystal extends Phaser.GameObjects.Container {
   crystalImage: Phaser.GameObjects.Image;
   singleCrystalDebuff: Phaser.GameObjects.Image;
   doubleCrystalDebuff: Phaser.GameObjects.Image;
+  annihilatorDebuff: Phaser.GameObjects.Image;
+  shield: Phaser.GameObjects.Image;
   attackReticle: Phaser.GameObjects.Image;
   blockedLOS: Phaser.GameObjects.Image;
 
@@ -47,7 +52,10 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.row = tile.row;
     this.col = tile.col;
     this.belongsTo = data.belongsTo;
-    this.debuffLevel = data.debuffLevel < 0 ? 0 : data.debuffLevel; // safeguard for bug that keeps making debuff level negative. Remove when fixed
+    this.debuffAmount = data.debuffAmount < 0 ? 0 : data.debuffAmount; // safeguard for bug that keeps making debuff level negative. Remove when fixed
+    this.debuffLevel = data.debuffLevel < 0 || data.debuffLevel === undefined ? 0 : data.debuffLevel; // safeguard for bug that keeps making debuff level negative. Remove when fixed
+    this.isShielded = data.isShielded;
+    this.paladinAura = data.paladinAura;
 
     this.healthBar = new HealthBar(context, data, -38, -70);
     this.unitCard = new CrystalCard(context, data).setVisible(false);
@@ -64,6 +72,11 @@ export class Crystal extends Phaser.GameObjects.Container {
 
     // Debuff images and animation
     this.singleCrystalDebuff = context.add.image(0, -30, 'crystalDebuff_1').setVisible(false);
+    this.doubleCrystalDebuff = context.add.image(0, -30, 'crystalDebuff_3').setVisible(false);
+
+    this.shield = context.add.image(0, -30, 'shield').setVisible(false);
+    this.annihilatorDebuff = context.add.image(0, -30, 'annihilatorDebuff').setVisible(false);
+
     this.doubleCrystalDebuff = context.add.image(0, -30, 'crystalDebuff_3').setVisible(false);
 
     const crystalDebuffEvent = (debuffImage: Phaser.GameObjects.Image, texture1: string, texture2: string) => {
@@ -104,6 +117,9 @@ export class Crystal extends Phaser.GameObjects.Container {
   }
 
   updateDebuffAnimation(newLevel: number): void {
+    if (newLevel === undefined) {
+      newLevel = 0;
+    }
     switch (newLevel) {
       case 0:
         this.singleCrystalDebuff.setVisible(false);
@@ -124,11 +140,7 @@ export class Crystal extends Phaser.GameObjects.Container {
         console.error('updateDebuffAnimation() level and case dont match', newLevel);
         break;
     }
-
-    if (newLevel !== this.debuffLevel) {
-      this.debuffLevel = newLevel;
-      this.updateTileData();
-    }
+    this.debuffLevel = newLevel
   }
 
   getTile(): Tile {
@@ -145,6 +157,10 @@ export class Crystal extends Phaser.GameObjects.Container {
       this.debuffLevel = 0;
       this.updateDebuffAnimation(this.debuffLevel);
     }
+    if (this.debuffAmount < 0) {
+      this.debuffAmount = 0;
+    }
+
 
     tile.crystal = {
       belongsTo: this.belongsTo,
@@ -155,12 +171,20 @@ export class Crystal extends Phaser.GameObjects.Container {
       boardPosition: this.boardPosition,
       row: this.row,
       col: this.col,
-      debuffLevel: this.debuffLevel
+      debuffAmount: this.debuffAmount,
+      debuffLevel: this.debuffLevel,
+      isShielded: this.isShielded,
+      paladinAura: this.paladinAura
     };
   }
 
-  getsDamaged(damage: number, _attackType: EAttackType, delay: number, multiplier = 1,): void {
-    if (this.debuffLevel > 0) {
+  getsDamaged(damage: number, _attackType: EAttackType, delay: number, multiplier = 1): void {
+    if (this.isShielded) {
+      this.isShielded = false;
+      playSound(this.context, EGameSounds.ENGINEER_SHIELD_BREAK);
+      return
+    }
+    if (this.debuffAmount > 0) {
       // Use Phaser's delayedCall for game-related timing
       this.scene.time.delayedCall(delay, playSound, [this.scene, EGameSounds.CRYSTAL_DAMAGE_BUFF]);
     } else {
@@ -168,7 +192,9 @@ export class Crystal extends Phaser.GameObjects.Container {
       this.scene.time.delayedCall(delay, playSound, [this.scene, EGameSounds.CRYSTAL_DAMAGE]);
     }
 
-    const damageMultiplier = 300 * multiplier * this.debuffLevel;
+    
+
+    const damageMultiplier = this.debuffAmount * multiplier;
     const totalDamage = roundToFive(damage + damageMultiplier);
     const damageTaken = totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
     this.currentHealth -= damageTaken;

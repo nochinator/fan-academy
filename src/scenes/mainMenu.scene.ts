@@ -31,8 +31,8 @@ export default class MainMenuScene extends Phaser.Scene {
     this.load.image('mainMenuButton', `${CDN_PATH}/ui/main_menu_button.webp`);
 
     // fonts
-    this.load.font('proHeavy', '/scribble-academy/fonts/BlambotFXProHeavyLowerCapsBB.woff', 'truetype');
-    this.load.font('proLight', '/scribble-academy/fonts/BlambotFXProLightBB.woff', 'truetype');
+    this.load.font('proHeavy', '/fan-academy/fonts/BlambotFXProHeavyLowerCapsBB.woff', 'truetype');
+    this.load.font('proLight', '/fan-academy/fonts/BlambotFXProLightBB.woff', 'truetype');
 
     // sounds
     this.load.audio('buttonFailedSound', `${CDN_PATH}/audio/ui/buttonFailed.mp3`);
