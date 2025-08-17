@@ -8,6 +8,7 @@ import { Tile } from "../classes/tile";
 import { EActionClass, EActionType, ECardType, EClass, EGameSounds, EHeroes, EItems, ETiles, EUiSounds, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, IHero, IItem, IPlayerState, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import UIScene from "../scenes/ui.scene";
 
 export function isHero(hero: IHero | IItem): hero is Hero {
   return hero.class === "hero";
@@ -495,4 +496,12 @@ export function textAnimationFadeOut(text: GameObjects.Text, duration = 1000): P
       }
     });
   });
+}
+
+export function gameListFadeOutText(context: UIScene | GameScene, x: number, y: number, message: string): Phaser.GameObjects.Text {
+  return context.add.text(x, y, message, {
+    fontFamily: "proLight",
+    fontSize: 60,
+    color: '#fffb00'
+  }).setDepth(9999);
 }

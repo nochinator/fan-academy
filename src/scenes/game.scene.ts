@@ -9,6 +9,7 @@ import { createChatComponent } from "./gameSceneUtils/chatComponent";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameAssets } from "./mainMenuUtils/gameAssets";
 import { Tile } from "../classes/tile";
+import { gameListFadeOutText, textAnimationFadeOut } from "../utils/gameUtils";
 
 export default class GameScene extends Phaser.Scene {
   userId!: string;
@@ -87,10 +88,19 @@ export default class GameScene extends Phaser.Scene {
     this.input.mouse!.disableContextMenu();
     this.gameController = new GameController(this);
     if (this.triggerReplay) this.gameController.replayTurn();
+
+    this.game.events.on('messageToGameScene', (data: {
+      x: number,
+      y: number,
+      message: string
+    }) => {
+      const { x, y, message } = data;
+      const openGameLimitReached = gameListFadeOutText(this, x, y, message );
+      textAnimationFadeOut(openGameLimitReached, 3000);
+    });
   }
 
   onShutdown() {
-    console.log('Game scene shutdown logs, remove');
     this.sound.stopAll();
   }
 };

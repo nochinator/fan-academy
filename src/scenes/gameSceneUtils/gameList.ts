@@ -3,7 +3,7 @@ import { createGame } from "../../colyseus/colyseusGameRoom";
 import { sendDeletedGameMessage } from "../../colyseus/colyseusLobbyRoom";
 import { EChallengePopup, EFaction, EGameStatus, EUiSounds } from "../../enums/gameEnums";
 import { IGame, IPlayerData } from "../../interfaces/gameInterface";
-import { textAnimationFadeOut, truncateText } from "../../utils/gameUtils";
+import { gameListFadeOutText, textAnimationFadeOut, truncateText } from "../../utils/gameUtils";
 import { timeAgo } from "../../utils/timeAgo";
 import UIScene from "../ui.scene";
 import { accessGame } from "./gameMenuUI";
@@ -179,28 +179,41 @@ export async function createGameList(context: UIScene) {
   const councilEmblem = context.add.image(380, lastListItemY, EFaction.COUNCIL).setOrigin(0).setScale(0.5).setInteractive({ useHandCursor: true });
   const elvesEmblem = context.add.image(530, lastListItemY, EFaction.DARK_ELVES).setOrigin(0).setScale(0.5).setInteractive({ useHandCursor: true });
 
-  const openGameLimitText = () => {
-    return context.add.text(300, 350, `You have reached the max amount of open games`, {
-      fontFamily: "proLight",
-      fontSize: 60,
-      color: '#fffb00'
-    }).setDepth(999);
-  };
-
   // Creating a new game when clicking on the desired faction
   const createNewGame = async (faction: EFaction) => {
     if (context.activeGamesAmount >= context.activeGamesAmountLimit) {
       console.log('Reached game cap');
-      const openGameLimitReached = openGameLimitText();
-      textAnimationFadeOut(openGameLimitReached, 3000);
+      if (context.currentRoom) {
+        context.game.events.emit('messageToGameScene', {
+          x: 300,
+          y: 350,
+          message: `You have reached the max amount of open games`
+        });
+      } else {
+        const openGameLimitReached = gameListFadeOutText(context, 300, 350, `You have reached the max amount of open games`);
+        textAnimationFadeOut(openGameLimitReached, 3000);
+      }
       return;
     }
     // Create the faction's deck and starting hand
     if (context.userId) {
       context.sound.play(EUiSounds.BUTTON_PLAY);
+      const activeRoom = context.currentRoom ? context.currentRoom : undefined;
       await createGame(context, faction);
       await context.currentRoom?.leave();
       context.currentRoom = undefined;
+      if (activeRoom) context.currentRoom = activeRoom;
+
+      if (context.currentRoom) {
+        context.game.events.emit('messageToGameScene', {
+          x: 700,
+          y: 350,
+          message: `New game created`
+        });
+      } else {
+        const newGameCreated = gameListFadeOutText(context, 700, 350, `New game created`);
+        textAnimationFadeOut(newGameCreated, 3000);
+      }
     } else {
       console.error('No userId when creating a new game');
     }
