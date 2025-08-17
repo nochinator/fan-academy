@@ -23,7 +23,7 @@ export class Board {
   constructor(context: GameScene, data: ITile[]) {
     this.context = context;
     this.tiles = this.createTileGrid(data);
-    this.crystals.forEach(crystal => crystal.updateDebuffAnimation(crystal.debuffLevel));
+    this.crystals.forEach(crystal => crystal.updateDebuffAnimation(crystal.debuffAmount));
   }
 
   createTileGrid(tiles: ITile[]) {

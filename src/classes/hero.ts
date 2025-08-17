@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EClass, EFaction, EGameSounds, EHeroes, EItems, ETiles } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { checkUnitGameOver, getGridDistance, isInHand, moveAnimation, playSound, roundToFive, selectDeathSound, useAnimation } from "../utils/gameUtils";
+import { checkUnitGameOver, getAOETiles, getGridDistance, isInHand, moveAnimation, playSound, roundToFive, selectDeathSound, useAnimation } from "../utils/gameUtils";
 import { positionHeroImage } from "../utils/heroImagePosition";
 import { makeUnitClickable } from "../utils/makeUnitClickable";
 import { Crystal } from "./crystal";
@@ -37,14 +37,18 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   runeMetal: boolean;
   shiningHelm: boolean;
   superCharge: boolean;
-  attackTile: boolean;
+  attackTile: number;
   isActiveValue: boolean;
   belongsTo: number;
   canHeal: boolean;
   unitsConsumed: number;
-  isDebuffed: boolean;
+  priestessDebuff: boolean;
+  annihilatorDebuff: boolean;
+  isShielded: boolean;
+  isDrunk: boolean;
+  paladinAura: number;
   manaVial?: boolean;
-  speedTile?: boolean;
+  speedTile?: number;
 
   context: GameScene;
   unitCard: HeroCard;
@@ -57,7 +61,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   healReticle: Phaser.GameObjects.Image;
   allyReticle: Phaser.GameObjects.Image;
   blockedLOS: Phaser.GameObjects.Image;
-  debuffImage: Phaser.GameObjects.Image;
+  priestessDebuffImage: Phaser.GameObjects.Image;
+  annihilatorDebuffImage: Phaser.GameObjects.Image;
+  shieldImage: Phaser.GameObjects.Image;
   crystalDebuffTileAnim: Phaser.GameObjects.Image;
   powerTileAnim: Phaser.GameObjects.Image;
   magicalResistanceTileAnim: Phaser.GameObjects.Image;
@@ -112,7 +118,11 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.belongsTo = data.belongsTo ?? 1;
     this.canHeal = data.canHeal ?? false;
     this.unitsConsumed = data.unitsConsumed ?? 0;
-    this.isDebuffed = data.isDebuffed;
+    this.priestessDebuff = data.priestessDebuff ?? false;
+    this.annihilatorDebuff = data.annihilatorDebuff ?? false;
+    this.isShielded = data.isShielded ?? false;
+    this.isDrunk = data.isDrunk ?? false;
+    this.paladinAura = data.paladinAura ?? 0;
     this.manaVial = data?.manaVial ?? undefined;
     this.speedTile = data.speedTile;
 
@@ -151,11 +161,23 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.attackReticle = context.add.image(0, -10, 'attackReticle').setOrigin(0.5).setScale(0.8).setName('attackReticle').setVisible(false);
     this.healReticle = context.add.image(0, -10, 'healReticle').setOrigin(0.5).setScale(0.8).setName('healReticle').setVisible(false);
     this.allyReticle = context.add.image(0, -10, 'allyReticle').setOrigin(0.5).setScale(0.6).setName('allyReticle').setVisible(false);
-    this.debuffImage = context.add.image(0, -10, 'debuff').setOrigin(0.5).setScale(2.5).setName('debuff');
-    if (this.isDebuffed) {
-      this.debuffImage.setVisible(true);
+    this.priestessDebuffImage = context.add.image(0, -10, 'priestessDebuff').setOrigin(0.5).setScale(2.5).setName('priesetessDebuff');
+    if (this.priestessDebuff) {
+      this.priestessDebuffImage.setVisible(true);
     } else {
-      this.debuffImage.setVisible(false);
+      this.priestessDebuffImage.setVisible(false);
+    }
+    this.annihilatorDebuffImage = context.add.image(0, -10, 'annihilatorDebuff').setOrigin(0.5).setScale(2.5).setName('annihilatorDebuff');
+    if (this.priestessDebuff) {
+      this.annihilatorDebuffImage.setVisible(true);
+    } else {
+      this.annihilatorDebuffImage.setVisible(false);
+    }
+    this.shieldImage = context.add.image(0, -10, 'shield').setOrigin(0.5).setScale(2.5).setName('shield');
+    if (this.priestessDebuff) {
+      this.shieldImage.setVisible(true);
+    } else {
+      this.shieldImage.setVisible(false);
     }
 
     // Add animations to the reticles
@@ -175,7 +197,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     addCirclingTween(this.attackReticle);
     addCirclingTween(this.healReticle);
     addCirclingTween(this.allyReticle);
-    addCirclingTween(this.debuffImage);
+    addCirclingTween(this.priestessDebuffImage);
 
     // Add blocked LOS and its animation
     this.blockedLOS = context.add.image(0, -10, 'blockedLOS').setOrigin(0.5).setName('blockedLOS').setVisible(false);
@@ -239,7 +261,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const hitArea = new Phaser.Geom.Rectangle(-35, -50, 75, 85); // centered on (0,0)
     // Add all individual images to container
     this.add([
-      this.debuffImage,
+      this.priestessDebuffImage,
+      this.annihilatorDebuffImage,
+      this.shieldImage,
       this.superChargeAnim,
       this.reviveAnim,
       this.characterImage,
@@ -325,7 +349,11 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       belongsTo: this.belongsTo,
       canHeal: this.canHeal,
       unitsConsumed: this.unitsConsumed,
-      isDebuffed: this.isDebuffed,
+      priestessDebuff: this.priestessDebuff,
+      annihilatorDebuff: this.annihilatorDebuff,
+      isShielded: this.isShielded,
+      paladinAura: this.paladinAura,
+      isDrunk: this.isDrunk,
       manaVial: this.manaVial,
       speedTile: this.speedTile
     };
@@ -410,6 +438,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.unitCard.updateCardData(this);
     this.updateTileData();
 
+    if (this instanceof Hero && this.isKO && this.unitType === EHeroes.PHANTOM) this.removeFromGame();
+
     return totalDamage; // Return damage taken for lifesteal
   }
 
@@ -423,11 +453,12 @@ export abstract class Hero extends Phaser.GameObjects.Container {
      */
     if (rangeModifier === 0) rangeModifier = 1;
     const runeMetalBuff = this.runeMetal ? 1.5 : 1;
-    const attackTileBuff = this.attackTile ? 100 : 0;
+    const attackTileBuff = this.attackTile;
     const superCharge = this.superCharge ? 3 : 1;
-    const priestessDebuff = this.isDebuffed ? 0.5 : 1;
+    const priestessDebuff = this.priestessDebuff ? 0.5 : 1;
+    const paladinAura = (this.paladinAura * 0.05) + 1;
 
-    return (this.basePower + attackTileBuff) * rangeModifier * superCharge * priestessDebuff * runeMetalBuff;
+    return (this.basePower + attackTileBuff) * paladinAura * rangeModifier * superCharge * priestessDebuff * runeMetalBuff;
   }
 
   getLifeLost(damage: number, attackType: EAttackType) {
@@ -435,6 +466,17 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       [EAttackType.MAGICAL]: this.magicalDamageResistance,
       [EAttackType.PHYSICAL]: this.physicalDamageResistance
     };
+
+    if (this.isShielded) {
+      this.isShielded = false;
+      this.shieldImage.setVisible(false);
+      return 0
+    }
+    if (this.annihilatorDebuff) {
+      resistance[EAttackType.PHYSICAL] -= 50;
+      this.annihilatorDebuff = false;
+      this.annihilatorDebuffImage.setVisible(false);
+    } 
 
     const reduction = resistance[attackType];
 
@@ -444,9 +486,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   getTotalHealing(unitHealingMult: number): number {
     const runeMetalBuff = this.runeMetal ? 1.5 : 1;
-    const attackTileBuff = this.attackTile ? 100 : 0;
+    const attackTileBuff = this.attackTile;
     const superCharge = this.superCharge ? 3 : 1;
-    const priestessDebuff = this.isDebuffed ? 0.5 : 1;
+    const priestessDebuff = this.priestessDebuff ? 0.5 : 1;
 
     return (this.basePower + attackTileBuff) * unitHealingMult * superCharge * priestessDebuff * runeMetalBuff;
   }
@@ -485,7 +527,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.lastBreath = false;
     this.characterImage.setTexture(this.updateCharacterImage());
     const { charImageX, charImageY } = positionHeroImage(this.unitType, this.belongsTo === 1, false, false);
-    this.specialTileCheck(this.getTile().tileType);
+    this.specialTileCheck(this.getTile());
 
     this.characterImage.x = charImageX;
     this.characterImage.y = charImageY;
@@ -624,7 +666,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     }
 
     // Check if the unit is leaving or entering a special tile and apply any effects
-    this.specialTileCheck(targetTile.tileType, startTile.tileType);
+    this.specialTileCheck(targetTile, startTile);
     this.updatePosition(targetTile);
     targetTile.hero = this.exportData();
     startTile.removeHero();
@@ -659,7 +701,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Update vertical positioning of the info card
     this.unitCard.y = 0;
     // A Wraith can spawn on a special tile. Phantom spawning is handled within its class
-    this.specialTileCheck(tile.tileType);
+    this.specialTileCheck(tile);
     // Position hero on the board
     this.updatePosition(tile);
     // Update tile data
@@ -674,7 +716,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
   abstract attack(target: Hero | Crystal): void;
   abstract heal(target: Hero): void;
-  abstract teleport(target: Hero): void;
+  abstract special(target: Hero): void;
   abstract equipFactionBuff(handPosition: number): void;
 
   isFullHP(): boolean {
@@ -738,89 +780,149 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
   }
 
-  private updateCrystals(increase: boolean): void {
+  private updateCrystals(change: number): void {
     this.context.gameController!.board.crystals.forEach(crystal => {
       if (crystal.belongsTo !== this.belongsTo) {
         let newLevel: number = 0;
 
-        if (increase) newLevel = crystal.debuffLevel + 1;
-        if (!increase && crystal.debuffLevel > 0) newLevel = crystal.debuffLevel - 1; // Safeguard to avoid it going negative until I figure out the bug
+        if (change > 0) newLevel = crystal.debuffLevel + 1;
+        else if (change < 0 && crystal.debuffAmount > 0) newLevel = crystal.debuffLevel + 1;
+        else return
 
         crystal.updateDebuffAnimation(newLevel);
+        crystal.debuffAmount += change
       }
     });
   };
 
-  specialTileCheck(targetTile: ETiles, currentTile?: ETiles): void {
+  specialTileCheck(targetTile: Tile, currentTile?: Tile, sound = true): void {
+    let multiplier = 1;
+    if (this.faction === EFaction.DWARVES) {
+      multiplier = 1.2;
+      if (this.unitType === EHeroes.ENGINEER){
+        multiplier = 1.4;
+      }
+    }
+    // TODO: speed tile buffs with dwarves
+
+    const targetType = targetTile.tileType;
+    const currentType = currentTile?.tileType;
+
     // If hero is leaving a special tile
-    if (currentTile === ETiles.CRYSTAL_DAMAGE) {
-      this.updateCrystals(false);
-      this.crystalDebuffTileAnim.setVisible(false);
-    }
-    if (currentTile === ETiles.POWER) {
-      this.attackTile = false;
-      this.powerTileAnim.setVisible(false);
-    }
-    if (currentTile === ETiles.MAGICAL_RESISTANCE) {
-      this.magicalDamageResistance -= 20;
-      this.magicalResistanceTileAnim.setVisible(false);
-    }
-    if (currentTile === ETiles.PHYSICAL_RESISTANCE) {
-      this.physicalDamageResistance -= 20;
-      this.physicalResistanceTileAnim.setVisible(false);
-    }
-    if (currentTile === ETiles.SPEED) {
-      this.speedTile = false;
-      this.magicalResistanceTileAnim.setVisible(false);
+    switch (currentType) {
+      case ETiles.CRYSTAL_DAMAGE:
+        this.updateCrystals(-300 * multiplier);
+        this.crystalDebuffTileAnim.setVisible(false);
+        break;
+      case ETiles.POWER:
+        this.attackTile = 0;
+        this.powerTileAnim.setVisible(false);
+        break;
+      case ETiles.MAGICAL_RESISTANCE:
+        this.magicalDamageResistance -= 20 * multiplier;
+        this.magicalResistanceTileAnim.setVisible(false);
+        break;
+      case ETiles.PHYSICAL_RESISTANCE:
+        this.physicalDamageResistance -= 20 * multiplier;
+        this.physicalResistanceTileAnim.setVisible(false);
+        break;
+      case ETiles.SPEED:
+        this.speedTile = 0;
+        this.magicalResistanceTileAnim.setVisible(false);
+        break;
     }
 
     // If hero is entering a special tile
-    if (targetTile === ETiles.CRYSTAL_DAMAGE) {
-      this.updateCrystals(true);
-      this.crystalDebuffTileAnim.setVisible(true);
-      playSound(this.scene, EGameSounds.CRYSTAL_TILE);
+    switch (targetType) {
+      case ETiles.CRYSTAL_DAMAGE:
+        console.log("crystal");
+        this.updateCrystals(300 * multiplier);
+        this.crystalDebuffTileAnim.setVisible(true);
+        if (sound) playSound(this.scene, EGameSounds.CRYSTAL_TILE);
+        break;
+      case ETiles.POWER:
+        this.attackTile = 100 * multiplier;
+        this.powerTileAnim.setVisible(true);
+        if (sound) playSound(this.scene, EGameSounds.SWORD_TILE);
+        break;
+      case ETiles.MAGICAL_RESISTANCE:
+        this.magicalDamageResistance += 20 * multiplier;
+        this.magicalResistanceTileAnim.setVisible(true);
+        if (sound) playSound(this.scene, EGameSounds.HELM_TILE);
+        break;
+      case ETiles.PHYSICAL_RESISTANCE:
+        this.physicalDamageResistance += 20 * multiplier;
+        this.physicalResistanceTileAnim.setVisible(true);
+        if (sound) playSound(this.scene, EGameSounds.SHIELD_TILE);
+        break;
+      case ETiles.SPEED:
+        this.speedTile = 2;
+        if (multiplier < 1) {
+          this.speedTile = 3;
+          if (multiplier < 1.2) {
+            this.speedTile = 4;
+          }
+        }        this.magicalResistanceTileAnim.setVisible(true);
+        if (sound) playSound(this.scene, EGameSounds.HELM_TILE);
+        break;
     }
-    if (targetTile === ETiles.POWER) {
-      this.attackTile = true;
-      this.powerTileAnim.setVisible(true);
-      playSound(this.scene, EGameSounds.SWORD_TILE);
-    }
-    if (targetTile === ETiles.MAGICAL_RESISTANCE) {
-      this.magicalDamageResistance += 20;
-      this.magicalResistanceTileAnim.setVisible(true);
-      playSound(this.scene, EGameSounds.HELM_TILE);
-    }
-    if (targetTile === ETiles.PHYSICAL_RESISTANCE) {
-      this.physicalDamageResistance += 20;
-      this.physicalResistanceTileAnim.setVisible(true);
-      playSound(this.scene, EGameSounds.SHIELD_TILE);
-    }
-    if (targetTile === ETiles.SPEED) {
-      this.speedTile = true;
-      this.magicalResistanceTileAnim.setVisible(true); // Reusing the animation since it's basically the same color
-    }
+    
+    // remove auras
+    this.magicalDamageResistance -= this.paladinAura * 5;
+    this.physicalDamageResistance -= this.paladinAura * 5;
+    this.paladinAura = 0;
+
+    // check for new auras
+    const { heroTiles, } = getAOETiles(this.context, this, targetTile, true);
+    heroTiles.forEach(tile => {
+      const hero = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+
+      if (hero) {
+        console.log(hero.unitType);
+      }
+
+      if (hero && !hero.isKO && hero.unitType === EHeroes.PALADIN && hero !== this) {
+        this.magicalDamageResistance += 5;
+        this.physicalDamageResistance += 5;
+        this.paladinAura += 1;
+      }
+    });
 
     this.unitCard.updateCardData(this);
   }
 
   removeSpecialTileOnKo(): void {
-    const currentTile = this.getTile();
+    const currentType = this.getTile().tileType;
 
-    if (currentTile.tileType === ETiles.CRYSTAL_DAMAGE) {
-      this.updateCrystals(false);
-      this.crystalDebuffTileAnim.setVisible(false);
+    let multiplier = 1;
+    if (this.faction === EFaction.DWARVES) {
+      multiplier = 1.2;
+      if (this.unitType === EHeroes.ENGINEER){
+        multiplier = 1.4;
+      }
     }
-    if (currentTile.tileType === ETiles.POWER) {
-      this.attackTile = false;
-      this.powerTileAnim.setVisible(false);
-    }
-    if (currentTile.tileType === ETiles.MAGICAL_RESISTANCE) {
-      this.magicalDamageResistance -= 20;
-      this.magicalResistanceTileAnim.setVisible(false);
-    }
-    if (currentTile.tileType === ETiles.PHYSICAL_RESISTANCE) {
-      this.physicalDamageResistance -= 20;
-      this.physicalResistanceTileAnim.setVisible(false);
+
+    switch (currentType) {
+      case ETiles.CRYSTAL_DAMAGE:
+        this.updateCrystals(-300 * multiplier);
+        this.crystalDebuffTileAnim.setVisible(false);
+        break;
+      case ETiles.POWER:
+        this.attackTile = 0;
+        this.powerTileAnim.setVisible(false);
+        break;
+      case ETiles.MAGICAL_RESISTANCE:
+        this.magicalDamageResistance -= 20 * multiplier;
+        this.magicalResistanceTileAnim.setVisible(false);
+        break;
+      case ETiles.PHYSICAL_RESISTANCE:
+        this.physicalDamageResistance -= 20 * multiplier;
+        this.physicalResistanceTileAnim.setVisible(false);
+        break;
+      case ETiles.SPEED:
+        this.speedTile = 0;
+        this.magicalResistanceTileAnim.setVisible(false);
+        break;
     }
 
     this.unitCard.updateCardData(this);
@@ -843,8 +945,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   removeAttackModifiers() {
-    this.isDebuffed = false;
-    this.debuffImage.setVisible(false);
+    this.priestessDebuff = false;
+    this.priestessDebuffImage.setVisible(false);
     this.superCharge = false;
     this.superChargeAnim.setVisible(false);
 

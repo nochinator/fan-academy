@@ -13,6 +13,9 @@ function renderChunks(deps: Record<string, string>) {
 }
 
 export default defineConfig({
+  // Add this line to set the base path for GitHub Pages
+  base: '/fan-academy/', 
+
   build: {
     rollupOptions: {
       output: {

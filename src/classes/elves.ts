@@ -68,7 +68,7 @@ export class Impaler extends DarkElf {
         if (distance === 1) playSound(this.scene, EGameSounds.IMPALER_ATTACK_MELEE);
         if (distance !== 1) playSound(this.scene, EGameSounds.IMPALER_ATTACK);
       }
-      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
+      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
       if (damageDone !== undefined) this.lifeSteal(damageDone);
 
@@ -77,13 +77,12 @@ export class Impaler extends DarkElf {
 
     if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) this.context.gameController!.pullEnemy(this, target);
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  special(_target: Hero): void { };
 }
 
 export class VoidMonk extends DarkElf {
@@ -159,7 +158,7 @@ export class VoidMonk extends DarkElf {
       if (enemy instanceof Hero && enemy.unitType === EHeroes.PHANTOM && enemy.isKO) enemy.removeFromGame(true);
     });
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -193,8 +192,8 @@ export class VoidMonk extends DarkElf {
     });
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  special(_target: Hero): void { };
 }
 
 export class Necromancer extends DarkElf {
@@ -208,24 +207,8 @@ export class Necromancer extends DarkElf {
     turnIfBehind(this.context, this, target);
 
     if (target instanceof Hero && target.isKO) {
-      const tile = target.getTile();
 
-      playSound(this.scene, EGameSounds.PHANTOM_SPAWN);
-
-      const phantom = new Phantom(this.context, createElvesPhantomData({
-        unitId: `${this.context.userId}_phantom_${generateFourDigitId()}`,
-        boardPosition: target.boardPosition,
-        belongsTo: this.belongsTo,
-        row: target.row,
-        col: target.col
-      }), tile, true);
-
-      target.removeFromGame(true);
-
-      this.context.gameController?.board.units.push(phantom);
-      tile.hero = phantom.exportData();
-
-      this.context.gameController!.afterAction(EActionType.SPAWN_PHANTOM, this.boardPosition, target.boardPosition);
+      this.special(target);
 
       return;
     } else {
@@ -239,12 +222,30 @@ export class Necromancer extends DarkElf {
 
     this.removeAttackModifiers();
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  special(target: Hero): void { 
+    playSound(this.scene, EGameSounds.PHANTOM_SPAWN);
+    const tile = target.getTile();
+
+    const phantom = new Phantom(this.context, createElvesPhantomData({
+      unitId: `${this.context.userId}_phantom_${generateFourDigitId()}`,
+      boardPosition: target.boardPosition,
+      belongsTo: this.belongsTo,
+      row: target.row,
+      col: target.col
+    }), tile, true);
+
+    target.removeFromGame(true);
+
+    this.context.gameController?.board.units.push(phantom);
+    tile.hero = phantom.exportData();
+
+    this.context.gameController!.afterAction(EActionType.SPECIAL, this.boardPosition, target.boardPosition);
+  };
 }
 
 export class Priestess extends DarkElf {
@@ -277,8 +278,8 @@ export class Priestess extends DarkElf {
 
       // Apply a 50% debuff to the target's next attack or heal
       if (target instanceof Hero) {
-        target.isDebuffed = true;
-        target.debuffImage.setVisible(true);
+        target.priestessDebuff = true;
+        target.priestessDebuffImage.setVisible(true);
         target.updateTileData();
         target.unitCard.updateCardData(target);
       }
@@ -286,7 +287,6 @@ export class Priestess extends DarkElf {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -309,7 +309,7 @@ export class Priestess extends DarkElf {
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
 
-  teleport(_target: Hero): void {};
+  special(_target: Hero): void { };
 }
 
 export class Wraith extends DarkElf {
@@ -344,12 +344,12 @@ export class Wraith extends DarkElf {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  special(_target: Hero): void {};
 }
 
 export class Phantom extends Hero {
@@ -361,7 +361,7 @@ export class Phantom extends Hero {
     if (spawned && tile) {
       this.spawnAnim = context.add.image(0, -15, 'phantomSpawnAnim_1').setOrigin(0.5).setScale(0.9);
 
-      this.specialTileCheck(tile.tileType);
+      this.specialTileCheck(tile);
       this.add([this.spawnAnim]);
       this.singleTween(this.spawnAnim, 200);
     }
@@ -390,9 +390,9 @@ export class Phantom extends Hero {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
-  equipFactionBuff(): void {}
+  heal(_target: Hero): void { };
+  special(_target: Hero): void { };
+  equipFactionBuff(): void { }
 }
 
 export class SoulStone extends Item {
@@ -451,12 +451,12 @@ export class SoulHarvest extends Item {
     // Damages enemy units and crystals but doesn't remove KO'd enemy units
     const damage = 100;
 
-    const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, this, targetTile);
+    const { heroTiles, crystalTiles } = getAOETiles(this.context, this, targetTile);
 
     // Keep track of the cumulative damage done (not attack power used) to enemy heroes (not crystals)
     let totalDamageInflicted = 0;
 
-    enemyHeroTiles?.forEach(tile => {
+    heroTiles.forEach(tile => {
       const hero = gameController.board.units.find(unit => unit.boardPosition === tile.boardPosition);
 
       if (!hero) throw new Error('SoulHarvest use() hero not found');
@@ -467,7 +467,7 @@ export class SoulHarvest extends Item {
       if (hero && hero instanceof Hero && hero.unitType === EHeroes.PHANTOM) hero.removeFromGame();
     });
 
-    enemyCrystalTiles.forEach(tile => {
+    crystalTiles.forEach(tile => {
       const crystal = gameController.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('SoulHarvest use() crystal not found');
 
@@ -523,8 +523,12 @@ function createGenericElvesData(data: Partial<IHero>): {
   lastBreath: boolean,
   row: number,
   col: number,
-  isDebuffed: boolean,
-  attackTile: boolean
+  isShielded: boolean,
+  isDrunk: boolean,
+  paladinAura: number,
+  priestessDebuff: boolean,
+  annihilatorDebuff: boolean,
+  attackTile: number
 } {
   return {
     class: EClass.HERO,
@@ -540,7 +544,11 @@ function createGenericElvesData(data: Partial<IHero>): {
     belongsTo: data.belongsTo ?? 1,
     row: data.row ?? 0,
     col: data.col ?? 0,
-    isDebuffed: data.isDebuffed ?? false,
-    attackTile: data.attackTile ?? false
+    isShielded: data.priestessDebuff ?? false,
+    isDrunk: data.isDrunk ?? false,
+    paladinAura: data.paladinAura ?? 1,
+    priestessDebuff: data.priestessDebuff ?? false,
+    annihilatorDebuff: data.priestessDebuff ?? false,
+    attackTile: data.attackTile ?? 0
   };
 }

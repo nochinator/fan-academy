@@ -72,12 +72,12 @@ export class Archer extends Human {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  special(_target: Hero): void { };
 }
 
 export class Knight extends Human {
@@ -110,12 +110,12 @@ export class Knight extends Human {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  special(_target: Hero): void { };
 }
 
 export class Wizard extends Human {
@@ -264,8 +264,8 @@ export class Wizard extends Human {
     }
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  special(_target: Hero): void { };
 }
 
 export class Ninja extends Human {
@@ -305,11 +305,10 @@ export class Ninja extends Human {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  teleport(target: Hero): void {
+  special(target: Hero): void {
     playSound(this.scene, EGameSounds.NINJA_SMOKE);
     const targetDestination = this.getTile();
     const unitDestination = target.getTile();
@@ -318,15 +317,15 @@ export class Ninja extends Human {
     this.singleTween(this.smokeAnim!, 500);
     target.singleTween(target.smokeAnim!, 500);
 
-    target.specialTileCheck(targetDestination.tileType, unitDestination.tileType);
+    target.specialTileCheck(targetDestination, unitDestination);
     target.updatePosition(targetDestination);
     targetDestination.hero = target.exportData();
 
-    this.specialTileCheck(unitDestination.tileType, targetDestination.tileType);
+    this.specialTileCheck(unitDestination, targetDestination);
     this.updatePosition(unitDestination);
     unitDestination.hero = this.exportData();
 
-    this.context.gameController!.afterAction(EActionType.TELEPORT, targetDestination.boardPosition, unitDestination.boardPosition);
+    this.context.gameController!.afterAction(EActionType.SPECIAL, targetDestination.boardPosition, unitDestination.boardPosition);
   };
 
   heal(_target: Hero): void {};
@@ -359,7 +358,6 @@ export class Cleric extends Human {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -384,7 +382,7 @@ export class Cleric extends Human {
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
 
-  teleport(_target: Hero): void {};
+  special(_target: Hero): void { };
 }
 
 export class DragonScale extends Item {
@@ -431,9 +429,9 @@ export class Inferno extends Item {
     // Damages enemy units and crystals, and removes enemy KO'd units
     const damage = 350;
 
-    const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, this, targetTile);
+    const { heroTiles, crystalTiles } = getAOETiles(this.context, this, targetTile);
 
-    enemyHeroTiles?.forEach(tile => {
+    heroTiles?.forEach(tile => {
       const hero = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
       if (!hero) throw new Error('Inferno use() hero not found');
 
@@ -448,7 +446,7 @@ export class Inferno extends Item {
       if (hero && hero instanceof Hero && hero.unitType === EHeroes.PHANTOM) hero.removeFromGame();
     });
 
-    enemyCrystalTiles.forEach(tile => {
+    crystalTiles.forEach(tile => {
       const crystal = this.context.gameController!.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
       if (!crystal) throw new Error('Inferno use() crystal not found');
 

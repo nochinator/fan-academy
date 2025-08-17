@@ -29,7 +29,10 @@ export interface ICrystal {
   isDestroyed: boolean;
   isLastCrystal: boolean;
   boardPosition: number;
+  debuffAmount: number;
   debuffLevel: number;
+  isShielded: boolean;
+  paladinAura: boolean;
   row: number;
   col: number;
 }
@@ -80,10 +83,14 @@ export interface IHero {
   belongsTo: number;
   canHeal: boolean;
   unitsConsumed?: number;
-  isDebuffed: boolean;
-  attackTile: boolean;
+  annihilatorDebuff: boolean;
+  priestessDebuff: boolean;
+  isShielded: boolean;
+  isDrunk: boolean;
+  paladinAura: number;
+  attackTile: number;
   manaVial?: boolean;
-  speedTile?: boolean;
+  speedTile?: number;
 }
 
 /**
