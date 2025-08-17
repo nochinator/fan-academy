@@ -181,7 +181,7 @@ export class Board {
   }
 
   highlightFriendlyTargets(hero: Hero) {
-    if (!hero.canHeal) return;
+    if (!hero.canHeal && hero.unitType !== EHeroes.ENGINEER) return;
 
     const tilesInRange: Tile[] = this.getHeroTilesInRange(hero, ERange.HEAL);
     if (!tilesInRange.length) return;
@@ -197,7 +197,7 @@ export class Board {
       const maxHealth = target.maxHealth;
       const currentHealth = target.currentHealth;
 
-      if (tile.isFriendly(userId) && currentHealth! < maxHealth!) target.healReticle.setVisible(true);
+      if (tile.isFriendly(userId) && (currentHealth! < maxHealth! || hero.unitType === EHeroes.ENGINEER)) target.healReticle.setVisible(true);
     });
   }
 

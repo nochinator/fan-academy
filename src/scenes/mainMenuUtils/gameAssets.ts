@@ -63,8 +63,8 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('phantomSpawnAnim_2', `${CDN_PATH}/images/gameItems/animations/PhantomSpawn_Explosion02-hd.webp`);
 
   context.load.image('priestessDebuff', `${CDN_PATH}/images/gameItems/animations/MoveDebuff_PurpleGlow-hd.webp`);
-  context.load.image('annihilatorDebuff', `${CDN_PATH}/images/gameItems/animations/ArmorDebuff2_ShieldBroken1-hd.webp`);
-  context.load.image('shield', `${CDN_PATH}/images/gameItems/animations/EngineerShield_Color-hd.webp`);
+  context.load.image('annihilatorDebuff', `${CDN_PATH}/images/factions/dwarves/ArmorDebuff2_ShieldBroken1-hd.png`);
+  context.load.image('shield', `${CDN_PATH}/images/factions/dwarves/EngineerShield_Color-hd.png`);
 
 
   // Crystal tile images
@@ -124,7 +124,7 @@ export function loadGameAssets(context: GameScene) {
 
   // Dwarves
   context.load.image('dwarvernBrew', `${CDN_PATH}/images/factions/dwarves/Ale-hd.png`);
-  context.load.image('pulverizer', `${CDN_PATH}/images/factions/dwarves/ShaterDrill_Icon-hd.png`);
+  context.load.image('pulverizer', `${CDN_PATH}/images/factions/dwarves/ShatterDrill_Icon-hd.png`);
 
   // Shared items
   context.load.image('superCharge', `${CDN_PATH}/images/factions/common/super_charge.webp`);

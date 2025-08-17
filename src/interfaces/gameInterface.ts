@@ -32,7 +32,9 @@ export interface ICrystal {
   debuffAmount: number;
   debuffLevel: number;
   isShielded: boolean;
-  paladinAura: boolean;
+  paladinAura: number;
+  physicalDamageResistance: number,
+  magicalDamageResistance: number,
   row: number;
   col: number;
 }

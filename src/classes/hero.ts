@@ -167,13 +167,13 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     } else {
       this.priestessDebuffImage.setVisible(false);
     }
-    this.annihilatorDebuffImage = context.add.image(0, -10, 'annihilatorDebuff').setOrigin(0.5).setScale(2.5).setName('annihilatorDebuff');
+    this.annihilatorDebuffImage = context.add.image(0, -10, 'annihilatorDebuff').setOrigin(0.5).setName('annihilatorDebuff');
     if (this.priestessDebuff) {
       this.annihilatorDebuffImage.setVisible(true);
     } else {
       this.annihilatorDebuffImage.setVisible(false);
     }
-    this.shieldImage = context.add.image(0, -10, 'shield').setOrigin(0.5).setScale(2.5).setName('shield');
+    this.shieldImage = context.add.image(0, -10, 'shield').setOrigin(0.5).setName('shield');
     if (this.priestessDebuff) {
       this.shieldImage.setVisible(true);
     } else {
@@ -483,12 +483,17 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       this.isShielded = false;
       this.shieldImage.setVisible(false);
       return 0
+    } else if (this.isDrunk) {
+      this.physicalDamageResistance -= 50;
+      this.magicalDamageResistance -= 50;
+      this.isDrunk = false;
+      //this.drunkImage.setVisible(false);
     }
-    if (this.annihilatorDebuff) {
-      resistance[EAttackType.PHYSICAL] -= 50;
+    if (this.annihilatorDebuff && attackType === EAttackType.PHYSICAL) {
+      this.physicalDamageResistance += 50;
       this.annihilatorDebuff = false;
       this.annihilatorDebuffImage.setVisible(false);
-    } 
+    }
 
     const reduction = resistance[attackType];
 
@@ -891,13 +896,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.paladinAura = 0;
 
     // check for new auras
-    const { heroTiles, } = getAOETiles(this.context, this, targetTile, true);
+    const heroTiles = [...getAOETiles(this.context, this, targetTile, true).heroTiles, ...getAOETiles(this.context, this, targetTile, true).crystalTiles];
     heroTiles.forEach(tile => {
       const hero = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
-
-      if (hero) {
-        console.log(hero.unitType);
-      }
 
       if (hero && !hero.isKO && hero.unitType === EHeroes.PALADIN && hero !== this) {
         this.magicalDamageResistance += 5;
