@@ -212,7 +212,7 @@ export class Grenadier extends Dwarf {
       target.getsDamaged(damage, this.attackType);
 
       // AoE damage to nearby enemies
-      const aoeTiles = getAOETiles(this.context, this, target.getTile(), true);
+      const aoeTiles = getAOETiles(this.context, this, target.getTile(), false);
       const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
       allTiles.forEach(tile => {
         const unit = board.units.find(u => u.boardPosition === tile.boardPosition);
