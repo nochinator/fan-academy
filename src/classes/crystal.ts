@@ -179,7 +179,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
   }
 
-  getsDamaged(damage: number, attackType: EAttackType, delay: number, multiplier = 1): void {
+  getsDamaged(damage: number, attackType: EAttackType, multiplier = 1): void {
     // Determine resistance based on attack type
     const resistance = attackType === EAttackType.PHYSICAL ? this.physicalDamageResistance : this.magicalDamageResistance;
     
