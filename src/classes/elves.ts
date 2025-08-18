@@ -457,12 +457,15 @@ export class SoulHarvest extends Item {
     let totalDamageInflicted = 0;
 
     allTiles.forEach(tile => {
-      const unit = gameController.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+      const unit =
+        this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+        this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
       if (!unit) throw new Error('SoulHarvest use() hero not found');
-      if (unit.isKO) return;
-
-      totalDamageInflicted += unit.getsDamaged(damage, EAttackType.MAGICAL); // if crystal, nothing chnages
+      if (unit instanceof Hero) {
+        if (unit.isKO) return;
+              totalDamageInflicted += unit.getsDamaged(damage, EAttackType.MAGICAL); // if crystal, nothing chnages
+      }
     });
 
     // Get total amount of friendly units in the map, including KO'd ones

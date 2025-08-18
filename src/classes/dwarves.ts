@@ -154,7 +154,9 @@ export class Paladin extends Dwarf {
     let aoeTiles = getAOETiles(this.context, this, this.getTile(), true);
     let allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
     allTiles.forEach(tile => {
-      const unit = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+      const unit =
+        this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+        this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
       if (unit && unit !== this) {
         this.magicalDamageResistance -= 5;
@@ -167,13 +169,15 @@ export class Paladin extends Dwarf {
     aoeTiles = getAOETiles(this.context, this, targetTile, true);
     allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
     allTiles.forEach(tile => {
-      const unit = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+      const unit =
+        this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+        this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
       if (unit && unit !== this) {
         unit.magicalDamageResistance += 5;
         unit.physicalDamageResistance += 5;
         unit.paladinAura += 1;
-        unit.unitCard.updateCardData(unit);
+        unit.unitCard.updateCardData(unit as any); // compiler is being dumb, unit matches the type of whatever it is.
       }
     });
 
@@ -194,7 +198,6 @@ export class Grenadier extends Dwarf {
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
-    const board = this.context.gameController!.board;
 
     if (distance === 1) { // Melee attack
       playSound(this.scene, EGameSounds.GRENADIER_ATTACK_MELEE);
@@ -215,12 +218,12 @@ export class Grenadier extends Dwarf {
       const aoeTiles = getAOETiles(this.context, this, target.getTile(), false);
       const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
       allTiles.forEach(tile => {
-        const unit = board.units.find(u => u.boardPosition === tile.boardPosition);
+        const unit =
+          this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+          this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
+        console.log(unit);
         if (unit && target !== unit && unit.belongsTo !== this.belongsTo) {
           unit.getsDamaged(splashDamage, this.attackType);
-          if (unit instanceof Hero) {
-            this.context.gameController!.pushEnemy(target, unit); // knocked away from target
-          }
         }
       });
     }
@@ -262,14 +265,12 @@ export class Gunner extends Dwarf {
         if (targetsHit >= 2) return;
         const tile = board.getTileFromBoardPosition(tilePos);
         if (tile && canBeAttacked(this, tile)) {
-          const hero = tile.hero ? board.units.find(u => u.unitId === tile.hero!.unitId) : null;
-          const crystal = tile.crystal ? board.crystals.find(c => c.boardPosition === tile.crystal!.boardPosition) : null;
+          const unit =
+          this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+          this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
-          if (hero && hero !== target) {
-            hero.getsDamaged(damage, this.attackType);
-            targetsHit++;
-          } else if (crystal && crystal !== target) {
-            crystal.getsDamaged(damage, this.attackType);
+          if (unit && unit !== target) {
+            unit.getsDamaged(damage, this.attackType);
             targetsHit++;
           }
         }
@@ -364,7 +365,6 @@ export class Annihilator extends Dwarf {
 
     const damage = this.getTotalPower();
     const splashDamage = damage * 0.2;
-    const board = this.context.gameController!.board;
 
     // Apply debuff to main target
     target.annihilatorDebuff = true;
@@ -372,17 +372,26 @@ export class Annihilator extends Dwarf {
 
     // Apply AoE splash damage and knockback
     const aoeTiles = getAOETiles(this.context, this, target.getTile(), true);
-    const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];    allTiles.forEach(tile => {
-      const unit = board.units.find(u => u.boardPosition === tile.boardPosition);
+    const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];   
+    let enemiesToPush: Hero[] = []
+    allTiles.forEach(tile => {
+      const unit =
+        this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+        this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
       if (unit && unit.belongsTo !== this.belongsTo) {
         unit.getsDamaged(splashDamage, this.attackType);
         
         if (unit instanceof Hero) {
-          this.context.gameController!.pushEnemy(target, unit);
+          enemiesToPush.push(unit);
         }
       }
     });
+    // so paladin aura isn't removed before damaging
+    enemiesToPush.forEach(enemy => {
+      this.context.gameController!.pushEnemy(target, enemy);
+    });
+
 
     this.removeAttackModifiers();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -453,7 +462,6 @@ export class Pulverizer extends Item {
     super(context, data);
   }
   use(target: Hero | Crystal): void {
-    const board = this.context.gameController!.board;
     const damage = 600;
 
     // Apply damage to main target
@@ -472,9 +480,11 @@ export class Pulverizer extends Item {
       const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
 
       allTiles.forEach(tile => {
-        const hero = board.units.find(u => u.boardPosition === tile.boardPosition);
+        const unit =
+          this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+          this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
-        if (hero) hero.getsDamaged(splashDamage, EAttackType.PHYSICAL);
+        if (unit) unit.getsDamaged(splashDamage, EAttackType.PHYSICAL);
       });
     }
 
