@@ -18,8 +18,8 @@ jobs:
           npm install
           npm run build
         env:
-          VITE_SOCKET: ${{ secrets.VITE_SOCKET }}
-          VITE_BE_URL: ${{ secrets.VITE_BE_URL }}
+          VITE_SOCKET: ${{ vars.VITE_SOCKET }}
+          VITE_BE_URL: ${{ vars.VITE_BE_URL }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
