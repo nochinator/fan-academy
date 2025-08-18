@@ -878,13 +878,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.paladinAura = 0;
 
     // check for new auras
-    const aoeTiles = getAOETiles(this.context, this, targetTile, true);
-    const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
-    allTiles.forEach(tile => {
-      const unit =
-        this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
-        this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
-      if (unit && (unit instanceof Crystal || (!unit.isKO && unit.unitType === EHeroes.PALADIN && unit !== this))) {
+    const heroTiles = getAOETiles(this.context, this, targetTile, true).heroTiles;
+    heroTiles.forEach(tile => {
+      const unit = this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition)
+      if (unit && !unit.isKO && unit.unitType === EHeroes.PALADIN && unit !== this) {
         this.magicalDamageResistance += 5;
         this.physicalDamageResistance += 5;
         this.paladinAura += 1;
