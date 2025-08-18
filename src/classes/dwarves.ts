@@ -92,14 +92,13 @@ export class Paladin extends Dwarf {
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
     turnIfBehind(this.context, this, target);
-    let delay = 0;
     if (this.superCharge) {
       playSound(this.scene, EGameSounds.PALADIN_ATTACK);
     } else {
       playSound(this.scene, EGameSounds.PALADIN_ATTACK_BIG);
     }
 
-    target.getsDamaged(this.getTotalPower(), this.attackType, delay);
+    target.getsDamaged(this.getTotalPower(), this.attackType);
 
     this.removeAttackModifiers();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -128,23 +127,7 @@ export class Paladin extends Dwarf {
   }
 
   playHealSounds() {
-    let delay = 0;
-
-    // First sound
-    this.context.time.delayedCall(delay, () => {
-      this.context.sound.play(EGameSounds.PALADIN_HEAL, { volume: 0.5 });
-    });
-
-    // Second sound
-    this.context.time.delayedCall(delay, () => {
-      this.context.sound.play(EGameSounds.PALADIN_HEAL, { volume: 0.5 });
-    });
-
-    // Third sound
-    delay += 900;
-    this.context.time.delayedCall(delay, () => {
-      this.context.sound.play(EGameSounds.PALADIN_HEAL, { volume: 0.5 });
-    });
+    this.context.sound.play(EGameSounds.HEAL, { volume: 0.5 });
   }
 
   special(_target: Hero): void {};
@@ -163,38 +146,33 @@ export class Grenadier extends Dwarf {
     const distance = this.getDistanceToTarget(target);
     const board = this.context.gameController!.board;
 
-    let delay = 0;
-
     if (distance === 1) { // Melee attack
       playSound(this.scene, EGameSounds.GRENADIER_ATTACK_MELEE);
-      target.getsDamaged(this.getTotalPower() * 0.5, this.attackType, 500);
+      target.getsDamaged(this.getTotalPower() * 0.5, this.attackType);
     } else { // Ranged attack, ignores LOS
       if (!this.superCharge) {
         playSound(this.scene, EGameSounds.GRENADIER_ATTACK);
       } else {
         playSound(this.scene, EGameSounds.GRENADIER_ATTACK_BIG);
-        this.context.time.delayedCall(delay, () => {
-          this.context.sound.play(EGameSounds.GRENADIER_ATTACK, { volume: 0.5 });
-        });
       }
       const damage = this.getTotalPower();
       const splashDamage = damage * 0.5;
 
       // Damage main target
-      target.getsDamaged(damage, this.attackType, 500);
+      target.getsDamaged(damage, this.attackType);
 
       // AoE damage to nearby enemies
       const { heroTiles, crystalTiles } = getAOETiles(this.context, this, target.getTile()!);
       heroTiles.forEach(tile => {
         const hero = board.units.find(u => u.boardPosition === tile.boardPosition);
         if (hero && target !== hero && hero.belongsTo !== this.belongsTo) {
-          hero.getsDamaged(splashDamage, this.attackType, delay);
+          hero.getsDamaged(splashDamage, this.attackType);
         }
       });
       crystalTiles.forEach(tile => {
         const crystal = board.crystals.find(c => c.boardPosition === tile.boardPosition);
         if (crystal && target !== crystal && crystal.belongsTo !== this.belongsTo) {
-          crystal.getsDamaged(splashDamage, this.attackType, delay);
+          crystal.getsDamaged(splashDamage, this.attackType);
         }
       });
     }
@@ -220,7 +198,7 @@ export class Gunner extends Dwarf {
 
     if (distance === 1) { // Melee attack
       playSound(this.scene, EGameSounds.GUNNER_ATTACK_ONLY);
-      target.getsDamaged(this.getTotalPower(), this.attackType, 500);
+      target.getsDamaged(this.getTotalPower(), this.attackType);
     } else { // Ranged cone attack
       playSound(this.scene, EGameSounds.GUNNER_ATTACK);
       const damage = this.getTotalPower() * 0.66;
@@ -228,7 +206,7 @@ export class Gunner extends Dwarf {
       const coneTiles = getConeTiles(target.boardPosition, attackDirection, this.boardPosition, 2);
 
       // Damage main target
-      target.getsDamaged(damage, this.attackType, 500);
+      target.getsDamaged(damage, this.attackType);
 
       // Damage up to two other targets in the cone
       let targetsHit = 0;
@@ -240,10 +218,10 @@ export class Gunner extends Dwarf {
           const crystal = tile.crystal ? board.crystals.find(c => c.boardPosition === tile.crystal!.boardPosition) : null;
 
           if (hero && hero !== target) {
-            hero.getsDamaged(damage, this.attackType, 500);
+            hero.getsDamaged(damage, this.attackType);
             targetsHit++;
           } else if (crystal && crystal !== target) {
-            crystal.getsDamaged(damage, this.attackType, 500);
+            crystal.getsDamaged(damage, this.attackType);
             targetsHit++;
           }
         }
@@ -314,7 +292,7 @@ export class Engineer extends Dwarf {
     this.flashActingUnit();
     turnIfBehind(this.context, this, target);
     playSound(this.scene, EGameSounds.ENGINEER_ATTACK);
-    target.getsDamaged(this.getTotalPower(), this.attackType, 500);
+    target.getsDamaged(this.getTotalPower(), this.attackType);
 
     this.removeAttackModifiers();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
@@ -340,7 +318,7 @@ export class Annihilator extends Dwarf {
 
     // Apply debuff to main target
     target.annihilatorDebuff = true;
-    target.getsDamaged(damage, this.attackType, 500);
+    target.getsDamaged(damage, this.attackType);
 
     // Apply AoE splash damage and knockback
     const { heroTiles, crystalTiles } = getAOETiles(this.context, this, target.getTile()!);
@@ -348,7 +326,7 @@ export class Annihilator extends Dwarf {
       const hero = board.units.find(u => u.boardPosition === tile.boardPosition);
 
       if (hero && hero.belongsTo !== this.belongsTo) {
-        hero.getsDamaged(splashDamage, this.attackType, 500);
+        hero.getsDamaged(splashDamage, this.attackType);
         // Knockback logic
         this.context.gameController!.pushEnemy(this, hero);
       }
@@ -358,7 +336,7 @@ export class Annihilator extends Dwarf {
       const crystal = board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
       if (crystal && crystal.belongsTo !== this.belongsTo) {
-        crystal.getsDamaged(splashDamage, this.attackType, 500);
+        crystal.getsDamaged(splashDamage, this.attackType);
       }
     });
 
@@ -436,7 +414,7 @@ export class Pulverizer extends Item {
     const damage = 600;
 
     // Apply damage to main target
-    const totalDamageDone = target.getsDamaged(damage, EAttackType.PHYSICAL, 500);
+    const totalDamageDone = target.getsDamaged(damage, EAttackType.PHYSICAL);
     playSound(this.scene, EGameSounds.DRILL_USE);
 
     // If target is a hero, destroy specific items
@@ -452,12 +430,12 @@ export class Pulverizer extends Item {
       heroTiles.forEach(tile => {
         const hero = board.units.find(u => u.boardPosition === tile.boardPosition);
 
-        if (hero) hero.getsDamaged(splashDamage, EAttackType.PHYSICAL, 500);
+        if (hero) hero.getsDamaged(splashDamage, EAttackType.PHYSICAL);
       });
       crystalTiles.forEach(tile => {
         const crystal = board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
-        if (crystal) crystal.getsDamaged(splashDamage, EAttackType.PHYSICAL, 500);
+        if (crystal) crystal.getsDamaged(splashDamage, EAttackType.PHYSICAL);
       });
     }
 

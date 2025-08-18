@@ -178,15 +178,14 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
   }
 
-  getsDamaged(damage: number, _attackType: EAttackType, delay: number, multiplier = 1): void {
+  getsDamaged(damage: number, _attackType: EAttackType, multiplier = 1): void {
     if (this.isShielded) {
       this.isShielded = false;
       playSound(this.context, EGameSounds.ENGINEER_SHIELD_BREAK);
       return
     }
     if (this.debuffAmount > 0) {
-      // Use Phaser's delayedCall for game-related timing
-      this.scene.time.delayedCall(delay, playSound, [this.scene, EGameSounds.CRYSTAL_DAMAGE_BUFF]);
+      playSound(this.scene, EGameSounds.CRYSTAL_DAMAGE_BUFF);
     } else {
       playSound(this.scene, EGameSounds.CRYSTAL_DAMAGE);
     }
