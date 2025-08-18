@@ -884,7 +884,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
       const unit =
         this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
         this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
-      if (unit && ((!unit.isKO && unit.unitType === EHeroes.PALADIN && unit !== this) || unit instanceof Crystal)) {
+      if (unit && (unit instanceof Crystal || (!unit.isKO && unit.unitType === EHeroes.PALADIN && unit !== this))) {
         this.magicalDamageResistance += 5;
         this.physicalDamageResistance += 5;
         this.paladinAura += 1;
