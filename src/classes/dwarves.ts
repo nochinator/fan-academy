@@ -1,7 +1,7 @@
 import { EActionType, EAttackType, EGameSounds, ETiles } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { canBeAttacked, getAOETiles, isOnBoard, playSound, roundToFive, turnIfBehind } from "../utils/gameUtils";
+import { canBeAttacked, getAOETiles, isOnBoard, playSound, roundToFive, turnIfBehind, useAnimation } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -73,8 +73,27 @@ export abstract class Dwarf extends Hero {
 
   // Abstract methods to be implemented by children
   special(_target: Hero): void { };
-  equipFactionBuff(): void { };
-}
+  equipFactionBuff(handPosition: number): void {
+    playSound(this.scene, EGameSounds.DRAGON_SCALE_USE);
+
+    const dragonScaleImg = this.scene.add.image(this.x + 10, this.y - 10, 'dragonScale').setOrigin(0.5).setDepth(100);
+    useAnimation(dragonScaleImg);
+
+    this.factionBuff = true;
+    this.factionBuffImage.setVisible(true);
+    this.characterImage.setTexture(this.updateCharacterImage());
+
+    this.physicalDamageResistance += 20;
+
+    this.increaseMaxHealth(this.baseHealth * 0.1);
+
+    this.unitCard.updateCardData(this);
+    this.updateTileData();
+
+    this.scene.sound.play(EGameSounds.DRAGON_SCALE_USE);
+
+    this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
+  }}
 
 // Hero Class: Paladin
 export class Paladin extends Dwarf {
@@ -387,16 +406,13 @@ export class Sword extends Item {
   }
 }
 
-export class Armor extends Item {
+export class DragonScale extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
   }
+
   use(target: Hero): void {
-    target.basePhysicalDamageResistance += 20;
-    target.increaseMaxHealth(target.baseHealth * 0.1);
-    target.unitCard.updateCardData(target);
-    target.updateTileData();
-    this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
+    target.equipFactionBuff(this.boardPosition);
     this.removeFromGame();
   }
 }
