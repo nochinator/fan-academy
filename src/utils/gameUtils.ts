@@ -338,7 +338,7 @@ export function checkUnitGameOver(context: GameScene, hero: Hero): void {
   };
 }
 
-export function forcedMoveSpawnCheck(tile: Tile | ITile, hero: Hero): boolean {
+export function forcedMoveSpawnCheck(tile: Tile | ITile, hero: Hero | Crystal): boolean {
   const spawnBelongsTo = tile.col < 5 ? 1 : 2;
   return tile.tileType === ETiles.SPAWN && hero.belongsTo === spawnBelongsTo;
 }

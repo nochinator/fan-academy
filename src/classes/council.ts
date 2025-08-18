@@ -429,28 +429,20 @@ export class Inferno extends Item {
     // Damages enemy units and crystals, and removes enemy KO'd units
     const damage = 350;
 
-    const { heroTiles, crystalTiles } = getAOETiles(this.context, this, targetTile);
+    const aoeTiles = getAOETiles(this.context, this, targetTile, false);
+    const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
 
-    heroTiles?.forEach(tile => {
-      const hero = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
-      if (!hero) throw new Error('Inferno use() hero not found');
+    allTiles?.forEach(tile => {
+      const unit = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+      if (!unit) throw new Error('Inferno use() hero not found');
 
       // Inferno removes KO'd enemy units
-      if (hero.isKO){
-        hero.removeFromGame(true);
+      if (unit.isKO) {
+        unit.removeFromGame(true);
         return;
       }
 
-      hero.getsDamaged(damage, EAttackType.MAGICAL);
-
-      if (hero && hero instanceof Hero && hero.unitType === EHeroes.PHANTOM) hero.removeFromGame();
-    });
-
-    crystalTiles.forEach(tile => {
-      const crystal = this.context.gameController!.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
-      if (!crystal) throw new Error('Inferno use() crystal not found');
-
-      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage, EAttackType.MAGICAL);
+      unit.getsDamaged(damage, EAttackType.MAGICAL);
     });
 
     this.removeFromGame();
