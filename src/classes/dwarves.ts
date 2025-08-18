@@ -468,9 +468,15 @@ export class Pulverizer extends Item {
     const totalDamageDone = target.getsDamaged(damage, EAttackType.PHYSICAL);
     playSound(this.scene, EGameSounds.DRILL_USE);
 
-    // If target is a hero, destroy specific items
+    // If target is a hero, destroy team-specific equipment
     if (target instanceof Hero) {
       target.factionBuff = false;
+      target.factionBuffImage.setVisible(false);
+      target.characterImage.setTexture(target.updateCharacterImage());
+      target.increaseMaxHealth(target.baseHealth * -0.1);
+  
+      target.unitCard.updateCardData(target);
+      target.updateTileData();
     }
 
     // AoE splash logic for crystals
