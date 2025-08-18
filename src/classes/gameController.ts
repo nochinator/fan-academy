@@ -8,6 +8,7 @@ import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
 import { ConcedeWarningPopup } from "./concedePopup";
+import { Crystal } from "./crystal";
 import { Deck } from "./deck";
 import { Door } from "./door";
 import { GameOverScreen } from "./gameOverScreen";
@@ -454,7 +455,7 @@ export class GameController {
     });
   }
 
-  async pushEnemy(attacker: Hero, target: Hero): Promise<void> {
+  async pushEnemy(attacker: Hero | Crystal, target: Hero): Promise<void> {
     const attackerTile = this.board.getTileFromBoardPosition(attacker.boardPosition);
     const targetTile = this.board.getTileFromBoardPosition(target.boardPosition);
     if (!attackerTile || !targetTile) {

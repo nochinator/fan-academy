@@ -149,7 +149,8 @@ export class Paladin extends Dwarf {
 
   async move(targetTile: Tile): Promise<void> {
     // remove current auras
-    let allTiles = [...getAOETiles(this.context, this, targetTile, true).heroTiles, ...getAOETiles(this.context, this, targetTile, true).crystalTiles];
+    let aoeTiles = getAOETiles(this.context, this, this.getTile(), true);
+    let allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
     allTiles.forEach(tile => {
       const unit = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
 
@@ -161,7 +162,8 @@ export class Paladin extends Dwarf {
     });
 
     // add new auras
-    allTiles = [...getAOETiles(this.context, this, targetTile, true).heroTiles, ...getAOETiles(this.context, this, targetTile, true).crystalTiles];
+    aoeTiles = getAOETiles(this.context, this, targetTile, true);
+    allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
     allTiles.forEach(tile => {
       const unit = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
 
@@ -213,17 +215,15 @@ export class Grenadier extends Dwarf {
       target.getsDamaged(damage, this.attackType, 500);
 
       // AoE damage to nearby enemies
-      const { heroTiles, crystalTiles } = getAOETiles(this.context, this, target.getTile()!);
-      heroTiles.forEach(tile => {
-        const hero = board.units.find(u => u.boardPosition === tile.boardPosition);
-        if (hero && target !== hero && hero.belongsTo !== this.belongsTo) {
-          hero.getsDamaged(splashDamage, this.attackType, delay);
-        }
-      });
-      crystalTiles.forEach(tile => {
-        const crystal = board.crystals.find(c => c.boardPosition === tile.boardPosition);
-        if (crystal && target !== crystal && crystal.belongsTo !== this.belongsTo) {
-          crystal.getsDamaged(splashDamage, this.attackType, delay);
+      const aoeTiles = getAOETiles(this.context, this, target.getTile(), true);
+      const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
+      allTiles.forEach(tile => {
+        const unit = board.units.find(u => u.boardPosition === tile.boardPosition);
+        if (unit && target !== unit && unit.belongsTo !== this.belongsTo) {
+          unit.getsDamaged(splashDamage, this.attackType, delay);
+          if (unit instanceof Hero) {
+            this.context.gameController!.pushEnemy(target, unit); // knocked away from target
+          }
         }
       });
     }
@@ -374,22 +374,16 @@ export class Annihilator extends Dwarf {
     target.getsDamaged(damage, this.attackType, 500);
 
     // Apply AoE splash damage and knockback
-    const { heroTiles, crystalTiles } = getAOETiles(this.context, this, target.getTile()!);
-    heroTiles.forEach(tile => {
-      const hero = board.units.find(u => u.boardPosition === tile.boardPosition);
+    const aoeTiles = getAOETiles(this.context, this, target.getTile(), true);
+    const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];    allTiles.forEach(tile => {
+      const unit = board.units.find(u => u.boardPosition === tile.boardPosition);
 
-      if (hero && hero.belongsTo !== this.belongsTo) {
-        hero.getsDamaged(splashDamage, this.attackType, 500);
-        // Knockback logic
-        this.context.gameController!.pushEnemy(this, hero);
-      }
-    });
-
-    crystalTiles.forEach(tile => {
-      const crystal = board.crystals.find(c => c.boardPosition === tile.boardPosition);
-
-      if (crystal && crystal.belongsTo !== this.belongsTo) {
-        crystal.getsDamaged(splashDamage, this.attackType, 500);
+      if (unit && unit.belongsTo !== this.belongsTo) {
+        unit.getsDamaged(splashDamage, this.attackType, 500);
+        
+        if (unit instanceof Hero) {
+          this.context.gameController!.pushEnemy(target, unit);
+        }
       }
     });
 
@@ -480,17 +474,13 @@ export class Pulverizer extends Item {
     // AoE splash logic for crystals
     if (target instanceof Crystal) {
       const splashDamage = totalDamageDone! * 0.33;
-      const { heroTiles, crystalTiles } = getAOETiles(this.context, this, target.getTile()!);
+      const aoeTiles = getAOETiles(this.context, this, target.getTile(), true);
+      const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
 
-      heroTiles.forEach(tile => {
+      allTiles.forEach(tile => {
         const hero = board.units.find(u => u.boardPosition === tile.boardPosition);
 
         if (hero) hero.getsDamaged(splashDamage, EAttackType.PHYSICAL, 500);
-      });
-      crystalTiles.forEach(tile => {
-        const crystal = board.crystals.find(c => c.boardPosition === tile.boardPosition);
-
-        if (crystal) crystal.getsDamaged(splashDamage, EAttackType.PHYSICAL, 500);
       });
     }
 
