@@ -8,6 +8,7 @@ import { Tile } from "../classes/tile";
 import { EActionClass, EActionType, ECardType, EClass, EGameSounds, EHeroes, EItems, ETiles, EUiSounds, EWinConditions } from "../enums/gameEnums";
 import { ICrystal, IHero, IItem, IPlayerState, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import UIScene from "../scenes/ui.scene";
 import { Annihilator, DwarvenBrew, Engineer, Grenadier, Gunner, Paladin, Pulverizer } from "../classes/dwarves";
 
 export function isHero(hero: IHero | IItem): hero is Hero {
@@ -508,7 +509,7 @@ export function truncateText(text: string, maxLength: number) {
 // Used to remove any visible unit cards from a mobile long press action
 export function visibleUnitCardCheck(context: GameScene): void {
   if (context.visibleUnitCard) {
-    context.visibleUnitCard.setDepth(context.visibleUnitCard.boardPosition + 10);
+    context.visibleUnitCard.setDepth(context.visibleUnitCard.row + 10);
     context.visibleUnitCard.unitCard?.setVisible(false);
   }
 }
@@ -557,4 +558,12 @@ export function textAnimationFadeOut(text: GameObjects.Text, duration = 1000): P
       }
     });
   });
+}
+
+export function gameListFadeOutText(context: UIScene | GameScene, x: number, y: number, message: string): Phaser.GameObjects.Text {
+  return context.add.text(x, y, message, {
+    fontFamily: "proLight",
+    fontSize: 60,
+    color: '#fffb00'
+  }).setDepth(9999);
 }

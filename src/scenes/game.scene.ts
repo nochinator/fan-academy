@@ -9,6 +9,7 @@ import { createChatComponent } from "./gameSceneUtils/chatComponent";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameAssets } from "./mainMenuUtils/gameAssets";
 import { Tile } from "../classes/tile";
+import { gameListFadeOutText, textAnimationFadeOut } from "../utils/gameUtils";
 
 export default class GameScene extends Phaser.Scene {
   userId!: string;
@@ -88,9 +89,18 @@ export default class GameScene extends Phaser.Scene {
     this.gameController = new GameController(this);
     if (this.triggerReplay) this.gameController.replayTurn();
 
-    // Listen for the 'shutdown' event and stop all sounds
-    this.events.on('shutdown', () => {
-        this.sound.stopAll();
+    this.game.events.on('messageToGameScene', (data: {
+      x: number,
+      y: number,
+      message: string
+    }) => {
+      const { x, y, message } = data;
+      const openGameLimitReached = gameListFadeOutText(this, x, y, message );
+      textAnimationFadeOut(openGameLimitReached, 3000);
     });
+  }
+
+  onShutdown() {
+    this.sound.stopAll();
   }
 };

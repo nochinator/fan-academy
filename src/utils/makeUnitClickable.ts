@@ -346,7 +346,7 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
     // Ignore if there was a long press. Used on mobile
     if (context.visibleUnitCard) return;
 
-    crystal.setDepth(crystal.boardPosition + 10);
+    crystal.setDepth(crystal.row + 10);
     crystal.unitCard.setVisible(false);
   });
 }
