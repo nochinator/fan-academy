@@ -24,7 +24,8 @@ export enum EWinConditions {
 
 export enum EFaction {
   COUNCIL = 'Council',
-  DARK_ELVES = 'Dark Elves'
+  DARK_ELVES = 'Dark Elves',
+  DWARVES = 'Dwarves'
 }
 
 export enum EActionType {
@@ -35,7 +36,7 @@ export enum EActionType {
   SPAWN_PHANTOM = 'phantom',
   USE = 'use',
   SHUFFLE = 'shuffle',
-  TELEPORT = 'teleport',
+  SPECIAL = 'special',
   CONCEDE = 'concede',
 
   // Automated actions
@@ -63,7 +64,12 @@ export enum EItems {
   // Dark elves
   SOUL_STONE = 'soulStone',
   SOUL_HARVEST = 'soulHarvest',
-  MANA_VIAL = 'manaVial'
+  MANA_VIAL = 'manaVial',
+
+  // Dwarves
+  // reuses dragon scale
+  DWARVERN_BREW = 'dwarvernBrew',
+  PULVERIZER = 'pulverizer'
 }
 
 export enum EClass {
@@ -85,7 +91,14 @@ export enum EHeroes {
   NECROMANCER = 'necromancer',
   PHANTOM = 'phantom',
   VOIDMONK = 'voidmonk',
-  WRAITH = 'wraith'
+  WRAITH = 'wraith',
+
+  // Dwarves
+  PALADIN = 'paladin',
+  GRENADIER = 'grenadier',
+  GUNNER = 'gunner',
+  ENGINEER = 'engineer',
+  ANNIHILATOR = 'annihilator'
 }
 
 export enum ETiles {
@@ -99,7 +112,8 @@ export enum ETiles {
   CRYSTAL_BIG = 'crystalBig',
   CRYSTAL_SMALL = 'crystalSmall',
   SPAWN = 'spawnTile',
-  SPEED = 'speedTile'
+  SPEED = 'speedTile',
+  PALADIN_AURA = 'paladinAura'
 }
 
 export enum ERange {
@@ -146,6 +160,7 @@ export enum EUiSounds {
 export enum EGameSounds {
   HERO_HAND_SELECT = 'selectHeroFromHandSound',
   HERO_BOARD_SELECT = 'selectHeroFromBoardSound',
+  HERO_THINKING = 'thinkingSound',
   HERO_SPAWN = 'spawnHeroSound',
   HERO_MOVE = 'moveHeroSound',
   MOVE_FLY = 'moveFlySound',
@@ -180,6 +195,11 @@ export enum EGameSounds {
   CRYSTAL_DAMAGE = 'damageCrystal1Sound',
   CRYSTAL_DAMAGE_BUFF = 'damageCrystal2Sound',
   CRYSTAL_DESTROY = 'destroyCrystalSound',
+  HERO_DAMAGE_1 = 'damageHero1Sound',
+  HERO_DAMAGE_2 = 'damageHero2Sound',
+  HERO_DAMAGE_3 = 'damageHero3Sound',
+  HERO_DAMAGE_4 = 'damageHero4Sound',
+  HERO_DAMAGE_KO = 'damageHeroKOSound',
 
   // Council sounds
   ARCHER_ATTACK = 'archerAttackSound',
@@ -204,7 +224,7 @@ export enum EGameSounds {
 
   // Elves sounds
   PRIESTESS_ATTACK = 'priestessAttackSound',
-  PRIESTESS_DEATH = 'priestessDeathSound',
+  PRIESTESS_DEATH = 'priestessDeathSound', // used also for Necromancer's death
   IMPALER_ATTACK = 'impalerAttackSound',
   IMPALER_ATTACK_BIG = 'impalerAttackBigSound',
   IMPALER_ATTACK_MELEE = 'impalerAttackMeleeSound',
@@ -219,7 +239,32 @@ export enum EGameSounds {
   VOIDMONK_DEATH = 'voidmonkDeathSound',
   WRAITH_ATTACK = 'wraithAttackSound',
   WRAITH_ATTACK_BIG = 'wraithAttackBigSound',
-  WRAITH_DEATH = 'wraithDeathSound', // used also for Necromancer's death
+  WRAITH_DEATH = 'wraithDeathSound', 
   WRAITH_CONSUME = 'wraithConsumeSound',
-  USE_HARVEST = 'useHarvestSound'
+  USE_HARVEST = 'useHarvestSound',
+
+  // Dwarves sounds
+  PALADIN_HEAL = 'paladinHealSound',
+  PALADIN_ATTACK = 'paladinAttackSound',
+  PALADIN_ATTACK_BIG = 'paladinAttackBigSound',
+  PALADIN_DEATH = 'paladinDeath',
+  ENGINEER_ATTACK = 'engineerAttackSound',
+  ENGINEER_ATTACK_BIG = 'engineerAttackBigSound',
+  ENGINEER_SHIELD_MAKE = 'engineerShieldMake',
+  ENGINEER_SHIELD_BREAK = 'engineerShieldBreak',
+  GRENADIER_ATTACK = 'grenadierAttack',
+  GRENADIER_ATTACK_BIG = 'grenadierAttackBig',
+  GRENADIER_ATTACK_MELEE = 'grenadierAttackMelee',
+  GRENADIER_DEATH = 'grenadierDeath',
+  GUNNER_ATTACK = 'gunnerAttack',
+  GUNNER_JUMP = 'gunnerJump',
+  GUNNER_ATTACK_ONLY = 'gunnerAttackGunOnly',
+  GUNNER_DEATH = 'gunnerDeath',
+  ANNIHILATOR_SHOOT = 'annihilatorShoot',
+  ANNIHILATOR_HIT = 'annihilatorHit',
+  ANNIHILATOR_WINDUP = 'annihilatorWindup',
+  BREW_SELECT = 'brewSelect',
+  BREW_USE = 'brewUse',
+  DRILL_SELECT = 'drillSelect',
+  DRILL_USE = 'drillUse'
 }

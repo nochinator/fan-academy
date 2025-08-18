@@ -42,6 +42,7 @@ export default class UIScene extends Phaser.Scene {
     // faction emblems
     this.load.image(EFaction.COUNCIL, `${CDN_PATH}/ui/council_emblem.webp`);
     this.load.image(EFaction.DARK_ELVES, `${CDN_PATH}/ui/elves_emblem.webp`);
+    this.load.image(EFaction.DWARVES, `${CDN_PATH}/ui/dwarves_emblem.png`);
 
     // profile pictures
     profilePicNames.forEach(name => {

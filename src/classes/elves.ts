@@ -48,27 +48,31 @@ export class Impaler extends DarkElf {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
-    turnIfBehind(this.context, this, target); // Ensure turnIfBehind is imported/defined
+    turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
 
+    let delay = 0;
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
-      distance === 1 &&
-      target instanceof Hero &&
-      target.isKO &&
-      isEnemySpawn(this.context, target.getTile())
+      distance === 1
     ) {
       playSound(this.scene, EGameSounds.IMPALER_ATTACK_MELEE);
-      target.removeFromGame();
+      delay = 750;
+      if (target instanceof Hero &&
+        target.isKO &&
+        isEnemySpawn(this.context, target.getTile())) {
+        target.removeFromGame();
+      }
     } else {
       if (this.superCharge) {
         playSound(this.scene, EGameSounds.IMPALER_ATTACK_BIG);
+        delay = 1500;
       } else {
-        if (distance === 1) playSound(this.scene, EGameSounds.IMPALER_ATTACK_MELEE);
-        if (distance !== 1) playSound(this.scene, EGameSounds.IMPALER_ATTACK);
+        playSound(this.scene, EGameSounds.IMPALER_ATTACK);
+        delay = 650;
       }
-      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
+      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
       if (damageDone !== undefined) this.lifeSteal(damageDone);
 
@@ -77,13 +81,12 @@ export class Impaler extends DarkElf {
 
     if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) this.context.gameController!.pullEnemy(this, target);
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  special(_target: Hero): void { };
 }
 
 export class VoidMonk extends DarkElf {
@@ -97,8 +100,15 @@ export class VoidMonk extends DarkElf {
 
     const splashedEnemies: (Hero | Crystal)[] = [];
 
-    if (this.superCharge) playSound(this.scene, EGameSounds.VOIDMONK_ATTACK_BIG);
-    if (!this.superCharge) playSound(this.scene, EGameSounds.VOIDMONK_ATTACK);
+    let delay = 0;
+
+    if (this.superCharge) {
+      playSound(this.scene, EGameSounds.VOIDMONK_ATTACK_BIG);
+      delay = 3000;
+    } else {
+      playSound(this.scene, EGameSounds.VOIDMONK_ATTACK);
+      delay = 650;
+    }
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
@@ -139,13 +149,13 @@ export class VoidMonk extends DarkElf {
 
       // Apply damage to targets
       let damageDone = 0;
-      const unitDamage = target.getsDamaged(this.getTotalPower(), this.attackType);
+      const unitDamage = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
       if (unitDamage) damageDone += unitDamage;
       if (splashedEnemies.length) {
         const splashDamage = this.getTotalPower() * 0.666;
         console.log(splashDamage);
         splashedEnemies.forEach(enemy => {
-          const unitDamage = enemy.getsDamaged(splashDamage, this.attackType, 0.666);
+          const unitDamage = enemy.getsDamaged(splashDamage, this.attackType, delay, 0.666);
           if (unitDamage) damageDone += unitDamage;
         });
       }
@@ -159,7 +169,7 @@ export class VoidMonk extends DarkElf {
       if (enemy instanceof Hero && enemy.unitType === EHeroes.PHANTOM && enemy.isKO) enemy.removeFromGame(true);
     });
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
@@ -193,8 +203,8 @@ export class VoidMonk extends DarkElf {
     });
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  special(_target: Hero): void { };
 }
 
 export class Necromancer extends DarkElf {
@@ -207,44 +217,53 @@ export class Necromancer extends DarkElf {
 
     turnIfBehind(this.context, this, target);
 
+    let delay = 0;
+
     if (target instanceof Hero && target.isKO) {
-      const tile = target.getTile();
 
-      playSound(this.scene, EGameSounds.PHANTOM_SPAWN);
-
-      const phantom = new Phantom(this.context, createElvesPhantomData({
-        unitId: `${this.context.userId}_phantom_${generateFourDigitId()}`,
-        boardPosition: target.boardPosition,
-        belongsTo: this.belongsTo,
-        row: target.row,
-        col: target.col
-      }), tile, true);
-
-      target.removeFromGame(true);
-
-      this.context.gameController?.board.units.push(phantom);
-      tile.hero = phantom.exportData();
-
-      this.context.gameController!.afterAction(EActionType.SPAWN_PHANTOM, this.boardPosition, target.boardPosition);
+      this.special(target);
 
       return;
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK_BIG);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK);
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.NECROMANCER_ATTACK_BIG);
+        delay = 1500;
+      } else {
+        playSound(this.scene, EGameSounds.NECROMANCER_ATTACK);
+        delay = 800;
+      }
     }
 
-    const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
+    const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
     if (damageDone) this.lifeSteal(damageDone);
 
     this.removeAttackModifiers();
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+  heal(_target: Hero): void { };
+  special(target: Hero): void { 
+    playSound(this.scene, EGameSounds.PHANTOM_SPAWN);
+    const tile = target.getTile();
+
+    const phantom = new Phantom(this.context, createElvesPhantomData({
+      unitId: `${this.context.userId}_phantom_${generateFourDigitId()}`,
+      boardPosition: target.boardPosition,
+      belongsTo: this.belongsTo,
+      row: target.row,
+      col: target.col
+    }), tile, true);
+
+    target.removeFromGame(true);
+
+    this.context.gameController?.board.units.push(phantom);
+    tile.hero = phantom.exportData();
+
+    this.context.gameController!.afterAction(EActionType.SPECIAL, this.boardPosition, target.boardPosition);
+  };
 }
 
 export class Priestess extends DarkElf {
@@ -259,6 +278,8 @@ export class Priestess extends DarkElf {
 
     const distance = this.getDistanceToTarget(target);
 
+    let delay = 0;
+
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
       distance === 1 &&
@@ -270,15 +291,16 @@ export class Priestess extends DarkElf {
       target.removeFromGame();
     } else {
       playSound(this.scene, EGameSounds.PRIESTESS_ATTACK);
+      delay = 500; // no supercharged sound
 
-      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
+      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
       if (damageDone) this.lifeSteal(damageDone);
 
       // Apply a 50% debuff to the target's next attack or heal
       if (target instanceof Hero) {
-        target.isDebuffed = true;
-        target.debuffImage.setVisible(true);
+        target.priestessDebuff = true;
+        target.priestessDebuffImage.setVisible(true);
         target.updateTileData();
         target.unitCard.updateCardData(target);
       }
@@ -286,15 +308,13 @@ export class Priestess extends DarkElf {
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   async heal(target: Hero): Promise<void> {
     this.flashActingUnit();
     turnIfBehind(this.context, this, target);
-    if (!this.superCharge) playSound(this.scene, EGameSounds.HEAL);
-    if (this.superCharge)  playSound(this.scene, EGameSounds.HEAL_EXTRA);
+    playSound(this.scene, EGameSounds.HEAL);
 
     if (target.isKO) {
       const healingAmount = this.getTotalHealing(0.5);
@@ -309,7 +329,7 @@ export class Priestess extends DarkElf {
     this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
   };
 
-  teleport(_target: Hero): void {};
+  special(_target: Hero): void { };
 }
 
 export class Wraith extends DarkElf {
@@ -321,6 +341,8 @@ export class Wraith extends DarkElf {
     this.flashActingUnit();
 
     turnIfBehind(this.context, this, target);
+
+    let delay = 0;
 
     if (target instanceof Hero && target.isKO) {
       playSound(this.scene, EGameSounds.WRAITH_CONSUME);
@@ -334,22 +356,78 @@ export class Wraith extends DarkElf {
         this.unitCard.updateCardData(this);
       }
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.WRAITH_ATTACK_BIG);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.WRAITH_ATTACK);
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.WRAITH_ATTACK_BIG);
+        delay = 4000;
+      } else {
+        playSound(this.scene, EGameSounds.WRAITH_ATTACK);
+        delay = 100;
+      }
 
-      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
+      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
       if (damageDone) this.lifeSteal(damageDone);
 
       this.removeAttackModifiers();
     }
 
-    if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
+
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
+
+  playSuperHitSounds() {
+    const damageSounds = [EGameSounds.HERO_DAMAGE_1, EGameSounds.HERO_DAMAGE_2, EGameSounds.HERO_DAMAGE_3, EGameSounds.HERO_DAMAGE_4];
+
+    let delay = 0;
+
+    // First sound
+    delay += 1500;
+    this.context.time.delayedCall(delay, () => {
+      this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
+    });
+
+    // Second sound
+    delay += 250;
+    this.context.time.delayedCall(delay, () => {
+      this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
+    });
+
+    // Third sound
+    delay += 350;
+    this.context.time.delayedCall(delay, () => {
+      this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
+    });
+
+    // Fourth sound
+    delay += 400;
+    this.context.time.delayedCall(delay, () => {
+      this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
+    });
+
+    // Fifth sound
+    delay += 350;
+    this.context.time.delayedCall(delay, () => {
+      this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
+    });
+
+    // Sixth sound
+    delay += 200;
+    this.context.time.delayedCall(delay, () => {
+      this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
+    });
+
+    // Seventh sound
+    delay += 300;
+    this.context.time.delayedCall(delay, () => {
+      this.context.sound.play(Phaser.Math.RND.pick(damageSounds), { volume: 0.5 });
+    });
+
+    // last sound handled by getsDamaged
+  }
+
+  heal(_target: Hero): void { };
+  special(_target: Hero): void { };
 }
 
 export class Phantom extends Hero {
@@ -361,7 +439,7 @@ export class Phantom extends Hero {
     if (spawned && tile) {
       this.spawnAnim = context.add.image(0, -15, 'phantomSpawnAnim_1').setOrigin(0.5).setScale(0.9);
 
-      this.specialTileCheck(tile.tileType);
+      this.specialTileCheck(tile);
       this.add([this.spawnAnim]);
       this.singleTween(this.spawnAnim, 200);
     }
@@ -382,7 +460,7 @@ export class Phantom extends Hero {
     ) {
       target.removeFromGame();
     } else {
-      target.getsDamaged(this.getTotalPower(), this.attackType);
+      target.getsDamaged(this.getTotalPower(), this.attackType, 100);
 
       this.removeAttackModifiers();
     }
@@ -390,9 +468,9 @@ export class Phantom extends Hero {
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(_target: Hero): void {};
-  teleport(_target: Hero): void {};
-  equipFactionBuff(): void {}
+  heal(_target: Hero): void { };
+  special(_target: Hero): void { };
+  equipFactionBuff(): void { }
 }
 
 export class SoulStone extends Item {
@@ -451,27 +529,18 @@ export class SoulHarvest extends Item {
     // Damages enemy units and crystals but doesn't remove KO'd enemy units
     const damage = 100;
 
-    const { enemyHeroTiles, enemyCrystalTiles } = getAOETiles(this.context, this, targetTile);
-
+    const aoeTiles = getAOETiles(this.context, this, targetTile, false);
+    const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
     // Keep track of the cumulative damage done (not attack power used) to enemy heroes (not crystals)
     let totalDamageInflicted = 0;
 
-    enemyHeroTiles?.forEach(tile => {
-      const hero = gameController.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+    allTiles.forEach(tile => {
+      const unit = gameController.board.units.find(unit => unit.boardPosition === tile.boardPosition);
 
-      if (!hero) throw new Error('SoulHarvest use() hero not found');
-      if (hero.isKO) return;
+      if (!unit) throw new Error('SoulHarvest use() hero not found');
+      if (unit.isKO) return;
 
-      totalDamageInflicted += hero.getsDamaged(damage, EAttackType.MAGICAL);
-
-      if (hero && hero instanceof Hero && hero.unitType === EHeroes.PHANTOM) hero.removeFromGame();
-    });
-
-    enemyCrystalTiles.forEach(tile => {
-      const crystal = gameController.board.crystals.find(crystal => crystal.boardPosition === tile.boardPosition);
-      if (!crystal) throw new Error('SoulHarvest use() crystal not found');
-
-      if (crystal.belongsTo !== this.belongsTo) crystal.getsDamaged(damage, EAttackType.MAGICAL);
+      totalDamageInflicted += unit.getsDamaged(damage, EAttackType.MAGICAL, 700); // if crystal, nothing chnages
     });
 
     // Get total amount of friendly units in the map, including KO'd ones
@@ -523,8 +592,12 @@ function createGenericElvesData(data: Partial<IHero>): {
   lastBreath: boolean,
   row: number,
   col: number,
-  isDebuffed: boolean,
-  attackTile: boolean
+  isShielded: boolean,
+  isDrunk: boolean,
+  paladinAura: number,
+  priestessDebuff: boolean,
+  annihilatorDebuff: boolean,
+  attackTile: number
 } {
   return {
     class: EClass.HERO,
@@ -540,7 +613,11 @@ function createGenericElvesData(data: Partial<IHero>): {
     belongsTo: data.belongsTo ?? 1,
     row: data.row ?? 0,
     col: data.col ?? 0,
-    isDebuffed: data.isDebuffed ?? false,
-    attackTile: data.attackTile ?? false
+    isShielded: data.priestessDebuff ?? false,
+    isDrunk: data.isDrunk ?? false,
+    paladinAura: data.paladinAura ?? 1,
+    priestessDebuff: data.priestessDebuff ?? false,
+    annihilatorDebuff: data.priestessDebuff ?? false,
+    attackTile: data.attackTile ?? 0
   };
 }

@@ -3,7 +3,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 
 import { dependencies } from './package.json';
-function renderChunks(deps: Record<string, string>) {
+function renderChunks(deps) {
   const chunks = {};
   Object.keys(deps).forEach((key) => {
     if (['phaser'].includes(key)) return;
@@ -13,6 +13,9 @@ function renderChunks(deps: Record<string, string>) {
 }
 
 export default defineConfig({
+  // Add this line to set the base path for GitHub Pages
+  base: '/fan-academy/', 
+
   build: {
     rollupOptions: {
       output: {

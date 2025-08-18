@@ -8,6 +8,7 @@ import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
 import { ConcedeWarningPopup } from "./concedePopup";
+import { Crystal } from "./crystal";
 import { Deck } from "./deck";
 import { Door } from "./door";
 import { GameOverScreen } from "./gameOverScreen";
@@ -147,9 +148,8 @@ export class GameController {
           if (
             actionTaken === EActionType.ATTACK ||
             actionTaken === EActionType.HEAL ||
-            actionTaken === EActionType.TELEPORT ||
-            actionTaken === EActionType.SPAWN_PHANTOM
-          ) await this.replayAttackHealTeleport(turn.action!);
+            actionTaken === EActionType.SPECIAL
+          ) await this.replayAttackHealSpecial(turn.action!);
 
           if (actionTaken === EActionType.SHUFFLE) await this.replayShuffle();
 
@@ -186,15 +186,14 @@ export class GameController {
     if (actionTaken === EActionType.SPAWN) hero.setVisible(true).spawn(tile);
   };
 
-  async replayAttackHealTeleport(action: ITurnAction): Promise<void> {
+  async replayAttackHealSpecial(action: ITurnAction): Promise<void> {
     const hero = this.board.units.find(unit => unit.boardPosition === action.actorPosition);
     const target = this.board.crystals.find(crystal => crystal.boardPosition === action.targetPosition) ?? this.board.units.find(unit => unit.boardPosition === action.targetPosition);
     if (!hero || !target) throw new Error('Missing hero or target in attack or heal action');
 
     // VSCode says await has no effect on them, but it does work
-    if (action.action === EActionType.ATTACK || action.action === EActionType.SPAWN_PHANTOM) await hero.attack(target);
     if (action.action === EActionType.HEAL) await hero.heal(target as Hero);
-    if (action.action === EActionType.TELEPORT) await hero.teleport(target as Hero);
+    if (action.action === EActionType.SPECIAL) await hero.special(target as Hero);
   };
 
   async replayUse(action: ITurnAction, opponentHand: (Hero | Item)[]): Promise<void> {
@@ -231,9 +230,8 @@ export class GameController {
     deselectUnit(this.context);
     this.context.longPressStart = undefined;
     this.context.visibleUnitCard = undefined;
-    playSound(this.context, EGameSounds.RESET_TURN);
-
     this.context.scene.restart();
+    playSound(this.context, EGameSounds.RESET_TURN);
   };
 
   getDeck() {
@@ -375,6 +373,45 @@ export class GameController {
     console.log(`A tile ${tile.tileType} has been clicked`);
   }
 
+  rebuildFromState(state: IGameState): void {
+    const { player, opponent } = getPlayersKey(this.context);
+    
+    const playerState = this.context.isPlayerOne ? state.player1 : state.player2;
+    this.context[player] = playerState;
+
+    const opponentState = this.context.isPlayerOne ? state.player2 : state.player1;
+    this.context[opponent] = opponentState;
+    
+    this.board.setBoardState(state.boardState);
+
+    this.hand.importHandData(playerState!.factionData.unitsInHand);
+    
+    this.deck.setDeck(playerState!.factionData.unitsInDeck);
+
+    this.door.updateBannerText();
+    
+    this.context.currentTurnAction!--;
+  }
+
+  undoLastAction(): void {
+    playSound(this.context, EUiSounds.BUTTON_GENERIC);
+
+    if (this.currentTurn.length <= 0) {
+      return;
+    }
+
+    console.log(this.lastTurnState);
+    // initial board state is stored in lastTurnState
+    const previousState = this.currentTurn[this.currentTurn.length - 1] ?? this.lastTurnState;
+  
+    this.rebuildFromState(previousState);
+
+    this.currentTurn.pop();
+  
+    this.actionPie.showActionSlice(this.context.currentTurnAction!);
+    if (this.context.activeUnit) deselectUnit(this.context);
+  }
+
   afterAction(actionType: EActionType, activePosition: number, targetPosition?: number): void {
     // Don't trigger pie animation during replays
     if (this.context.triggerReplay) return;
@@ -418,7 +455,7 @@ export class GameController {
     });
   }
 
-  async pushEnemy(attacker: Hero, target: Hero): Promise<void> {
+  async pushEnemy(attacker: Hero | Crystal, target: Hero): Promise<void> {
     const attackerTile = this.board.getTileFromBoardPosition(attacker.boardPosition);
     const targetTile = this.board.getTileFromBoardPosition(target.boardPosition);
     if (!attackerTile || !targetTile) {
@@ -451,7 +488,7 @@ export class GameController {
       return;
     }
 
-    if (!target.isKO) target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
+    if (!target.isKO) target.specialTileCheck(targetNewTile, targetTile);
 
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
@@ -484,7 +521,7 @@ export class GameController {
       return;
     }
 
-    if (!target.isKO) target.specialTileCheck(targetNewTile.tileType, targetTile.tileType);
+    if (!target.isKO) target.specialTileCheck(targetNewTile, targetTile);
 
     await forcedMoveAnimation(this.context, target, targetNewTile);
 

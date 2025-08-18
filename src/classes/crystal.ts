@@ -17,7 +17,12 @@ export class Crystal extends Phaser.GameObjects.Container {
   boardPosition: number;
   row: number;
   col: number;
+  debuffAmount: number;
   debuffLevel: number;
+  isShielded: boolean;
+  paladinAura: number;
+  physicalDamageResistance: number;
+  magicalDamageResistance: number;
 
   context: GameScene;
 
@@ -25,6 +30,8 @@ export class Crystal extends Phaser.GameObjects.Container {
   crystalImage: Phaser.GameObjects.Image;
   singleCrystalDebuff: Phaser.GameObjects.Image;
   doubleCrystalDebuff: Phaser.GameObjects.Image;
+  annihilatorDebuff: Phaser.GameObjects.Image;
+  shieldImage: Phaser.GameObjects.Image;
   attackReticle: Phaser.GameObjects.Image;
   blockedLOS: Phaser.GameObjects.Image;
 
@@ -47,7 +54,12 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.row = tile.row;
     this.col = tile.col;
     this.belongsTo = data.belongsTo;
-    this.debuffLevel = data.debuffLevel < 0 ? 0 : data.debuffLevel; // safeguard for bug that keeps making debuff level negative. Remove when fixed
+    this.debuffAmount = data.debuffAmount < 0 ? 0 : data.debuffAmount; // safeguard for bug
+    this.debuffLevel = data.debuffLevel < 0 || data.debuffLevel === undefined ? 0 : data.debuffLevel; // safeguard for bug
+    this.isShielded = data.isShielded;
+    this.paladinAura = data.paladinAura ?? 0; // Initialize as number, default to 0
+    this.physicalDamageResistance = data.physicalDamageResistance ?? 0; // Default to 0
+    this.magicalDamageResistance = data.magicalDamageResistance ?? 0; // Default to 0
 
     this.healthBar = new HealthBar(context, data, -38, -70);
     this.unitCard = new CrystalCard(context, data).setVisible(false);
@@ -59,12 +71,15 @@ export class Crystal extends Phaser.GameObjects.Container {
 
     this.blockedLOS = context.add.image(0, -10, 'blockedLOS').setOrigin(0.5).setName('blockedLOS').setVisible(false);
 
-    const crystalColor = this.belongsTo === 1 ?  0x3399ff : 0x990000;
+    const crystalColor = this.belongsTo === 1 ? 0x3399ff : 0x990000;
     this.crystalImage.setTint(crystalColor);
 
     // Debuff images and animation
     this.singleCrystalDebuff = context.add.image(0, -30, 'crystalDebuff_1').setVisible(false);
     this.doubleCrystalDebuff = context.add.image(0, -30, 'crystalDebuff_3').setVisible(false);
+
+    this.shieldImage = context.add.image(0, -30, 'shield').setVisible(this.isShielded);
+    this.annihilatorDebuff = context.add.image(0, -30, 'annihilatorDebuff').setVisible(false);
 
     const crystalDebuffEvent = (debuffImage: Phaser.GameObjects.Image, texture1: string, texture2: string) => {
       let frame = 0;
@@ -75,7 +90,8 @@ export class Crystal extends Phaser.GameObjects.Container {
           frame = 1 - frame; // Toggle between 0 and 1
           debuffImage.setTexture(frame === 0 ? texture1 : texture2);
         }
-      });};
+      });
+    };
 
     this.debuffEventSingle = crystalDebuffEvent(this.singleCrystalDebuff, 'crystalDebuff_1', 'crystalDebuff_2');
     this.debuffEventDouble = crystalDebuffEvent(this.doubleCrystalDebuff, 'crystalDebuff_3', 'crystalDebuff_4');
@@ -98,37 +114,34 @@ export class Crystal extends Phaser.GameObjects.Container {
     addTween(this.attackReticle);
 
     this.add([this.pedestalImage, this.crystalImage, this.singleCrystalDebuff, this.doubleCrystalDebuff, this.healthBar, this.attackReticle, this.blockedLOS, this.unitCard]).setSize(90, 95).setInteractive({ useHandCursor: true }).setDepth(this.row + 10);
+
     makeCrystalClickable(this, this.context);
 
     context.add.existing(this);
   }
 
   updateDebuffAnimation(newLevel: number): void {
+    if (newLevel === undefined) {
+      newLevel = 0;
+    }
     switch (newLevel) {
       case 0:
         this.singleCrystalDebuff.setVisible(false);
         this.doubleCrystalDebuff.setVisible(false);
         break;
-
       case 1:
         this.singleCrystalDebuff.setVisible(true);
         this.doubleCrystalDebuff.setVisible(false);
         break;
-
       case 2:
         this.singleCrystalDebuff.setVisible(false);
         this.doubleCrystalDebuff.setVisible(true);
         break;
-
       default:
         console.error('updateDebuffAnimation() level and case dont match', newLevel);
         break;
     }
-
-    if (newLevel !== this.debuffLevel) {
-      this.debuffLevel = newLevel;
-      this.updateTileData();
-    }
+    this.debuffLevel = newLevel;
   }
 
   getTile(): Tile {
@@ -145,6 +158,9 @@ export class Crystal extends Phaser.GameObjects.Container {
       this.debuffLevel = 0;
       this.updateDebuffAnimation(this.debuffLevel);
     }
+    if (this.debuffAmount < 0) {
+      this.debuffAmount = 0;
+    }
 
     tile.crystal = {
       belongsTo: this.belongsTo,
@@ -155,22 +171,47 @@ export class Crystal extends Phaser.GameObjects.Container {
       boardPosition: this.boardPosition,
       row: this.row,
       col: this.col,
-      debuffLevel: this.debuffLevel
+      debuffAmount: this.debuffAmount,
+      debuffLevel: this.debuffLevel,
+      isShielded: this.isShielded,
+      paladinAura: this.paladinAura,
+      physicalDamageResistance: this.physicalDamageResistance,
+      magicalDamageResistance: this.magicalDamageResistance,
     };
   }
 
-  getsDamaged(damage: number, _attackType: EAttackType, multiplier = 1): void {
-    if (this.debuffLevel > 0) {
-      playSound(this.scene, EGameSounds.CRYSTAL_DAMAGE_BUFF);
-    } else {
-      playSound(this.scene, EGameSounds.CRYSTAL_DAMAGE);
+  getsDamaged(damage: number, attackType: EAttackType, delay: number, multiplier = 1): void {
+    // Determine resistance based on attack type
+    const resistance = attackType === EAttackType.PHYSICAL ? this.physicalDamageResistance : this.magicalDamageResistance;
+    
+    if (this.isShielded) {
+      this.isShielded = false;
+      this.shieldImage.setVisible(false);
+      playSound(this.context, EGameSounds.ENGINEER_SHIELD_BREAK);
+      return;
+    }
+    if (this.annihilatorDebuff.visible && attackType === EAttackType.PHYSICAL) {
+      this.annihilatorDebuff.setVisible(false);
+      this.physicalDamageResistance
     }
 
-    const damageMultiplier = 300 * multiplier * this.debuffLevel;
-    const totalDamage = roundToFive(damage + damageMultiplier);
+    // Calculate damage after resistance
+    const damageAfterResistance = damage - (damage * resistance) / 100;
+
+    // Apply debuff multiplier
+    const damageMultiplier = this.debuffAmount * multiplier;
+    const totalDamage = roundToFive(damageAfterResistance + damageMultiplier);
     const damageTaken = totalDamage > this.currentHealth ? this.currentHealth : totalDamage;
     this.currentHealth -= damageTaken;
 
+    // Play sound based on debuff
+    if (this.debuffAmount > 0) {
+      this.scene.time.delayedCall(delay, playSound, [this.scene, EGameSounds.CRYSTAL_DAMAGE_BUFF]);
+    } else {
+      this.scene.time.delayedCall(delay, playSound, [this.scene, EGameSounds.CRYSTAL_DAMAGE]);
+    }
+
+    // Update crystal texture if health is low
     if (this.currentHealth <= this.maxHealth / 2) {
       this.crystalImage.setTexture('crystalDamaged');
     }
@@ -191,34 +232,16 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.currentHealth <= 0) this.removeFromGame();
   }
 
-  removeFromGame(): void {
-    playSound(this.scene, EGameSounds.CRYSTAL_DESTROY);
-
+  removeFromGame(permanent = true): void {
     const tile = this.getTile();
     tile.crystal = undefined;
     tile.obstacle = false;
     tile.tileType = ETiles.BASIC;
 
-    // Remove destoyed crystal from the board array
+    // Remove destroyed crystal from the board array
     const crystalArray = this.context.gameController!.board.crystals;
     const index = crystalArray.findIndex(crystal => crystal.boardPosition === this.boardPosition);
     crystalArray.splice(index, 1);
-
-    // Update the remaining crystal or set gameOver
-    if (this.isLastCrystal) {
-      this.context.gameController!.gameOver = {
-        winCondition: EWinConditions.CRYSTAL,
-        winner: this.context.activePlayer!
-      };
-    } else {
-      const otherCrystals = crystalArray.filter(crystal => crystal.belongsTo === this.belongsTo);
-      if (!otherCrystals.length) throw new Error('Crystal getsDestroyed() No other crystals found');
-
-      if (otherCrystals.length === 1) {
-        otherCrystals[0].isLastCrystal = true;
-        otherCrystals[0].updateTileData();
-      }
-    }
 
     // Remove animations
     this.scene.tweens.killTweensOf(this);
@@ -231,7 +254,43 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.debuffEventSingle.remove(false);
     this.debuffEventDouble.remove(false);
 
+    if (permanent) {
+      playSound(this.scene, EGameSounds.CRYSTAL_DESTROY);
+
+      // Update the remaining crystal or set gameOver
+      if (this.isLastCrystal) {
+        this.context.gameController!.gameOver = {
+          winCondition: EWinConditions.CRYSTAL,
+          winner: this.context.activePlayer!
+        };
+      } else {
+        const otherCrystal = crystalArray.find(crystal => crystal.belongsTo === this.belongsTo);
+        if (!otherCrystal) throw new Error('Crystal getsDestroyed() No other crystal found');
+
+        otherCrystal.isLastCrystal = true;
+        otherCrystal.updateTileData();
+      }
+    }
     // Destroy container and children
     this.destroy(true);
+  }
+
+  exportData(): ICrystal {
+    return {
+      belongsTo: this.belongsTo,
+      maxHealth: this.maxHealth,
+      currentHealth: this.currentHealth,
+      isDestroyed: this.isDestroyed,
+      isLastCrystal: this.isLastCrystal,
+      boardPosition: this.boardPosition,
+      row: this.row,
+      col: this.col,
+      debuffAmount: this.debuffAmount,
+      debuffLevel: this.debuffLevel,
+      isShielded: this.isShielded,
+      paladinAura: this.paladinAura,
+      physicalDamageResistance: this.physicalDamageResistance,
+      magicalDamageResistance: this.magicalDamageResistance,
+    };
   }
 }
