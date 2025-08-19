@@ -102,9 +102,9 @@ export class Paladin extends Dwarf {
         this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
       if (unit && unit !== this) {
-        this.magicalDamageResistance -= 5;
-        this.physicalDamageResistance -= 5;
-        this.paladinAura -= 1;
+        unit.magicalDamageResistance -= 5;
+        unit.physicalDamageResistance -= 5;
+        unit.paladinAura -= 1;
       }
     });
 
