@@ -151,6 +151,7 @@ export class Board {
        * Show attack reticle if one of the below is true:
        *  -target is an enemy hero and it's not KO
        *  -target is an enemy crystal
+       *  - active unit is grenadier
        *  -target is KO and active unit is a Necro or a Wraith
        *  -target is KO and standing on an enemy spawn, and hero is orthogonally adjacent
        */
@@ -159,7 +160,7 @@ export class Board {
         target instanceof Crystal && target.belongsTo !== hero.belongsTo ||
         target instanceof Hero && target.belongsTo !== hero.belongsTo && !target.isKO ||
         (hero.unitType === EHeroes.NECROMANCER || hero.unitType === EHeroes.WRAITH) && target instanceof Hero && target.isKO ||
-        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile())
+        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile()) || hero.unitType === EHeroes.GRENADIER
       ) {
         enemyLOSCheck.push(target);
       }

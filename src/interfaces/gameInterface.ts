@@ -31,6 +31,7 @@ export interface ICrystal {
   boardPosition: number;
   debuffAmount: number;
   debuffLevel: number;
+  annihilatorDebuff: boolean;
   isShielded: boolean;
   paladinAura: number;
   physicalDamageResistance: number,

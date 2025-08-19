@@ -483,7 +483,7 @@ export class GameController {
       console.error('pushEnemy() Destination tile is occupied');
       return;
     }
-    if (targetNewTile.tileType == ETiles.SPAWN && forcedMoveSpawnCheck(targetNewTile, attacker) && !target.isKO) {
+    if (targetNewTile.tileType == ETiles.SPAWN && forcedMoveSpawnCheck(targetNewTile, target) && !target.isKO) {
       console.error(`pushEnemy() Can't push a non-KO'd enemy onto a friendly spawn`);
       return;
     }

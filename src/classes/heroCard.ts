@@ -1,7 +1,7 @@
 import { EAttackType, EHeroes } from "../enums/gameEnums";
 import { IHero } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { capitalize, getCardText } from "../utils/gameUtils";
+import { capitalize, getCardText, roundToFive } from "../utils/gameUtils";
 import { Hero } from "./hero";
 
 export class HeroCard extends Phaser.GameObjects.Container {
@@ -170,7 +170,7 @@ export class HeroCard extends Phaser.GameObjects.Container {
 
   updateCardPower(hero: Hero): void {
     const totalPow = hero.getTotalPower();
-    this.powerText.setText(`${totalPow} ${this.attackType}`);
+    this.powerText.setText(`${roundToFive(totalPow)} ${this.attackType}`);
 
     const basePower = hero.unitType === EHeroes.WRAITH ? 250 : hero.basePower;
 
@@ -182,17 +182,17 @@ export class HeroCard extends Phaser.GameObjects.Container {
   }
 
   updateCardPhysicalResistance(hero: Hero): void {
-    this.physicalResistanceText.setText(`${hero.physicalDamageResistance} %`);
+    this.physicalResistanceText.setText(`${roundToFive(hero.physicalDamageResistance)} %`);
     this.physicalResistanceText.setColor(this.getTextColor(hero.physicalDamageResistance, hero.basePhysicalDamageResistance));
   }
 
   updateCardMagicalResistance(hero: Hero): void {
-    this.magicalResistanceText.setText(`${hero.magicalDamageResistance} %`);
+    this.magicalResistanceText.setText(`${roundToFive(hero.magicalDamageResistance)} %`);
     this.magicalResistanceText.setColor(this.getTextColor(hero.magicalDamageResistance, hero.baseMagicalDamageResistance));
   }
 
   updateCardHealth(hero: Hero ): void {
-    this.currentHpText.setText(`${hero.currentHealth}/${hero.maxHealth}`);
+    this.currentHpText.setText(`${roundToFive(hero.currentHealth)}/${hero.maxHealth}`);
     this.currentHpText.setColor(this.getTextColor(hero.maxHealth, hero.baseHealth));
     this.setHealthBar(hero.currentHealth, hero.maxHealth);
   }

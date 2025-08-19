@@ -19,6 +19,7 @@ export class Crystal extends Phaser.GameObjects.Container {
   col: number;
   debuffAmount: number;
   debuffLevel: number;
+  annihilatorDebuff: boolean;
   isShielded: boolean;
   paladinAura: number;
   physicalDamageResistance: number;
@@ -30,7 +31,7 @@ export class Crystal extends Phaser.GameObjects.Container {
   crystalImage: Phaser.GameObjects.Image;
   singleCrystalDebuff: Phaser.GameObjects.Image;
   doubleCrystalDebuff: Phaser.GameObjects.Image;
-  annihilatorDebuff: Phaser.GameObjects.Image;
+  annihilatorDebuffImage: Phaser.GameObjects.Image;
   shieldImage: Phaser.GameObjects.Image;
   attackReticle: Phaser.GameObjects.Image;
   blockedLOS: Phaser.GameObjects.Image;
@@ -57,6 +58,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.debuffAmount = data.debuffAmount < 0 ? 0 : data.debuffAmount; // safeguard for bug
     this.debuffLevel = data.debuffLevel < 0 || data.debuffLevel === undefined ? 0 : data.debuffLevel; // safeguard for bug
     this.isShielded = data.isShielded;
+    this.annihilatorDebuff = data.annihilatorDebuff;
     this.paladinAura = data.paladinAura ?? 0; // Initialize as number, default to 0
     this.physicalDamageResistance = data.physicalDamageResistance ?? 0; // Default to 0
     this.magicalDamageResistance = data.magicalDamageResistance ?? 0; // Default to 0
@@ -79,7 +81,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.doubleCrystalDebuff = context.add.image(0, -30, 'crystalDebuff_3').setVisible(false);
 
     this.shieldImage = context.add.image(0, -30, 'shield').setVisible(this.isShielded);
-    this.annihilatorDebuff = context.add.image(0, -30, 'annihilatorDebuff').setVisible(false);
+    this.annihilatorDebuffImage = context.add.image(0, -30, 'annihilatorDebuff').setVisible(this.annihilatorDebuff);
 
     const crystalDebuffEvent = (debuffImage: Phaser.GameObjects.Image, texture1: string, texture2: string) => {
       let frame = 0;
@@ -113,8 +115,8 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
     addTween(this.attackReticle);
 
-    this.add([this.pedestalImage, this.crystalImage, this.singleCrystalDebuff, this.doubleCrystalDebuff, this.healthBar, this.attackReticle, this.blockedLOS, this.unitCard]).setSize(90, 95).setInteractive({ useHandCursor: true }).setDepth(this.row + 10);
-
+    this.add([this.pedestalImage, this.crystalImage, this.singleCrystalDebuff, this.doubleCrystalDebuff, this.shieldImage, this.annihilatorDebuffImage, this.healthBar, this.attackReticle, this.blockedLOS, this.unitCard]).setSize(90, 95).setInteractive({ useHandCursor: true }).setDepth(this.boardPosition + 10);
+    
     makeCrystalClickable(this, this.context);
 
     context.add.existing(this);
@@ -173,6 +175,7 @@ export class Crystal extends Phaser.GameObjects.Container {
       col: this.col,
       debuffAmount: this.debuffAmount,
       debuffLevel: this.debuffLevel,
+      annihilatorDebuff: this.annihilatorDebuff,
       isShielded: this.isShielded,
       paladinAura: this.paladinAura,
       physicalDamageResistance: this.physicalDamageResistance,
@@ -190,10 +193,18 @@ export class Crystal extends Phaser.GameObjects.Container {
       playSound(this.context, EGameSounds.ENGINEER_SHIELD_BREAK);
       return;
     }
+    if (this.annihilatorDebuff && attackType === EAttackType.PHYSICAL) {
+      this.annihilatorDebuff = false;
+      this.physicalDamageResistance += 50;
+      this.annihilatorDebuffImage.setVisible(false);
+    }
     if (this.annihilatorDebuff.visible && attackType === EAttackType.PHYSICAL) {
       this.annihilatorDebuff.setVisible(false);
       this.physicalDamageResistance
     }
+
+    // Calculate damage after resistance
+    const damageAfterResistance = damage - (damage * resistance) / 100;
 
     // Calculate damage after resistance
     const damageAfterResistance = damage - (damage * resistance) / 100;
@@ -287,6 +298,7 @@ export class Crystal extends Phaser.GameObjects.Container {
       col: this.col,
       debuffAmount: this.debuffAmount,
       debuffLevel: this.debuffLevel,
+      annihilatorDebuff: this.annihilatorDebuff,
       isShielded: this.isShielded,
       paladinAura: this.paladinAura,
       physicalDamageResistance: this.physicalDamageResistance,

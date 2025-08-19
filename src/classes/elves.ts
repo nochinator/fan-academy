@@ -232,14 +232,12 @@ export class Necromancer extends DarkElf {
         playSound(this.scene, EGameSounds.NECROMANCER_ATTACK);
         delay = 800;
       }
+      this.removeAttackModifiers();
     }
 
     const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType, delay);
 
     if (damageDone) this.lifeSteal(damageDone);
-
-    this.removeAttackModifiers();
-
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
@@ -374,7 +372,6 @@ export class Wraith extends DarkElf {
 
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
-
 
   playSuperHitSounds() {
     const damageSounds = [EGameSounds.HERO_DAMAGE_1, EGameSounds.HERO_DAMAGE_2, EGameSounds.HERO_DAMAGE_3, EGameSounds.HERO_DAMAGE_4];
@@ -535,12 +532,15 @@ export class SoulHarvest extends Item {
     let totalDamageInflicted = 0;
 
     allTiles.forEach(tile => {
-      const unit = gameController.board.units.find(unit => unit.boardPosition === tile.boardPosition);
+      const unit =
+        this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+        this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
       if (!unit) throw new Error('SoulHarvest use() hero not found');
-      if (unit.isKO) return;
-
-      totalDamageInflicted += unit.getsDamaged(damage, EAttackType.MAGICAL, 700); // if crystal, nothing chnages
+      if (unit instanceof Hero) {
+        if (unit.isKO) return;
+              totalDamageInflicted += unit.getsDamaged(damage, EAttackType.MAGICAL, 700); // if crystal, nothing chnages
+      }
     });
 
     // Get total amount of friendly units in the map, including KO'd ones

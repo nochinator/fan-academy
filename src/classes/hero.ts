@@ -141,18 +141,17 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     if (inHand) this.characterImage.setScale(0.8);
     if (this.belongsTo === 2 && this.boardPosition < 45) this.characterImage.setFlipX(true);
 
-    this.runeMetalImage = context.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.4).setName('runeMetal');
+    this.runeMetalImage = context.add.image(33, 25, 'runeMetal').setOrigin(0.5).setScale(0.4).setName('runeMetal').setVisible(this.runeMetal);
     if (!this.runeMetal) this.runeMetalImage.setVisible(false);
 
     this.shiningHelmImage = context.add.image(-28, 25, 'shiningHelm').setOrigin(0.5).setScale(0.4).setName('shiningHelm');
     if (!this.shiningHelm) this.shiningHelmImage.setVisible(false);
 
-    if (this.faction === EFaction.COUNCIL) {
-      this.factionBuffImage = context.add.image(5, 25, 'dragonScale').setOrigin(0.5).setScale(0.4).setName('dragonScale');
+    if (this.faction === EFaction.COUNCIL || EFaction.DWARVES) {
+      this.factionBuffImage = context.add.image(5, 25, 'dragonScale').setOrigin(0.5).setScale(0.4).setName('dragonScale').setVisible(this.factionBuff);
     } else {
-      this.factionBuffImage = context.add.image(5, 25, 'soulStone').setOrigin(0.5).setScale(0.4).setName('soulStone');
+      this.factionBuffImage = context.add.image(5, 25, 'soulStone').setOrigin(0.5).setScale(0.4).setName('soulStone').setVisible(this.factionBuff);
     } // Using else here removes a bunch of checks on factionBuff being possibly undefined
-    if (!this.factionBuff) this.factionBuffImage.setVisible(false);
 
     if (this.faction === EFaction.COUNCIL) {
       this.smokeAnim = context.add.image(0, 0, 'smokeAnim_1').setOrigin(0.5).setScale(2.5).setVisible(false).setTint(0x393D47);
@@ -161,24 +160,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.attackReticle = context.add.image(0, -10, 'attackReticle').setOrigin(0.5).setScale(0.8).setName('attackReticle').setVisible(false);
     this.healReticle = context.add.image(0, -10, 'healReticle').setOrigin(0.5).setScale(0.8).setName('healReticle').setVisible(false);
     this.allyReticle = context.add.image(0, -10, 'allyReticle').setOrigin(0.5).setScale(0.6).setName('allyReticle').setVisible(false);
-    this.priestessDebuffImage = context.add.image(0, -10, 'priestessDebuff').setOrigin(0.5).setScale(2.5).setName('priesetessDebuff');
-    if (this.priestessDebuff) {
-      this.priestessDebuffImage.setVisible(true);
-    } else {
-      this.priestessDebuffImage.setVisible(false);
-    }
-    this.annihilatorDebuffImage = context.add.image(0, -10, 'annihilatorDebuff').setOrigin(0.5).setName('annihilatorDebuff');
-    if (this.priestessDebuff) {
-      this.annihilatorDebuffImage.setVisible(true);
-    } else {
-      this.annihilatorDebuffImage.setVisible(false);
-    }
-    this.shieldImage = context.add.image(0, -10, 'shield').setOrigin(0.5).setName('shield');
-    if (this.priestessDebuff) {
-      this.shieldImage.setVisible(true);
-    } else {
-      this.shieldImage.setVisible(false);
-    }
+    this.priestessDebuffImage = context.add.image(0, -10, 'priestessDebuff').setOrigin(0.5).setScale(2.5).setName('priesetessDebuff').setVisible(this.priestessDebuff);
+    this.annihilatorDebuffImage = context.add.image(0, -10, 'annihilatorDebuff').setOrigin(0.5).setName('annihilatorDebuff').setVisible(this.annihilatorDebuff);
+    this.shieldImage = context.add.image(0, -10, 'shield').setOrigin(0.5).setName('shield').setVisible(this.isShielded);
+
 
     // Add animations to the reticles
     const addCirclingTween = (reticle: Phaser.GameObjects.Image) => {
@@ -211,47 +196,19 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     });
 
     // Add special tile and character animations
-    this.crystalDebuffTileAnim = context.add.image(0, 30, 'crystalDamageAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tile?.tileType === ETiles.CRYSTAL_DAMAGE && !this.isKO) {
-      this.crystalDebuffTileAnim.setVisible(true);
-    } else {
-      this.crystalDebuffTileAnim.setVisible(false);
-    }
+    this.crystalDebuffTileAnim = context.add.image(0, 30, 'crystalDamageAnim_1').setOrigin(0.5).setScale(0.6).setVisible(tile?.tileType === ETiles.CRYSTAL_DAMAGE && !this.isKO);
     this.crystalDebuffEvent = this.continuousEvent(this.crystalDebuffTileAnim, ['crystalDamageAnim_1', 'crystalDamageAnim_2', 'crystalDamageAnim_3']);
 
-    this.powerTileAnim = context.add.image(0, 27, 'powerTileAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tile?.tileType === ETiles.POWER && !this.isKO) {
-      this.powerTileAnim.setVisible(true);
-    } else {
-      this.powerTileAnim.setVisible(false);
-    }
-
+    this.powerTileAnim = context.add.image(0, 27, 'powerTileAnim_1').setOrigin(0.5).setScale(0.6).setVisible(tile?.tileType === ETiles.POWER && !this.isKO);
     this.powerTileEvent = this.continuousEvent(this.powerTileAnim, ['powerTileAnim_1', 'powerTileAnim_2', 'powerTileAnim_3']);
 
-    this.magicalResistanceTileAnim = context.add.image(0, 30, 'magicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
-    if ((tile?.tileType === ETiles.MAGICAL_RESISTANCE || tile?.tileType === ETiles.SPEED) && !this.isKO) {
-      this.magicalResistanceTileAnim.setVisible(true);
-    } else {
-      this.magicalResistanceTileAnim.setVisible(false);
-    }
-
+    this.magicalResistanceTileAnim = context.add.image(0, 30, 'magicalResistanceAnim_1').setOrigin(0.5).setScale(0.6).setVisible((tile?.tileType === ETiles.MAGICAL_RESISTANCE || tile?.tileType === ETiles.SPEED) && !this.isKO);
     this.magicalResistanceTileEvent = this.continuousEvent(this.magicalResistanceTileAnim, ['magicalResistanceAnim_1', 'magicalResistanceAnim_2', 'magicalResistanceAnim_3']);
 
-    this.physicalResistanceTileAnim = context.add.image(0, 30, 'physicalResistanceAnim_1').setOrigin(0.5).setScale(0.6);
-    if (tile?.tileType === ETiles.PHYSICAL_RESISTANCE && !this.isKO) {
-      this.physicalResistanceTileAnim.setVisible(true);
-    } else {
-      this.physicalResistanceTileAnim.setVisible(false);
-    }
-
+    this.physicalResistanceTileAnim = context.add.image(0, 30, 'physicalResistanceAnim_1').setOrigin(0.5).setScale(0.6).setVisible(tile?.tileType === ETiles.PHYSICAL_RESISTANCE && !this.isKO);
     this.physicalResistanceTileEvent = this.continuousEvent(this.physicalResistanceTileAnim, ['physicalResistanceAnim_1', 'physicalResistanceAnim_2', 'physicalResistanceAnim_3']);
 
-    this.superChargeAnim = context.add.image(0, -18, 'superChargeAnim_1').setOrigin(0.5).setScale(0.8);
-    if (this.superCharge) {
-      this.superChargeAnim.setVisible(true);
-    } else {
-      this.superChargeAnim.setVisible(false);
-    }
+    this.superChargeAnim = context.add.image(0, -18, 'superChargeAnim_1').setOrigin(0.5).setScale(0.8).setVisible(this.superCharge);
 
     this.superChargeEvent = this.continuousEvent(this.superChargeAnim, ['superChargeAnim_1', 'superChargeAnim_2', 'superChargeAnim_3']);
 
@@ -898,11 +855,9 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.paladinAura = 0;
 
     // check for new auras
-    const aoeTiles = getAOETiles(this.context, this, targetTile, true);
-    const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
-    allTiles.forEach(tile => {
-      const unit = this.context.gameController!.board.units.find(unit => unit.boardPosition === tile.boardPosition);
-
+    const heroTiles = getAOETiles(this.context, this, targetTile, true).heroTiles;
+    heroTiles.forEach(tile => {
+      const unit = this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition)
       if (unit && !unit.isKO && unit.unitType === EHeroes.PALADIN && unit !== this) {
         this.magicalDamageResistance += 5;
         this.physicalDamageResistance += 5;
