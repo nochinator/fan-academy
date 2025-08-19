@@ -425,7 +425,6 @@ export class GameController {
       console.error('pushEnemy() no attacker or target board position');
       return;
     }
-    console.log('this logs');
 
     const newPosition = getNewPositionAfterForce(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col, true);
 

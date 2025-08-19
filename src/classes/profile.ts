@@ -168,7 +168,6 @@ export class Profile extends Phaser.GameObjects.Container {
 
     this.deleteAccountButtonImage.on('pointerdown', () => {
       playSound(this.scene, EUiSounds.BUTTON_GENERIC);
-      console.log('Clicked on delete account');
       this.toggleFormVisibility(false);
       this.deletePopup.setVisible(true);
     });

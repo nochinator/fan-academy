@@ -143,7 +143,6 @@ export class VoidMonk extends DarkElf {
       if (unitDamage) damageDone += unitDamage;
       if (splashedEnemies.length) {
         const splashDamage = this.getTotalPower() * 0.666;
-        console.log(splashDamage);
         splashedEnemies.forEach(enemy => {
           const unitDamage = enemy.getsDamaged(splashDamage, this.attackType, 0.666);
           if (unitDamage) damageDone += unitDamage;
