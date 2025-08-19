@@ -367,9 +367,11 @@ export class Annihilator extends Dwarf {
     const splashDamage = damage * 0.2;
 
     // Apply debuff to main target
+    if (!target.annihilatorDebuff) {
+      target.physicalDamageResistance -= 50;
+    }
     target.annihilatorDebuff = true;
     target.annihilatorDebuffImage.setVisible(true);
-    target.physicalDamageResistance -= 50;
     target.unitCard.updateCardData(target as any); // stupid compiler
     target.getsDamaged(damage, this.attackType);
 
@@ -377,7 +379,6 @@ export class Annihilator extends Dwarf {
     const aoeTiles = getAOETiles(this.context, this, target.getTile(), false);
     const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];   
     let enemiesToPush: Hero[] = []
-    console.log(allTiles);
     allTiles.forEach(tile => {
       const unit =
         this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
@@ -393,6 +394,7 @@ export class Annihilator extends Dwarf {
     });
     // so paladin aura isn't removed before damaging
     enemiesToPush.forEach(enemy => {
+      console.log('pushed')
       this.context.gameController!.pushEnemy(target, enemy);
     });
 
