@@ -1,69 +1,12 @@
 import { EActionType, EAttackType, EGameSounds, ETiles } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { canBeAttacked, getAOETiles, isOnBoard, playSound, roundToFive, turnIfBehind, useAnimation } from "../utils/gameUtils";
+import { canBeAttacked, getAOETiles, playSound, roundToFive, turnIfBehind, useAnimation } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
 import { Tile } from "./tile";
 
-
-// Helper function to get tiles in a cone shape
-// This is a simple implementation and might need to be refined for a real game engine
-function getConeTiles(startPos: number, direction: number, boardWidth = 9, range = 2): number[] {
-  const tiles: number[] = [];
-  const startRow = Math.floor(startPos / boardWidth);
-  const startCol = startPos % boardWidth;
-
-  for (let r = 1; r <= range; r++) {
-    for (let c = -r; c <= r; c++) {
-      let targetRow = startRow;
-      let targetCol = startCol;
-
-      switch (direction) {
-        case 0: // North
-          targetRow = startRow - r;
-          targetCol = startCol + c;
-          break;
-        case 1: // North-East
-          targetRow = startRow - r;
-          targetCol = startCol + r;
-          break;
-        case 2: // East
-          targetRow = startRow;
-          targetCol = startCol + r;
-          break;
-        case 3: // South-East
-          targetRow = startRow + r;
-          targetCol = startCol + r;
-          break;
-        case 4: // South
-          targetRow = startRow + r;
-          targetCol = startCol + c;
-          break;
-        case 5: // South-West
-          targetRow = startRow + r;
-          targetCol = startCol - r;
-          break;
-        case 6: // West
-          targetRow = startRow;
-          targetCol = startCol - r;
-          break;
-        case 7: // North-West
-          targetRow = startRow - r;
-          targetCol = startCol - r;
-          break;
-      }
-
-      const targetPos = targetRow * boardWidth + targetCol;
-      if (isOnBoard(targetPos)) {
-        tiles.push(targetPos);
-      }
-    }
-  }
-
-  return tiles;
-}
 
 // Base Dwarf class with the racial passive
 export abstract class Dwarf extends Hero {
@@ -221,7 +164,6 @@ export class Grenadier extends Dwarf {
         const unit =
           this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
           this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
-        console.log(unit);
         if (unit && target !== unit && unit.belongsTo !== this.belongsTo) {
           unit.getsDamaged(splashDamage, this.attackType);
         }
@@ -254,31 +196,56 @@ export class Gunner extends Dwarf {
       playSound(this.scene, EGameSounds.GUNNER_ATTACK);
       const damage = this.getTotalPower() * 0.66;
       const attackDirection = board.getAttackDirection(this.boardPosition, target.boardPosition);
-      const coneTiles = getConeTiles(target.boardPosition, attackDirection, this.boardPosition, 2);
+      const coneUnits = this.getConeTiles(this.boardPosition, attackDirection);
 
       // Damage main target
       target.getsDamaged(damage, this.attackType);
 
       // Damage up to two other targets in the cone
       let targetsHit = 0;
-      coneTiles.forEach(tilePos => {
+      coneUnits.forEach(unit => {
         if (targetsHit >= 2) return;
-        const tile = board.getTileFromBoardPosition(tilePos);
-        if (tile && canBeAttacked(this, tile)) {
-          const unit =
-          this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
-          this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
-
-          if (unit && unit !== target) {
-            unit.getsDamaged(damage, this.attackType);
-            targetsHit++;
-          }
+        if (unit && canBeAttacked(this, unit.getTile()) && unit !== target) {
+          unit.getsDamaged(damage, this.attackType);
+          targetsHit++;
         }
       });
     }
 
     this.removeAttackModifiers();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+  }
+
+  getConeTiles(startPos: number, direction: number) {
+    const units = [];
+    const board = this.context.gameController!.board
+    const findTile = (position: number) =>
+      position > 0 && position < 45 ?
+        board.getUnitFromTile(board.getTileFromBoardPosition(position))?.belongsTo !== this.belongsTo ?
+        board.getUnitFromTile(board.getTileFromBoardPosition(position))
+        : undefined : undefined; // there is a unit that is on other team
+  
+    const offsets: { [key: number]: number[] } = {
+      1: [-10, -19, -8, -17], // vertical up
+      5: [10, 19, 8, 17],    // vertical down
+      2: [-9, -18, 1, 2],  // up-right
+      6: [9, 18, -1, -2],      // down-left
+      3: [-8, -7, 10, 11],   // horizontal left
+      7: [8, 7, -10, -11],   // horizontal right
+      4: [9, 18, 1, 2],    // down-right
+      8: [-9, -18, -1, -2],    // up-left
+    };
+  
+    const currentOffsets = offsets[direction];
+    if (currentOffsets) {
+      const [offset1, offset2, offset3, offset4] = currentOffsets;
+      const unit1 = findTile(startPos + offset1) ?? findTile(startPos + offset2);
+      const unit2 = findTile(startPos + offset3) ?? findTile(startPos + offset4);
+      if (unit1) units.push(unit1);
+      if (unit2) units.push(unit2);
+    }
+  
+    return units;
   }
 
   heal(_target: Hero): void { };
@@ -394,7 +361,6 @@ export class Annihilator extends Dwarf {
     });
     // so paladin aura isn't removed before damaging
     enemiesToPush.forEach(enemy => {
-      console.log('pushed')
       this.context.gameController!.pushEnemy(target, enemy);
     });
 
@@ -467,40 +433,41 @@ export class Pulverizer extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
   }
-  use(target: Hero | Crystal): void {
+  use(targetTile: Tile): void {
+    const target = this.context.gameController!.board.getUnitFromTile(targetTile);
     const damage = 600;
 
     // Apply damage to main target
-    const totalDamageDone = target.getsDamaged(damage, EAttackType.PHYSICAL);
-    playSound(this.scene, EGameSounds.DRILL_USE);
-
-    // If target is a hero, destroy team-specific equipment
-    if (target instanceof Hero) {
-      target.factionBuff = false;
-      target.factionBuffImage.setVisible(false);
-      target.characterImage.setTexture(target.updateCharacterImage());
-      target.increaseMaxHealth(target.baseHealth * -0.1);
+    if (target){
+      const totalDamage = target.getsDamaged(damage, EAttackType.PHYSICAL);
+      playSound(this.scene, EGameSounds.DRILL_USE);
   
-      target.unitCard.updateCardData(target);
-      target.updateTileData();
+      // If target is a hero, destroy team-specific equipment
+      if (target instanceof Hero && target.factionBuff) {
+        target.factionBuff = false;
+        target.factionBuffImage.setVisible(false);
+        target.characterImage.setTexture(target.updateCharacterImage());
+        target.increaseMaxHealth(target.baseHealth * -0.1);
+    
+        target.unitCard.updateCardData(target);
+        target.updateTileData();
+      }
+  
+      // AoE splash logic for crystals
+      else if (target instanceof Crystal) {
+        const splashDamage = totalDamage * 0.333;
+        const aoeTiles = getAOETiles(this.context, this, targetTile, false);
+        const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
+  
+        allTiles.forEach(tile => {
+          const unit = this.context.gameController!.board.getUnitFromTile(tile);
+  
+          if (unit && unit !== target) unit.getsDamaged(splashDamage, EAttackType.PHYSICAL);
+        });
+      }
+  
+      this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
+      this.removeFromGame();
     }
-
-    // AoE splash logic for crystals
-    if (target instanceof Crystal) {
-      const splashDamage = totalDamageDone! * 0.33;
-      const aoeTiles = getAOETiles(this.context, this, target.getTile(), true);
-      const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
-
-      allTiles.forEach(tile => {
-        const unit =
-          this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
-          this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
-
-        if (unit) unit.getsDamaged(splashDamage, EAttackType.PHYSICAL);
-      });
-    }
-
-    this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
-    this.removeFromGame();
   }
 }

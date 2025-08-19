@@ -51,6 +51,13 @@ export class Board {
     return result;
   }
 
+  getUnitFromTile(tile: Tile): Hero | Crystal | undefined {
+    const unit =
+    this.units.find(u => u.boardPosition === tile.boardPosition) ||
+    this.crystals.find(c => c.boardPosition === tile.boardPosition);
+    return unit;
+  }
+
   getBoardState(): ITile[] {
     return this.tiles.map(tile =>  tile.getTileData());
   }
@@ -99,18 +106,18 @@ export class Board {
 
       /**
        * Show attack reticle if one of the below is true:
-       *  -target is an enemy hero and it's not KO
-       *  -target is an enemy crystal
-       *  - active unit is grenadier
-       *  -target is KO and active unit is a Necro or a Wraith
-       *  -target is KO and standing on an enemy spawn, and hero is orthogonally adjacent
+       * -target is an enemy hero and it's not KO
+       * -target is an enemy crystal
+       * -target is KO and active unit is a Necro or a Wraith
+       * -target is KO and standing on an enemy spawn, and hero is orthogonally adjacent
        */
 
       if (
         target instanceof Crystal && target.belongsTo !== hero.belongsTo ||
         target instanceof Hero && target.belongsTo !== hero.belongsTo && !target.isKO ||
         (hero.unitType === EHeroes.NECROMANCER || hero.unitType === EHeroes.WRAITH) && target instanceof Hero && target.isKO ||
-        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile()) || hero.unitType === EHeroes.GRENADIER
+        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile()) ||
+        hero.unitType === EHeroes.GRENADIER // Add this condition to include targets for the Grenadier
       ) {
         enemyLOSCheck.push(target);
       }
@@ -119,13 +126,22 @@ export class Board {
     const enemiesToHighlight: (Hero | Crystal)[] = [];
     const enemiesBlocked: (Hero | Crystal)[] = [];
 
-    enemyLOSCheck.forEach((enemy: Hero | Crystal) => {
-      if (this.hasLineOfSight(hero, enemy)) {
+    // skip loss for grenadier
+    if (hero.unitType === EHeroes.GRENADIER) {
+      // If the hero is a Grenadier, all targets in range are highlightable, as LOS check is skipped
+      enemyLOSCheck.forEach((enemy: Hero | Crystal) => {
         enemiesToHighlight.push(enemy);
-      } else {
-        enemiesBlocked.push(enemy);
-      }
-    });
+      });
+    } else {
+      // For all other heroes, perform the LOS check as normal
+      enemyLOSCheck.forEach((enemy: Hero | Crystal) => {
+        if (this.hasLineOfSight(hero, enemy)) {
+          enemiesToHighlight.push(enemy);
+        } else {
+          enemiesBlocked.push(enemy);
+        }
+      });
+    }
 
     enemiesToHighlight.forEach(enemy => enemy.attackReticle.setVisible(true));
     enemiesBlocked.forEach(enemy => enemy.blockedLOS.setVisible(true));
@@ -307,37 +323,37 @@ export class Board {
       case -27:
       case -18:
       case -9:
-        direction = 1;
+        direction = 1; // up
         break;
       case -8:
-        direction = 2;
+        direction = 2; // up-right
         break;
       case 1:
       case 2:
       case 3:
-        direction = 3;
+        direction = 3; // right
         break;
       case 10:
-        direction = 4;
+        direction = 4; // right-down
         break;
       case 9:
       case 18:
       case 27:
-        direction = 5;
+        direction = 5; // down
         break;
       case 8:
-        direction = 6;
+        direction = 6; // down-left
         break;
       case -1:
       case -2:
       case -3:
-        direction = 7;
+        direction = 7; // left
         break;
       case -10:
-        direction = 8;
+        direction = 8; // left-up
         break;
       default:
-        direction = 0;
+        direction = 0; // starting point
         break;
     }
 

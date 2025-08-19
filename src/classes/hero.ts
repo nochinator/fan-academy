@@ -744,10 +744,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   private updateCrystals(change: number): void {
     this.context.gameController!.board.crystals.forEach(crystal => {
       if (crystal.belongsTo !== this.belongsTo) {
-        let newLevel: number = 0;
+        let newLevel: number = crystal.debuffLevel;
 
-        if (change > 0) newLevel = crystal.debuffLevel + 1;
-        else if (change < 0 && crystal.debuffAmount > 0) newLevel = crystal.debuffLevel + 1;
+        if (change > 0) newLevel += 1;
+        else if (change < 0) newLevel -= 1;
         else return
 
         crystal.updateDebuffAnimation(newLevel);

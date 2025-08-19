@@ -182,7 +182,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     };
   }
 
-  getsDamaged(damage: number, attackType: EAttackType, multiplier = 1): void {
+  getsDamaged(damage: number, attackType: EAttackType, multiplier = 1): number {
     // Determine resistance based on attack type
     const resistance = attackType === EAttackType.PHYSICAL ? this.physicalDamageResistance : this.magicalDamageResistance;
     
@@ -190,7 +190,7 @@ export class Crystal extends Phaser.GameObjects.Container {
       this.isShielded = false;
       this.shieldImage.setVisible(false);
       playSound(this.context, EGameSounds.ENGINEER_SHIELD_BREAK);
-      return;
+      return 0;
     }
     if (this.annihilatorDebuff && attackType === EAttackType.PHYSICAL) {
       this.annihilatorDebuff = false;
@@ -233,6 +233,8 @@ export class Crystal extends Phaser.GameObjects.Container {
     if (this.belongsTo === 2) this.context.gameController?.gameUI.banner.playerTwoHpBar.setHealth();
 
     if (this.currentHealth <= 0) this.removeFromGame();
+
+    return damageTaken;
   }
 
   removeFromGame(): void {
