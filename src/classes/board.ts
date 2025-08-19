@@ -55,56 +55,6 @@ export class Board {
     return this.tiles.map(tile =>  tile.getTileData());
   }
 
-  setBoardState(boardState: any[]): void {
-    // remove all units and crystals from the board and the game state
-    const objectsToRemove: (Hero | Crystal)[] = []; 
-    this.units.forEach(unit => {
-      objectsToRemove.push(unit);
-    });
-    this.crystals.forEach(crystal => {
-      objectsToRemove.push(crystal);
-    });
-
-    objectsToRemove.forEach(object => object.removeFromGame(false));
-
-    // Reset the game's internal unit and crystal arrays
-    this.units = [];
-    this.crystals = [];
-    
-    const heroOperations: (() => void)[] = [];
-
-    // Rebuild the board from the saved state
-    boardState.forEach(tileData => {
-      const tile = this.getTileFromBoardPosition(tileData.boardPosition);
-      if (tile) {
-        // Clear any remaining state on the tile
-        tile.removeHero();
-        tile.removeCrystal();
-    
-        if (tileData.crystal) {
-          const crystal = new Crystal(this.context, tileData.crystal, tile);
-          crystal.updateDebuffAnimation(0);
-          this.crystals.push(crystal);
-          tile.setCrystal(crystal); // Make sure the tile knows about the crystal
-        }
-    
-        if (tileData.hero) {
-          // Store hero processing till after crystals
-          heroOperations.push(() => {
-            const hero = createNewHero(this.context, tileData.hero);
-            hero.specialTileCheck(tile, undefined, false);
-            hero.updatePosition(tile);
-            this.units.push(hero);
-            tile.hero = hero.exportData();
-          });
-        }
-      }
-    });
-    
-    // Process all heroes after crystals
-    heroOperations.forEach(operation => operation());
-  }
-
   clearHighlights() {
     this.tiles.forEach(tile => tile.clearHighlight());
   }

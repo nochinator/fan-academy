@@ -3,7 +3,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 
 import { dependencies } from './package.json';
-function renderChunks(deps) {
+function renderChunks(deps: Record<string, string>) {
   const chunks = {};
   Object.keys(deps).forEach((key) => {
     if (['phaser'].includes(key)) return;
