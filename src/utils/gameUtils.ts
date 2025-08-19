@@ -9,6 +9,7 @@ import { EActionClass, EActionType, ECardType, EClass, EGameSounds, EHeroes, EIt
 import { ICrystal, IHero, IItem, IPlayerState, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import UIScene from "../scenes/ui.scene";
+import { Annihilator, DwarvenBrew, Engineer, Grenadier, Gunner, Paladin, Pulverizer } from "../classes/dwarves";
 
 export function isHero(hero: IHero | IItem): hero is Hero {
   return hero.class === "hero";
@@ -52,7 +53,10 @@ export function createNewItem(context: GameScene, itemData: IItem): Item {
 
     [EItems.MANA_VIAL]: () => new ManaVial(context, itemData),
     [EItems.SOUL_HARVEST]: () => new SoulHarvest(context, itemData),
-    [EItems.SOUL_STONE]: () => new SoulStone(context, itemData)
+    [EItems.SOUL_STONE]: () => new SoulStone(context, itemData),
+
+    [EItems.DWARVERN_BREW]: () => new DwarvenBrew(context, itemData),
+    [EItems.PULVERIZER]: () => new Pulverizer(context, itemData)
   };
 
   const createItem = itemTypes[itemData.itemType];
@@ -73,7 +77,13 @@ export function createNewHero(context: GameScene, heroData: IHero, tile?: Tile):
     [EHeroes.NECROMANCER]: () => new Necromancer(context, heroData, tile),
     [EHeroes.PHANTOM]: () => new Phantom(context, heroData, tile),
     [EHeroes.VOIDMONK]: () => new VoidMonk(context, heroData, tile),
-    [EHeroes.WRAITH]: () => new Wraith(context, heroData, tile)
+    [EHeroes.WRAITH]: () => new Wraith(context, heroData, tile),
+
+    [EHeroes.PALADIN]: () => new Paladin(context, heroData, tile),
+    [EHeroes.GUNNER]: () => new Gunner(context, heroData, tile),
+    [EHeroes.GRENADIER]: () => new Grenadier(context, heroData, tile),
+    [EHeroes.ENGINEER]: () => new Engineer(context, heroData, tile),
+    [EHeroes.ANNIHILATOR]: () => new Annihilator(context, heroData, tile)
   };
 
   const createHero = heroTypes[heroData.unitType];
@@ -192,7 +202,10 @@ export function selectItemSound(scene: Phaser.Scene, item: EItems): void {
 
     [EItems.SOUL_STONE]: EGameSounds.ITEM_SELECT,
     [EItems.MANA_VIAL]: EGameSounds.POTION_SELECT,
-    [EItems.SOUL_HARVEST]: EGameSounds.AOE_SPELL_SELECT
+    [EItems.SOUL_HARVEST]: EGameSounds.AOE_SPELL_SELECT,
+
+    [EItems.DWARVERN_BREW]: EGameSounds.BREW_SELECT,
+    [EItems.PULVERIZER]: EGameSounds.DRILL_SELECT
   };
 
   const soundToPlay = itemMap[item];
@@ -214,7 +227,13 @@ export function selectDeathSound(scene: Phaser.Scene, hero: EHeroes): void {
     [EHeroes.PRIESTESS]: EGameSounds.PRIESTESS_DEATH,
     [EHeroes.NECROMANCER]: EGameSounds.NECROMANCER_DEATH,
     [EHeroes.WRAITH]: EGameSounds.WRAITH_DEATH,
-    [EHeroes.PHANTOM]: EGameSounds.PHANTOM_DEATH
+    [EHeroes.PHANTOM]: EGameSounds.PHANTOM_DEATH,
+
+    [EHeroes.GRENADIER]: EGameSounds.GRENADIER_DEATH,
+    [EHeroes.GUNNER]: EGameSounds.GUNNER_DEATH, // TODO: modify sound to not have beginning
+    [EHeroes.PALADIN]: EGameSounds.PALADIN_DEATH,
+    [EHeroes.ENGINEER]: EGameSounds.GUNNER_DEATH, // no official sound
+    [EHeroes.ANNIHILATOR]: EGameSounds.GRENADIER_DEATH // no official sound
   };
 
   const soundToPlay = heroMap[hero];
@@ -227,22 +246,33 @@ export function getActionClass(action: EActionType): EActionClass {
   return [EActionType.PASS, EActionType.DRAW, EActionType.REMOVE_UNITS].includes(action) ? EActionClass.AUTO : EActionClass.USER;
 }
 
-export function getAOETiles(context: GameScene, spell: Item,  targetTile: Tile): {
-  enemyHeroTiles: Tile[],
-  enemyCrystalTiles: Tile[]
+export function getAOETiles(context: GameScene, caster: Item | Hero,  targetTile: Tile, getFriendly = false): {
+  heroTiles: Tile[],
+  crystalTiles: Tile[]
 } {
   const board = context.gameController?.board;
   if (!board) throw new Error('Inferno use() board not found');
 
   const areaOfEffect = board.getAreaOfEffectTiles(targetTile);
 
-  const enemyHeroTiles = areaOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo !== spell.belongsTo);
+  let heroTiles: Tile[] = [];
+  let crystalTiles: Tile[] = [];
+  if (getFriendly === true) {
+    heroTiles = areaOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo === caster.belongsTo);
+    crystalTiles = areaOfEffect?.filter(tile => tile.crystal && tile.crystal?.belongsTo === caster.belongsTo);
 
-  const enemyCrystalTiles = areaOfEffect?.filter(tile => tile.crystal && tile.crystal?.belongsTo !== spell.belongsTo);
+  } else if (getFriendly === false) {
+    heroTiles = areaOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo !== caster.belongsTo);
+    crystalTiles = areaOfEffect?.filter(tile => tile.crystal && tile.crystal?.belongsTo !== caster.belongsTo);
+
+  } else { // set to undefined/null to get all in area
+    heroTiles = areaOfEffect;
+    crystalTiles = areaOfEffect;
+  }
 
   return {
-    enemyHeroTiles,
-    enemyCrystalTiles
+    heroTiles,
+    crystalTiles
   };
 }
 
@@ -308,9 +338,9 @@ export function checkUnitGameOver(context: GameScene, hero: Hero): void {
   };
 }
 
-export function forcedMoveSpawnCheck(tile: Tile | ITile, hero: Hero): boolean {
+export function forcedMoveSpawnCheck(tile: Tile | ITile, hero: Hero | Crystal): boolean {
   const spawnBelongsTo = tile.col < 5 ? 1 : 2;
-  return tile.tileType === ETiles.SPAWN && hero.belongsTo === spawnBelongsTo;
+  return tile.tileType === ETiles.SPAWN && hero.belongsTo !== spawnBelongsTo;
 }
 
 export function isEnemySpawn(context: GameScene, tile: Tile | ITile): boolean {
@@ -384,6 +414,27 @@ export function getCardText(unit: EHeroes | EItems): {
       cardText: "A terror who gains max health and power by draining K.O.'d units."
     },
 
+    [EHeroes.GUNNER]: {
+      cardType: ECardType.SHOOTER,
+      cardText: "Fires a shotgun, hitting up to 3 targets at range for 66% damage or 1 target for 100% damage"
+    },
+    [EHeroes.PALADIN]: {
+      cardType: ECardType.SUPPORT,
+      cardText: "Spellcaster who revives and heals allies. Provides 5% defense to nearby allys."
+    },
+    [EHeroes.GRENADIER]: {
+      cardType: ECardType.CASTER,
+      cardText: "Lobs explosives dealing 50% damage to all enemys around target."
+    },
+    [EHeroes.ANNIHILATOR]: {
+      cardType: ECardType.SUPER,
+      cardText: "Fragile rocketeer who temporarily removes 50% physical defense on targets."
+    },
+    [EHeroes.ENGINEER]: {
+      cardType: ECardType.SUPPORT,
+      cardText: "Can create a shield to protect allys and crystals. Additionally, gains 140% bonus from special tiles."
+    },
+
     [EItems.SHINING_HELM]: {
       cardName: 'Shining Helm',
       cardType: ECardType.EQUIPMENT,
@@ -430,7 +481,18 @@ export function getCardText(unit: EHeroes | EItems): {
       cardName: 'Soulstone',
       cardType: ECardType.EQUIPMENT,
       cardText: "Doubles the effect of a unit's life leech and increases max health by 10%."
-    }
+    },
+
+    [EItems.DWARVERN_BREW]: {
+      cardName: 'Dwarvern Brew',
+      cardType: ECardType.CONSUMABLE,
+      cardText: "Heals an ally for 1000 HP and temporarily adds 50% resistance."
+    },
+    [EItems.PULVERIZER]: {
+      cardName: 'Pulverizer',
+      cardType: ECardType.SPELL,
+      cardText: "Targets 1 enemy destroying armor in process, or does 33% spash damage if target is a crystal."
+    },
   };
 
   return unitMap[unit];

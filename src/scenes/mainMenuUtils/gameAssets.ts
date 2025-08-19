@@ -62,7 +62,10 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('phantomSpawnAnim_1', `${CDN_PATH}/images/gameItems/animations/PhantomSpawn_Explosion01-hd.webp`);
   context.load.image('phantomSpawnAnim_2', `${CDN_PATH}/images/gameItems/animations/PhantomSpawn_Explosion02-hd.webp`);
 
-  context.load.image('debuff', `${CDN_PATH}/images/gameItems/animations/MoveDebuff_PurpleGlow-hd.webp`);
+  context.load.image('priestessDebuff', `${CDN_PATH}/images/gameItems/animations/MoveDebuff_PurpleGlow-hd.webp`);
+  context.load.image('annihilatorDebuff', `${CDN_PATH}/images/factions/dwarves/ArmorDebuff2_ShieldBroken1-hd.png`);
+  context.load.image('shield', `${CDN_PATH}/images/factions/dwarves/EngineerShield_Color-hd.png`);
+
 
   // Crystal tile images
   context.load.image('crystalFull', `${CDN_PATH}/images/gameItems/crystal_full.webp`);
@@ -79,6 +82,7 @@ export function loadGameAssets(context: GameScene) {
   // Loading units
   const councilArray = ['archer', 'cleric', 'knight', 'ninja', 'wizard'];
   const darkElvesArray = ['priestess', 'impaler', 'necromancer', 'phantom', 'voidmonk', 'wraith'];
+  const dwarvesArray = ['paladin', 'engineer', 'gunner', 'grenadier', 'annihilator'];
 
   councilArray.forEach(asset => {
     for (let i = 1; i <= 9; i++) {
@@ -93,6 +97,12 @@ export function loadGameAssets(context: GameScene) {
       }
     } else {
       context.load.image(`${asset}_1`, `${CDN_PATH}/images/factions/darkElves/${asset}/${asset}_1.webp`);
+    }
+    context.load.image(`${asset}CardPic`, `${CDN_PATH}/images/profilePics/${asset}_v1-hd.webp`); // Unit picture for its unit card
+  });
+  dwarvesArray.forEach(asset => {
+    for (let i = 1; i <= 9; i++) {
+      context.load.image(`${asset}_${i}`, `${CDN_PATH}/images/factions/dwarves/${asset}/${asset}_${i}.webp`);
     }
     context.load.image(`${asset}CardPic`, `${CDN_PATH}/images/profilePics/${asset}_v1-hd.webp`); // Unit picture for its unit card
   });
@@ -111,6 +121,10 @@ export function loadGameAssets(context: GameScene) {
   context.load.image('soulStone', `${CDN_PATH}/images/factions/darkElves/soul_stone.webp`);
   context.load.image('soulHarvest', `${CDN_PATH}/images/factions/darkElves/soul_harvest.webp`);
   context.load.image('manaVial', `${CDN_PATH}/images/factions/darkElves/mana_vial.webp`);
+
+  // Dwarves
+  context.load.image('dwarvernBrew', `${CDN_PATH}/images/factions/dwarves/Ale-hd.png`);
+  context.load.image('pulverizer', `${CDN_PATH}/images/factions/dwarves/ShatterDrill_Icon-hd.png`);
 
   // Shared items
   context.load.image('superCharge', `${CDN_PATH}/images/factions/common/super_charge.webp`);
@@ -246,4 +260,31 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('wraithDeathSound', `${CDN_PATH}/audio/elves/DE-Wraith_Death.mp3`);
   context.load.audio('wraithConsumeSound', `${CDN_PATH}/audio/elves/DE-Wraith_Consume.mp3`);
   context.load.audio('useHarvestSound', `${CDN_PATH}/audio/elves/Civ_DarkElf_Inferno_Explosion.mp3`);
+
+  // Dwarves specific audio
+  context.load.audio('paladinHealSound', `${CDN_PATH}/audio/dwarves/DWF_Paladin_Heal.mp3`); // along with cleric sounds
+  context.load.audio('paladinAttackSound', `${CDN_PATH}/audio/dwarves/DWF_Paladin_Melee.mp3`);
+  context.load.audio('paladinAttackBigSound', `${CDN_PATH}/audio/dwarves/DWF_Paladin_Special.mp3`);
+  context.load.audio('paladinDeath', `${CDN_PATH}/audio/dwarves/DWF_Paladin_Deploy.mp3`);
+  context.load.audio('engineerAttackSound', `${CDN_PATH}/audio/dwarves/DWF_Engineer_Attack_Melee.mp3`);
+  context.load.audio('engineerAttackBigSound', `${CDN_PATH}/audio/dwarves/DWF_Engineer_BigAttack.mp3`);
+  // no death sound
+  context.load.audio('engineerShieldMake', `${CDN_PATH}/audio/dwarves/DWF_Engineer_Cast_Shield_Buff.mp3`);
+  context.load.audio('engineerShieldBreak', `${CDN_PATH}/audio/dwarves/DWF_Engineer_Shield_Shatter.mp3`);
+  context.load.audio('grenadierAttack', `${CDN_PATH}/audio/dwarves/DWF_Grenadier_Attack_Throw_01.mp3`);
+  context.load.audio('grenadierAttackBig', `${CDN_PATH}/audio/dwarves/DWF_Grenadier_Attack_Throw_01.mp3`); // followed by regular attack sound
+  context.load.audio('grenadierAttackMelee', `${CDN_PATH}/audio/dwarves/DWF_Grenadier_Melee.mp3`);
+  context.load.audio('grenadierDeath', `${CDN_PATH}/audio/dwarves/DWF_Grenadier_Bomb_Catch.mp3`);
+  context.load.audio('gunnerAttack', `${CDN_PATH}/audio/dwarves/DWF_Gunner_Attack_Rifle_rev1.mp3`);
+  context.load.audio('gunnerJump', `${CDN_PATH}/audio/dwarves/DWF_Gunner_Jump.mp3`); // start supercharge sound
+  context.load.audio('gunnerAttackGunOnly', `${CDN_PATH}/audio/dwarves/DWF_Gunner_Attack_Rifle_01.mp3`); // play several times in supercharge
+  context.load.audio('gunnerDeath', `${CDN_PATH}/audio/dwarves/DE-VoidMonk_Attack_Punch.mp3`);
+  context.load.audio('annihilatorShoot', `${CDN_PATH}/audio/dwarves/DWF_Bazooka_Fire.mp3`); // attack part 1
+  context.load.audio('annihilatorHit', `${CDN_PATH}/audio/dwarves/DWF_Bazooka_Fire.mp3`); // attack part 2
+  context.load.audio('annihilatorWindup', `${CDN_PATH}/audio/dwarves/DWF_Bazooka_Fire.mp3`); // big attack, followed by regular attack sounds
+  // no death sound
+  context.load.audio('brewSelect', `${CDN_PATH}/audio/dwarves/DWF_Item_Pickup_Beer.mp3`);
+  context.load.audio('brewUse', `${CDN_PATH}/audio/dwarves/DWF_Item_Beer_Use.mp3`);
+  context.load.audio('drillSelect', `${CDN_PATH}/audio/dwarves/DWF_Item_Pickup_Drill.mp3`);
+  context.load.audio('drillUse', `${CDN_PATH}/audio/dwarves/DWF_Item_Drill.mp3`);
 }

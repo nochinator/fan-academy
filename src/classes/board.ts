@@ -23,7 +23,7 @@ export class Board {
   constructor(context: GameScene, data: ITile[]) {
     this.context = context;
     this.tiles = this.createTileGrid(data);
-    this.crystals.forEach(crystal => crystal.updateDebuffAnimation(crystal.debuffLevel));
+    this.crystals.forEach(crystal => crystal.updateDebuffAnimation(crystal.debuffAmount));
   }
 
   createTileGrid(tiles: ITile[]) {
@@ -101,6 +101,7 @@ export class Board {
        * Show attack reticle if one of the below is true:
        *  -target is an enemy hero and it's not KO
        *  -target is an enemy crystal
+       *  - active unit is grenadier
        *  -target is KO and active unit is a Necro or a Wraith
        *  -target is KO and standing on an enemy spawn, and hero is orthogonally adjacent
        */
@@ -109,7 +110,7 @@ export class Board {
         target instanceof Crystal && target.belongsTo !== hero.belongsTo ||
         target instanceof Hero && target.belongsTo !== hero.belongsTo && !target.isKO ||
         (hero.unitType === EHeroes.NECROMANCER || hero.unitType === EHeroes.WRAITH) && target instanceof Hero && target.isKO ||
-        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile())
+        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile()) || hero.unitType === EHeroes.GRENADIER
       ) {
         enemyLOSCheck.push(target);
       }
@@ -131,7 +132,7 @@ export class Board {
   }
 
   highlightFriendlyTargets(hero: Hero) {
-    if (!hero.canHeal) return;
+    if (!hero.canHeal && hero.unitType !== EHeroes.ENGINEER) return;
 
     const tilesInRange: Tile[] = this.getHeroTilesInRange(hero, ERange.HEAL);
     if (!tilesInRange.length) return;
@@ -147,7 +148,7 @@ export class Board {
       const maxHealth = target.maxHealth;
       const currentHealth = target.currentHealth;
 
-      if (tile.isFriendly(userId) && currentHealth! < maxHealth!) target.healReticle.setVisible(true);
+      if (tile.isFriendly(userId) && (currentHealth! < maxHealth! || hero.unitType === EHeroes.ENGINEER)) target.healReticle.setVisible(true);
     });
   }
 

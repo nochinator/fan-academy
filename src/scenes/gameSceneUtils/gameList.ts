@@ -176,8 +176,9 @@ export async function createGameList(context: UIScene) {
     fontFamily: "proHeavy"
   });
   const newGameButton = context.add.image(0, lastListItemY, 'newGameButton').setOrigin(0);
-  const councilEmblem = context.add.image(380, lastListItemY, EFaction.COUNCIL).setOrigin(0).setScale(0.5).setInteractive({ useHandCursor: true });
-  const elvesEmblem = context.add.image(530, lastListItemY, EFaction.DARK_ELVES).setOrigin(0).setScale(0.5).setInteractive({ useHandCursor: true });
+  const councilEmblem = context.add.image(230, lastListItemY, EFaction.COUNCIL).setOrigin(0).setScale(0.5).setInteractive({ useHandCursor: true });
+  const elvesEmblem = context.add.image(380, lastListItemY, EFaction.DARK_ELVES).setOrigin(0).setScale(0.5).setInteractive({ useHandCursor: true });
+  const dwarvesEmblem = context.add.image(530, lastListItemY, EFaction.DWARVES).setOrigin(0).setScale(0.5).setInteractive({ useHandCursor: true });
 
   // Creating a new game when clicking on the desired faction
   const createNewGame = async (faction: EFaction) => {
@@ -221,10 +222,11 @@ export async function createGameList(context: UIScene) {
 
   councilEmblem.on('pointerdown', async () => await createNewGame(EFaction.COUNCIL));
   elvesEmblem.on('pointerdown', async () => await createNewGame(EFaction.DARK_ELVES));
+  dwarvesEmblem.on('pointerdown', async () => await createNewGame(EFaction.DWARVES));
 
   lastListItemY += 150;
 
-  gameListContainer.add([newGameButton, newGameText, councilEmblem, elvesEmblem]);
+  gameListContainer.add([newGameButton, newGameText, councilEmblem, elvesEmblem, dwarvesEmblem]);
 
   // Check the arrays one by one, adding the elements in order
   const setHeaderText = (header: string) => {
