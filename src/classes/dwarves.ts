@@ -368,18 +368,22 @@ export class Annihilator extends Dwarf {
 
     // Apply debuff to main target
     target.annihilatorDebuff = true;
+    target.annihilatorDebuffImage.setVisible(true);
+    target.physicalDamageResistance -= 50;
+    target.unitCard.updateCardData(target as any); // stupid compiler
     target.getsDamaged(damage, this.attackType);
 
     // Apply AoE splash damage and knockback
-    const aoeTiles = getAOETiles(this.context, this, target.getTile(), true);
+    const aoeTiles = getAOETiles(this.context, this, target.getTile(), false);
     const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];   
     let enemiesToPush: Hero[] = []
+    console.log(allTiles);
     allTiles.forEach(tile => {
       const unit =
         this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
         this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
-      if (unit && unit.belongsTo !== this.belongsTo) {
+      if (unit && unit.belongsTo !== this.belongsTo && unit !== target) {
         unit.getsDamaged(splashDamage, this.attackType);
         
         if (unit instanceof Hero) {
