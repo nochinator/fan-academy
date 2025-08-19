@@ -231,13 +231,13 @@ export class Necromancer extends DarkElf {
     } else {
       if (this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK_BIG);
       if (!this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK);
+      this.removeAttackModifiers();
     }
 
     const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
 
     if (damageDone) this.lifeSteal(damageDone);
 
-    this.removeAttackModifiers();
 
     if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
     this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
