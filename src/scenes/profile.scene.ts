@@ -37,7 +37,6 @@ export default class ProfileScene extends Phaser.Scene {
     this.userData = await getProfile();
 
     this.profile = new Profile(this);
-    // TODO: throw error if no user data
   }
 
   onShutdown() {
