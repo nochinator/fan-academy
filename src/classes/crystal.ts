@@ -58,7 +58,7 @@ export class Crystal extends Phaser.GameObjects.Container {
     this.debuffAmount = data.debuffAmount < 0 ? 0 : data.debuffAmount; // safeguard for bug
     this.debuffLevel = data.debuffLevel < 0 || data.debuffLevel === undefined ? 0 : data.debuffLevel; // safeguard for bug
     this.isShielded = data.isShielded;
-    this.annihilatorDebuff = data.isShielded
+    this.annihilatorDebuff = data.annihilatorDebuff;
     this.paladinAura = data.paladinAura ?? 0; // Initialize as number, default to 0
     this.physicalDamageResistance = data.physicalDamageResistance ?? 0; // Default to 0
     this.magicalDamageResistance = data.magicalDamageResistance ?? 0; // Default to 0
@@ -174,6 +174,7 @@ export class Crystal extends Phaser.GameObjects.Container {
       col: this.col,
       debuffAmount: this.debuffAmount,
       debuffLevel: this.debuffLevel,
+      annihilatorDebuff: this.annihilatorDebuff,
       isShielded: this.isShielded,
       paladinAura: this.paladinAura,
       physicalDamageResistance: this.physicalDamageResistance,
@@ -290,6 +291,7 @@ export class Crystal extends Phaser.GameObjects.Container {
       col: this.col,
       debuffAmount: this.debuffAmount,
       debuffLevel: this.debuffLevel,
+      annihilatorDebuff: this.annihilatorDebuff,
       isShielded: this.isShielded,
       paladinAura: this.paladinAura,
       physicalDamageResistance: this.physicalDamageResistance,
