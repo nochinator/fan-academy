@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 
+.github/
+
 # Env files
 *.env
 

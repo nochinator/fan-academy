@@ -129,7 +129,7 @@ export abstract class Item extends Phaser.GameObjects.Container {
     // Remove animations
     this.scene.tweens.killTweensOf(this);
 
-    this.context.gameController?.hand.removeFromHand(this);
+    this.context.gameController!.hand.removeFromHand(this);
 
     this.destroy(true);
   }
