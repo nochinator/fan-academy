@@ -1,7 +1,7 @@
-import { EActionType, EAttackType, EGameSounds, ETiles } from "../enums/gameEnums";
+import { EActionType, EAttackType, EGameSounds, ETiles, EHeroes } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { canBeAttacked, getAOETiles, playSound, roundToFive, turnIfBehind, useAnimation } from "../utils/gameUtils";
+import { canBeAttacked, getAOETiles, playSound, roundToFive, turnIfBehind, useAnimation, isEnemySpawn } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
@@ -53,17 +53,32 @@ export class Paladin extends Dwarf {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
+    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
-    if (this.superCharge) {
-      playSound(this.scene, EGameSounds.PALADIN_ATTACK);
+
+    const distance = this.getDistanceToTarget(target);
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile()) &&
+      distance === 1
+    ) {
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
+      target.removeFromGame();
     } else {
-      playSound(this.scene, EGameSounds.PALADIN_ATTACK_BIG);
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.PALADIN_ATTACK);
+      } else {
+        playSound(this.scene, EGameSounds.PALADIN_ATTACK_BIG);
+      }
+
+      target.getsDamaged(this.getTotalPower(), this.attackType);
+
+      if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
     }
 
-    target.getsDamaged(this.getTotalPower(), this.attackType);
-
     this.removeAttackModifiers();
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   async heal(target: Hero): Promise<void> {
@@ -138,11 +153,20 @@ export class Grenadier extends Dwarf {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
+    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
 
-    if (distance === 1) { // Melee attack
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile()) &&
+      distance === 1
+    ) {
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
+      target.removeFromGame();
+    } else if (distance === 1) { // Melee attack
       playSound(this.scene, EGameSounds.GRENADIER_ATTACK_MELEE);
       target.getsDamaged(this.getTotalPower() * 0.5, this.attackType);
     } else { // Ranged attack, ignores LOS
@@ -162,16 +186,18 @@ export class Grenadier extends Dwarf {
       const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
       allTiles.forEach(tile => {
         const unit =
-          this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
-          this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
+          gameController.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+          gameController.board.crystals.find(c => c.boardPosition === tile.boardPosition);
         if (unit && target !== unit && unit.belongsTo !== this.belongsTo) {
           unit.getsDamaged(splashDamage, this.attackType);
         }
       });
     }
+    
+    if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
 
     this.removeAttackModifiers();
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
   heal(_target: Hero): void { };
   special(_target: Hero): void {};}
@@ -184,12 +210,21 @@ export class Gunner extends Dwarf {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
+    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
-    const board = this.context.gameController!.board;
+    const board = gameController.board;
 
-    if (distance === 1) { // Melee attack
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile()) &&
+      distance === 1
+    ) {
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
+      target.removeFromGame();
+    } else if (distance === 1) { // Melee attack
       playSound(this.scene, EGameSounds.GUNNER_ATTACK_ONLY);
       target.getsDamaged(this.getTotalPower(), this.attackType);
     } else { // Ranged cone attack
@@ -212,8 +247,10 @@ export class Gunner extends Dwarf {
       });
     }
 
+    if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
+    
     this.removeAttackModifiers();
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   getConeTiles(startPos: number, direction: number) {
@@ -306,14 +343,29 @@ export class Engineer extends Dwarf {
     this.updateTileData();
   }
 
-  attack(target: Hero | Crystal): void {
+  async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
+    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
-    playSound(this.scene, EGameSounds.ENGINEER_ATTACK);
-    target.getsDamaged(this.getTotalPower(), this.attackType);
+    
+    const distance = this.getDistanceToTarget(target);
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile()) &&
+      distance === 1
+    ) {
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
+      target.removeFromGame();
+    } else {
+      playSound(this.scene, EGameSounds.ENGINEER_ATTACK);
+      target.getsDamaged(this.getTotalPower(), this.attackType);
+    }
+    
+    if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
 
     this.removeAttackModifiers();
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(_target: Hero): void { };
@@ -327,46 +379,60 @@ export class Annihilator extends Dwarf {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
+    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
-    playSound(this.scene, EGameSounds.ANNIHILATOR_SHOOT);
+    
+    const distance = this.getDistanceToTarget(target);
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile()) &&
+      distance === 1
+    ) {
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
+      target.removeFromGame();
+    } else {
+      playSound(this.scene, EGameSounds.ANNIHILATOR_SHOOT);
 
-    const damage = this.getTotalPower();
-    const splashDamage = damage * 0.2;
+      const damage = this.getTotalPower();
+      const splashDamage = damage * 0.2;
 
-    // Apply debuff to main target
-    if (!target.annihilatorDebuff) {
-      target.physicalDamageResistance -= 50;
-    }
-    target.annihilatorDebuff = true;
-    target.annihilatorDebuffImage.setVisible(true);
-    target.unitCard.updateCardData(target as any); // stupid compiler
-    target.getsDamaged(damage, this.attackType);
-
-    // Apply AoE splash damage and knockback
-    const aoeTiles = getAOETiles(this.context, this, target.getTile(), false);
-    const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];   
-    let enemiesToPush: Hero[] = []
-    allTiles.forEach(tile => {
-      const unit =
-        this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
-        this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
-
-      if (unit && unit.belongsTo !== this.belongsTo && unit !== target) {
-        unit.getsDamaged(splashDamage, this.attackType);
-        
-        if (unit instanceof Hero) {
-          enemiesToPush.push(unit);
-        }
+      // Apply debuff to main target
+      if (!target.annihilatorDebuff) {
+        target.physicalDamageResistance -= 50;
       }
-    });
-    // so paladin aura isn't removed before damaging
-    enemiesToPush.forEach(enemy => {
-      this.context.gameController!.pushEnemy(target, enemy);
-    });
+      target.annihilatorDebuff = true;
+      target.annihilatorDebuffImage.setVisible(true);
+      target.unitCard.updateCardData(target as any); // stupid compiler
+      target.getsDamaged(damage, this.attackType);
 
+      // Apply AoE splash damage and knockback
+      const aoeTiles = getAOETiles(this.context, this, target.getTile(), false);
+      const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];   
+      let enemiesToPush: Hero[] = []
+      allTiles.forEach(tile => {
+        const unit =
+          gameController.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+          gameController.board.crystals.find(c => c.boardPosition === tile.boardPosition);
+
+        if (unit && unit.belongsTo !== this.belongsTo && unit !== target) {
+          unit.getsDamaged(splashDamage, this.attackType);
+          
+          if (unit instanceof Hero) {
+            enemiesToPush.push(unit);
+          }
+        }
+      });
+      // so paladin aura isn't removed before damaging
+      enemiesToPush.forEach(enemy => {
+        gameController.pushEnemy(target, enemy);
+      });
+    }
+
+    if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
 
     this.removeAttackModifiers();
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(_target: Hero): void { };
