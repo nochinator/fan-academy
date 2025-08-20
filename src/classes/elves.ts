@@ -164,14 +164,19 @@ export class VoidMonk extends DarkElf {
 
   getOffsetTiles(targetBoardPosition: number, attackDirection: number): number[] {
     const boardWidth = 9;
-    const offsets: number[] = [];
+    let offsets: number[];
 
     switch (attackDirection) {
-      case 1: return [-1, 1, -9];
-      case 3: return [-9, 1, 9];
-      case 5: return [-1, 1, 9];
-      case 7: return [-9, -1, 9];
-      default: return [];
+      case 1: offsets = [-1, 1, -9];
+        break;
+      case 3: offsets = [-9, 1, 9];
+        break;
+      case 5: offsets = [-1, 1, 9];
+        break;
+      case 7: offsets = [-9, -1, 9];
+        break;
+      default: offsets = [];
+        break;
     }
 
     const isTargetOnLeftEdge = targetBoardPosition % boardWidth === 0;
