@@ -11,8 +11,8 @@ export async function loginQuery(username: string, password: string) {
         'Authorization': `Bearer ${jwt}`
       },
       body: JSON.stringify({
-        username,
-        password
+        username: username.trim(),
+        password: password.trim()
       })
     });
 
@@ -54,9 +54,9 @@ export async function signUpQuery(email: string, username: string, password: str
         'Authorization': `Bearer ${jwt}`
       },
       body: JSON.stringify({
-        email,
-        username,
-        password
+        email: email.trim(),
+        username: username.trim(),
+        password: password.trim()
       })
     });
 

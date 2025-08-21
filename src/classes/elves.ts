@@ -142,7 +142,6 @@ export class VoidMonk extends DarkElf {
       if (unitDamage) damageDone += unitDamage;
       if (splashedEnemies.length) {
         const splashDamage = this.getTotalPower() * 0.666;
-        console.log(splashDamage);
         splashedEnemies.forEach(enemy => {
           const unitDamage = enemy.getsDamaged(splashDamage, this.attackType, 0.666);
           if (unitDamage) damageDone += unitDamage;
@@ -164,14 +163,19 @@ export class VoidMonk extends DarkElf {
 
   getOffsetTiles(targetBoardPosition: number, attackDirection: number): number[] {
     const boardWidth = 9;
-    const offsets: number[] = [];
+    let offsets: number[];
 
     switch (attackDirection) {
-      case 1: return [-1, 1, -9];
-      case 3: return [-9, 1, 9];
-      case 5: return [-1, 1, 9];
-      case 7: return [-9, -1, 9];
-      default: return [];
+      case 1: offsets = [-1, 1, -9];
+        break;
+      case 3: offsets = [-9, 1, 9];
+        break;
+      case 5: offsets = [-1, 1, 9];
+        break;
+      case 7: offsets = [-9, -1, 9];
+        break;
+      default: offsets = [];
+        break;
     }
 
     const isTargetOnLeftEdge = targetBoardPosition % boardWidth === 0;
@@ -214,12 +218,11 @@ export class Necromancer extends DarkElf {
     } else {
       if (this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK_BIG);
       if (!this.superCharge) playSound(this.scene, EGameSounds.NECROMANCER_ATTACK);
+
+      const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
+      if (damageDone) this.lifeSteal(damageDone);
       this.removeAttackModifiers();
     }
-
-    const damageDone = target.getsDamaged(this.getTotalPower(), this.attackType);
-
-    if (damageDone) this.lifeSteal(damageDone);
 
     if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
 
