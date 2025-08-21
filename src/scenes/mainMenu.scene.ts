@@ -108,7 +108,7 @@ export default class MainMenuScene extends Phaser.Scene {
       x: menuButtonX,
       y: menuButtonHeight * 7 + 5,
       imageKey: 'mainMenuButton',
-      text: 'About',
+      text: 'Guide',
       font: '70px proHeavy',
       callback: () => {
         this.sound.play(EUiSounds.BUTTON_GENERIC);
