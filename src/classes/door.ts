@@ -42,22 +42,6 @@ export class Door extends Phaser.GameObjects.Container {
 
         this.updateBannerText();
       }
-
-      if (pointer.button === 2) {
-        console.log('Add list of items in Deck here');
-      }
-    });
-
-    this.on('pointerover', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.rightButtonDown()) {
-        // this.setDepth(1001);
-        // this.unitCard.setVisible(true);
-      }
-    });
-
-    this.on('pointerout', () => {
-      // unit.setDepth(unit.boardPosition + 10);
-      // unit.unitCard.setVisible(false);
     });
 
     context.add.existing(this);
