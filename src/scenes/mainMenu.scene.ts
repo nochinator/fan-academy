@@ -63,17 +63,6 @@ export default class MainMenuScene extends Phaser.Scene {
     // menuBottomContainer
     this.add.container(bg.width - menuBottomImage.width - 14, bg.height - menuBottomImage.height - 14, [menuBottomImage, menuBottomText]);
 
-    // disclaimer text // FIXME: removed once beta is done
-    this.add.text(30, 730, 'This game is in beta state: Expect bugs and crashes. If you run into any issues, please let dadazbk know on Discord. Thanks!', {
-      fontFamily: "proLight",
-      fontSize: 35,
-      color: '#ffffff',
-      wordWrap: {
-        width: 350,
-        useAdvancedWrap: true
-      }
-    });
-
     // main menu buttons
     const menuButtonHeight = this.textures.get('mainMenuButton').getSourceImage().height;
     const menuButtonX =  200;
