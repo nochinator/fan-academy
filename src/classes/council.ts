@@ -146,7 +146,7 @@ export class Wizard extends Human {
 
       // Get directions for finding out the next targets
       const attackDirection = gameController.board.getAttackDirection(this.boardPosition, target.boardPosition);
-      const opponentDirection = this.context.isPlayerOne ? [2, 3, 4] : [6, 7, 8];
+      const opponentDirection = this.belongsTo === 1 ? [2, 3, 4] : [6, 7, 8];
 
       // Collect all targets
       const secondTarget = this.getNextTarget(target, attackDirection, opponentDirection, gameController.board, false);
