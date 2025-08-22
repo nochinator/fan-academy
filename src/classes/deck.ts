@@ -18,10 +18,6 @@ export class Deck {
     return this.deck;
   }
 
-  setDeck(deckData: any[]): void {
-    this.deck = [...deckData];
-  }
-
   removeFromDeck(amount: number): (IHero | IItem)[] {
     return this.deck.splice(0, amount);
   }

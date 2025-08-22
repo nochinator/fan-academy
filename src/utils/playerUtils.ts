@@ -1,6 +1,6 @@
 import { Hero } from "../classes/hero";
 import { Item } from "../classes/item";
-import { EClass, EGameSounds } from "../enums/gameEnums";
+import { EClass } from "../enums/gameEnums";
 import { IPlayerState } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 
@@ -33,11 +33,6 @@ export function selectUnit(context: GameScene, unit: Hero | Item): void {
   unit.isActive = true;
   context.activeUnit = unit;
 
-  // Play the sound
-  if (unit.boardPosition < 45) {
-    context.sound.play(EGameSounds.HERO_THINKING);
-  }
-
   // Highlight tiles
   if (unit.class === EClass.HERO) context.gameController?.onHeroClicked(unit as Hero);
   if (unit.class === EClass.ITEM) context.gameController?.onItemClicked(unit as Item);
@@ -45,9 +40,6 @@ export function selectUnit(context: GameScene, unit: Hero | Item): void {
 
 export function deselectUnit(context: GameScene): void {
   if (!context.activeUnit) return;
-
-  // Stop the sound
-  context.sound.stopByKey(EGameSounds.HERO_THINKING);
 
   context.activeUnit.isActive = false;
   context.activeUnit = undefined;

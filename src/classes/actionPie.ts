@@ -35,25 +35,6 @@ export class ActionPie extends Phaser.GameObjects.Container {
 
     this.add([this.actionCircle, this.actionPie1, this.actionPie2, this.actionPie3, this.actionPie4, this.actionPie5, this.actionArrow]);
 
-    this.setSize(90, 90).setInteractive({ useHandCursor: true });
-
-
-    this.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      this.context.longPressStart = this.context.time.now;
-
-      if (pointer.button === 2) {
-        this.context.gameController!.resetTurn();
-      } else if (pointer.button === 0) {
-        this.context.gameController!.undoLastAction();
-      }
-    });
-    this.on('pointerup', () => {
-      // Check if a long press occurred
-      if (this.context.longPressStart && this.context.time.now - this.context.longPressStart > 500) {
-        this.context.gameController!.resetTurn();
-      }
-    });
-
     context.add.existing(this);
   }
 
@@ -75,29 +56,27 @@ export class ActionPie extends Phaser.GameObjects.Container {
     this.popAnimation(this.actionPie5, true);
 
     this.actionArrow.setVisible(false);
+    this.removeInteractive();
   }
 
-popAnimation(image: Phaser.GameObjects.Image, show = false) {
+  popAnimation(image: Phaser.GameObjects.Image, show = false) {
     if (!image) return;
 
-    // Set the visibility immediately
-    image.setVisible(show);
-
-    const originalIndex = this.getIndex(image);
-    this.bringToTop(image);
+    const originalIndex = this.getIndex(image); // Save original order
+    this.bringToTop(image); // Temporarily move on top
 
     this.context.tweens.add({
       targets: image,
-      scale: 1.5,
+      scale: 1.5, // Increase the size
       duration: 100,
-      yoyo: true,
+      yoyo: true, // Return to original scale
       ease: 'Quad.easeInOut',
       onComplete: () => {
-        // No need to set visibility here anymore
+        image.visible = show;
         this.moveTo(image, originalIndex);
       }
     });
-}
+  }
 
   hideActionSlice(actionNumber: number) {
     switch (actionNumber) {
@@ -110,35 +89,20 @@ popAnimation(image: Phaser.GameObjects.Image, show = false) {
         break;
       case 3:
         this.popAnimation(this.actionPie3);
+        this.actionArrow.setVisible(true);
         break;
       case 4:
         this.popAnimation(this.actionPie4);
-        this.actionArrow.setVisible(true);
         break;
       case 5:
         this.popAnimation(this.actionPie5);
         break;
     }
-  };
 
-  showActionSlice(actionNumber: number) {
-    switch (actionNumber) {
-      case 1:
-        this.popAnimation(this.actionPie1, true);
-        this.actionArrow.setVisible(false);
-        break;
-      case 2:
-        this.popAnimation(this.actionPie2, true);
-        break;
-      case 3:
-        this.popAnimation(this.actionPie3, true);
-        break;
-      case 4:
-        this.popAnimation(this.actionPie4, true);
-        break;
-      case 5:
-        this.popAnimation(this.actionPie5, true);
-        break;
-    }
-  }
+    this.setSize(90, 90).setInteractive({ useHandCursor: true });
+
+    this.on('pointerdown', () => {
+      this.context.gameController!.resetTurn();
+    });
+  };
 }

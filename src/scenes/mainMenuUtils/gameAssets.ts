@@ -180,7 +180,6 @@ export function loadGameAssets(context: GameScene) {
   // Generic game sounds
   context.load.audio('selectHeroFromHandSound', `${CDN_PATH}/audio/game/Game_Pickup_CharacterTile_Generic.mp3`);
   context.load.audio('selectHeroFromBoardSound', `${CDN_PATH}/audio/game/Game_Select_Character.mp3`);
-  context.load.audio('thinkingSound', `${CDN_PATH}/audio/game/Game_Ponder_LP.mp3`);
   context.load.audio('spawnHeroSound', `${CDN_PATH}/audio/game/Game_Place_CharacterTile.mp3`);
   context.load.audio('moveHeroSound', `${CDN_PATH}/audio/game/Game_Release_ToMove_Character.mp3`);
   context.load.audio('moveFlySound', `${CDN_PATH}/audio/game/Character_Movement_Flying.mp3`);
@@ -215,11 +214,6 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('damageCrystal1Sound', `${CDN_PATH}/audio/game/Game_Crystal_Damage_1.mp3`);
   context.load.audio('damageCrystal2Sound', `${CDN_PATH}/audio/game/Game_Crystal_Damage_2.mp3`);
   context.load.audio('destroyCrystalSound', `${CDN_PATH}/audio/game/Game_Crystal_Destroy.mp3`);
-  context.load.audio('damageHero1Sound', `${CDN_PATH}/audio/game/Game_Damage_Opponent_1.mp3`)
-  context.load.audio('damageHero2Sound', `${CDN_PATH}/audio/game/Game_Damage_Opponent_2.mp3`)
-  context.load.audio('damageHero3Sound', `${CDN_PATH}/audio/game/Game_Damage_Opponent_3.mp3`)
-  context.load.audio('damageHero4Sound', `${CDN_PATH}/audio/game/Game_Damage_Opponent_4.mp3`)
-  context.load.audio('damageHeroKOSound', `${CDN_PATH}/audio/game/KO_Slow_Mo_Punch.mp3`)
 
   context.load.audio('winSFXSound', `${CDN_PATH}/audio/game/Game_Win_SFX_01.mp3`);
   context.load.audio('loseSFXSound', `${CDN_PATH}/audio/game/Game_Lose_SFX_01.mp3`);
@@ -271,7 +265,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('paladinHealSound', `${CDN_PATH}/audio/dwarves/DWF_Paladin_Heal.mp3`); // along with cleric sounds
   context.load.audio('paladinAttackSound', `${CDN_PATH}/audio/dwarves/DWF_Paladin_Melee.mp3`);
   context.load.audio('paladinAttackBigSound', `${CDN_PATH}/audio/dwarves/DWF_Paladin_Special.mp3`);
-  context.load.audio('paladinDeath', `${CDN_PATH}/audio/dwarves/DWF_Paladin_Deploy.mp3`);
+  //context.load.audio('paladinDeath', `${CDN_PATH}/audio/dwarves/DWF_Paladin_Deploy.mp3`);
   context.load.audio('engineerAttackSound', `${CDN_PATH}/audio/dwarves/DWF_Engineer_Attack_Melee.mp3`);
   context.load.audio('engineerAttackBigSound', `${CDN_PATH}/audio/dwarves/DWF_Engineer_BigAttack.mp3`);
   // no death sound
@@ -284,7 +278,7 @@ export function loadGameAssets(context: GameScene) {
   context.load.audio('gunnerAttack', `${CDN_PATH}/audio/dwarves/DWF_Gunner_Attack_Rifle_rev1.mp3`);
   context.load.audio('gunnerJump', `${CDN_PATH}/audio/dwarves/DWF_Gunner_Jump.mp3`); // start supercharge sound
   context.load.audio('gunnerAttackGunOnly', `${CDN_PATH}/audio/dwarves/DWF_Gunner_Attack_Rifle_01.mp3`); // play several times in supercharge
-  context.load.audio('gunnerDeath', `${CDN_PATH}/audio/dwarves/DE-VoidMonk_Attack_Punch.mp3`);
+  context.load.audio('gunnerDeath', `${CDN_PATH}/audio/dwarves/DWF_Gunner_KO.mp3`);
   context.load.audio('annihilatorShoot', `${CDN_PATH}/audio/dwarves/DWF_Bazooka_Fire.mp3`); // attack part 1
   context.load.audio('annihilatorHit', `${CDN_PATH}/audio/dwarves/DWF_Bazooka_Fire.mp3`); // attack part 2
   context.load.audio('annihilatorWindup', `${CDN_PATH}/audio/dwarves/DWF_Bazooka_Fire.mp3`); // big attack, followed by regular attack sounds

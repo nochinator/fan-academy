@@ -231,7 +231,7 @@ export function selectDeathSound(scene: Phaser.Scene, hero: EHeroes): void {
 
     [EHeroes.GRENADIER]: EGameSounds.GRENADIER_DEATH,
     [EHeroes.GUNNER]: EGameSounds.GUNNER_DEATH, // TODO: modify sound to not have beginning
-    [EHeroes.PALADIN]: EGameSounds.PALADIN_DEATH,
+     [EHeroes.PALADIN]: undefined, //EGameSounds.PALADIN_DEATH, // missing on assets repository
     [EHeroes.ENGINEER]: EGameSounds.GUNNER_DEATH, // no official sound
     [EHeroes.ANNIHILATOR]: EGameSounds.GRENADIER_DEATH // no official sound
   };

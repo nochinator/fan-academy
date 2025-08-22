@@ -51,58 +51,15 @@ export class Board {
     return result;
   }
 
-  getBoardState(): ITile[] {
-    return this.tiles.map(tile =>  tile.getTileData());
+  getUnitFromTile(tile: Tile): Hero | Crystal | undefined {
+    const unit =
+    this.units.find(u => u.boardPosition === tile.boardPosition) ||
+    this.crystals.find(c => c.boardPosition === tile.boardPosition);
+    return unit;
   }
 
-  setBoardState(boardState: any[]): void {
-    // remove all units and crystals from the board and the game state
-    const objectsToRemove: (Hero | Crystal)[] = []; 
-    this.units.forEach(unit => {
-      objectsToRemove.push(unit);
-    });
-    this.crystals.forEach(crystal => {
-      objectsToRemove.push(crystal);
-    });
-
-    objectsToRemove.forEach(object => object.removeFromGame(false));
-
-    // Reset the game's internal unit and crystal arrays
-    this.units = [];
-    this.crystals = [];
-    
-    const heroOperations: (() => void)[] = [];
-
-    // Rebuild the board from the saved state
-    boardState.forEach(tileData => {
-      const tile = this.getTileFromBoardPosition(tileData.boardPosition);
-      if (tile) {
-        // Clear any remaining state on the tile
-        tile.removeHero();
-        tile.removeCrystal();
-    
-        if (tileData.crystal) {
-          const crystal = new Crystal(this.context, tileData.crystal, tile);
-          crystal.updateDebuffAnimation(0);
-          this.crystals.push(crystal);
-          tile.setCrystal(crystal); // Make sure the tile knows about the crystal
-        }
-    
-        if (tileData.hero) {
-          // Store hero processing till after crystals
-          heroOperations.push(() => {
-            const hero = createNewHero(this.context, tileData.hero);
-            hero.specialTileCheck(tile, undefined, false);
-            hero.updatePosition(tile);
-            this.units.push(hero);
-            tile.hero = hero.exportData();
-          });
-        }
-      }
-    });
-    
-    // Process all heroes after crystals
-    heroOperations.forEach(operation => operation());
+  getBoardState(): ITile[] {
+    return this.tiles.map(tile =>  tile.getTileData());
   }
 
   clearHighlights() {
@@ -149,18 +106,18 @@ export class Board {
 
       /**
        * Show attack reticle if one of the below is true:
-       *  -target is an enemy hero and it's not KO
-       *  -target is an enemy crystal
-       *  - active unit is grenadier
-       *  -target is KO and active unit is a Necro or a Wraith
-       *  -target is KO and standing on an enemy spawn, and hero is orthogonally adjacent
+       * -target is an enemy hero and it's not KO
+       * -target is an enemy crystal
+       * -target is KO and active unit is a Necro or a Wraith
+       * -target is KO and standing on an enemy spawn, and hero is orthogonally adjacent
        */
 
       if (
         target instanceof Crystal && target.belongsTo !== hero.belongsTo ||
         target instanceof Hero && target.belongsTo !== hero.belongsTo && !target.isKO ||
         (hero.unitType === EHeroes.NECROMANCER || hero.unitType === EHeroes.WRAITH) && target instanceof Hero && target.isKO ||
-        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile()) || hero.unitType === EHeroes.GRENADIER
+        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile()) ||
+        hero.unitType === EHeroes.GRENADIER // Add this condition to include targets for the Grenadier
       ) {
         enemyLOSCheck.push(target);
       }
@@ -169,13 +126,22 @@ export class Board {
     const enemiesToHighlight: (Hero | Crystal)[] = [];
     const enemiesBlocked: (Hero | Crystal)[] = [];
 
-    enemyLOSCheck.forEach((enemy: Hero | Crystal) => {
-      if (this.hasLineOfSight(hero, enemy)) {
+    // skip loss for grenadier
+    if (hero.unitType === EHeroes.GRENADIER) {
+      // If the hero is a Grenadier, all targets in range are highlightable, as LOS check is skipped
+      enemyLOSCheck.forEach((enemy: Hero | Crystal) => {
         enemiesToHighlight.push(enemy);
-      } else {
-        enemiesBlocked.push(enemy);
-      }
-    });
+      });
+    } else {
+      // For all other heroes, perform the LOS check as normal
+      enemyLOSCheck.forEach((enemy: Hero | Crystal) => {
+        if (this.hasLineOfSight(hero, enemy)) {
+          enemiesToHighlight.push(enemy);
+        } else {
+          enemiesBlocked.push(enemy);
+        }
+      });
+    }
 
     enemiesToHighlight.forEach(enemy => enemy.attackReticle.setVisible(true));
     enemiesBlocked.forEach(enemy => enemy.blockedLOS.setVisible(true));
@@ -357,37 +323,37 @@ export class Board {
       case -27:
       case -18:
       case -9:
-        direction = 1;
+        direction = 1; // up
         break;
       case -8:
-        direction = 2;
+        direction = 2; // up-right
         break;
       case 1:
       case 2:
       case 3:
-        direction = 3;
+        direction = 3; // right
         break;
       case 10:
-        direction = 4;
+        direction = 4; // right-down
         break;
       case 9:
       case 18:
       case 27:
-        direction = 5;
+        direction = 5; // down
         break;
       case 8:
-        direction = 6;
+        direction = 6; // down-left
         break;
       case -1:
       case -2:
       case -3:
-        direction = 7;
+        direction = 7; // left
         break;
       case -10:
-        direction = 8;
+        direction = 8; // left-up
         break;
       default:
-        direction = 0;
+        direction = 0; // starting point
         break;
     }
 

@@ -1,69 +1,12 @@
-import { EActionType, EAttackType, EGameSounds, ETiles } from "../enums/gameEnums";
+import { EActionType, EAttackType, EGameSounds, ETiles, EHeroes } from "../enums/gameEnums";
 import { IHero, IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { canBeAttacked, getAOETiles, isOnBoard, playSound, roundToFive, turnIfBehind, useAnimation } from "../utils/gameUtils";
+import { canBeAttacked, getAOETiles, playSound, roundToFive, turnIfBehind, useAnimation, isEnemySpawn } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
 import { Hero } from "./hero";
 import { Item } from "./item";
 import { Tile } from "./tile";
 
-
-// Helper function to get tiles in a cone shape
-// This is a simple implementation and might need to be refined for a real game engine
-function getConeTiles(startPos: number, direction: number, boardWidth = 9, range = 2): number[] {
-  const tiles: number[] = [];
-  const startRow = Math.floor(startPos / boardWidth);
-  const startCol = startPos % boardWidth;
-
-  for (let r = 1; r <= range; r++) {
-    for (let c = -r; c <= r; c++) {
-      let targetRow = startRow;
-      let targetCol = startCol;
-
-      switch (direction) {
-        case 0: // North
-          targetRow = startRow - r;
-          targetCol = startCol + c;
-          break;
-        case 1: // North-East
-          targetRow = startRow - r;
-          targetCol = startCol + r;
-          break;
-        case 2: // East
-          targetRow = startRow;
-          targetCol = startCol + r;
-          break;
-        case 3: // South-East
-          targetRow = startRow + r;
-          targetCol = startCol + r;
-          break;
-        case 4: // South
-          targetRow = startRow + r;
-          targetCol = startCol + c;
-          break;
-        case 5: // South-West
-          targetRow = startRow + r;
-          targetCol = startCol - r;
-          break;
-        case 6: // West
-          targetRow = startRow;
-          targetCol = startCol - r;
-          break;
-        case 7: // North-West
-          targetRow = startRow - r;
-          targetCol = startCol - r;
-          break;
-      }
-
-      const targetPos = targetRow * boardWidth + targetCol;
-      if (isOnBoard(targetPos)) {
-        tiles.push(targetPos);
-      }
-    }
-  }
-
-  return tiles;
-}
 
 // Base Dwarf class with the racial passive
 export abstract class Dwarf extends Hero {
@@ -110,20 +53,32 @@ export class Paladin extends Dwarf {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
+    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
-    let delay = 0;
-    if (this.superCharge) {
-      playSound(this.scene, EGameSounds.PALADIN_ATTACK);
+    const distance = this.getDistanceToTarget(target);
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile()) &&
+      distance === 1
+    ) {
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
+      target.removeFromGame();
     } else {
-      playSound(this.scene, EGameSounds.PALADIN_ATTACK_BIG);
+      if (this.superCharge) {
+        playSound(this.scene, EGameSounds.PALADIN_ATTACK);
+      } else {
+        playSound(this.scene, EGameSounds.PALADIN_ATTACK_BIG);
+      }
+
+      target.getsDamaged(this.getTotalPower(), this.attackType);
+
+      if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
     }
 
-
-    target.getsDamaged(this.getTotalPower(), this.attackType, delay);
-
     this.removeAttackModifiers();
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   async heal(target: Hero): Promise<void> {
@@ -149,24 +104,7 @@ export class Paladin extends Dwarf {
   }
 
   playHealSounds() {
-
-    let delay = 0;
-
-    // First sound
-    this.context.time.delayedCall(delay, () => {
-      this.context.sound.play(EGameSounds.PALADIN_HEAL, { volume: 0.5 });
-    });
-
-    // Second sound
-    this.context.time.delayedCall(delay, () => {
-      this.context.sound.play(EGameSounds.PALADIN_HEAL, { volume: 0.5 });
-    });
-
-    // Third sound
-    delay += 900;
-    this.context.time.delayedCall(delay, () => {
-      this.context.sound.play(EGameSounds.PALADIN_HEAL, { volume: 0.5 });
-    });
+    this.context.sound.play(EGameSounds.HEAL, { volume: 0.5 });
   }
 
   async move(targetTile: Tile): Promise<void> {
@@ -178,11 +116,10 @@ export class Paladin extends Dwarf {
         this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
         this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
 
-
       if (unit && unit !== this) {
-        this.magicalDamageResistance -= 5;
-        this.physicalDamageResistance -= 5;
-        this.paladinAura -= 1;
+        unit.magicalDamageResistance -= 5;
+        unit.physicalDamageResistance -= 5;
+        unit.paladinAura -= 1;
       }
     });
 
@@ -216,47 +153,51 @@ export class Grenadier extends Dwarf {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
+    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
-    const board = this.context.gameController!.board;
 
-    let delay = 0;
-
-    if (distance === 1) { // Melee attack
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile()) &&
+      distance === 1
+    ) {
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
+      target.removeFromGame();
+    } else if (distance === 1) { // Melee attack
       playSound(this.scene, EGameSounds.GRENADIER_ATTACK_MELEE);
-      target.getsDamaged(this.getTotalPower() * 0.5, this.attackType, 500);
+      target.getsDamaged(this.getTotalPower() * 0.5, this.attackType);
     } else { // Ranged attack, ignores LOS
       if (!this.superCharge) {
         playSound(this.scene, EGameSounds.GRENADIER_ATTACK);
       } else {
         playSound(this.scene, EGameSounds.GRENADIER_ATTACK_BIG);
-        this.context.time.delayedCall(delay, () => {
-          this.context.sound.play(EGameSounds.GRENADIER_ATTACK, { volume: 0.5 });
-        });
       }
       const damage = this.getTotalPower();
       const splashDamage = damage * 0.5;
 
       // Damage main target
-      target.getsDamaged(damage, this.attackType, 500);
+      target.getsDamaged(damage, this.attackType);
 
       // AoE damage to nearby enemies
       const aoeTiles = getAOETiles(this.context, this, target.getTile(), false);
       const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
       allTiles.forEach(tile => {
         const unit =
-          this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
-          this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
-        console.log(unit);
+          gameController.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+          gameController.board.crystals.find(c => c.boardPosition === tile.boardPosition);
         if (unit && target !== unit && unit.belongsTo !== this.belongsTo) {
-          unit.getsDamaged(splashDamage, this.attackType, delay);
+          unit.getsDamaged(splashDamage, this.attackType);
         }
       });
     }
+    
+    if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
 
     this.removeAttackModifiers();
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
   heal(_target: Hero): void { };
   special(_target: Hero): void {};}
@@ -269,44 +210,79 @@ export class Gunner extends Dwarf {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
+    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
-    const board = this.context.gameController!.board;
+    const board = gameController.board;
 
-    if (distance === 1) { // Melee attack
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile()) &&
+      distance === 1
+    ) {
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
+      target.removeFromGame();
+    } else if (distance === 1) { // Melee attack
       playSound(this.scene, EGameSounds.GUNNER_ATTACK_ONLY);
-      target.getsDamaged(this.getTotalPower(), this.attackType, 500);
+      target.getsDamaged(this.getTotalPower(), this.attackType);
     } else { // Ranged cone attack
       playSound(this.scene, EGameSounds.GUNNER_ATTACK);
       const damage = this.getTotalPower() * 0.66;
       const attackDirection = board.getAttackDirection(this.boardPosition, target.boardPosition);
-      const coneTiles = getConeTiles(target.boardPosition, attackDirection, this.boardPosition, 2);
+      const coneUnits = this.getConeTiles(this.boardPosition, attackDirection);
 
       // Damage main target
-      target.getsDamaged(damage, this.attackType, 500);
+      target.getsDamaged(damage, this.attackType);
 
       // Damage up to two other targets in the cone
       let targetsHit = 0;
-      coneTiles.forEach(tilePos => {
+      coneUnits.forEach(unit => {
         if (targetsHit >= 2) return;
-        const tile = board.getTileFromBoardPosition(tilePos);
-        if (tile && canBeAttacked(this, tile)) {
-          const unit =
-          this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
-          this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
-
-          if (unit && unit !== target) {
-            unit.getsDamaged(damage, this.attackType, 500);
-
-            targetsHit++;
-          }
+        if (unit && canBeAttacked(this, unit.getTile()) && unit !== target) {
+          unit.getsDamaged(damage, this.attackType);
+          targetsHit++;
         }
       });
     }
 
+    if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
+    
     this.removeAttackModifiers();
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+  }
+
+  getConeTiles(startPos: number, direction: number) {
+    const units = [];
+    const board = this.context.gameController!.board
+    const findTile = (position: number) =>
+      position > 0 && position < 45 ?
+        board.getUnitFromTile(board.getTileFromBoardPosition(position))?.belongsTo !== this.belongsTo ?
+        board.getUnitFromTile(board.getTileFromBoardPosition(position))
+        : undefined : undefined; // there is a unit that is on other team
+  
+    const offsets: { [key: number]: number[] } = {
+      1: [-10, -19, -8, -17], // vertical up
+      5: [10, 19, 8, 17],    // vertical down
+      2: [-9, -18, 1, 2],  // up-right
+      6: [9, 18, -1, -2],      // down-left
+      3: [-8, -7, 10, 11],   // horizontal left
+      7: [8, 7, -10, -11],   // horizontal right
+      4: [9, 18, 1, 2],    // down-right
+      8: [-9, -18, -1, -2],    // up-left
+    };
+  
+    const currentOffsets = offsets[direction];
+    if (currentOffsets) {
+      const [offset1, offset2, offset3, offset4] = currentOffsets;
+      const unit1 = findTile(startPos + offset1) ?? findTile(startPos + offset2);
+      const unit2 = findTile(startPos + offset3) ?? findTile(startPos + offset4);
+      if (unit1) units.push(unit1);
+      if (unit2) units.push(unit2);
+    }
+  
+    return units;
   }
 
   heal(_target: Hero): void { };
@@ -367,15 +343,29 @@ export class Engineer extends Dwarf {
     this.updateTileData();
   }
 
-  attack(target: Hero | Crystal): void {
+  async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
+    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
-    playSound(this.scene, EGameSounds.ENGINEER_ATTACK);
-
-    target.getsDamaged(this.getTotalPower(), this.attackType, 500);
+    
+    const distance = this.getDistanceToTarget(target);
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile()) &&
+      distance === 1
+    ) {
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
+      target.removeFromGame();
+    } else {
+      playSound(this.scene, EGameSounds.ENGINEER_ATTACK);
+      target.getsDamaged(this.getTotalPower(), this.attackType);
+    }
+    
+    if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
 
     this.removeAttackModifiers();
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(_target: Hero): void { };
@@ -389,46 +379,60 @@ export class Annihilator extends Dwarf {
 
   async attack(target: Hero | Crystal): Promise<void> {
     this.flashActingUnit();
+    const gameController = this.context.gameController!;
     turnIfBehind(this.context, this, target);
-    playSound(this.scene, EGameSounds.ANNIHILATOR_SHOOT);
+    
+    const distance = this.getDistanceToTarget(target);
+    if (
+      target instanceof Hero &&
+      target.isKO &&
+      isEnemySpawn(this.context, target.getTile()) &&
+      distance === 1
+    ) {
+      playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
+      target.removeFromGame();
+    } else {
+      playSound(this.scene, EGameSounds.ANNIHILATOR_SHOOT);
 
-    const damage = this.getTotalPower();
-    const splashDamage = damage * 0.2;
+      const damage = this.getTotalPower();
+      const splashDamage = damage * 0.2;
 
-    // Apply debuff to main target
-    if (!target.annihilatorDebuff) {
-      target.physicalDamageResistance -= 50;
-    }
-    target.annihilatorDebuff = true;
-    target.annihilatorDebuffImage.setVisible(true);
-    target.unitCard.updateCardData(target as any); // stupid compiler
-    target.getsDamaged(damage, this.attackType, 500);
-
-    // Apply AoE splash damage and knockback
-    const aoeTiles = getAOETiles(this.context, this, target.getTile(), false);
-    const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];   
-    let enemiesToPush: Hero[] = []
-    allTiles.forEach(tile => {
-      const unit =
-        this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
-        this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
-
-      if (unit && unit.belongsTo !== this.belongsTo && unit !== target) {
-        unit.getsDamaged(splashDamage, this.attackType, 500);
-        
-        if (unit instanceof Hero) {
-          enemiesToPush.push(unit);
-        }
+      // Apply debuff to main target
+      if (!target.annihilatorDebuff) {
+        target.physicalDamageResistance -= 50;
       }
-    });
-    // so paladin aura isn't removed before damaging
-    enemiesToPush.forEach(enemy => {
-      console.log('pushed')
-      this.context.gameController!.pushEnemy(target, enemy);
-    });
+      target.annihilatorDebuff = true;
+      target.annihilatorDebuffImage.setVisible(true);
+      target.unitCard.updateCardData(target as any); // stupid compiler
+      target.getsDamaged(damage, this.attackType);
+
+      // Apply AoE splash damage and knockback
+      const aoeTiles = getAOETiles(this.context, this, target.getTile(), false);
+      const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];   
+      let enemiesToPush: Hero[] = []
+      allTiles.forEach(tile => {
+        const unit =
+          gameController.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+          gameController.board.crystals.find(c => c.boardPosition === tile.boardPosition);
+
+        if (unit && unit.belongsTo !== this.belongsTo && unit !== target) {
+          unit.getsDamaged(splashDamage, this.attackType);
+          
+          if (unit instanceof Hero) {
+            enemiesToPush.push(unit);
+          }
+        }
+      });
+      // so paladin aura isn't removed before damaging
+      enemiesToPush.forEach(enemy => {
+        gameController.pushEnemy(target, enemy);
+      });
+    }
+
+    if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
 
     this.removeAttackModifiers();
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
   heal(_target: Hero): void { };
@@ -495,40 +499,41 @@ export class Pulverizer extends Item {
   constructor(context: GameScene, data: IItem) {
     super(context, data);
   }
-  use(target: Hero | Crystal): void {
+  use(targetTile: Tile): void {
+    const target = this.context.gameController!.board.getUnitFromTile(targetTile);
     const damage = 600;
 
     // Apply damage to main target
-    const totalDamageDone = target.getsDamaged(damage, EAttackType.PHYSICAL, 500);
-    playSound(this.scene, EGameSounds.DRILL_USE);
-
-    // If target is a hero, destroy team-specific equipment
-    if (target instanceof Hero) {
-      target.factionBuff = false;
-      target.factionBuffImage.setVisible(false);
-      target.characterImage.setTexture(target.updateCharacterImage());
-      target.increaseMaxHealth(target.baseHealth * -0.1);
+    if (target){
+      const totalDamage = target.getsDamaged(damage, EAttackType.PHYSICAL);
+      playSound(this.scene, EGameSounds.DRILL_USE);
   
-      target.unitCard.updateCardData(target);
-      target.updateTileData();
+      // If target is a hero, destroy team-specific equipment
+      if (target instanceof Hero && target.factionBuff) {
+        target.factionBuff = false;
+        target.factionBuffImage.setVisible(false);
+        target.characterImage.setTexture(target.updateCharacterImage());
+        target.increaseMaxHealth(target.baseHealth * -0.1);
+    
+        target.unitCard.updateCardData(target);
+        target.updateTileData();
+      }
+  
+      // AoE splash logic for crystals
+      else if (target instanceof Crystal) {
+        const splashDamage = totalDamage * 0.333;
+        const aoeTiles = getAOETiles(this.context, this, targetTile, false);
+        const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
+  
+        allTiles.forEach(tile => {
+          const unit = this.context.gameController!.board.getUnitFromTile(tile);
+  
+          if (unit && unit !== target) unit.getsDamaged(splashDamage, EAttackType.PHYSICAL);
+        });
+      }
+  
+      this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
+      this.removeFromGame();
     }
-
-    // AoE splash logic for crystals
-    if (target instanceof Crystal) {
-      const splashDamage = totalDamageDone! * 0.33;
-      const aoeTiles = getAOETiles(this.context, this, target.getTile(), true);
-      const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
-
-      allTiles.forEach(tile => {
-        const unit =
-          this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
-          this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
-
-        if (unit) unit.getsDamaged(splashDamage, EAttackType.PHYSICAL, 500);
-      });
-    }
-
-    this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
-    this.removeFromGame();
   }
 }
