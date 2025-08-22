@@ -164,6 +164,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.annihilatorDebuffImage = context.add.image(0, -10, 'annihilatorDebuff').setOrigin(0.5).setName('annihilatorDebuff').setVisible(this.annihilatorDebuff);
     this.shieldImage = context.add.image(0, -10, 'shield').setOrigin(0.5).setName('shield').setVisible(this.isShielded);
 
+
     // Add animations to the reticles
     const addCirclingTween = (reticle: Phaser.GameObjects.Image) => {
       context.tweens.add({
@@ -318,14 +319,22 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   private continuousEvent(image: Phaser.GameObjects.Image, textures: string[]): Phaser.Time.TimerEvent {
     let frame = 0;
 
-    return this.scene.time.addEvent({
+    const animationTimer = this.scene.time.addEvent({
       delay: 100, // milliseconds between frames
       loop: true,
       callback: () => {
-        image.setTexture(textures[frame]);
-        frame = (frame + 1) % textures.length;
+        // safety check to ensure there are never lingering animations
+        if (!image.scene) {
+          animationTimer.remove(false);
+          return;
+        } else {
+          image.setTexture(textures[frame]);
+          frame = (frame + 1) % textures.length;
+        }
       }
     });
+
+    return animationTimer
   };
 
   singleEvent(image: Phaser.GameObjects.Image, textures: string[], delay: number): Phaser.Time.TimerEvent {
@@ -373,7 +382,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.setScale(1);
   }
 
-  getsDamaged(damage: number, attackType: EAttackType): number {
+  getsDamaged(damage: number, attackType: EAttackType, delay: number): number {
     // Flash the unit red
     this.characterImage.setTint(0xff0000);
     this.scene.time.delayedCall(500, () => this.characterImage.clearTint());
@@ -383,7 +392,12 @@ export abstract class Hero extends Phaser.GameObjects.Container {
 
     this.currentHealth -= totalDamage;
 
-    if (this.currentHealth <= 0) this.getsKnockedDown();
+    if (this.currentHealth <= 0) this.getsKnockedDown(delay);
+    else {
+      // don't play a normal hit sound on ko
+      const hitSounds = [EGameSounds.HERO_DAMAGE_1, EGameSounds.HERO_DAMAGE_2, EGameSounds.HERO_DAMAGE_3, EGameSounds.HERO_DAMAGE_4]
+      this.scene.time.delayedCall(delay, playSound, [this.context, hitSounds[Math.floor(Math.random() * hitSounds.length)]]);
+    }
 
     // Update hp bar
     this.healthBar.setHealth(this.maxHealth, this.currentHealth);
@@ -521,8 +535,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     new FloatingText(this.context, this.x, this.y - 50, textFigure.toString(), true);
   };
 
-  getsKnockedDown(): void {
-    if (this.unitType !== EHeroes.PHANTOM) selectDeathSound(this.scene, this.unitType);
+  getsKnockedDown(delay: number): void {
+    this.scene.time.delayedCall(delay, playSound, [this.context, EGameSounds.HERO_DAMAGE_KO]);
+    if (this.unitType !== EHeroes.PHANTOM) this.scene.time.delayedCall(delay, selectDeathSound, [this.scene, this.unitType]);
+
     this.removeSpecialTileOnKo();
 
     this.currentHealth = 0;
@@ -563,6 +579,10 @@ export abstract class Hero extends Phaser.GameObjects.Container {
   }
 
   removeFromGame(board = true): void {
+    if (!this.scene) {
+      return;
+    }
+
     // Remove animations
     this.scene.tweens.killTweensOf(this);
 
@@ -588,6 +608,7 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     // Remove hero data from tile
     const tile = this.getTile();
     tile.removeHero();
+
 
     // Remove hero from board array
     const index = this.context.gameController!.board.units.findIndex(unit => unit.unitId === this.unitId);
@@ -616,6 +637,8 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     const startTile = gameController.board.getTileFromBoardPosition(this.boardPosition);
     if (!startTile) return;
 
+    gameController.afterAction(EActionType.MOVE, startTile.boardPosition, targetTile.boardPosition);
+
     await moveAnimation(this.context, this, targetTile);
 
     // Stomp KO'd units
@@ -631,8 +654,6 @@ export abstract class Hero extends Phaser.GameObjects.Container {
     this.updatePosition(targetTile);
     targetTile.hero = this.exportData();
     startTile.removeHero();
-
-    gameController.afterAction(EActionType.MOVE, startTile.boardPosition, targetTile.boardPosition);
   }
 
   spawn(tile: Tile): void {
