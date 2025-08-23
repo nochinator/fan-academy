@@ -19,10 +19,8 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
       unit.unitCard.setVisible(true);
       context.visibleUnitCard = unit;
       event.stopPropagation();
+      return;
     }
-
-    // Set a timer for the a hold press on mobile
-    context.longPressStart = context.time.now;
 
     if (pointer.button === 0) handleOnUnitLeftClick(unit, context);
   });
@@ -42,6 +40,8 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
 function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
   console.log(`Unit in ${unit.boardPosition}`, unit);
+  // Set a timer for the a hold press on mobile
+  context.longPressStart = context.time.now;
 
   // Only the active player can click on tiles, and only if they still have actions available
   if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
@@ -239,6 +239,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
         context.visibleUnitCard = tile;
         event.stopPropagation();
       }
+      return;
     }
 
     // Only the active player can click on tiles, and only if they still have actions available
@@ -303,6 +304,7 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
       crystal.unitCard.setVisible(true);
       context.visibleUnitCard = crystal;
       event.stopPropagation();
+      return;
     }
 
     // Set a timer for the a hold press on mobile
