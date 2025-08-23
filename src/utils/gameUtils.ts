@@ -508,10 +508,15 @@ export function truncateText(text: string, maxLength: number) {
 
 // Used to remove any visible unit cards from a mobile long press action
 export function visibleUnitCardCheck(context: GameScene): void {
-  if (context.visibleUnitCard) {
+  if (!context.visibleUnitCard) return;
+
+  if (context.visibleUnitCard instanceof Tile) {
+    context.visibleUnitCard.setDepth(2);
+  } else {
     context.visibleUnitCard.setDepth(context.visibleUnitCard.row + 10);
-    context.visibleUnitCard.unitCard?.setVisible(false);
   }
+
+  context.visibleUnitCard.unitCard?.setVisible(false);
 }
 
 export function generateFourDigitId(): number {

@@ -19,10 +19,8 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
       unit.unitCard.setVisible(true);
       context.visibleUnitCard = unit;
       event.stopPropagation();
+      return;
     }
-
-    // Set a timer for the a hold press on mobile
-    context.longPressStart = context.time.now;
 
     if (pointer.button === 0) handleOnUnitLeftClick(unit, context);
   });
@@ -42,6 +40,8 @@ export function makeUnitClickable(unit: Hero | Item, context: GameScene): void {
 
 function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
   console.log(`Unit in ${unit.boardPosition}`, unit);
+  // Set a timer for the a hold press on mobile
+  context.longPressStart = context.time.now;
 
   // Only the active player can click on tiles, and only if they still have actions available
   if (context.activePlayer !== context.userId || context.currentTurnAction! > 5) return;
@@ -230,7 +230,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
 export function makeTileClickable(tile: Tile, context: GameScene): void {
   tile.on('pointerdown', (pointer: Phaser.Input.Pointer, _x: number, _y: number, event: Types.Input.EventData) => {
-    if (context.currentGame.status === EGameStatus.FINISHED) return;
+    if (context.currentGame.status === EGameStatus.FINISHED || tile.hero || tile.crystal) return;
 
     visibleUnitCardCheck(context);
     context.longPressStart = context.time.now;
@@ -245,6 +245,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
         context.visibleUnitCard = tile;
         event.stopPropagation();
       }
+      return;
     }
 
     // Only the active player can click on tiles, and only if they still have actions available
@@ -276,7 +277,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
 
   // Handle long press on the tile
   tile.on('pointerup', () => {
-    if (context.currentGame.status === EGameStatus.FINISHED) return;
+    if (context.currentGame.status === EGameStatus.FINISHED || tile.hero || tile.crystal) return;
 
     if (context.longPressStart && context.time.now - context.longPressStart > 500) {
       tile.setDepth(1001);
@@ -309,6 +310,7 @@ export function makeCrystalClickable(crystal: Crystal, context: GameScene): void
       crystal.unitCard.setVisible(true);
       context.visibleUnitCard = crystal;
       event.stopPropagation();
+      return;
     }
 
     // Set a timer for the a hold press on mobile
