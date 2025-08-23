@@ -224,7 +224,7 @@ function handleOnUnitLeftClick(unit: Hero | Item, context: GameScene): void {
 
 export function makeTileClickable(tile: Tile, context: GameScene): void {
   tile.on('pointerdown', (pointer: Phaser.Input.Pointer, _x: number, _y: number, event: Types.Input.EventData) => {
-    if (context.currentGame.status === EGameStatus.FINISHED) return;
+    if (context.currentGame.status === EGameStatus.FINISHED || tile.hero || tile.crystal) return;
 
     visibleUnitCardCheck(context);
     context.longPressStart = context.time.now;
@@ -270,7 +270,7 @@ export function makeTileClickable(tile: Tile, context: GameScene): void {
 
   // Handle long press on the tile
   tile.on('pointerup', () => {
-    if (context.currentGame.status === EGameStatus.FINISHED) return;
+    if (context.currentGame.status === EGameStatus.FINISHED || tile.hero || tile.crystal) return;
 
     if (context.longPressStart && context.time.now - context.longPressStart > 500) {
       tile.setDepth(1001);
