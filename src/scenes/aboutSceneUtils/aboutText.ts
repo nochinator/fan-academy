@@ -201,3 +201,54 @@ Consumables:
 
 Faction passive:
 Units are healed for 33% of any damage they deal to enemy units (not crystals).`;
+
+export const dwarvesText = `Grenadier (3):
+800 HP
+200 attack (P), range 3
+100% damage at range with AOE for 50% damage.
+50% damage in melee.
+Targeting ignores line of sight.
+Move 3
+
+Gunner (3):
+800 HP
+300 attack (P), range 2
+If main target is at range 2 then the attack deals 66% damage in a cone.
+Move 2
+
+Engineer (3):
+800 HP
+200 attack (P), range 1
+Able to shield a single ally for 1 full attack within range 3, negating all damage. Shield moves with the target, including beyond range 3.
+Also the dwarve passive is twice as effective. Attack tiles give +140, resistance tiles +28%, assault tiles +420, and move tiles +4 movement.
+Move 2
+
+Paladin (3):
+900 HP
+10% P resist, 10% M resist
+200 attack (P), range 1
+Heals for 200% attack, revives for 50% attack, range 2
+Allys (including crystals) near her gain a 5% damage buff and +5% physical and magic resistance.
+Move 2
+
+Anihilator (1):
+650 HP
+300 attack (M), range 3
+100% damage to main target and 20% damage in AOE range, knocking AOE targets away from main target.
+Main targets physical resistance is reduced by 50% for the next physical attack.
+Move 2`;
+
+export const dwarvesItemsText = `Upgrades:
+-Sword (3): +50% attack
+-Armor (3): +20% physical resist, +10% base HP
+-Helm (3): +20% magical resist, +10% base HP
+
+Consumables:
+-Scroll (2): Targets one friendly. Unit has 300% attack power for one attack/heal.
+
+-Pulverizer (2): Targets a single unit. target takes 600 physcal damage and loses armor (or soul stone). If target is a crystal then it deals 33% of the damage dealt to the crystal in AOE, even if crystal is shielded by engineer.
+
+-Dwarvern Brew (2): Targets one friendly. Heals for 1000 and increases both resistances by 50% for the next hit.
+
+Faction passive:
+Special tiles are 20% more effective. Attack tiles give +120, resistance tiles give +24%, assault give +360 to crystal, and speed gives +3 movement`;

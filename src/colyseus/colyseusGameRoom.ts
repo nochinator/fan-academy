@@ -17,8 +17,8 @@ export async function createGame(context: UIScene, faction: EFaction): Promise<v
     console.log('Checking for open games | creating a new game...');
 
     const room = await colyseusClient.create('game_room', {
-      userId,
-      faction,
+      userId: userId,
+      faction: faction,
       token
     });
 

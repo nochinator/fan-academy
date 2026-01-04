@@ -7,19 +7,18 @@ import ProfileScene from './scenes/profile.scene';
 import PreloaderScene from './scenes/preloader.scene';
 import AboutScene from './scenes/about.scene';
 
-const config = {
+const config: Phaser.Types.Core.GameConfig = {
   backgroundColor: '#808080',
-  type: Phaser.AUTO, // webgl if browser supports it, fallback to canvas
+  type: Phaser.AUTO,
   scene: [PreloaderScene, MainMenuScene, UIScene, GameScene, LeaderboardScene, ProfileScene, AboutScene],
   scale: {
-    mode: Phaser.Scale.FIT, // automatically resize the canvas on window resize
-    autoCenter: Phaser.Scale.CENTER_BOTH, // center the canvas
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
     width: 1434,
     height: 990
   },
   dom: { createContainer: true },
-  parent: 'app'
-
+  parent: 'app',
 };
 
 // Create a new game

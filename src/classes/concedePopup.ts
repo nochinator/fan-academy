@@ -60,7 +60,7 @@ export class ConcedeWarningPopup extends Phaser.GameObjects.Container {
       playSound(this.scene, EUiSounds.RESIGN);
 
       this.setVisible(false);
-      const gameController = context.gameController!;
+      const gameController = context.gameController;
 
       const winner = context.currentGame.players.find(player => player.userData._id.toString() !== context.userId)?.userData._id;
       if (!winner) {

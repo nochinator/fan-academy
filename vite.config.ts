@@ -34,5 +34,9 @@ export default defineConfig({
       ]
     }
   },
-  resolve: { alias: { phaser: path.resolve(__dirname, 'node_modules/phaser/dist/phaser-arcade-physics.min.js') } }
+  resolve: { 
+    alias: { 
+      'dragonbones': path.resolve(__dirname, 'node_modules/dragonbones/build/dragonbones-alone.js')
+    } 
+  }
 });

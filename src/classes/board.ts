@@ -1,311 +1,164 @@
-import { EHeroes, ERange, ETiles } from "../enums/gameEnums";
-import { Coordinates, ITile } from "../interfaces/gameInterface";
+import { ETiles } from "../enums/gameEnums";
+import { ICoordinates, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { belongsToPlayer, createNewHero, getGridDistance, isEnemySpawn } from "../utils/gameUtils";
+import { getGridDistance, belongsToPlayer } from "../utils/gameUtils";
 import { Crystal } from "./crystal";
-import { ManaVial, Phantom } from "./elves";
-import { Hero } from "./hero";
-import { Item } from "./item";
+import { Unit } from "./unit";
 import { Tile } from "./tile";
 
 export class Board {
-  topLeft: Coordinates =  {
+  topLeft: ICoordinates =  {
     x: 545,
     y: 225
   };
 
   tileSize: number = 90;
   context: GameScene;
-  tiles: Tile[];
-  units: Hero[] = [];
-  crystals: Crystal[] = [];
+  tiles: Tile[][];
+  handTiles: Tile[];
+  units: Unit[] = [];
+  crystals: Unit[] = [];
 
-  constructor(context: GameScene, data: ITile[]) {
+  constructor(context: GameScene, data: ITile[][]) {
     this.context = context;
     this.tiles = this.createTileGrid(data);
-    this.crystals.forEach(crystal => crystal.updateDebuffAnimation(crystal.debuffAmount));
+    this.handTiles = this.createHandTile()
   }
 
-  createTileGrid(tiles: ITile[]) {
-    const grid: Tile[] = [];
-
-    tiles.forEach(tile => {
-      const newTile = new Tile(this.context, tile);
-      if (newTile.hero) this.units.push(createNewHero(this.context, newTile.hero, newTile));
-      if (newTile.crystal) this.crystals.push(new Crystal(this.context, newTile.crystal, tile));
-      grid.push(newTile);
-    });
+  createTileGrid(tilesData: ITile[][]) {
+    const grid: Tile[][] = [];
+    for (let row = 0; row < 5; row++) {
+      grid.push([]);
+      for (let col = 0; col < 9; col++) {
+        const tile = tilesData[row][col];
+        const newTile = new Tile(this.context, tile);
+        if (newTile.unit instanceof Crystal) {
+          this.crystals.push(newTile.unit);
+        } else if (newTile.unit) {
+          this.units.push(newTile.unit);
+        }
+        grid[row].push(newTile);
+      }
+    }
 
     return grid;
   }
 
-  getTileFromCoordinates(row: number, col: number): Tile {
-    const result = this.tiles.find(tile => tile.row === row && tile.col === col);
-    if (!result) throw new Error('Board getTile() No tile found');
-    return result;
+  createHandTile(): Tile[] {
+    const handRow: Tile[] = [];
+    for (let col = 0; col < 6; col++) {
+      const { x, y } = this.context.centerPoints[JSON.stringify([-1, col])];
+
+      const handTileData: ITile = {
+        x: x,
+        y: y,
+        tileType: ETiles.BASIC,
+        boardPosition: [-1, col],
+        unit: undefined,
+        item: undefined,
+      };
+      const newHandTile = new Tile(this.context, handTileData);
+
+      handRow.push(newHandTile);
+    }
+    return handRow
   }
 
-  getTileFromBoardPosition(boardPosition: number): Tile {
-    const result = this.tiles.find(tile => tile.boardPosition === boardPosition);
-    if (!result) throw new Error('Board getTile() No tile found');
-    return result;
+  getTileFromBoardPosition(boardPosition: [number, number]): Tile {
+    const row = boardPosition[0];
+    const col = boardPosition[1];
+
+    if (row === -1) {
+      return this.handTiles[col]
+    }
+
+    const rowTiles = this.tiles[row];
+    if (!rowTiles || col < 0 || col >= rowTiles.length) {
+      throw new Error(`Board getTileFromBoardPosition() Invalid board position: [${row}, ${col}]`);
+    }
+    return rowTiles[col];
   }
 
-  getUnitFromTile(tile: Tile): Hero | Crystal | undefined {
-    const unit =
-    this.units.find(u => u.boardPosition === tile.boardPosition) ||
-    this.crystals.find(c => c.boardPosition === tile.boardPosition);
+  getUnitFromTile(tile: Tile): Unit | undefined {
+    const unit = this.units.find(unit => unit.boardPosition[0] === tile.boardPosition[0] && unit.boardPosition[1] === tile.boardPosition[1]);
     return unit;
   }
 
-  getBoardState(): ITile[] {
-    return this.tiles.map(tile =>  tile.getTileData());
+  getBoardState(): ITile[][] {
+    return this.tiles.map(row => row.map(tile => tile.getTileData()));
   }
 
   clearHighlights() {
-    this.tiles.forEach(tile => tile.clearHighlight());
+    this.tiles.forEach(row => row.forEach(tile => tile.clearHighlight()));
+    this.handTiles.forEach(tile => tile.clearHighlight());
   }
 
-  highlightSpawns(unitType: EHeroes) {
-    const spawns = new Set<Tile>();
+  getUnitsInRange(activeUnit: Unit, range: number, targetEnemies = true, includeKoUnits = false): [Tile[], Tile[]] {
+    const LOSBlocked: Tile[] = [];
+    const targets: Tile[] = []
 
-    this.tiles.forEach(tile => {
-      const enemySpawn = isEnemySpawn(this.context, tile);
-      /** We add:
-       *  -friendly spawn tiles (unless they are occupied by a live unit other than an enemy phantom)
-       *  -any tile with a KO'd unit if the unit spawning is a Wraith
-       */
-      if (tile.tileType === ETiles.SPAWN && !enemySpawn){
-        if (!tile.hero) spawns.add(tile);
-        if (tile.hero?.isKO) spawns.add(tile);
-        if (tile.hero?.unitType === EHeroes.PHANTOM) spawns.add(tile);
-      }
-      if (
-        unitType === EHeroes.WRAITH &&
-        tile.hero?.isKO &&
-        !isEnemySpawn(this.context, tile)
-      )
-        spawns.add(tile);
-    });
-
-    this.highlightTiles([...spawns]);
-  }
-
-  highlightEnemyTargets(hero: Hero): void {
-    const tilesInRange: Tile[] = this.getHeroTilesInRange(hero, ERange.ATTACK);
-    if (!tilesInRange.length) return;
-
-    const enemyLOSCheck: (Hero | Crystal)[] = [];
+    const tilesInRange = this.getTilesInRange(activeUnit.boardPosition, range);
 
     tilesInRange.forEach(tile => {
-      const target = tile.hero ? this.units.find(unit => unit.unitId === tile.hero!.unitId) : tile.crystal ? this.crystals.find(crystal => crystal.boardPosition === tile.crystal?.boardPosition) : undefined;
-      if (!target) {
-        console.error('No target found', tile.hero);
-        return;
-      }
+      const target = tile.unit;
+      if (!target) return;
 
-      /**
-       * Show attack reticle if one of the below is true:
-       * -target is an enemy hero and it's not KO
-       * -target is an enemy crystal
-       * -target is KO and active unit is a Necro or a Wraith
-       * -target is KO and standing on an enemy spawn, and hero is orthogonally adjacent
-       */
+      // only get enemies, or only get allys, or get both
+      const isTargetable = targetEnemies ? target.belongsTo !== activeUnit.belongsTo : target.belongsTo === activeUnit.belongsTo;
 
       if (
-        target instanceof Crystal && target.belongsTo !== hero.belongsTo ||
-        target instanceof Hero && target.belongsTo !== hero.belongsTo && !target.isKO ||
-        (hero.unitType === EHeroes.NECROMANCER || hero.unitType === EHeroes.WRAITH) && target instanceof Hero && target.isKO ||
-        target instanceof Hero && target.isKO && this.isOrthogonalAdjacent(hero, target) && isEnemySpawn(this.context, target.getTile()) ||
-        hero.unitType === EHeroes.GRENADIER // Add this condition to include targets for the Grenadier
+        isTargetable
+        && (!target.isKO || includeKoUnits)
+        && target !== activeUnit  // can't target self
       ) {
-        enemyLOSCheck.push(target);
+        if (this.hasLineOfSight(activeUnit, target)) targets.push(tile);
+        else LOSBlocked.push(tile);
       }
     });
-
-    const enemiesToHighlight: (Hero | Crystal)[] = [];
-    const enemiesBlocked: (Hero | Crystal)[] = [];
-
-    // skip loss for grenadier
-    if (hero.unitType === EHeroes.GRENADIER) {
-      // If the hero is a Grenadier, all targets in range are highlightable, as LOS check is skipped
-      enemyLOSCheck.forEach((enemy: Hero | Crystal) => {
-        enemiesToHighlight.push(enemy);
-      });
-    } else {
-      // For all other heroes, perform the LOS check as normal
-      enemyLOSCheck.forEach((enemy: Hero | Crystal) => {
-        if (this.hasLineOfSight(hero, enemy)) {
-          enemiesToHighlight.push(enemy);
-        } else {
-          enemiesBlocked.push(enemy);
-        }
-      });
-    }
-
-    enemiesToHighlight.forEach(enemy => enemy.attackReticle.setVisible(true));
-    enemiesBlocked.forEach(enemy => enemy.blockedLOS.setVisible(true));
+    
+    return [targets, LOSBlocked]
   }
 
-  highlightFriendlyTargets(hero: Hero) {
-    if (!hero.canHeal && hero.unitType !== EHeroes.ENGINEER) return;
+  getTilesInRange(startPosition: [number, number], range: number): Tile[] {
 
-    const tilesInRange: Tile[] = this.getHeroTilesInRange(hero, ERange.HEAL);
-    if (!tilesInRange.length) return;
+    const inRangeTiles = new Set<Tile>();
 
-    tilesInRange.forEach(tile => {
-      if (tile.crystal) return;
-      const target = this.units.find(unit => unit.unitId === tile.hero?.unitId);
-      if (!target) {
-        console.error('No healing target found', tile);
-        return;
-      }
-      const userId = this.context.userId;
-      const maxHealth = target.maxHealth;
-      const currentHealth = target.currentHealth;
-
-      if (tile.isFriendly(userId) && (currentHealth! < maxHealth! || hero.unitType === EHeroes.ENGINEER)) target.healReticle.setVisible(true);
-    });
-  }
-
-  highlightMovementArea(hero: Hero) {
-    const tilesInRange = this.getHeroTilesInRange(hero, ERange.MOVE);
-
-    this.highlightTiles(tilesInRange);
-  }
-
-  highlightTeleportOptions(hero: Hero) {
-    // Teleporting tile
-    if (hero.getTile().tileType === ETiles.TELEPORTER) {
-      const teleportTiles: Tile[] = this.tiles.filter(tile => tile.tileType === ETiles.TELEPORTER && (!tile.hero || tile.hero.isKO));
-      this.highlightTiles(teleportTiles);
-    }
-
-    // Ninja teleporting
-    if (hero.unitType !== EHeroes.NINJA) return;
-
-    const friendlyUnitsOnBoard: Hero[] = [];
-    this.units.forEach(unit => {
-      if (hero.belongsTo === unit.belongsTo && !unit.isKO) friendlyUnitsOnBoard.push(unit);
-    });
-
-    if (friendlyUnitsOnBoard.length <= 1) return;
-
-    friendlyUnitsOnBoard.forEach(unit => {
-      unit.allyReticle.setVisible(true);
-    });
-  }
-
-  highlightEquipmentTargets(item: Item): void {
-    const tilesToHighlight: Tile[] = [];
-
-    this.units.forEach(hero => {
-      if (hero.belongsTo !== item.belongsTo) return;
-      if (hero instanceof Phantom) return;
-      if (hero.isAlreadyEquipped(item)) return;
-      if (item.canHeal && hero.isFullHP()) return;
-      if (item.canHeal && item instanceof ManaVial && hero.isKO) return;
-      if (!item.canHeal && hero.isKO) return;
-
-      tilesToHighlight.push(hero.getTile());
-    });
-
-    this.highlightTiles(tilesToHighlight);
-  }
-
-  highlightAllBoard() {
-    this.highlightTiles(this.tiles);
-  }
-
-  highlightTiles(tiles: Tile[]) {
-    tiles.forEach(tile => {
-      tile.setHighlight();
-    });
-  }
-
-  removeReticles(): void {
-    this.units.forEach(unit => {
-      unit.attackReticle.setVisible(false);
-      unit.blockedLOS.setVisible(false);
-
-      unit.healReticle.setVisible(false);
-      unit.allyReticle.setVisible(false);
-    });
-
-    this.crystals.forEach(crystal => {
-      crystal.attackReticle.setVisible(false);
-      crystal.blockedLOS.setVisible(false);
-    });
-  }
-
-  getHeroTilesInRange(hero: Hero, rangeType: ERange): Tile[] {
-    const heroTile = this.getTileFromBoardPosition(hero.boardPosition);
-    let range: number;
-
-    switch (rangeType) {
-      case ERange.MOVE:
-        range = hero.speedTile ? hero.movement + 2 : hero.movement;
-        break;
-
-      case ERange.ATTACK:
-        range = hero.attackRange;
-        break;
-
-      case ERange.HEAL:
-        range = hero.healingRange;
-        break;
-
-      default:
-        break;
-    }
-
-    if (!heroTile) {
-      console.error('No tile found - getTilesInRange');
-      return [];
-    }
-
-    const inRangeTiles = new Set<Tile>;
-
-    this.tiles.forEach(tile => {
-      const distance = getGridDistance(tile.row, tile.col, heroTile.row, heroTile.col);
+    this.tiles.forEach(row => row.forEach(tile => {
+      const distance = getGridDistance(
+        tile.boardPosition[0],
+        tile.boardPosition[1],
+        startPosition[0],
+        startPosition[1]
+      );
 
       if (distance <= range) {
-        if (
-          rangeType === ERange.MOVE &&
-          !isEnemySpawn(this.context, tile) &&
-          (!tile.hero || tile.hero.isKO) &&
-          !tile.crystal
-        ) inRangeTiles.add(tile);
-
-        if (rangeType === ERange.ATTACK || rangeType === ERange.HEAL) {
-          if (tile.crystal || tile.hero && tile.hero.unitId !== hero.unitId) inRangeTiles.add(tile);
-        }
+        inRangeTiles.add(tile)
       }
-    });
+    }));
 
-    return [...inRangeTiles];
+    
+    const tilesInRange: Tile[] = [...inRangeTiles];
+    if (!tilesInRange.length) return [];
+    return tilesInRange
   }
 
   getAreaOfEffectTiles(tile: Tile): Tile[] {
+    // TODO: replace usage with getTilesInRange with range of 1.5
     const totalRows = 4;
     const totalCols = 8;
     const areaTiles: Tile[] = [];
 
-    // Loop through the 3x3 square centered on the target tile
     for (let rowOffset = -1; rowOffset <= 1; rowOffset++) {
       for (let colOffset = -1; colOffset <= 1; colOffset++) {
-        const currentRow = tile.row + rowOffset;
-        const currentCol = tile.col + colOffset;
+        const currentRow = tile.boardPosition[0] + rowOffset;
+        const currentCol = tile.boardPosition[1] + colOffset;
 
-        // Check that the current tile is within the bounds of the map
         const isRowValid = currentRow >= 0 && currentRow <= totalRows;
         const isColValid = currentCol >= 0 && currentCol <= totalCols;
 
         if (isRowValid && isColValid) {
-          const aoeTile = this.getTileFromCoordinates(currentRow, currentCol);
+          const aoeTile = this.getTileFromBoardPosition([currentRow, currentCol]);
           areaTiles.push(aoeTile);
-        } else {
-          console.warn('Invalid tile coordinates skipped:', currentRow, currentCol);
         }
       }
     }
@@ -313,66 +166,43 @@ export class Board {
     return areaTiles;
   }
 
-  // Used for Wizard and VoidMonk's attacks
-  getAttackDirection(attackerBP: number, targetBP: number): number {
-    const distance =  targetBP - attackerBP;
+  getAttackDirection(attackerBP: [number, number], targetBP: [number, number]): number {
+    const attackerRow = attackerBP[0];
+    const attackerCol = attackerBP[1];
+    const targetRow = targetBP[0];
+    const targetCol = targetBP[1];
+
+    const rowDiff = targetRow - attackerRow;
+    const colDiff = targetCol - attackerCol;
 
     let direction: number;
 
-    switch (distance) {
-      case -27:
-      case -18:
-      case -9:
-        direction = 1; // up
-        break;
-      case -8:
-        direction = 2; // up-right
-        break;
-      case 1:
-      case 2:
-      case 3:
-        direction = 3; // right
-        break;
-      case 10:
-        direction = 4; // right-down
-        break;
-      case 9:
-      case 18:
-      case 27:
-        direction = 5; // down
-        break;
-      case 8:
-        direction = 6; // down-left
-        break;
-      case -1:
-      case -2:
-      case -3:
-        direction = 7; // left
-        break;
-      case -10:
-        direction = 8; // left-up
-        break;
-      default:
-        direction = 0; // starting point
-        break;
-    }
+    if (rowDiff < 0 && colDiff === 0) direction = 1;
+    else if (rowDiff < 0 && colDiff > 0) direction = 2;
+    else if (rowDiff === 0 && colDiff > 0) direction = 3;
+    else if (rowDiff > 0 && colDiff > 0) direction = 4;
+    else if (rowDiff > 0 && colDiff === 0) direction = 5;
+    else if (rowDiff > 0 && colDiff < 0) direction = 6;
+    else if (rowDiff === 0 && colDiff < 0) direction = 7;
+    else if (rowDiff < 0 && colDiff < 0) direction = 8;
+    else direction = 0;
 
     if (direction === 0) console.error(`getAttackDirection() No direction found between: ${attackerBP} and ${targetBP}`);
 
     return direction;
   }
 
-  hasLineOfSight(attacker: Hero, target: (Hero | Crystal)): boolean {
+  hasLineOfSight(attacker: Unit, target: Unit): boolean {
     if (this.isAdjacent(attacker, target)) return true;
 
-    if (attacker.row === target.row || attacker.col === target.col) {
+    if (attacker.boardPosition[0] === target.boardPosition[0] || attacker.boardPosition[1] === target.boardPosition[1]) {
       const attackDirection = this.getAttackDirection(attacker.boardPosition, target.boardPosition);
 
-      const attackDirectionOffsetMap: Record<string, number[]> = {
-        1: [-9, -18],
-        3: [1, 2],
-        5: [9, 18],
-        7: [-1, -2]
+      const attackDirectionOffsetMap: Record<string, [number, number][]> = {
+        '1': [[-1, 0], [-2, 0]],
+        '3': [[0, 1], [0, 2]],
+        '5': [[1, 0], [2, 0]],
+        '7': [[0, -1], [0, -2]]
       };
 
       const offsets = attackDirectionOffsetMap[attackDirection];
@@ -380,20 +210,19 @@ export class Board {
       if (!offsets) return true;
 
       for (const offset of offsets) {
-        const positionToCheck = attacker.boardPosition + offset; // should never be out of bounds
+        const positionToCheck: [number, number] = [attacker.boardPosition[0] + offset[0], attacker.boardPosition[1] + offset[1]];
 
-        if (positionToCheck === target.boardPosition) return true; // don't block self
+        if (positionToCheck[0] === target.boardPosition[0] && positionToCheck[1] === target.boardPosition[1]) continue;
 
+        // FIX: Now passing the array directly
         const tile = this.getTileFromBoardPosition(positionToCheck);
 
         if (
-          tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
-          tile.hero && !belongsToPlayer(this.context, tile.hero) && !tile.hero.isKO
+          tile.unit && !belongsToPlayer(this.context, tile.unit) && !tile.unit.isKO
         ) return false;
       }
     }
 
-    // Get the coordinates of the two tiles that can block the target
     const tileOffsetMap: Record<string, [number, number][]> = {
       '1, 2': [[0, 1], [1, 1]],
       '1, -2': [[0, -1], [1, -1]],
@@ -409,8 +238,8 @@ export class Board {
     };
 
     const getOffset = {
-      row: target.row - attacker.row,
-      col: target.col - attacker.col
+      row: target.boardPosition[0] - attacker.boardPosition[0],
+      col: target.boardPosition[1] - attacker.boardPosition[1],
     };
 
     const tileCoordKey = `${getOffset.row}, ${getOffset.col}`;
@@ -420,20 +249,20 @@ export class Board {
 
     if (offsetsToCheck && offsetsToCheck.length) {
       for (const offset of offsetsToCheck) {
-        const tileRow = attacker.row + offset[0];
-        const tileCol = attacker.col + offset[1];
+        const tileRow = attacker.boardPosition[0] + offset[0];
+        const tileCol = attacker.boardPosition[1] + offset[1];
 
         const isWrongRow = tileRow < 0 || tileRow > 4;
         const isWrongCol = tileCol < 0 || tileCol > 8;
         if (isWrongRow || isWrongCol) continue;
 
-        const tile = this.getTileFromCoordinates(tileRow, tileCol);
+        // FIX: Now passing the array directly
+        const tile = this.getTileFromBoardPosition([tileRow, tileCol]);
 
-        if (tile.boardPosition === target.boardPosition) return true; // don't block self
+        if (tile.boardPosition[0] === target.boardPosition[0] && tile.boardPosition[1] === target.boardPosition[1]) continue;
 
         if (
-          tile.crystal && !belongsToPlayer(this.context, tile.crystal) ||
-          tile.hero && !belongsToPlayer(this.context, tile.hero) && !tile.hero.isKO
+          tile.unit && !belongsToPlayer(this.context, tile.unit) && !tile.unit.isKO
         ) {
           result = false;
           break;
@@ -444,18 +273,17 @@ export class Board {
     return result !== false;
   }
 
-  // Includes diagonally adjacent
-  isAdjacent(hero: Hero, unitToCompare: Hero | Crystal): boolean {
-    const row = Math.abs(hero.row - unitToCompare.row);
-    const col = Math.abs(hero.col - unitToCompare.col);
+  isAdjacent(unit: Unit, unitToCompare: Unit): boolean {
+    const row = Math.abs(unit.boardPosition[0] - unitToCompare.boardPosition[0]);
+    const col = Math.abs(unit.boardPosition[1] - unitToCompare.boardPosition[1]);
 
     return col <= 1 && row <= 1 && !(row === 0 && col === 0);
   }
 
-  isOrthogonalAdjacent(hero: Hero, unitToCompare: Hero | Crystal): boolean {
-    const row = Math.abs(hero.row - unitToCompare.row);
-    const col = Math.abs(hero.col - unitToCompare.col);
+  isOrthogonalAdjacent(unit: Unit, unitToCompare: Unit): boolean {
+    const row = Math.abs(unit.boardPosition[0] - unitToCompare.boardPosition[0]);
+    const col = Math.abs(unit.boardPosition[1] - unitToCompare.boardPosition[1]);
 
-    return row === 1 && col === 0 || row === 0 && col === 1;
+    return (row === 1 && col === 0) || (row === 0 && col === 1);
   }
 }

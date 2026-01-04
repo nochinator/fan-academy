@@ -1,25 +1,25 @@
 import { sendTurnMessage } from "../colyseus/colyseusGameRoom";
-import { EActionClass, EActionType, EGameSounds, EGameStatus, EHeroes, ETiles, EUiSounds } from "../enums/gameEnums";
+import { EActionClass, EActionType, EGameSounds, EGameStatus, ETiles, EUiSounds } from "../enums/gameEnums";
 import { IGame, IGameOver, IGameState, IPlayerState, ITurnAction, IUserData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { replayButton } from "../scenes/gameSceneUtils/replayButton";
-import { createNewHero, createNewItem, forcedMoveAnimation, forcedMoveSpawnCheck, getActionClass, getNewPositionAfterForce, isHero, isItem, playSound, textAnimationSizeIncrease, visibleUnitCardCheck } from "../utils/gameUtils";
+import { createNewUnit, createNewItem, forcedMoveAnimation, forcedMoveSpawnCheck, getActionClass, getNewPositionAfterForce, isUnit, isItem, playSound, textAnimationSizeIncrease, visibleUnitCardCheck } from "../utils/gameUtils";
 import { deselectUnit, getPlayersKey } from "../utils/playerUtils";
 import { ActionPie } from "./actionPie";
 import { Board } from "./board";
 import { ConcedeWarningPopup } from "./concedePopup";
-import { Crystal } from "./crystal";
 import { Deck } from "./deck";
 import { Door } from "./door";
 import { GameOverScreen } from "./gameOverScreen";
 import { GameUI } from "./gameUI";
 import { Hand } from "./hand";
-import { Hero } from "./hero";
+import { Unit } from "./unit";
 import { Item } from "./item";
 import { RematchButton } from "./rematchButton";
 import { Tile } from "./tile";
 import { TurnButton } from "./turnButton";
 import { TurnWarningPopup } from "./turnPopup";
+import { Crystal } from "./crystal";
 
 export class GameController {
   context: GameScene;
@@ -48,13 +48,13 @@ export class GameController {
     if (context.triggerReplay && context.chatComponent) context.chatComponent!.pointerEvents = 'none';
 
     if (context.currentGame.status === EGameStatus.FINISHED && !context.triggerReplay){
-      const gameOverScreen =  new GameOverScreen(context);
+      const gameOverScreen = new GameOverScreen(context);
       gameOverScreen.init();
     }
 
     this.context = context;
     this.game = context.currentGame!;
-    this.lastTurnState =  context.currentGame.previousTurn[context.triggerReplay ? 0 : context.currentGame.previousTurn.length - 1];
+    this.lastTurnState = context.currentGame.previousTurn[context.triggerReplay ? 0 : context.currentGame.previousTurn.length - 1];
     this.board = new Board(context, this.lastTurnState.boardState);
 
     this.playerData = context.currentGame.players.map(player => { return player.userData;});
@@ -62,8 +62,8 @@ export class GameController {
     context.player1 = this.lastTurnState.player1;
     context.player2 = this.lastTurnState.player2;
 
-    this.deck  = new Deck(context);
-    this.hand = new Hand(context);
+    this.deck = new Deck(context);
+    this.hand = new Hand(context, this.board);
     this.actionPie = new ActionPie(context);
 
     this.turnButton = new TurnButton(context);
@@ -119,49 +119,51 @@ export class GameController {
   }
 
   async replayTurn() {
-    // Fake the opponent's hand if needed
-    const opponentHand: (Hero | Item)[] = [];
-    if (this.context.activePlayer === this.context.userId) {
-      const opponentData = this.context.isPlayerOne ? this.lastTurnState.player2 : this.lastTurnState.player1;
-
-      opponentData?.factionData.unitsInHand.forEach(unit => {
-        if (isHero(unit)) opponentHand.push(createNewHero(this.context, unit).setVisible(false).setInteractive(false));
-        if (isItem(unit)) opponentHand.push(createNewItem(this.context, unit).setVisible(false).setInteractive(false));
-      });
-    }
-
+    const opponentHand: (Unit | Item)[] = [];
+  
+    // Always reconstruct opponent's hand from viewer's POV (symmetric for both players)
+    const opponentData = this.context.isPlayerOne ? this.lastTurnState.player2 : this.lastTurnState.player1;
+  
+    opponentData?.factionData?.unitsInHand?.forEach(unit => {
+      if (isUnit(unit)) {
+        opponentHand.push(createNewUnit(this.context, unit).setVisible(false).setInteractive(false));
+      }
+      if (isItem(unit)) {
+        opponentHand.push(createNewItem(this.context, unit).setVisible(false).setInteractive(false));
+      }
+    });
+  
     for (let i = 1; i < this.context.currentGame.previousTurn.length; i++) {
       const turn = this.context.currentGame.previousTurn[i];
-
+  
       const actionsToIgnore = [EActionType.DRAW, EActionType.PASS];
       const actionTaken = turn.action?.action;
-
+  
       if (!actionTaken || actionsToIgnore.includes(actionTaken)) continue;
-
+  
       await new Promise<void>(resolve => {
         this.context.time.delayedCall(1000, async () => {
           if (
             actionTaken === EActionType.SPAWN ||
             actionTaken === EActionType.MOVE
-          ) this.replaySpawnOrMove(turn.action!, opponentHand);
-
+          ) await this.replaySpawnOrMove(turn.action!, opponentHand);
+  
           if (
             actionTaken === EActionType.ATTACK ||
-            actionTaken === EActionType.HEAL ||
             actionTaken === EActionType.SPECIAL
           ) await this.replayAttackHealSpecial(turn.action!);
-
+  
           if (actionTaken === EActionType.SHUFFLE) await this.replayShuffle();
-
+  
           if (actionTaken === EActionType.USE) await this.replayUse(turn.action!, opponentHand);
-
+  
           if (actionTaken === EActionType.REMOVE_UNITS) await this.removeKOUnits();
-
+  
           resolve();
         });
       });
     }
-
+  
     this.context.scene.restart({
       userId: this.context.userId,
       colyseusClient: this.context.colyseusClient,
@@ -169,49 +171,55 @@ export class GameController {
       currentRoom: this.context.currentRoom,
       triggerReplay: false,
       gameOver: undefined
-    } );
+    });
   }
 
-  replaySpawnOrMove(action: ITurnAction, opponentHand: (Hero | Item)[]): void {
+  async replaySpawnOrMove(action: ITurnAction, opponentHand: (Unit | Item)[]): Promise<void> {
     const actionTaken = action.action;
     const hand = opponentHand.length ? opponentHand : this.hand.hand;
 
-    const hero = actionTaken === EActionType.SPAWN ? hand.find(unit => unit.boardPosition === action.actorPosition) as Hero : this.board.units.find(unit => unit.boardPosition === action.actorPosition);
+    // Use a deep comparison for the board position array
+    const unit = actionTaken === EActionType.SPAWN ?
+      hand.find(unit => unit.boardPosition && unit.boardPosition[0] === action.actorPosition![0] && unit.boardPosition[1] === action.actorPosition![1]) as Unit :
+      this.board.units.find(unit => unit.boardPosition[0] === action.actorPosition![0] && unit.boardPosition[1] === action.actorPosition![1]);
 
     const tile = this.board.getTileFromBoardPosition(action.targetPosition!);
 
-    if (!hero || !tile) throw new Error('Missing hero or tile in spawn or move action');
+    if (!unit || !tile) throw new Error('Missing unit or tile in spawn or move action');
 
-    if (actionTaken === EActionType.MOVE) hero.move(tile);
-    if (actionTaken === EActionType.SPAWN) hero.setVisible(true).spawn(tile);
+    if (actionTaken === EActionType.MOVE) await unit.move(tile);
+    if (actionTaken === EActionType.SPAWN) unit.setVisible(true).spawn(tile);
   };
 
   async replayAttackHealSpecial(action: ITurnAction): Promise<void> {
-    const hero = this.board.units.find(unit => unit.boardPosition === action.actorPosition);
-    const target = this.board.crystals.find(crystal => crystal.boardPosition === action.targetPosition) ?? this.board.units.find(unit => unit.boardPosition === action.targetPosition);
-    if (!hero || !target) throw new Error('Missing hero or target in attack or heal action');
+    // Use a deep comparison for the board position array
+    const unit = this.board.units.find(unit => unit.boardPosition[0] === action.actorPosition![0] && unit.boardPosition[1] === action.actorPosition![1]);
+    const target = this.board.crystals.find(crystal => crystal.boardPosition[0] === action.targetPosition![0] && crystal.boardPosition[1] === action.targetPosition![1]) ?? this.board.units.find(unit => unit.boardPosition[0] === action.targetPosition![0] && unit.boardPosition[1] === action.targetPosition![1]);
+
+    if (!unit || !target) throw new Error('Missing unit or target in attack or heal action');
 
     // VSCode says await has no effect on them, but it does work
-    if (action.action === EActionType.HEAL) await hero.heal(target as Hero);
-    if (action.action === EActionType.SPECIAL) await hero.special(target as Hero);
+    if (action.action === EActionType.ATTACK) await unit.attack(target.getTile());
+    if (action.action === EActionType.SPECIAL) await unit.special(target.getTile());
   };
 
-  async replayUse(action: ITurnAction, opponentHand: (Hero | Item)[]): Promise<void> {
+  async replayUse(action: ITurnAction, opponentHand: (Unit | Item)[]): Promise<void> {
     const hand = opponentHand.length ? opponentHand : this.hand.hand;
 
-    const item = hand.find(item => item.boardPosition === action.actorPosition) as Item;
+    // Use a deep comparison for the board position array
+    const item = hand.find(item => item.boardPosition && item.boardPosition[0] === action.actorPosition![0] && item.boardPosition[1] === action.actorPosition![1]) as Item;
     if (!item) throw new Error('Missing item in use action');
 
     if (item.dealsDamage) {
       const tile = this.board.getTileFromBoardPosition(action.targetPosition!);
-      if (!item) throw new Error('Missing tile in use action');
+      if (!tile) throw new Error('Missing tile in use action');
       await item.use(tile);
     }
 
     if (!item.dealsDamage) {
-      const hero = this.board.units.find(unit => unit.boardPosition === action.targetPosition);
-      if (!hero) throw new Error('Missing target in use action');
-      await item.use(hero);
+      const unit = this.board.units.find(unit => unit.boardPosition[0] === action.targetPosition![0] && unit.boardPosition[1] === action.targetPosition![1]);
+      if (!unit) throw new Error('Missing target in use action');
+      await item.use(unit);
     }
   }
 
@@ -276,30 +284,28 @@ export class GameController {
   }
 
   async removeKOUnits() {
-    // Remove KO'd units from the board
-    const unitsToRemove: Hero[] = [];
+    const unitsToRemove: Unit[] = [];
 
     this.board.units.forEach(unit => {
       if (unit.isKO) {
         if (unit.lastBreath) unitsToRemove.push(unit);
         if (!unit.lastBreath) {
           unit.lastBreath = true;
-          unit.updateTileData();
         }
       }
     });
 
     if (unitsToRemove.length) {
       playSound(this.context, EGameSounds.VANISH);
-      const animation = (hero: Hero): Promise<void> => {
+      const animation = (unit: Unit): Promise<void> => {
         return new Promise((resolve) => {
           this.context.tweens.add({
-            targets: hero,
+            targets: unit,
             alpha: 0,
             duration: 500,
             ease: 'Linear',
             onComplete: () => {
-              hero.removeFromGame(true);
+              unit.removeFromGame(true);
               resolve();
             }
           });
@@ -311,7 +317,7 @@ export class GameController {
       }));
     }
 
-    this.addActionToState(EActionType.REMOVE_UNITS); // this step needs to happen every turn in order to update the tiles
+    this.addActionToState(EActionType.REMOVE_UNITS);
   }
 
   hasActionsLeft(): boolean {
@@ -321,15 +327,12 @@ export class GameController {
   }
 
   async endOfTurnActions(): Promise<void> {
-    // If a unit was currently selected, de-select it
     if (this.context.activeUnit) deselectUnit(this.context);
 
-    // Refresh actionPie, draw units and update door banner
     this.actionPie.resetActionPie();
     this.drawUnits();
     this.door.updateBannerText();
 
-    // Add the last action of the previous turn at index 0 of the actions array to serve as the base for the replay
     this.currentTurn.unshift(this.lastTurnState);
 
     this.context.activePlayer = this.context.opponentId;
@@ -348,47 +351,21 @@ export class GameController {
     }
   }
 
-  onHeroClicked(hero: Hero) {
-    console.log(`A hero in position ${hero.boardPosition} has been clicked`);
-    if (hero.boardPosition > 44) this.board.highlightSpawns(hero.unitType);
-
-    if (hero.boardPosition < 45) {
-      this.board.highlightEnemyTargets(hero);
-      this.board.highlightFriendlyTargets(hero);
-      this.board.highlightMovementArea(hero);
-
-      if (hero.unitType === EHeroes.NINJA || hero.getTile().tileType === ETiles.TELEPORTER) this.board.highlightTeleportOptions(hero);
-    }
-  }
-
-  onItemClicked(item: Item) {
-    console.log(`An item ${item.unitId} has been clicked`);
-    if (item.dealsDamage) {
-      this.board.highlightAllBoard();
-    } else {
-      this.board.highlightEquipmentTargets(item);
-    }
-  }
-
   onTileClicked(tile: Tile) {
     console.log(`A tile ${tile.tileType} has been clicked`);
   }
 
-  afterAction(actionType: EActionType, activePosition: number, targetPosition?: number): void {
-    // Don't trigger pie animation during replays
+  afterAction(actionType: EActionType, activePosition: [number, number], targetPosition?: [number, number]): void {
     if (this.context.triggerReplay) return;
 
-    // Add action to current state
     this.addActionToState(actionType, activePosition, targetPosition);
 
-    // Remove a slice from the action pie
     this.actionPie.hideActionSlice(this.context.currentTurnAction!++);
 
-    // Deselect unit and clear highlights
     if (this.context.activeUnit) deselectUnit(this.context);
   }
 
-  addActionToState(action: EActionType, actorPosition?: number, targetPosition?: number): void {
+  addActionToState(action: EActionType, actorPosition?: [number, number], targetPosition?: [number, number]): void {
     const { player, opponent } = getPlayersKey(this.context);
 
     const actionClass = getActionClass(action);
@@ -403,13 +380,13 @@ export class GameController {
     };
 
     const opponentState = this.context[opponent];
-    // Add action to current turn state
     this.currentTurn.push({
       player1: this.context.isPlayerOne ? playerState : opponentState!,
       player2: !this.context.isPlayerOne ? playerState : opponentState!,
       action: {
         actorPosition,
-        targetPosition: targetPosition ?? actorPosition,
+        // The target position is now explicitly passed as an array
+        targetPosition: targetPosition,
         action,
         actionClass
       },
@@ -417,7 +394,8 @@ export class GameController {
     });
   }
 
-  async pushEnemy(attacker: Hero | Crystal, target: Hero): Promise<void> {
+  async pushEnemy(attacker: Unit, target: Unit): Promise<void> {
+    if (target instanceof Crystal) return; // can't push crystals
     const attackerTile = this.board.getTileFromBoardPosition(attacker.boardPosition);
     const targetTile = this.board.getTileFromBoardPosition(target.boardPosition);
     if (!attackerTile || !targetTile) {
@@ -425,40 +403,47 @@ export class GameController {
       return;
     }
 
-    const newPosition = getNewPositionAfterForce(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col, true);
+    const attackerRow = attackerTile.boardPosition[0];
+    const attackerCol = attackerTile.boardPosition[1];
+    const targetRow = target.boardPosition[0];
+    const targetCol = target.boardPosition[1];
 
-    // If the tile is beyond the boundaries of the map, ignore
-    const isWrongRow = newPosition.row < 0 || newPosition.row > 4;
-    const isWrongCol = newPosition.col < 0 || newPosition.col > 8;
+    // This function returns a [row, col] tuple, which is the correct format for the new system.
+    const newPosition = getNewPositionAfterForce(attackerRow, attackerCol, targetRow, targetCol, true);
+
+    const isWrongRow = newPosition[0] < 0 || newPosition[0] > 4;
+    const isWrongCol = newPosition[1] < 0 || newPosition[1] > 8;
     if (isWrongRow || isWrongCol) {
       console.error('pushEnemy() Cant push enemy out of the map');
       return;
     }
 
-    const targetNewTile = this.board.getTileFromCoordinates(newPosition.row, newPosition.col);
+    const targetNewTile = this.board.getTileFromBoardPosition(newPosition);
     if (!targetNewTile) {
       console.error('pushEnemy() No destination tile found');
       return;
     }
-    if (targetNewTile.crystal || targetNewTile.hero) {
+    if (targetNewTile.unit) {
       console.error('pushEnemy() Destination tile is occupied');
       return;
     }
-    if (targetNewTile.tileType == ETiles.SPAWN && forcedMoveSpawnCheck(targetNewTile, target) && !target.isKO) {
+    if (targetNewTile.tileType === ETiles.SPAWN && forcedMoveSpawnCheck(targetNewTile, target) && !target.isKO) {
       console.error(`pushEnemy() Can't push a non-KO'd enemy onto a friendly spawn`);
       return;
     }
 
-    if (!target.isKO) target.specialTileCheck(targetNewTile, targetTile);
+    if (!target.isKO) target.specialTileCheck(targetNewTile);
 
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);
-    targetNewTile.hero = target.exportData();
-    targetTile.removeHero();
+    targetNewTile.unit = target;
+    targetTile.removeUnit();
   }
 
-  async pullEnemy(attacker: Hero, target: Hero): Promise<void> {
+  async pullEnemy(attacker: Unit, target: Unit): Promise<void> {
+    if (target instanceof Crystal) return; // can't pull crystals
+
     const attackerTile = this.board.getTileFromBoardPosition(attacker.boardPosition);
     const targetTile = this.board.getTileFromBoardPosition(target.boardPosition);
     if (!attackerTile || !targetTile) {
@@ -466,28 +451,34 @@ export class GameController {
       return;
     }
 
-    const newPosition = getNewPositionAfterForce(attackerTile.row, attackerTile.col, targetTile.row, targetTile.col, false);
+    const attackerRow = attackerTile.boardPosition[0];
+    const attackerCol = attackerTile.boardPosition[1];
+    const targetRow = attackerTile.boardPosition[0];
+    const targetCol = attackerTile.boardPosition[1];
 
-    const targetNewTile = this.board.getTileFromCoordinates(newPosition.row, newPosition.col);
+    // This function returns a [row, col] tuple, which is the correct format for the new system.
+    const newPosition = getNewPositionAfterForce(attackerRow, attackerCol, targetRow, targetCol, false);
+
+    const targetNewTile = this.board.getTileFromBoardPosition(newPosition);
     if (!targetNewTile) {
       console.error('pullEnemy() No destination tile found');
       return;
     }
-    if (targetNewTile.crystal || targetNewTile.hero) {
+    if (targetNewTile.unit) {
       console.error('pullEnemy() Destination tile is occupied');
       return;
     }
-    if (targetNewTile.tileType == ETiles.SPAWN && forcedMoveSpawnCheck(targetNewTile, attacker) && !target.isKO) {
+    if (targetNewTile.tileType === ETiles.SPAWN && forcedMoveSpawnCheck(targetNewTile, attacker) && !target.isKO) {
       console.error(`pushEnemy() Can't pull a non-KO'd enemy onto a friendly spawn`);
       return;
     }
 
-    if (!target.isKO) target.specialTileCheck(targetNewTile, targetTile);
+    if (!target.isKO) target.specialTileCheck(targetNewTile);
 
     await forcedMoveAnimation(this.context, target, targetNewTile);
 
     target.updatePosition(targetNewTile);
-    targetNewTile.hero = target.exportData();
-    targetTile.removeHero();
+    targetNewTile.unit = target;
+    targetTile.removeUnit();
   }
 }

@@ -1,5 +1,5 @@
 import { EClass, EUiSounds } from "../enums/gameEnums";
-import { IHero, IItem } from "../interfaces/gameInterface";
+import { IUnitData, IItemData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { playSound } from "../utils/gameUtils";
 
@@ -39,14 +39,14 @@ export class DeckPopup extends Phaser.GameObjects.Container {
     context.add.existing(this);
   }
 
-  showDeckContents(deck: (IHero | IItem)[]) {
+  showDeckContents(deck: (IUnitData | IItemData)[]) {
   // Clear old card images
     this.cardImages.forEach(img => img.destroy());
     this.cardImages = [];
 
     // Sort deck: heroes first, then alphabetically
     const classOrder = {
-      [EClass.HERO]: 0,
+      [EClass.UNIT]: 0,
       [EClass.ITEM]: 1
     };
 
@@ -87,10 +87,10 @@ export class DeckPopup extends Phaser.GameObjects.Container {
       const y = startY + row * spacingY;
 
       let imageKey: string;
-      if (card.class === EClass.HERO) {
-        imageKey = `${(card as IHero).unitType}CardPic`;
+      if (card.class === EClass.UNIT) {
+        imageKey = `${(card as IUnitData).type}CardPic`;
       } else {
-        imageKey = `${(card as IItem).itemType}CardPic`;
+        imageKey = `${(card as IItemData).itemType}CardPic`;
       }
 
       const cardImage = this.context.add.image(x, y, imageKey)

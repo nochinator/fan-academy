@@ -15,8 +15,8 @@ export class TurnButton {
 
         console.log('Clicked on send turn');
 
-        if (context.gameController!.hasActionsLeft()) {
-          context.gameController!.turnPopup.setVisible(true);
+        if (context.gameController.hasActionsLeft()) {
+          context.gameController.turnPopup.setVisible(true);
           return;
         }
 
@@ -26,7 +26,7 @@ export class TurnButton {
   }
 
   async handleSendingTurn(): Promise<void> {
-    const gameController = this.context.gameController!;
+    const gameController = this.context.gameController;
     if (this.context.currentTurnAction === 1) gameController.addActionToState(EActionType.PASS);
 
     // Remove KO'd units before end of turn actions to handle a possible game over

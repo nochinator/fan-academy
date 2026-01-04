@@ -1,4 +1,4 @@
-import { EHeroes, EItems } from "../../enums/gameEnums";
+import { EUnitTypes, EItems } from "../../enums/gameEnums";
 import GameScene from "../game.scene";
 import { CDN_PATH } from "../preloader.scene";
 
@@ -91,7 +91,7 @@ export function loadGameAssets(context: GameScene) {
     context.load.image(`${asset}CardPic`, `${CDN_PATH}/images/profilePics/${asset}_v1-hd.webp`); // Unit picture for its unit card
   });
   darkElvesArray.forEach(asset => {
-    if (asset !== EHeroes.PHANTOM) {
+    if (asset !== EUnitTypes.PHANTOM) {
       for (let i = 1; i <= 9; i++) {
         context.load.image(`${asset}_${i}`, `${CDN_PATH}/images/factions/darkElves/${asset}/${asset}_${i}.webp`);
       }
@@ -176,9 +176,11 @@ export function loadGameAssets(context: GameScene) {
   // UI audio
   context.load.audio('resignSound', `${CDN_PATH}/audio/ui/resignGame.mp3`);
   context.load.audio('resetTurnSound', `${CDN_PATH}/audio/ui/turnReset.mp3`);
+  context.load.audio('backgroundTune', `${CDN_PATH}/audio/game/Amb_Field_LP.mp3`)
 
   // Generic game sounds
   context.load.audio('selectHeroFromHandSound', `${CDN_PATH}/audio/game/Game_Pickup_CharacterTile_Generic.mp3`);
+  context.load.audio('thinkingTune', `${CDN_PATH}/audio/game/Game_Ponder_LP.mp3`)
   context.load.audio('selectHeroFromBoardSound', `${CDN_PATH}/audio/game/Game_Select_Character.mp3`);
   context.load.audio('spawnHeroSound', `${CDN_PATH}/audio/game/Game_Place_CharacterTile.mp3`);
   context.load.audio('moveHeroSound', `${CDN_PATH}/audio/game/Game_Release_ToMove_Character.mp3`);

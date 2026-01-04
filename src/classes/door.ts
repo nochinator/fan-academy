@@ -1,6 +1,6 @@
 import { EActionType, EGameSounds } from "../enums/gameEnums";
 import GameScene from "../scenes/game.scene";
-import { isInHand, playSound } from "../utils/gameUtils";
+import { playSound } from "../utils/gameUtils";
 import { getCurrentPlayer } from "../utils/playerUtils";
 
 export class Door extends Phaser.GameObjects.Container {
@@ -31,14 +31,14 @@ export class Door extends Phaser.GameObjects.Container {
     this.setSize(70, 100).setInteractive({ useHandCursor: true });
 
     this.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.button === 0 && context.activeUnit && isInHand(context.activeUnit.boardPosition)) {
+      if (pointer.button === 0 && context.activeUnit && context.activeUnit.boardPosition >= 45) {
         playSound(this.scene, EGameSounds.SHUFFLE);
 
         const activePosition = context.activeUnit.boardPosition;
         context.activeUnit.shuffleInDeck();
 
         // Add action to state
-        context.gameController?.afterAction(EActionType.SHUFFLE, activePosition, 51);
+        context.gameController.afterAction(EActionType.SHUFFLE, activePosition, 51);
 
         this.updateBannerText();
       }
@@ -48,7 +48,7 @@ export class Door extends Phaser.GameObjects.Container {
   }
 
   updateBannerText(): void {
-    const deckSize: number = this.context.gameController?.deck.getDeckSize() ?? 0;
+    const deckSize: number = this.context.gameController.deck.getDeckSize() ?? 0;
 
     this.bannerText.setText(deckSize.toString());
   }

@@ -1,10 +1,9 @@
-import { EAttackType, EHeroes } from "../enums/gameEnums";
-import { IHero } from "../interfaces/gameInterface";
+import { EAttackType, EEffect, EUnitTypes } from "../enums/gameEnums";
+import { IUnitData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { capitalize, getCardText, roundToFive } from "../utils/gameUtils";
-import { Hero } from "./hero";
 
-export class HeroCard extends Phaser.GameObjects.Container {
+export class UnitCard extends Phaser.GameObjects.Container {
   cardBackgroundImage: Phaser.GameObjects.Image;
   unitPictureImage: Phaser.GameObjects.Image;
   cardSeparatorImage: Phaser.GameObjects.Image;
@@ -21,7 +20,7 @@ export class HeroCard extends Phaser.GameObjects.Container {
 
   context: GameScene;
   attackType: EAttackType;
-  unitType: EHeroes;
+  unitType: EUnitTypes;
 
   currentHpText: Phaser.GameObjects.Text;
   powerText: Phaser.GameObjects.Text;
@@ -32,20 +31,20 @@ export class HeroCard extends Phaser.GameObjects.Container {
   cardNameText: Phaser.GameObjects.Text;
   rangeText: Phaser.GameObjects.Text;
 
-  constructor(context: GameScene, data: IHero & { currentPower: number }) {
-    const cardY = data.boardPosition > 44 ? -200 : 0;
+  constructor(context: GameScene, data: IUnitData & { currentPower: number }) {
+    const cardY = data.boardPosition[0] === -1 ? -200 : 0;
     super(context, 0, cardY);
     this.context = context;
     this.attackType = data.attackType;
-    this.unitType = data.unitType;
+    this.unitType = data.type;
 
     // Background, unit image, name and type, and separator
     this.cardBackgroundImage = context.add.image(10, 10, 'cardBackground');
-    this.unitPictureImage = context.add.image(-130, -140, `${data.unitType}CardPic`).setOrigin(0.5).setScale(0.4);
+    this.unitPictureImage = context.add.image(-130, -140, `${data.type}CardPic`).setOrigin(0.5).setScale(0.4);
     this.cardSeparatorImage = context.add.image(50, -100, 'cardSeparator').setOrigin(0.5).setScale(1.3);
 
-    const { cardText, cardType } = getCardText(data.unitType);
-    this.cardNameText = this.context.add.text(55, -170, capitalize(data.unitType), {
+    const { cardText, cardType } = getCardText(data.type);
+    this.cardNameText = this.context.add.text(55, -170, capitalize(data.type), {
       fontFamily: "proLight",
       fontSize: 50,
       color: '#ffffff'
@@ -75,7 +74,7 @@ export class HeroCard extends Phaser.GameObjects.Container {
     this.powerText = this.context.add.text(-40, -15, `${data.currentPower} ${data.attackType}`, {
       fontFamily: "proLight",
       fontSize: 35,
-      color: this.getTextColor(data.currentPower, data.basePower)
+      color: this.getTextColor(data.currentPower, data.currentPower)
     }).setOrigin(0.5);
 
     // Resistances
@@ -83,14 +82,14 @@ export class HeroCard extends Phaser.GameObjects.Container {
     this.magicalResistanceText = this.context.add.text(100, 30, `${data.magicalDamageResistance} %`, {
       fontFamily: "proLight",
       fontSize: 35,
-      color: this.getTextColor(data.magicalDamageResistance, data.baseMagicalDamageResistance)
+      color: this.getTextColor(data.magicalDamageResistance, data.magicalDamageResistance)
     }).setOrigin(0.5);
 
     this.physicalResistanceImage = context.add.image(-150, 30, 'physicalResistance').setOrigin(0.5);
     this.physicalResistanceText = this.context.add.text(-85, 30, `${data.physicalDamageResistance} %`, {
       fontFamily: "proLight",
       fontSize: 35,
-      color: this.getTextColor(data.physicalDamageResistance, data.basePhysicalDamageResistance)
+      color: this.getTextColor(data.physicalDamageResistance, data.physicalDamageResistance)
     }).setOrigin(0.5);
 
     // Range
@@ -161,40 +160,41 @@ export class HeroCard extends Phaser.GameObjects.Container {
     return currentNumber > baseNumber ? '#00FF00' : currentNumber < baseNumber ? '#ff0000' : '#ffffff';
   }
 
-  updateCardData(hero: Hero): void {
-    this.updateCardPower(hero);
-    this.updateCardPhysicalResistance(hero);
-    this.updateCardMagicalResistance(hero);
-    this.updateCardHealth(hero);
+  updateCardData(data: IUnitData & { currentPower: number }): void {
+    this.updateCardPower(data);
+    this.updateCardPhysicalResistance(data);
+    this.updateCardMagicalResistance(data);
+    this.updateCardHealth(data);
   }
 
-  updateCardPower(hero: Hero): void {
-    const totalPow = hero.getTotalPower();
+  updateCardPower(data: IUnitData & { currentPower: number }): void {
+    const totalPow = data.currentPower; // Use currentPower from data
     this.powerText.setText(`${roundToFive(totalPow)} ${this.attackType}`);
 
-    const basePower = hero.unitType === EHeroes.WRAITH ? 250 : hero.basePower;
+    const basePower = data.type === EUnitTypes.WRAITH ? 250 : data.currentPower;
 
-    if (hero.priestessDebuff) {
+    const hasPriestessDebuff = data.effects?.some(effect => effect.name === EEffect.PRIESTESS_DEBUFF);
+    if (hasPriestessDebuff) {
       this.powerText.setColor('#ff0000');
     } else {
       this.powerText.setColor(this.getTextColor(totalPow, basePower));
     }
   }
 
-  updateCardPhysicalResistance(hero: Hero): void {
-    this.physicalResistanceText.setText(`${roundToFive(hero.physicalDamageResistance)} %`);
-    this.physicalResistanceText.setColor(this.getTextColor(hero.physicalDamageResistance, hero.basePhysicalDamageResistance));
+  updateCardPhysicalResistance(data: IUnitData): void {
+    this.physicalResistanceText.setText(`${roundToFive(data.physicalDamageResistance)} %`);
+    this.physicalResistanceText.setColor(this.getTextColor(data.physicalDamageResistance, data.physicalDamageResistance));
   }
 
-  updateCardMagicalResistance(hero: Hero): void {
-    this.magicalResistanceText.setText(`${roundToFive(hero.magicalDamageResistance)} %`);
-    this.magicalResistanceText.setColor(this.getTextColor(hero.magicalDamageResistance, hero.baseMagicalDamageResistance));
+  updateCardMagicalResistance(data: IUnitData): void {
+    this.magicalResistanceText.setText(`${roundToFive(data.magicalDamageResistance)} %`);
+    this.magicalResistanceText.setColor(this.getTextColor(data.magicalDamageResistance, data.magicalDamageResistance));
   }
 
-  updateCardHealth(hero: Hero ): void {
-    this.currentHpText.setText(`${roundToFive(hero.currentHealth)}/${hero.maxHealth}`);
-    this.currentHpText.setColor(this.getTextColor(hero.maxHealth, hero.baseHealth));
-    this.setHealthBar(hero.currentHealth, hero.maxHealth);
+  updateCardHealth(data: IUnitData ): void {
+    this.currentHpText.setText(`${roundToFive(data.currentHealth)}/${data.maxHealth}`);
+    this.currentHpText.setColor(this.getTextColor(data.maxHealth, data.baseHealth));
+    this.setHealthBar(data.currentHealth, data.maxHealth);
   }
 
   setHealthBar(currentHealth: number, maxHealth: number) {

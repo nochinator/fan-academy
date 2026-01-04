@@ -1,48 +1,44 @@
-import { EActionType, EAttackType, EGameSounds, EHeroes } from "../enums/gameEnums";
-import { IHero, IItem } from "../interfaces/gameInterface";
+import { EActionType, EAttackType, EEffect, EGameSounds, EItems, EReticle, EUnitEvent, EUnitTypes } from "../enums/gameEnums";
+import { IUnitData, IItemData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
-import { canBeAttacked, getAOETiles, isEnemySpawn, isOnBoard, playSound, turnIfBehind, useAnimation } from "../utils/gameUtils";
+import { canBeAttacked, getAOETiles, isEnemySpawn, playSound, turnIfBehind, useAnimation } from "../utils/gameUtils";
 import { Board } from "./board";
 import { Crystal } from "./crystal";
-import { Hero } from "./hero";
+import { Unit } from "./unit";
 import { Item } from "./item";
 import { Tile } from "./tile";
+import * as effects from "./effects"
 
-export abstract class Human extends Hero {
-  constructor(context: GameScene, data: IHero, tile?: Tile) {
+export abstract class Human extends Unit {
+  constructor(context: GameScene, data: IUnitData, tile?: Tile) {
     super(context, data, tile);
   }
 
   equipFactionBuff(handPosition: number): void {
-    playSound(this.scene, EGameSounds.DRAGON_SCALE_USE);
-
     const dragonScaleImg = this.scene.add.image(this.x + 10, this.y - 10, 'dragonScale').setOrigin(0.5).setDepth(100);
     useAnimation(dragonScaleImg);
 
-    this.factionBuff = true;
-    this.factionBuffImage.setVisible(true);
-    this.characterImage.setTexture(this.updateCharacterImage());
+    this.applyEffect(new effects.DragonScaleEquipment(this.context, this));
 
-    this.physicalDamageResistance += 20;
-
-    this.increaseMaxHealth(this.baseHealth * 0.1);
-
-    this.unitCard.updateCardData(this);
-    this.updateTileData();
-
-    this.scene.sound.play(EGameSounds.DRAGON_SCALE_USE);
-
-    this.context.gameController!.afterAction(EActionType.USE, handPosition, this.boardPosition);
+    this.context.gameController.afterAction(EActionType.USE, [-1, handPosition], this.boardPosition);
   }
 }
 
 export class Archer extends Human {
-  constructor(context: GameScene, data: IHero, tile?: Tile) {
+  constructor(context: GameScene, data: IUnitData, tile?: Tile) {
     super(context, data, tile);
   }
 
-  attack(target: Hero | Crystal): void {
+  attack(targetTile: Tile): void {
+    const target = targetTile.unit;
+    if (target == undefined) {
+      console.error("NO UNIT FOUND ON TARGET TILE WHEN ATTACKING");
+      return;
+    }
+
     this.flashActingUnit();
+
+    this.effectEvent(EUnitEvent.ATTACK);
 
     const distance = this.getDistanceToTarget(target);
 
@@ -51,7 +47,7 @@ export class Archer extends Human {
     if (distance === 1) {
       // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
       if (
-        target instanceof Hero &&
+        target instanceof Unit &&
         target.isKO &&
         isEnemySpawn(this.context, target.getTile())
       ) {
@@ -62,71 +58,73 @@ export class Archer extends Human {
         playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
 
         target.getsDamaged(this.getTotalPower(0.5), this.attackType);
-        this.removeAttackModifiers();
       }
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK_BIG);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.ARCHER_ATTACK);
+      if (this.hasEffect(EEffect.SUPERCHARGED_BUFF)) playSound(this.scene, EGameSounds.ARCHER_ATTACK_BIG)
+      else playSound(this.scene, EGameSounds.ARCHER_ATTACK);
 
       target.getsDamaged(this.getTotalPower(), this.attackType);
-      this.removeAttackModifiers();
     }
 
 
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    this.context.gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
-
-  heal(_target: Hero): void { };
-  special(_target: Hero): void { };
 }
 
 export class Knight extends Human {
-  constructor(context: GameScene, data: IHero, tile?: Tile) {
+  constructor(context: GameScene, data: IUnitData, tile?: Tile) {
     super(context, data, tile);
   }
 
-  async attack(target: Hero | Crystal): Promise<void> {
-    this.flashActingUnit();
+  attack(targetTile: Tile): void {
+    const target = targetTile.unit;
+    if (target == undefined) {
+      console.error("NO UNIT FOUND ON TARGET TILE WHEN ATTACKING");
+      return;
+    }    this.flashActingUnit();
 
-    const gameController = this.context.gameController!;
+    this.effectEvent(EUnitEvent.ATTACK);
+
+    const gameController = this.context.gameController;
     turnIfBehind(this.context, this, target);
 
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
-      target instanceof Hero &&
+      target instanceof Unit &&
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
       playSound(this.scene, EGameSounds.KNIGHT_ATTACK);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.KNIGHT_ATTACK_BIG);
-      if (!this.superCharge)playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
+      if (this.hasEffect(EEffect.SUPERCHARGED_BUFF)) playSound(this.scene, EGameSounds.KNIGHT_ATTACK_BIG);
+      else playSound(this.scene, EGameSounds.ARCHER_ATTACK_MELEE);
 
       target.getsDamaged(this.getTotalPower(), this.attackType);
 
-      if (target instanceof Hero && target.unitType !== EHeroes.PHANTOM) gameController.pushEnemy(this, target);
-
-      this.removeAttackModifiers();
+      if (target instanceof Unit && target.type !== EUnitTypes.PHANTOM) gameController.pushEnemy(this, target);
     }
 
-
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    this.context.gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
-
-  heal(_target: Hero): void { };
-  special(_target: Hero): void { };
 }
 
 export class Wizard extends Human {
-  constructor(context: GameScene, data: IHero, tile?: Tile) {
+  constructor(context: GameScene, data: IUnitData, tile?: Tile) {
     super(context, data, tile);
   }
 
-  attack(target: Hero | Crystal): void {
+    attack(targetTile: Tile): void {
+    const target = targetTile.unit;
+    if (target == undefined) {
+      console.error("NO UNIT FOUND ON TARGET TILE WHEN ATTACKING");
+      return;
+    }
     this.flashActingUnit();
 
-    const gameController = this.context.gameController!;
+    this.effectEvent(EUnitEvent.ATTACK);
+
+    const gameController = this.context.gameController;
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
@@ -134,15 +132,15 @@ export class Wizard extends Human {
     // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
     if (
       distance === 1 &&
-      target instanceof Hero &&
+      target instanceof Unit &&
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
       playSound(this.scene, EGameSounds.WIZARD_ATTACK);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK_BIG);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.WIZARD_ATTACK);
+      if (this.hasEffect(EEffect.SUPERCHARGED_BUFF)) playSound(this.scene, EGameSounds.WIZARD_ATTACK_BIG);
+      else playSound(this.scene, EGameSounds.WIZARD_ATTACK);
 
       // Get directions for finding out the next targets
       const attackDirection = gameController.board.getAttackDirection(this.boardPosition, target.boardPosition);
@@ -150,25 +148,23 @@ export class Wizard extends Human {
 
       // Collect all targets
       const secondTarget = this.getNextTarget(target, attackDirection, opponentDirection, gameController.board, false);
-      let thirdTarget: Hero | Crystal | undefined;
+      let thirdTarget: Unit | undefined;
       if (secondTarget) thirdTarget = this.getNextTarget(secondTarget, attackDirection, opponentDirection, gameController.board, false, [target.boardPosition, secondTarget.boardPosition]);
 
       // Apply damage to targets
       target.getsDamaged(this.getTotalPower(), this.attackType);
-      if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType, 0.75);
-      if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType, 0.56);
+      if (secondTarget) secondTarget.getsDamaged(this.getTotalPower() * 0.75, this.attackType);
+      if (thirdTarget) thirdTarget.getsDamaged(this.getTotalPower() * 0.56, this.attackType);
 
-      if (target && target instanceof Hero && target.isKO && target.unitType === EHeroes.PHANTOM) target.removeFromGame();
-      if (secondTarget && secondTarget instanceof Hero && secondTarget.isKO && secondTarget.unitType === EHeroes.PHANTOM) secondTarget.removeFromGame();
-      if (thirdTarget && thirdTarget instanceof Hero && thirdTarget.isKO && thirdTarget.unitType === EHeroes.PHANTOM) thirdTarget.removeFromGame();
-
-      this.removeAttackModifiers();
+      if (target && target instanceof Unit && target.isKO && target.type === EUnitTypes.PHANTOM) target.removeFromGame();
+      if (secondTarget && secondTarget instanceof Unit && secondTarget.isKO && secondTarget.type === EUnitTypes.PHANTOM) secondTarget.removeFromGame();
+      if (thirdTarget && thirdTarget instanceof Unit && thirdTarget.isKO && thirdTarget.type === EUnitTypes.PHANTOM) thirdTarget.removeFromGame();
     }
 
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    this.context.gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  getNextTarget(target: Hero | Crystal, attackDirection: number, opponentDirection: number[], board: Board, isLastTarget: boolean, toIgnore?: number[]): Hero | Crystal | undefined {
+  getNextTarget(target: Unit, attackDirection: number, opponentDirection: number[], board: Board, isLastTarget: boolean, toIgnore?: [number, number][]): Unit | undefined {
     const positionsToIgnore = toIgnore ? toIgnore : [target.boardPosition];
     const adjacentEnemies = this.getAdjacentEnemyTiles(target.boardPosition, positionsToIgnore);
 
@@ -213,38 +209,41 @@ export class Wizard extends Human {
       return undefined;
     }
 
-    if (bestTarget.hero) {
-      const hero = board.units.find(unit => unit.unitId === bestTarget.hero!.unitId);
-      if (hero) return hero;
+    if (bestTarget.unit) {
+      const unit = board.units.find(unit => unit.unitId === bestTarget.unit!.unitId);
+      if (unit) return unit;
     }
 
-    if (bestTarget.crystal) {
-      const crystal = board.crystals.find(c => c.boardPosition === bestTarget.crystal!.boardPosition);
-      if (crystal) return crystal;
-    }
-
-    throw new Error("getNextTarget() Target found on tile, but not in board units or crystals");
+    throw new Error("getNextTarget() Target found on tile, but not in board units");
   }
 
-  getAdjacentEnemyTiles(boardPosition: number, ignorePosition: number[] = []): Tile[] {
-    const adjacentOffsets = [-10, -9, -8, -1, +1, +8, +9, +10];
-    const leftOffset = [-10, -1, +8];
-    const rightOffset = [+10, +1, -8];
+  getAdjacentEnemyTiles(boardPosition: [number, number], ignorePosition: [number, number][] = []): Tile[] {
     const adjacentTiles: Tile[] = [];
     const boardWidth = 9;
+    const boardHeight = 5;
 
-    const isOnLeftEdge = boardPosition % boardWidth === 0;
-    const isOnRightEdge = (boardPosition + 1) % boardWidth === 0;
+    const [row, col] = boardPosition;
 
-    for (const offset of adjacentOffsets) {
-      if (isOnLeftEdge && leftOffset.includes(offset) ||
-          isOnRightEdge && rightOffset.includes(offset)) continue;
+    for (let rowOffset = -1; rowOffset <= 1; rowOffset++) {
+      for (let colOffset = -1; colOffset <= 1; colOffset++) {
+        // Skip the center tile (the unit's own position)
+        if (rowOffset === 0 && colOffset === 0) continue;
 
-      const tilePosition = boardPosition + offset;
+        const newRow = row + rowOffset;
+        const newCol = col + colOffset;
 
-      if (isOnBoard(tilePosition) && !ignorePosition.includes(tilePosition)) {
-        const tile = this.context.gameController!.board.getTileFromBoardPosition(tilePosition);
-        if (canBeAttacked(this, tile)) adjacentTiles.push(tile);
+        // Check if the new coordinates are within the board boundaries
+        if (newRow >= 0 && newRow < boardHeight && newCol >= 0 && newCol < boardWidth) {
+          const newPosition: [number, number] = [newRow, newCol];
+          // Check if the new position is in the ignore list
+          const isIgnored = ignorePosition.some(pos => pos[0] === newRow && pos[1] === newCol);
+          if (!isIgnored) {
+            const tile = this.context.gameController.board.getTileFromBoardPosition(newPosition);
+            if (canBeAttacked(this, tile)) {
+              adjacentTiles.push(tile);
+            }
+          }
+        }
       }
     }
     return adjacentTiles;
@@ -263,32 +262,36 @@ export class Wizard extends Human {
       default: return [];
     }
   }
-
-  heal(_target: Hero): void { };
-  special(_target: Hero): void { };
 }
 
 export class Ninja extends Human {
-  constructor(context: GameScene, data: IHero, tile?: Tile) {
+  constructor(context: GameScene, data: IUnitData, tile?: Tile) {
     super(context, data, tile);
   }
 
-  attack(target: Hero | Crystal): void {
+    attack(targetTile: Tile): void {
+    const target = targetTile.unit;
+    if (target == undefined) {
+      console.error("NO UNIT FOUND ON TARGET TILE WHEN ATTACKING");
+      return;
+    }
     this.flashActingUnit();
+
+    this.effectEvent(EUnitEvent.ATTACK);
 
     turnIfBehind(this.context, this, target);
 
     const distance = this.getDistanceToTarget(target);
 
     const ninjaAttackSound = () => {
-      if (this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK_BIG);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.NINJA_ATTACK);
+      if (this.hasEffect(EEffect.SUPERCHARGED_BUFF)) playSound(this.scene, EGameSounds.NINJA_ATTACK_BIG);
+      else playSound(this.scene, EGameSounds.NINJA_ATTACK);
     };
 
     if (distance === 1) {
       // Check required for the very specific case of being orthogonally adjacent to a KO'd enemy unit on an enemy spawn
       if (
-        target instanceof Hero &&
+        target instanceof Unit &&
         target.isKO &&
         isEnemySpawn(this.context, target.getTile())
       ) {
@@ -297,18 +300,21 @@ export class Ninja extends Human {
       } else {
         ninjaAttackSound();
         target.getsDamaged(this.getTotalPower(2), this.attackType);
-        this.removeAttackModifiers();
       }
     } else {
       ninjaAttackSound();
       target.getsDamaged(this.getTotalPower(), this.attackType);
-      this.removeAttackModifiers();
     }
 
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    this.context.gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  special(target: Hero): void {
+  special(targetTile: Tile): void {
+    const target = targetTile.unit;
+    if (target == undefined) {
+      console.error("NO UNIT FOUND ON TARGET TILE WHEN ATTACKING");
+      return;
+    }
     playSound(this.scene, EGameSounds.NINJA_SMOKE);
     const targetDestination = this.getTile();
     const unitDestination = target.getTile();
@@ -317,27 +323,50 @@ export class Ninja extends Human {
     this.singleTween(this.smokeAnim!, 500);
     target.singleTween(target.smokeAnim!, 500);
 
-    target.specialTileCheck(targetDestination, unitDestination);
+    this.effectEvent(EUnitEvent.SPECIAL);
+
+    target.specialTileCheck(targetDestination);
     target.updatePosition(targetDestination);
-    targetDestination.hero = target.exportData();
+    targetDestination.unit = target;
 
-    this.specialTileCheck(unitDestination, targetDestination);
+    this.specialTileCheck(unitDestination);
     this.updatePosition(unitDestination);
-    unitDestination.hero = this.exportData();
+    unitDestination.unit = this;
 
-    this.context.gameController!.afterAction(EActionType.SPECIAL, targetDestination.boardPosition, unitDestination.boardPosition);
+    this.context.gameController.afterAction(EActionType.SPECIAL, targetDestination.boardPosition, unitDestination.boardPosition);
   };
 
-  heal(_target: Hero): void {};
+  _calculateActionTiles(): { moveTiles: Tile[], attackTiles: Tile[], LOSBlocked: Tile[], specialTiles: Tile[] } {
+    const board = this.context.gameController.board;
+    const moveTiles = board.getTilesInRange(this.boardPosition, this.movement).filter(tile => !tile.unit);
+    const [attackTiles, LOSBlocked] = board.getUnitsInRange(this, this.attackRange, true);
+    // teleport
+    let specialTiles: Tile[] = []
+    board.tiles.forEach(row => row.forEach(tile => {
+      if (tile.unit?.belongsTo === this.belongsTo) {
+        specialTiles.push(tile);
+      }
+    }));
+
+    return { moveTiles, attackTiles, LOSBlocked, specialTiles };
+  }
 }
 
 export class Cleric extends Human {
-  constructor(context: GameScene, data: IHero, tile?: Tile) {
+  constructor(context: GameScene, data: IUnitData, tile?: Tile) {
     super(context, data, tile);
+    this.specialReticle = EReticle.HEAL;
   }
 
-  attack(target: Hero | Crystal): void {
+    attack(targetTile: Tile): void {
+    const target = targetTile.unit;
+    if (target == undefined) {
+      console.error("NO UNIT FOUND ON TARGET TILE WHEN ATTACKING");
+      return;
+    }
     this.flashActingUnit();
+
+    this.effectEvent(EUnitEvent.ATTACK);
 
     turnIfBehind(this.context, this, target);
 
@@ -345,29 +374,35 @@ export class Cleric extends Human {
 
     if (
       distance === 1 &&
-      target instanceof Hero &&
+      target instanceof Unit &&
       target.isKO &&
       isEnemySpawn(this.context, target.getTile())
     ) {
-      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK);
+      playSound(this.scene, EGameSounds.CLERIC_ATTACK);
       target.removeFromGame();
     } else {
-      if (this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK_BIG);
-      if (!this.superCharge) playSound(this.scene, EGameSounds.CLERIC_ATTACK);
+      if (this.hasEffect(EEffect.SUPERCHARGED_BUFF)) playSound(this.scene, EGameSounds.CLERIC_ATTACK_BIG);
+      else playSound(this.scene, EGameSounds.CLERIC_ATTACK);
       target.getsDamaged(this.getTotalPower(), this.attackType);
-      this.removeAttackModifiers();
     }
 
-    this.context.gameController!.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
+    this.context.gameController.afterAction(EActionType.ATTACK, this.boardPosition, target.boardPosition);
   }
 
-  heal(target: Hero): void {
+  special(targetTile: Tile): void {
+    const target = targetTile.unit;
+    if (target == undefined) {
+      console.error("NO UNIT FOUND ON TARGET TILE WHEN ATTACKING");
+      return;
+    }
     this.flashActingUnit();
 
-    if (!this.superCharge) playSound(this.scene, EGameSounds.HEAL);
-    if (this.superCharge)  playSound(this.scene, EGameSounds.HEAL_EXTRA);
+    playSound(this.scene, EGameSounds.HEAL);
+    playSound(this.scene, EGameSounds.HEAL_EXTRA);
 
     turnIfBehind(this.context, this, target);
+
+    this.effectEvent(EUnitEvent.HEAL);
 
     if (target.isKO) {
       const healingAmount = this.getTotalHealing(2);
@@ -377,48 +412,74 @@ export class Cleric extends Human {
       target.getsHealed(healingAmount);
     }
 
-    this.removeAttackModifiers();
-
-    this.context.gameController?.afterAction(EActionType.HEAL, this.boardPosition, target.boardPosition);
+    this.context.gameController.afterAction(EActionType.SPECIAL, this.boardPosition, target.boardPosition);
   };
 
-  special(_target: Hero): void { };
+  _calculateActionTiles(): { moveTiles: Tile[], attackTiles: Tile[], LOSBlocked: Tile[], specialTiles: Tile[] } {
+    const board = this.context.gameController.board;
+    const moveTiles = board.getTilesInRange(this.boardPosition, this.movement).filter(tile => !tile.unit);
+    let [attackTiles, LOSBlocked] = board.getUnitsInRange(this, this.attackRange, true);
+    let [specialTiles, LOSSpecialTiles] = board.getUnitsInRange(this, this.specialRange, false);
+
+    // healing ignores LOS
+    specialTiles = [...specialTiles, ...LOSSpecialTiles];
+
+    // no crystal healing
+    specialTiles = specialTiles.filter(tile => !(tile.unit instanceof Crystal));
+
+
+    return { moveTiles, attackTiles, LOSBlocked, specialTiles };
+  }
 }
 
 export class DragonScale extends Item {
-  constructor(context: GameScene, data: IItem) {
+  constructor(context: GameScene, data: IItemData) {
     super(context, data);
+    this.itemType = EItems.DRAGON_SCALE;
+    this.selectSound = EGameSounds.SHIELD_SELECT;
   }
 
-  use(target: Hero): void {
-    target.equipFactionBuff(this.boardPosition);
-    this.removeFromGame();
+  use(target: Tile): void {
+    const unit = target.unit;
+    if (unit) {
+      playSound(this.scene, EGameSounds.DRAGON_SCALE_USE);
+      unit.equipFactionBuff(this.boardPosition[1]);
+      this.removeFromGame();
+    }
+
   }
 }
 
 export class HealingPotion extends Item {
-  constructor(context: GameScene, data: IItem) {
+  constructor(context: GameScene, data: IItemData) {
     super(context, data);
+    this.itemType = EItems.HEALING_POTION;
+    this.selectSound = EGameSounds.POTION_SELECT
   }
 
-  use(target: Hero): void {
-    playSound(this.scene, EGameSounds.POTION_USE);
+  use(target: Tile): void {
+    const unit = target.unit;
 
-    const potionImage = this.scene.add.image(target.x, target.y - 10, 'healingPotion').setDepth(100);
-    useAnimation(potionImage);
+    if (unit){
+      playSound(this.scene, EGameSounds.POTION_USE);
 
-    const healingAmount = target.isKO ? 100 : 1000;
-    target.getsHealed(healingAmount);
-
-    this.removeFromGame();
-
-    this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, target.boardPosition);
+      const potionImage = this.scene.add.image(unit.x, unit.y - 10, 'healingPotion').setDepth(100);
+      useAnimation(potionImage);
+  
+      const healingAmount = unit.isKO ? 100 : 1000;
+      unit.getsHealed(healingAmount);
+  
+      this.removeFromGame();
+  
+      this.context.gameController.afterAction(EActionType.USE, this.boardPosition, unit.boardPosition);
+    }
   }
 }
 
 export class Inferno extends Item {
-  constructor(context: GameScene, data: IItem) {
+  constructor(context: GameScene, data: IItemData) {
     super(context, data);
+    this.itemType = EItems.INFERNO;
   };
 
   use(targetTile: Tile): void {
@@ -430,12 +491,12 @@ export class Inferno extends Item {
     const damage = 350;
 
     const aoeTiles = getAOETiles(this.context, this, targetTile, false);
-    const allTiles = [...aoeTiles.heroTiles, ...aoeTiles.crystalTiles];
+    const allTiles = [...aoeTiles.unitTiles, ...aoeTiles.crystalTiles];
 
     allTiles?.forEach(tile => {
       const unit =
-        this.context.gameController!.board.units.find(u => u.boardPosition === tile.boardPosition) ||
-        this.context.gameController!.board.crystals.find(c => c.boardPosition === tile.boardPosition);
+        this.context.gameController.board.units.find(u => u.boardPosition === tile.boardPosition) ||
+        this.context.gameController.board.crystals.find(c => c.boardPosition === tile.boardPosition);
       if (!unit) throw new Error('Inferno use() hero not found');
 
       // Inferno removes KO'd enemy units
@@ -448,6 +509,14 @@ export class Inferno extends Item {
     });
 
     this.removeFromGame();
-    this.context.gameController!.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
+    this.context.gameController.afterAction(EActionType.USE, this.boardPosition, targetTile.boardPosition);
+  }
+
+  showActions(): void {
+    playSound(this.context, EGameSounds.AOE_SPELL_SELECT);
+    this.context.gameController.board.tiles.forEach(row => {row.forEach(tile => {
+        tile.setHighlight(EReticle.MOVE, this, this.use)
+      });
+    });
   }
 }

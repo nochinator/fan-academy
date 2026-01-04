@@ -1,4 +1,4 @@
-import { Hero } from "../classes/hero";
+import { Unit } from "../classes/unit";
 import { Item } from "../classes/item";
 import { EClass } from "../enums/gameEnums";
 import { IPlayerState } from "../interfaces/gameInterface";
@@ -29,13 +29,13 @@ export function isValidPassword(password: string): boolean {
   return password.length >= minLength && hasLetter && hasNumber;
 }
 
-export function selectUnit(context: GameScene, unit: Hero | Item): void {
+export function selectUnit(context: GameScene, unit: Unit | Item): void {
   unit.isActive = true;
   context.activeUnit = unit;
 
   // Highlight tiles
-  if (unit.class === EClass.HERO) context.gameController?.onHeroClicked(unit as Hero);
-  if (unit.class === EClass.ITEM) context.gameController?.onItemClicked(unit as Item);
+  if (unit.class === EClass.UNIT) context.gameController.onUnitClicked(unit as Unit);
+  if (unit.class === EClass.ITEM) context.gameController.onItemClicked(unit as Item);
 }
 
 export function deselectUnit(context: GameScene): void {
@@ -43,6 +43,5 @@ export function deselectUnit(context: GameScene): void {
 
   context.activeUnit.isActive = false;
   context.activeUnit = undefined;
-  context.gameController?.board.clearHighlights();
-  context.gameController?.board.removeReticles();
+  context.gameController.board.clearHighlights();
 }

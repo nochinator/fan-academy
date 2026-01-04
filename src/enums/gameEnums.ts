@@ -17,7 +17,7 @@ export enum EGameTermination {
 
 export enum EWinConditions {
   CRYSTAL = 'Crystal victory',
-  UNITS = 'Hero victory',
+  UNIT_VICTORY = 'Unit victory',
   TIME = 'Timeout',
   CONCEDED = 'Game conceded'
 };
@@ -25,18 +25,17 @@ export enum EWinConditions {
 export enum EFaction {
   COUNCIL = 'Council',
   DARK_ELVES = 'Dark Elves',
-  DWARVES = 'Dwarves'
+  DWARVES = 'Dwarves',
+  CRYSTAL = 'Crystal'
 }
 
 export enum EActionType {
   MOVE = 'move',
   ATTACK = 'attack',
-  HEAL = 'heal',
+  SPECIAL = 'special',
   SPAWN = 'spawn',
-  SPAWN_PHANTOM = 'phantom',
   USE = 'use',
   SHUFFLE = 'shuffle',
-  SPECIAL = 'special',
   CONCEDE = 'concede',
 
   // Automated actions
@@ -48,6 +47,48 @@ export enum EActionType {
 export enum EActionClass {
   USER = 'user',
   AUTO = 'automatic'
+}
+
+export enum EUnitEvent {
+  MOVE = 'Move',
+  ATTACK = 'Attack',
+  HEAL = 'Heal',
+  SPECIAL = 'Special',
+  PUSHED = 'Pushed',
+  HURT_PHYSICAL = 'HurtPhysical',
+  HURT_MAGICAL = 'HurtMagical',
+  HEALED = 'Healed',
+  EQUIP = 'Equip',
+  TURN_OVER = 'TurnOver'
+}
+
+export enum EEffect {
+  RUNE_METAL_EQUIPMENT = 'runeMetalEquipment',
+  HELM_EQUIPMENT = 'helmEquipment',
+  DRAGON_SCALE_EQUIPMENT = 'dragonScaleEquipment',
+  SOUL_STONE_EQUIPMENT = 'soulStoneEquipment',
+  MANA_VIAL_BUFF = 'manaVialBuff',
+  DRUNK_BUFF = 'drunkBuff',
+  SUPERCHARGED_BUFF = 'superCharged',
+  POWER_TILE_BUFF = 'powerTile',
+  MAGICAL_TILE_BUFF = 'magicTile',
+  PHYSICAL_TILE_BUFF = 'physicalTile',
+  SPEED_TILE_BUFF = 'speedTile',
+  CRYSTAL_TILE_EFFECT = 'crystalTile',
+  SHIELD_BUFF = 'shiledBuff',
+  PALADIN_BUFF = 'paladinBuff',
+  CONSUME_BUFF = 'consumeBuff',
+  PRIESTESS_DEBUFF = 'priestessDebuff',
+  ANNIHILATOR_DEBUFF = 'annihilatorDebuff',
+}
+
+export enum EReticle {
+  MOVE = 'move',
+  ATTACK = 'attck',
+  SPECIAL_ATTACK = 'specialAttack',
+  HEAL = 'heal',
+  ALLY = 'ally',
+  BLOCKED = 'blocked'
 }
 
 export enum EItems {
@@ -73,11 +114,11 @@ export enum EItems {
 }
 
 export enum EClass {
-  HERO = 'hero',
+  UNIT = 'unit',
   ITEM = 'item'
 }
 
-export enum EHeroes {
+export enum EUnitTypes {
   // Council
   ARCHER = 'archer',
   CLERIC = 'cleric',
@@ -98,22 +139,25 @@ export enum EHeroes {
   GRENADIER = 'grenadier',
   GUNNER = 'gunner',
   ENGINEER = 'engineer',
-  ANNIHILATOR = 'annihilator'
-}
+  ANNIHILATOR = 'annihilator',
+
+  // Special
+  CRYSTAL_SMALL = 'crystalSmall',
+  CRYSTAL = 'crystal',
+  CRYSTAL_BIG = 'crystalBig',
+};
 
 export enum ETiles {
   BASIC = 'basic',
+  HAND_SLOT = 'handSlot',
   POWER = 'powerTile',
   PHYSICAL_RESISTANCE = 'shieldTile',
   MAGICAL_RESISTANCE = 'helmetTile',
   CRYSTAL_DAMAGE = 'crystalDamageTile',
   TELEPORTER = 'teleporterTile',
-  CRYSTAL = 'crystal',
-  CRYSTAL_BIG = 'crystalBig',
-  CRYSTAL_SMALL = 'crystalSmall',
   SPAWN = 'spawnTile',
   SPEED = 'speedTile',
-  PALADIN_AURA = 'paladinAura'
+  PALADIN_AURA = 'paladinAura',
 }
 
 export enum ERange {
@@ -154,21 +198,23 @@ export enum EUiSounds {
   GAME_DELETE = 'deleteGameSound',
   RESIGN = 'resignSound',
   WIN_SFX = 'winSFXSound',
-  LOSE_SFX = 'loseSFXSound'
+  LOSE_SFX = 'loseSFXSound',
+  BACKGROUND_TUNE = 'backgroundTune'
 }
 
 export enum EGameSounds {
-  HERO_HAND_SELECT = 'selectHeroFromHandSound',
-  HERO_BOARD_SELECT = 'selectHeroFromBoardSound',
-  HERO_SPAWN = 'spawnHeroSound',
-  HERO_MOVE = 'moveHeroSound',
+  UNIT_HAND_SELECT = 'selectHeroFromHandSound',
+  THINKING_TUNE = 'thinkingTune',
+  UNIT_BOARD_SELECT = 'selectHeroFromBoardSound',
+  UNIT_SPAWN = 'spawnHeroSound',
+  UNIT_MOVE = 'moveHeroSound',
   MOVE_FLY = 'moveFlySound',
   MOVE_WALK = 'moveWalkSound',
   HEAL = 'healSound',
   HEAL_EXTRA = 'healExtraSound',
-  HERO_STOMP = 'stompSound',
+  UNIT_STOMP = 'stompSound',
   VANISH = 'vanishSound',
-  HERO_REVIVE = 'reviveHeroSound',
+  UNIT_REVIVE = 'reviveHeroSound',
 
   SCROLL_SELECT = 'selectScrollSound',
   RUNE_METAL_SELECT = 'selectRuneMetalSound',

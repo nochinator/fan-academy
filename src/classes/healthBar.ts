@@ -1,4 +1,4 @@
-import { ICrystal, IHero } from "../interfaces/gameInterface";
+import { IUnitData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { belongsToPlayer } from "../utils/gameUtils";
 
@@ -10,7 +10,7 @@ export class HealthBar extends Phaser.GameObjects.Container {
 
   fullWidth: number = 78;
 
-  constructor(context: GameScene, unit: IHero | ICrystal, x: number, y: number) {
+  constructor(context: GameScene, unit: IUnitData, x: number, y: number) {
     super(context, x, y);
 
     this.context = context;
@@ -20,6 +20,9 @@ export class HealthBar extends Phaser.GameObjects.Container {
     this.healthBar = context.add.image(0, 0, barType).setOrigin(0);
 
     this.setHealth(unit.maxHealth, unit.currentHealth);
+    if (unit.maxHealth > unit.currentHealth) {
+      console.log(unit);
+    }
 
     // Group into container
     this.add([this.background, this.healthBar]);

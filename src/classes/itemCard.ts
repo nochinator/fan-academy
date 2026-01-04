@@ -1,4 +1,4 @@
-import { IItem } from "../interfaces/gameInterface";
+import { IItemData } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import { capitalize, getCardText } from "../utils/gameUtils";
 
@@ -13,7 +13,7 @@ export class ItemCard extends Phaser.GameObjects.Container {
   cardTypeText: Phaser.GameObjects.Text;
   cardNameText: Phaser.GameObjects.Text;
 
-  constructor(context: GameScene, data: IItem) {
+  constructor(context: GameScene, data: IItemData) {
     const cardY = data.boardPosition > 44 ? -180 : 0;
     super(context, 0, cardY);
     this.context = context;

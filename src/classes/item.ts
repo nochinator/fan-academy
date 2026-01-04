@@ -1,52 +1,51 @@
-import { EClass, EFaction, EGameSounds, EItems } from "../enums/gameEnums";
-import { IItem } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
+import { IItemData as IItemData } from "../interfaces/gameInterface";
+import { EActionType, EClass, EEffect, EGameSounds, EItems, EReticle } from "../enums/gameEnums";
+import { Unit } from "./unit";
+import * as effects from "./effects"
+import { Tile } from "./tile";
+import { Crystal } from "./crystal";
 import { playSound } from "../utils/gameUtils";
-import { makeUnitClickable } from "../utils/makeUnitClickable";
-import { Hero } from "./hero";
-import { ItemCard } from "./itemCard";
 
 export abstract class Item extends Phaser.GameObjects.Container {
-  class: EClass = EClass.ITEM;
-  faction: EFaction;
   unitId: string;
+  name: string;
+  boardPosition: [number, number];
   itemType: EItems;
-  boardPosition: number;
-  isActiveValue: boolean;
   belongsTo: number;
+  class: EClass;
   canHeal: boolean;
   dealsDamage: boolean;
-  itemImage: Phaser.GameObjects.Image;
-  context: GameScene;
-  unitCard: ItemCard;
-  row = 10;
+  isActive: boolean;
+  selectSound: EGameSounds
 
-  constructor(context: GameScene, data: IItem) {
-    const { x, y } = context.centerPoints[data.boardPosition];
-    super(context, x, y - 20);
+  context: GameScene;
+  itemImage: Phaser.GameObjects.Image;
+
+  constructor(context: GameScene, data: IItemData) {
+    const { x, y } = context.centerPoints[JSON.stringify(data.boardPosition)];
+    super(context, x, y);
     this.context = context;
 
-    this.unitCard = new ItemCard(context, data).setVisible(false);
-
-    // Interface properties assignment
     this.unitId = data.unitId;
-    this.faction = data.faction;
-    this.itemType = data.itemType;
+    this.name = data.name;
     this.boardPosition = data.boardPosition;
-    this.isActiveValue = false;
-    this.belongsTo = data.belongsTo ?? 1;
+    this.itemType = data.itemType;
+    this.belongsTo = data.belongsTo;
+    this.class = data.class;
     this.canHeal = data.canHeal ?? false;
-    this.dealsDamage = data.dealsDamage ?? false;
+    this.dealsDamage = data.dealsDamage;
+    this.isActive = false;
+    this.selectSound = EGameSounds.ITEM_SELECT;
+
+    this.setDepth(this.boardPosition[0] + 10);
 
     this.itemImage = context.add.image(0, 0, this.itemType).setOrigin(0.5).setName('itemImage');
-
-    // Add listener for clicking on the unit
-    makeUnitClickable(this, context);
+    this.add(this.itemImage);
 
     // Making the item not visible if it's in the deck (board position 51)
-    if (this.boardPosition === 51) this.setVisible(false).disableInteractive();
+    if (this.boardPosition[0] === -1 && this.boardPosition[1] === 6) this.setVisible(false).disableInteractive();
 
-    // Setting the image size. SuperCharge and ShinningHelm icons have slighty different sizes
     this.itemImage.displayWidth = 110;
     this.itemImage.displayHeight = 110;
 
@@ -60,117 +59,109 @@ export abstract class Item extends Phaser.GameObjects.Container {
       this.itemImage.displayHeight = 65;
     }
 
-    // Set hitbox
-    const hitArea = new Phaser.Geom.Rectangle(-35, -30, 75, 85); // centered on (0,0)
-
-    this.add([this.itemImage, this.unitCard]).setDepth(this.boardPosition).setInteractive({
-      hitArea,
-      hitAreaCallback: Phaser.Geom.Rectangle.Contains,
-      useHandCursor: true
-    }).setName(this.unitId);
-
     context.add.existing(this);
   }
 
-  get isActive() {
-    return this.isActiveValue;
+  abstract use(target: Unit | Tile): void;
+  showActions(): void {
+    playSound(this.context, this.selectSound);
+  
+    this.context.gameController.board.tiles.forEach(row => {row.forEach(tile => {        
+      if (tile.unit && tile.unit.belongsTo === this.belongsTo && !(tile.unit instanceof Crystal)) {
+        console.log(tile.unit?.hasEffect(EEffect.SUPERCHARGED_BUFF))
+      }
+      if (tile.unit && tile.unit.belongsTo === this.belongsTo && !(tile.unit instanceof Crystal) && !tile.unit.isAlreadyEquipped(this.itemType)) {
+        tile.setHighlight(EReticle.MOVE, this, this.use)
+      }
+    });});
   }
 
-  set isActive(value: boolean) {
-    this.isActiveValue = value;
-    if (value) {
-      this.onActivate();
-    } else {
-      this.onDeactivate();
-    }
+  updatePosition(tile: Tile): void {
+    const { x, y } = this.context.centerPoints[JSON.stringify(tile.boardPosition)];
+    this.x = x;
+    this.y = y;
+    this.boardPosition = tile.boardPosition;
+    this.setDepth(tile.boardPosition[0] + 10);
   }
 
-  exportData(): IItem {
+  removeFromGame(): void {
+    this.destroy(true);
+  }
+
+  shuffleInDeck(): void {
+    this.boardPosition = [-1, 6];
+
+    const unitData = this.exportData();
+
+    this.context.gameController.hand.removeFromHand(unitData);
+    this.context.gameController.deck.addToDeck(unitData);
+
+    this.removeFromGame();
+  }
+
+  exportData(): IItemData {
     return {
-      class: this.class,
-      faction: this.faction,
       unitId: this.unitId,
-      itemType: this.itemType,
+      name: this.name,
       boardPosition: this.boardPosition,
+      itemType: this.itemType,
       belongsTo: this.belongsTo,
+      class: this.class,
       canHeal: this.canHeal,
       dealsDamage: this.dealsDamage
     };
   }
-
-  updatePosition(boardPosition: number): void {
-    const { x, y } = this.context.centerPoints[boardPosition];
-    this.x = x;
-    this.y = y;
-    this.boardPosition = boardPosition;
-  }
-
-  onActivate() {
-    console.log(`${this.unitId} is now active`);
-    this.setScale(1.2);
-  }
-
-  onDeactivate() {
-    console.log(`${this.unitId} is now inactive`);
-    this.setScale(1);
-  }
-
-  shuffleInDeck(): void {
-    this.boardPosition = 51;
-
-    const unitData = this.exportData();
-
-    this.context.gameController!.deck.addToDeck(unitData);
-
-    this.removeFromGame();
-  }
-
-  removeFromGame(): void {
-    // Remove animations
-    this.scene.tweens.killTweensOf(this);
-
-    this.context.gameController?.hand.removeFromHand(this);
-
-    this.destroy(true);
-  }
-
-  abstract use(target: any): void;
-}
-
-export class ShiningHelm extends Item {
-  constructor(context: GameScene, data: IItem) {
-    super(context, data);
-  }
-
-  use(target: Hero): void {
-    target.equipShiningHelm(this.boardPosition);
-    playSound(this.scene, EGameSounds.ITEM_USE);
-    this.removeFromGame();
-  }
 }
 
 export class RuneMetal extends Item {
-  constructor(context: GameScene, data: IItem) {
+  constructor(context: GameScene, data: IItemData) {
     super(context, data);
+    this.itemType = EItems.RUNE_METAL;
+    this.selectSound = EGameSounds.RUNE_METAL_SELECT;
   }
 
-  use(target: Hero): void {
-    target.equipRunemetal(this.boardPosition);
-    playSound(this.scene, EGameSounds.RUNE_METAL_USE);
+  use(target: Tile) {
+    const unit = target.unit;
+    if (unit) {
+      playSound(this.context, EGameSounds.RUNE_METAL_USE);
+      unit.applyEffect(new effects.RuneMetalEquipment(this.context, unit));
+      this.context.gameController.afterAction(EActionType.USE, this.boardPosition, unit.boardPosition);
+      this.removeFromGame();
+    }
+  }
+}
 
-    this.removeFromGame();
+export class ShiningHelm extends Item {
+  constructor(context: GameScene, data: IItemData) {
+    super(context, data);
+    this.itemType = EItems.SHINING_HELM;
+  }
+
+  use(target: Tile) {
+    const unit = target.unit;
+    if (unit) {
+      playSound(this.context, EGameSounds.ITEM_USE)
+      unit.applyEffect(new effects.HelmEquipment(this.context, unit));
+      this.context.gameController.afterAction(EActionType.USE, this.boardPosition, unit.boardPosition);
+      this.removeFromGame();
+    }
   }
 }
 
 export class SuperCharge extends Item {
-  constructor(context: GameScene, data: IItem) {
+  constructor(context: GameScene, data: IItemData) {
     super(context, data);
+    this.itemType = EItems.SUPERCHARGE;
+    this.selectSound = EGameSounds.SCROLL_SELECT
   }
 
-  use(target: Hero): void {
-    target.equipSuperCharge(this.boardPosition);
-    playSound(this.scene, EGameSounds.SCROLL_USE);
-
-    this.removeFromGame();
+  use(target: Tile) {
+    const unit = target.unit;
+    if (unit) {
+      playSound(this.context, EGameSounds.SCROLL_USE)
+      unit.applyEffect(new effects.SuperChargeBuff(this.context, unit));
+      this.context.gameController.afterAction(EActionType.USE, this.boardPosition, unit.boardPosition);
+      this.removeFromGame();
+    }
   }
 }

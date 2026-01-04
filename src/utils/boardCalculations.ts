@@ -1,59 +1,58 @@
-import { Coordinates } from "../interfaces/gameInterface";
+import { ICoordinates } from "../interfaces/gameInterface";
 
-export function calculateBoardCenterPoints(): Coordinates[] {
+export function calculateBoardCenterPoints(): { [key: string]: ICoordinates } {
   const topLeft = {
     x: 545,
-    y: 225,
-    row: 0,
-    col: 0
+    y: 225
   };
-
-  const result: Coordinates[] = [];
-  let boardPosition = 0;
+  const result: { [key: string]: ICoordinates } = {};
 
   for (let row = 0; row < 5; row++) {
     for (let col = 0; col < 9; col++) {
       const x = topLeft.x + col * 90;
       const y = topLeft.y + row * 90;
 
-      result.push({
+      const boardPosition: [number, number] = [row, col];
+      const key = JSON.stringify(boardPosition); // Use JSON.stringify for a unique string key
+
+      result[key] = {
         x,
         y,
-        row,
-        col,
-        boardPosition
-      });
-
-      boardPosition++;
+        boardPosition,
+      };
     }
   }
   return result;
 }
 
-export function calculateAllCenterPoints(): Coordinates[] {
+export function calculateAllCenterPoints(): { [key: string]: ICoordinates } {
   // Adding coordinates for the board tiles
-  const centerPoints: Coordinates[] = calculateBoardCenterPoints();
+  const centerPoints = calculateBoardCenterPoints();
 
   // Adding coordinates for the items in the player's hand
-  const leftMostItem = {
-    x: 700,
-    y: 745
-  };
+  const handX = 700;
+  const handY = 745;
 
-  for (let item = 0; item < 6; item++) {
-    centerPoints.push({
-      x: leftMostItem.x,
-      y: leftMostItem.y
-    });
+  for (let row = 0; row < 6; row++) {
+    const handPosition: [number, number] = [-1, row];
+    const key = JSON.stringify(handPosition);
 
-    leftMostItem.x += 80;
+    centerPoints[key] = {
+      x: handX + row * 80,
+      y: handY,
+      boardPosition: handPosition,
+    };
   }
 
   // Adding coordinates for the deck (door)
-  centerPoints.push({
+  const deckPosition: [number, number] = [-1, 6];
+  const deckKey = JSON.stringify(deckPosition);
+
+  centerPoints[deckKey] = {
     x: 435,
-    y: 720
-  });
+    y: 720,
+    boardPosition: deckPosition,
+  };
 
   return centerPoints;
 }

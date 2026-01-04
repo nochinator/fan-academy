@@ -2,46 +2,33 @@ import { GameObjects } from "phaser";
 import { Archer, Cleric, DragonScale, HealingPotion, Inferno, Knight, Ninja, Wizard } from "../classes/council";
 import { Crystal } from "../classes/crystal";
 import { Impaler, ManaVial, Necromancer, Phantom, Priestess, SoulHarvest, SoulStone, VoidMonk, Wraith } from "../classes/elves";
-import { Hero } from "../classes/hero";
+import { Unit } from "../classes/unit";
 import { Item, RuneMetal, ShiningHelm, SuperCharge } from "../classes/item";
 import { Tile } from "../classes/tile";
-import { EActionClass, EActionType, ECardType, EClass, EGameSounds, EHeroes, EItems, ETiles, EUiSounds, EWinConditions } from "../enums/gameEnums";
-import { ICrystal, IHero, IItem, IPlayerState, ITile } from "../interfaces/gameInterface";
+import { EActionClass, EActionType, ECardType, EClass, EGameSounds, EUnitTypes, EItems, ETiles, EUiSounds, EWinConditions } from "../enums/gameEnums";
+import { IUnitData, IItemData, IPlayerState, ITile } from "../interfaces/gameInterface";
 import GameScene from "../scenes/game.scene";
 import UIScene from "../scenes/ui.scene";
 import { Annihilator, DwarvenBrew, Engineer, Grenadier, Gunner, Paladin, Pulverizer } from "../classes/dwarves";
 
-export function isHero(hero: IHero | IItem): hero is Hero {
-  return hero.class === "hero";
+export function isUnit(obj: IUnitData | IItemData): obj is IUnitData {
+  return (obj as IUnitData).class === EClass.UNIT;
 }
 
-export function isItem(item: IHero | IItem): item is Item {
-  return item.class === "item";
-}
-
-export function isInHand(boardPosition: number): boolean {
-  return boardPosition > 44 && boardPosition < 51;
-}
-
-export function isOnBoard(position: number): boolean {
-  return position >= 0 && position <= 44;
-}
-
-export function belongsToPlayer(context: GameScene, unit: Hero | IHero | Item | IItem | Crystal | ICrystal): boolean {
-  const playerNumber = context.isPlayerOne ? 1 : 2;
-  return unit.belongsTo === playerNumber;
-}
-
-// Rounds a number to the nearest multiple of 5
-export function roundToFive(amount: number): number {
-  return Math.round(amount / 5) * 5;
+export function isItem(obj: IUnitData | IItemData): obj is IItemData {
+  return (obj as IItemData).class === EClass.ITEM;
 }
 
 export function getGridDistance(startRow: number, startColumn: number, targetRow: number, targetColumn: number): number {
-  return Math.abs(startRow - targetRow) + Math.abs(startColumn - targetColumn);
+  const rowChange = Math.abs(startRow - targetRow);
+  const columnChange = Math.abs(targetColumn - startColumn);
+  const manhattanDistance = rowChange + columnChange;
+  
+  // movment's on the diagonals are 0.5 less distance, allows the "rounder" .5 distances of some units
+  return (rowChange > 0 && columnChange > 0) ? manhattanDistance - 0.5 : manhattanDistance;
 }
 
-export function createNewItem(context: GameScene, itemData: IItem): Item {
+export function createNewItem(context: GameScene, itemData: IItemData): Item {
   const itemTypes: Record<EItems, () => Item> = {
     [EItems.SHINING_HELM]: () => new ShiningHelm(context, itemData),
     [EItems.SUPERCHARGE]: () => new SuperCharge(context, itemData),
@@ -64,36 +51,44 @@ export function createNewItem(context: GameScene, itemData: IItem): Item {
   return createItem();
 }
 
-export function createNewHero(context: GameScene, heroData: IHero, tile?: Tile): Hero {
-  const heroTypes: Record<EHeroes, () => Hero> = {
-    [EHeroes.ARCHER]: () => new Archer(context, heroData, tile),
-    [EHeroes.CLERIC]: () => new Cleric(context, heroData, tile),
-    [EHeroes.KNIGHT]: () => new Knight(context, heroData, tile),
-    [EHeroes.NINJA]: () => new Ninja(context, heroData, tile),
-    [EHeroes.WIZARD]: () => new Wizard(context, heroData, tile),
+export function createNewUnit(context: GameScene, unitData: IUnitData, tile?: Tile): Unit {
+  const unitTypes: Record<EUnitTypes, () => Unit> = {
+    [EUnitTypes.ARCHER]: () => new Archer(context, unitData, tile),
+    [EUnitTypes.CLERIC]: () => new Cleric(context, unitData, tile),
+    [EUnitTypes.KNIGHT]: () => new Knight(context, unitData, tile),
+    [EUnitTypes.NINJA]: () => new Ninja(context, unitData, tile),
+    [EUnitTypes.WIZARD]: () => new Wizard(context, unitData, tile),
 
-    [EHeroes.PRIESTESS]: () => new Priestess(context, heroData, tile),
-    [EHeroes.IMPALER]: () => new Impaler(context, heroData, tile),
-    [EHeroes.NECROMANCER]: () => new Necromancer(context, heroData, tile),
-    [EHeroes.PHANTOM]: () => new Phantom(context, heroData, tile),
-    [EHeroes.VOIDMONK]: () => new VoidMonk(context, heroData, tile),
-    [EHeroes.WRAITH]: () => new Wraith(context, heroData, tile),
+    [EUnitTypes.PRIESTESS]: () => new Priestess(context, unitData, tile),
+    [EUnitTypes.IMPALER]: () => new Impaler(context, unitData, tile),
+    [EUnitTypes.NECROMANCER]: () => new Necromancer(context, unitData, tile),
+    [EUnitTypes.PHANTOM]: () => new Phantom(context, unitData, tile),
+    [EUnitTypes.VOIDMONK]: () => new VoidMonk(context, unitData, tile),
+    [EUnitTypes.WRAITH]: () => new Wraith(context, unitData, tile),
 
-    [EHeroes.PALADIN]: () => new Paladin(context, heroData, tile),
-    [EHeroes.GUNNER]: () => new Gunner(context, heroData, tile),
-    [EHeroes.GRENADIER]: () => new Grenadier(context, heroData, tile),
-    [EHeroes.ENGINEER]: () => new Engineer(context, heroData, tile),
-    [EHeroes.ANNIHILATOR]: () => new Annihilator(context, heroData, tile)
+    [EUnitTypes.PALADIN]: () => new Paladin(context, unitData, tile),
+    [EUnitTypes.GUNNER]: () => new Gunner(context, unitData, tile),
+    [EUnitTypes.GRENADIER]: () => new Grenadier(context, unitData, tile),
+    [EUnitTypes.ENGINEER]: () => new Engineer(context, unitData, tile),
+    [EUnitTypes.ANNIHILATOR]: () => new Annihilator(context, unitData, tile),
+
+    [EUnitTypes.CRYSTAL]: () => new Crystal(context, unitData, tile),
+    [EUnitTypes.CRYSTAL_SMALL]: () => new Crystal(context, unitData, tile),
+    [EUnitTypes.CRYSTAL_BIG]: () => new Crystal(context, unitData, tile),
   };
 
-  const createHero = heroTypes[heroData.unitType];
-  if (!createHero) console.error('Error creating hero', heroData);
-  return createHero();
+  const createUnit = unitTypes[unitData.type];
+  if (!createUnit) console.error('Error creating unit', unitData);
+  return createUnit();
 }
 
-export async function moveAnimation(context: GameScene, hero: Hero, targetTile: Tile): Promise<void> {
-  const flyingUnits = [EHeroes.NECROMANCER, EHeroes.WRAITH, EHeroes.PHANTOM];
-  if (flyingUnits.includes(hero.unitType)) {
+export function belongsToPlayer(context: GameScene, unit: Unit | IUnitData): boolean {
+  return unit.belongsTo === (context.isPlayerOne ? 1 : 2);
+}
+
+export async function moveAnimation(context: GameScene, unit: Unit, targetTile: Tile): Promise<void> {
+  const flyingUnits = [EUnitTypes.NECROMANCER, EUnitTypes.WRAITH, EUnitTypes.PHANTOM];
+  if (flyingUnits.includes(unit.type)) {
     playSound(context, EGameSounds.MOVE_FLY);
   } else {
     playSound(context, EGameSounds.MOVE_WALK);
@@ -102,24 +97,24 @@ export async function moveAnimation(context: GameScene, hero: Hero, targetTile: 
   // Stop user input until the animation finishes playing
   context.input.enabled = false;
 
-  const unitImage: Phaser.GameObjects.Image = hero.getByName('body');
+  const unitImage: Phaser.GameObjects.Image = unit.characterImage;
 
   // If the unit is moving backwards, flip the unit's image for the duration of the animation
   let temporaryFlip: boolean;
-  if (hero.belongsTo === 1 &&  targetTile.x < hero.x) {
+  if (unit.belongsTo === 1 &&  targetTile.x < unit.x) {
     unitImage.setFlipX(true);
     temporaryFlip = true;
   }
 
-  if (hero.belongsTo === 2 &&  targetTile.x > hero.x ) {
+  if (unit.belongsTo === 2 &&  targetTile.x > unit.x ) {
     unitImage.setFlipX(false);
     temporaryFlip = true;
   }
 
-  const animation = (hero: Hero, targetTile: Tile): Promise<void> => {
+  const animation = (unit: Unit, targetTile: Tile): Promise<void> => {
     return new Promise((resolve) => {
       context.tweens.add({
-        targets: hero,
+        targets: unit,
         x: targetTile.x,
         y: targetTile.y,
         duration: 400,
@@ -133,16 +128,16 @@ export async function moveAnimation(context: GameScene, hero: Hero, targetTile: 
     });
   };
 
-  await animation.call(context, hero, targetTile);
+  await animation.call(context, unit, targetTile);
 }
 
-export async function forcedMoveAnimation(context: GameScene, hero: Hero, targetTile: Tile): Promise<void> {
+export async function forcedMoveAnimation(context: GameScene, unit: Unit, targetTile: Tile): Promise<void> {
   context.input.enabled = false;
 
-  const animation = (hero: Hero, targetTile: Tile): Promise<void> => {
+  const animation = (unit: Unit, targetTile: Tile): Promise<void> => {
     return new Promise((resolve) => {
       context.tweens.add({
-        targets: hero,
+        targets: unit,
         x: targetTile.x,
         y: targetTile.y,
         duration: 200,
@@ -155,10 +150,10 @@ export async function forcedMoveAnimation(context: GameScene, hero: Hero, target
     });
   };
 
-  await animation.call(context, hero, targetTile);
+  await animation.call(context, unit, targetTile);
 };
 
-export function getNewPositionAfterForce(attackerRow: number, attackerCol: number, targetRow: number, targetCol: number, isPush: boolean) {
+export function getNewPositionAfterForce(attackerRow: number, attackerCol: number, targetRow: number, targetCol: number, isPush: boolean): [number, number] {
   // Direction from attacker to target
   let directionRow = targetRow - attackerRow;
   let directionColumn = targetCol - attackerCol;
@@ -173,10 +168,7 @@ export function getNewPositionAfterForce(attackerRow: number, attackerCol: numbe
     directionColumn *= -1;
   }
 
-  return {
-    row: targetRow + directionRow,
-    col: targetCol + directionColumn
-  };
+  return [directionRow, directionColumn]
 }
 
 export function playSound(scene: Phaser.Scene, sound: EGameSounds | EUiSounds): void {
@@ -214,29 +206,33 @@ export function selectItemSound(scene: Phaser.Scene, item: EItems): void {
   playSound(scene, soundToPlay);
 }
 
-export function selectDeathSound(scene: Phaser.Scene, hero: EHeroes): void {
-  const heroMap = {
-    [EHeroes.ARCHER]: EGameSounds.ARCHER_DEATH,
-    [EHeroes.KNIGHT]: EGameSounds.KNIGHT_DEATH,
-    [EHeroes.CLERIC]: EGameSounds.CLERIC_DEATH,
-    [EHeroes.WIZARD]: EGameSounds.WIZARD_DEATH,
-    [EHeroes.NINJA]: EGameSounds.NINJA_DEATH,
+export function selectDeathSound(scene: Phaser.Scene, unit: EUnitTypes): void {
+  const unitMap = {
+    [EUnitTypes.ARCHER]: EGameSounds.ARCHER_DEATH,
+    [EUnitTypes.KNIGHT]: EGameSounds.KNIGHT_DEATH,
+    [EUnitTypes.CLERIC]: EGameSounds.CLERIC_DEATH,
+    [EUnitTypes.WIZARD]: EGameSounds.WIZARD_DEATH,
+    [EUnitTypes.NINJA]: EGameSounds.NINJA_DEATH,
 
-    [EHeroes.IMPALER]: EGameSounds.IMPALER_DEATH,
-    [EHeroes.VOIDMONK]: EGameSounds.VOIDMONK_DEATH,
-    [EHeroes.PRIESTESS]: EGameSounds.PRIESTESS_DEATH,
-    [EHeroes.NECROMANCER]: EGameSounds.NECROMANCER_DEATH,
-    [EHeroes.WRAITH]: EGameSounds.WRAITH_DEATH,
-    [EHeroes.PHANTOM]: EGameSounds.PHANTOM_DEATH,
+    [EUnitTypes.IMPALER]: EGameSounds.IMPALER_DEATH,
+    [EUnitTypes.VOIDMONK]: EGameSounds.VOIDMONK_DEATH,
+    [EUnitTypes.PRIESTESS]: EGameSounds.PRIESTESS_DEATH,
+    [EUnitTypes.NECROMANCER]: EGameSounds.NECROMANCER_DEATH,
+    [EUnitTypes.WRAITH]: EGameSounds.WRAITH_DEATH,
+    [EUnitTypes.PHANTOM]: EGameSounds.PHANTOM_DEATH,
 
-    [EHeroes.GRENADIER]: EGameSounds.GRENADIER_DEATH,
-    [EHeroes.GUNNER]: EGameSounds.GUNNER_DEATH, // TODO: modify sound to not have beginning
-     [EHeroes.PALADIN]: undefined, //EGameSounds.PALADIN_DEATH, // missing on assets repository
-    [EHeroes.ENGINEER]: EGameSounds.GUNNER_DEATH, // no official sound
-    [EHeroes.ANNIHILATOR]: EGameSounds.GRENADIER_DEATH // no official sound
+    [EUnitTypes.GRENADIER]: EGameSounds.GRENADIER_DEATH,
+    [EUnitTypes.GUNNER]: EGameSounds.GUNNER_DEATH, // TODO: modify sound to not have beginning
+     [EUnitTypes.PALADIN]: undefined, //EGameSounds.PALADIN_DEATH, // missing on assets repository
+    [EUnitTypes.ENGINEER]: EGameSounds.GUNNER_DEATH, // no official sound
+    [EUnitTypes.ANNIHILATOR]: EGameSounds.GRENADIER_DEATH, // no official sound
+
+    [EUnitTypes.CRYSTAL]: EGameSounds.CRYSTAL_DESTROY,
+    [EUnitTypes.CRYSTAL_SMALL]: EGameSounds.CRYSTAL_DESTROY,
+    [EUnitTypes.CRYSTAL_BIG]: EGameSounds.CRYSTAL_DESTROY,
   };
 
-  const soundToPlay = heroMap[hero];
+  const soundToPlay = unitMap[unit];
   if (!soundToPlay) return;
 
   playSound(scene, soundToPlay);
@@ -246,51 +242,50 @@ export function getActionClass(action: EActionType): EActionClass {
   return [EActionType.PASS, EActionType.DRAW, EActionType.REMOVE_UNITS].includes(action) ? EActionClass.AUTO : EActionClass.USER;
 }
 
-export function getAOETiles(context: GameScene, caster: Item | Hero,  targetTile: Tile, getFriendly = false): {
-  heroTiles: Tile[],
+export function getAOETiles(context: GameScene, caster: Item | Unit,  targetTile: Tile, getFriendly = false ): {
+  unitTiles: Tile[],
   crystalTiles: Tile[]
 } {
-  const board = context.gameController?.board;
+  const board = context.gameController.board;
   if (!board) throw new Error('Inferno use() board not found');
 
   const areaOfEffect = board.getAreaOfEffectTiles(targetTile);
 
-  let heroTiles: Tile[] = [];
+  let unitTiles: Tile[] = [];
   let crystalTiles: Tile[] = [];
   if (getFriendly === true) {
-    heroTiles = areaOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo === caster.belongsTo);
-    crystalTiles = areaOfEffect?.filter(tile => tile.crystal && tile.crystal?.belongsTo === caster.belongsTo);
+    unitTiles = areaOfEffect?.filter(tile => tile.unit && tile.unit?.belongsTo === caster.belongsTo);
+    crystalTiles = areaOfEffect?.filter(tile => tile.unit && tile.unit instanceof Crystal && tile.unit?.belongsTo === caster.belongsTo);
 
   } else if (getFriendly === false) {
-    heroTiles = areaOfEffect?.filter(tile => tile.hero && tile.hero?.belongsTo !== caster.belongsTo);
-    crystalTiles = areaOfEffect?.filter(tile => tile.crystal && tile.crystal?.belongsTo !== caster.belongsTo);
+    unitTiles = areaOfEffect?.filter(tile => tile.unit && tile.unit?.belongsTo !== caster.belongsTo);
+    crystalTiles = areaOfEffect?.filter(tile => tile.unit && tile.unit instanceof Crystal && tile.unit?.belongsTo !== caster.belongsTo);
 
   } else { // set to undefined/null to get all in area
-    heroTiles = areaOfEffect;
+    unitTiles = areaOfEffect;
     crystalTiles = areaOfEffect;
   }
 
   return {
-    heroTiles,
+    unitTiles,
     crystalTiles
   };
 }
 
 // Used only by the voidmonk and wizard's splash attacks
-export function canBeAttacked(attacker: Hero, tile: Tile): boolean {
+export function canBeAttacked(attacker: Unit, tile: Tile): boolean {
   let result = false;
 
-  if (tile.hero && tile.hero.belongsTo !== attacker.belongsTo && !tile.hero.isKO) result = true;
-  if (tile.crystal && tile.crystal.belongsTo !== attacker.belongsTo) result = true;
+  if (tile.unit && tile.unit.belongsTo !== attacker.belongsTo && !tile.unit.isKO) result = true;
 
   return result;
 }
 
-export function isLastUnit(context: GameScene, hero: Hero): boolean {
+export function isLastUnit(context: GameScene, unit: Unit): boolean {
   let attackingPlayer: IPlayerState | undefined;
   let defendingPlayer: IPlayerState | undefined;
 
-  if (hero.unitId.includes(context.player1!.playerId)) {
+  if (unit.unitId.includes(context.player1!.playerId)) {
     attackingPlayer = context.player2;
     defendingPlayer = context.player1;
   } else {
@@ -300,59 +295,59 @@ export function isLastUnit(context: GameScene, hero: Hero): boolean {
 
   if (!attackingPlayer || !defendingPlayer) throw new Error('updateUnitsLeft() No player found');
 
-  const unitsArray = context.gameController?.board.units;
+  const unitsArray = context.gameController.board.units;
   if (!unitsArray) throw new Error('updateUnitsLeft() no units array found');
 
   // Get remaining units of defending player. Populate gameOver flag if there are none left and the player has no revives in hand
-  const remainingBoardUnits = unitsArray.filter(unit => unit.belongsTo === hero.belongsTo).find(unit => !unit.isKO);
+  const remainingBoardUnits = unitsArray.filter(bUnit => bUnit.belongsTo === unit.belongsTo).find(bUnit => !bUnit.isKO);
 
   let hand;
   let remainingHandUnits;
   const defendingPlayerIsActivePlayer = defendingPlayer.playerId === context.activePlayer;
   if (defendingPlayerIsActivePlayer) {
-    hand = context.gameController?.hand.getHand();
-    remainingHandUnits = hand!.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
+    hand = context.gameController.hand.getHand();
+    remainingHandUnits = hand!.find(hUnit => hUnit.belongsTo === unit.belongsTo && hUnit.class === EClass.UNIT);
   } else {
     hand = defendingPlayer.factionData.unitsInHand;
-    remainingHandUnits = hand.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
+    remainingHandUnits = hand.find(hUnit => hUnit.belongsTo === unit.belongsTo && hUnit.class === EClass.UNIT);
   }
 
-  const remainingDeckUnits = defendingPlayer.factionData.unitsInDeck.find(unit => unit.belongsTo === hero.belongsTo && unit.class === EClass.HERO);
+  const remainingDeckUnits = defendingPlayer.factionData.unitsInDeck.find(dUnit => dUnit.belongsTo === unit.belongsTo && dUnit.class === EClass.UNIT);
 
   const reviveItems = [EItems.HEALING_POTION, EItems.SOUL_HARVEST];
-  const hasReviveInHand = hand ? hand.find(unit => reviveItems.includes((unit as Item)?.itemType)) : undefined;
+  const hasReviveInHand = hand ? hand.find(rUnit => reviveItems.includes((rUnit as Item)?.itemType)) : undefined;
 
   if (remainingBoardUnits || remainingHandUnits || remainingDeckUnits || hasReviveInHand) return false;
 
   return true;
 }
 
-export function checkUnitGameOver(context: GameScene, hero: Hero): void {
-  if (!isLastUnit(context, hero)) return;
+export function checkUnitGameOver(context: GameScene, unit: Unit): void {
+  if (!isLastUnit(context, unit)) return;
 
-  const attackingPlayer = hero.unitId.includes(context.player1!.playerId) ? context.player2 : context.player1;
+  const attackingPlayer = unit.unitId.includes(context.player1!.playerId) ? context.player2 : context.player1;
 
-  context.gameController!.gameOver = {
-    winCondition: EWinConditions.UNITS,
+  context.gameController.gameOver = {
+    winCondition: EWinConditions.UNIT_VICTORY,
     winner: attackingPlayer!.playerId
   };
 }
 
-export function forcedMoveSpawnCheck(tile: Tile | ITile, hero: Hero | Crystal): boolean {
-  const spawnBelongsTo = tile.col < 5 ? 1 : 2;
-  return tile.tileType === ETiles.SPAWN && hero.belongsTo !== spawnBelongsTo;
+export function forcedMoveSpawnCheck(tile: Tile | ITile, unit: Unit): boolean {
+  const spawnBelongsTo = tile.boardPosition[1] < 5 ? 1 : 2;
+  return tile.tileType === ETiles.SPAWN && unit.belongsTo !== spawnBelongsTo;
 }
 
 export function isEnemySpawn(context: GameScene, tile: Tile | ITile): boolean {
-  return tile.tileType === ETiles.SPAWN && (context.isPlayerOne ? tile.col > 5 : tile.col < 5);
+  return tile.tileType === ETiles.SPAWN && (context.isPlayerOne ? tile.boardPosition[1] > 5 : tile.boardPosition[1] < 5);
 }
 
-export function turnIfBehind(context: GameScene, attacker: Hero, target: Hero | Crystal): void {
+export function turnIfBehind(context: GameScene, attacker: Unit, target: Unit): void {
   const isLookingRight = attacker.belongsTo === 1;
   const attackerImage = attacker.characterImage;
 
-  if (isLookingRight && target.col >= attacker.col) return;
-  if (!isLookingRight && target.col <= attacker.col) return;
+  if (isLookingRight && target.getTile().boardPosition[1] >= attacker.getTile().boardPosition[1]) return;
+  if (!isLookingRight && target.getTile().boardPosition[1] <= attacker.getTile().boardPosition[1]) return;
 
   if (!isLookingRight) attackerImage.setFlipX(false);
   if (isLookingRight)  attackerImage.setFlipX(true);
@@ -362,75 +357,75 @@ export function turnIfBehind(context: GameScene, attacker: Hero, target: Hero | 
   });
 }
 
-export function getCardText(unit: EHeroes | EItems): {
+export function getCardText(unit: EUnitTypes | EItems): {
   cardType: ECardType,
   cardText: string,
   cardName?: string
 } {
   const unitMap = {
-    [EHeroes.ARCHER]: {
+    [EUnitTypes.ARCHER]: {
       cardType: ECardType.SHOOTER,
       cardText: "Marksman who does high damage to enemies at range. Weak melee attack."
     },
-    [EHeroes.CLERIC]: {
+    [EUnitTypes.CLERIC]: {
       cardType: ECardType.SUPPORT,
       cardText: "Spellcaster who revives and heals allies. Attacks enemies at range."
     },
-    [EHeroes.KNIGHT]: {
+    [EUnitTypes.KNIGHT]: {
       cardType: ECardType.FIGHTER,
       cardText: "Heavily armored and an excellent defender. His attacks knock back enemies."
     },
-    [EHeroes.NINJA]: {
+    [EUnitTypes.NINJA]: {
       cardType: ECardType.SUPER,
       cardText: "Deals double damage in melee range. He can teleport to allies."
     },
-    [EHeroes.WIZARD]: {
+    [EUnitTypes.WIZARD]: {
       cardType: ECardType.CASTER,
       cardText: "Powerful spellcaster, damages groups of enemies with chain lightning."
     },
 
-    [EHeroes.PRIESTESS]: {
+    [EUnitTypes.PRIESTESS]: {
       cardType: ECardType.SUPPORT,
       cardText: "She can heal up to 3 tiles away, and weakens enemy attacks."
     },
-    [EHeroes.IMPALER]: {
+    [EUnitTypes.IMPALER]: {
       cardType: ECardType.SHOOTER,
       cardText: "Wields a powerful harpoon that can pull enemies close."
     },
-    [EHeroes.NECROMANCER]: {
+    [EUnitTypes.NECROMANCER]: {
       cardType: ECardType.CASTER,
       cardText: "Dark caster who can create Phantoms from fallen units."
     },
-    [EHeroes.PHANTOM]: {
+    [EUnitTypes.PHANTOM]: {
       cardType: ECardType.SUMMONED,
       cardText: "A summoned phantom from beyond."
     },
-    [EHeroes.VOIDMONK]: {
+    [EUnitTypes.VOIDMONK]: {
       cardType: ECardType.FIGHTER,
       cardText: "Strong melee fighter whose hits do splash damage."
     },
-    [EHeroes.WRAITH]: {
+    [EUnitTypes.WRAITH]: {
       cardType: ECardType.SUPER,
       cardText: "A terror who gains max health and power by draining K.O.'d units."
     },
 
-    [EHeroes.GUNNER]: {
+    [EUnitTypes.GUNNER]: {
       cardType: ECardType.SHOOTER,
       cardText: "Fires a shotgun, hitting up to 3 targets at range for 66% damage or 1 target for 100% damage"
     },
-    [EHeroes.PALADIN]: {
+    [EUnitTypes.PALADIN]: {
       cardType: ECardType.SUPPORT,
       cardText: "Spellcaster who revives and heals allies. Provides 5% defense to nearby allys."
     },
-    [EHeroes.GRENADIER]: {
+    [EUnitTypes.GRENADIER]: {
       cardType: ECardType.CASTER,
       cardText: "Lobs explosives dealing 50% damage to all enemys around target."
     },
-    [EHeroes.ANNIHILATOR]: {
+    [EUnitTypes.ANNIHILATOR]: {
       cardType: ECardType.SUPER,
       cardText: "Fragile rocketeer who temporarily removes 50% physical defense on targets."
     },
-    [EHeroes.ENGINEER]: {
+    [EUnitTypes.ENGINEER]: {
       cardType: ECardType.SUPPORT,
       cardText: "Can create a shield to protect allys and crystals. Additionally, gains 140% bonus from special tiles."
     },
@@ -493,6 +488,22 @@ export function getCardText(unit: EHeroes | EItems): {
       cardType: ECardType.SPELL,
       cardText: "Targets 1 enemy destroying armor in process, or does 33% spash damage if target is a crystal."
     },
+    
+    [EUnitTypes.CRYSTAL]: {
+      cardType: ECardType.VICTORY,
+      cardText: "The main objective of the game. Destroy all enemy crystals to win."
+    },
+
+    [EUnitTypes.CRYSTAL_SMALL]: {
+      cardType: ECardType.VICTORY,
+      cardText: "The main objective of the game. Destroy all enemy crystals to win."
+    },
+    
+    [EUnitTypes.CRYSTAL_BIG]: {
+      cardType: ECardType.VICTORY,
+      cardText: "The main objective of the game. Destroy all enemy crystals to win."
+    },
+
   };
 
   return unitMap[unit];
@@ -509,8 +520,9 @@ export function truncateText(text: string, maxLength: number) {
 // Used to remove any visible unit cards from a mobile long press action
 export function visibleUnitCardCheck(context: GameScene): void {
   if (context.visibleUnitCard) {
-    context.visibleUnitCard.setDepth(context.visibleUnitCard.row + 10);
-    context.visibleUnitCard.unitCard?.setVisible(false);
+    if (context.visibleUnitCard instanceof Unit || context.visibleUnitCard instanceof Crystal) {
+      context.visibleUnitCard.unitCard?.setVisible(false);
+    }
   }
 }
 
@@ -566,4 +578,8 @@ export function gameListFadeOutText(context: UIScene | GameScene, x: number, y: 
     fontSize: 60,
     color: '#fffb00'
   }).setDepth(9999);
+}
+
+export function roundToFive(num: number): number {
+  return Math.round(num / 5) * 5;
 }

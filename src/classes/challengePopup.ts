@@ -32,9 +32,7 @@ export class ChallengePopup extends Phaser.GameObjects.Container {
     super(context, challengePopupCoordinates.x, challengePopupCoordinates.y);
 
     // Used to block the user from clicking on some other part of the game
-    this.blockingLayer = context.add.rectangle(0, 0, 2000, 2000, 0x000000, 0.001) // Almost invisible
-      .setOrigin(0.5)
-      .setInteractive();
+    this.blockingLayer = context.add.rectangle(0, 0, 2000, 2000, 0xf0f0f0, 0.001).setOrigin(0.5).setInteractive();
 
     this.backgroundImage = context.add.image(0, 0, 'popupBackground').setDisplaySize(500, 300);
     this.councilButtonImage = context.add.image(-150, 60, EFaction.COUNCIL).setScale(0.4).setInteractive({ useHandCursor: true });

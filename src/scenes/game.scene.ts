@@ -1,29 +1,30 @@
 import { Client, Room } from "colyseus.js";
 import { Crystal } from "../classes/crystal";
 import { GameController } from "../classes/gameController";
-import { Hero } from "../classes/hero";
+import { Unit } from "../classes/unit";
 import { Item } from "../classes/item";
-import { Coordinates, IGame, IPlayerData, IPlayerState } from "../interfaces/gameInterface";
+import { ICoordinates, IGame, IPlayerData, IPlayerState } from "../interfaces/gameInterface";
 import { calculateAllCenterPoints } from "../utils/boardCalculations";
 import { createChatComponent } from "./gameSceneUtils/chatComponent";
 import { loadGameBoardUI } from "./gameSceneUtils/gameBoardUI";
 import { loadGameAssets } from "./mainMenuUtils/gameAssets";
 import { Tile } from "../classes/tile";
 import { gameListFadeOutText, textAnimationFadeOut } from "../utils/gameUtils";
+import { Sound } from "phaser";
 
 export default class GameScene extends Phaser.Scene {
   userId!: string;
   colyseusClient!: Client;
-  centerPoints: Coordinates[];
+  centerPoints: Record<string, ICoordinates>;
 
   currentRoom!: Room;
   currentGame!: IGame;
-  currentTurnAction: number | undefined;
+  currentTurnAction!: number;
   turnNumber: number | undefined;
 
-  activeUnit: Hero | Item | undefined;
+  activeUnit: Unit | Item | undefined;
 
-  gameController: GameController | undefined;
+  gameController!: GameController;
 
   activePlayer: string | undefined;
   isPlayerOne: boolean | undefined;
@@ -33,11 +34,13 @@ export default class GameScene extends Phaser.Scene {
   player2: IPlayerState | undefined;
 
   longPressStart: number | undefined;
-  visibleUnitCard: Hero | Item | Crystal | Tile | undefined;
+  visibleUnitCard: Unit | Item | Crystal | Tile | undefined;
 
   triggerReplay = true;
 
   chatComponent: Phaser.GameObjects.DOMElement | undefined;
+
+  thinkingTune!: Sound.NoAudioSound | Sound.HTML5AudioSound | Sound.WebAudioSound;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -62,7 +65,7 @@ export default class GameScene extends Phaser.Scene {
     this.triggerReplay = data.triggerReplay ?? true;
 
     // Updating GameScene properties
-    this.activePlayer = this.currentGame.activePlayer.toString();
+    this.activePlayer = this.currentGame.activePlayer;
     this.isPlayerOne = this.currentGame?.players[0].userData._id === this.userId;
     this.currentTurnAction = this.turnNumber === 0 ? 3 : 1;
   }
@@ -89,6 +92,8 @@ export default class GameScene extends Phaser.Scene {
     this.gameController = new GameController(this);
     if (this.triggerReplay) this.gameController.replayTurn();
 
+    this.thinkingTune = this.sound.add('thinkingTune', { loop: true });
+
     this.game.events.on('messageToGameScene', (data: {
       x: number,
       y: number,
@@ -98,9 +103,13 @@ export default class GameScene extends Phaser.Scene {
       const openGameLimitReached = gameListFadeOutText(this, x, y, message );
       textAnimationFadeOut(openGameLimitReached, 3000);
     });
-  }
 
-  onShutdown() {
-    this.sound.stopAll();
+    this.events.on('shutdown', () => {
+      this.sound.stopAll();
+    });
+
+    this.events.on('destroy', () => {
+      this.sound.stopAll();
+    });
   }
 };
